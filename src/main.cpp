@@ -10,8 +10,11 @@
 
 /* From Arduino Libraries */
 #include "QNEthernet.h"
-using namespace qindesign::network;
 
+/* Local includes */
+#include "VCR_Tasks.h"
+
+using namespace qindesign::network;
 
 /* */
 EthernetUDP protobuf_send_socket;
