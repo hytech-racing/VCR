@@ -13,9 +13,6 @@
 /* From shared-systems-lib libdep */
 #include "SysClock.h"
 
-/* From shared-interfaces-lib libdep */
-
-
 /* From HT_SCHED libdep */
 #include "ht_sched.hpp"
 
@@ -23,6 +20,7 @@
 #include "QNEthernet.h"
 
 /* Local includes */
+#include "VCR_Constants.h"
 #include "VCR_Tasks.h"
 
 
@@ -40,12 +38,7 @@ unsigned long stdMicros()
 
 
 
-/* ADC setup */
-// MCP_ADC<8> a1 = MCP_ADC<8>(ADC1_CS);
-
-
-
-/* Ethernet message sockets */
+/* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
 
@@ -53,6 +46,8 @@ qindesign::network::EthernetUDP protobuf_recv_socket;
 
 void setup() {
     scheduler.setTimingFunction(stdMicros);
+
+    scheduler.schedule(read_adc0_task);
 }
 
 void loop() {
