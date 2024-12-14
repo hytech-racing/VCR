@@ -10,6 +10,7 @@
  *    this function's inputs MUST be sysMicros and taskInfo.
  * 3) Define the function itself. This requires using the HT_TASK::Task constructor and passing
  *    in your init function, your run function, a priority level, and a loop interval (in micros).
+ * 4) Add the function to your scheduler.
  * 
  */
 
@@ -36,7 +37,7 @@
 
 /* Local includes */
 #include "VCR_Constants.h"
-#include "ADC_interface.h"
+#include "VCR_Globals.h"
 
 /**
  * This "Test" function is purely for validation of the HT_SCHED dependency. This is intended to be removed when
@@ -61,19 +62,19 @@ HT_TASK::Task test_task = HT_TASK::Task(init_test_task, run_test_task, 1, 100000
 
 /**
  * The read_adc0 task will command adc0 to sample all eight channels, convert the outputs, and
- * store them in structs defined in shared_firmware_types. This function relies on ADC_0 and
- * ADC_1 being defined in ADC_interface.h.
+ * store them in structs defined in shared_firmware_types. This function relies on adc_0 being
+ * defined in ADC_interface.h.
  */
 bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
-    ADC_0.setChannelScaleAndOffset(GLV_SENSE_CHANNEL, GLV_SENSE_SCALE, GLV_SENSE_OFFSET);
-    ADC_0.setChannelScaleAndOffset(CURRENT_SENSE_CHANNEL, CURRENT_SENSE_SCALE, CURRENT_SENSE_OFFSET);
-    ADC_0.setChannelScaleAndOffset(REFERENCE_SENSE_CHANNEL, REFERENCE_SENSE_SCALE, REFERENCE_SENSE_OFFSET);
-    ADC_0.setChannelScaleAndOffset(RL_LOADCELL_CHANNEL, RL_LOADCELL_SCALE, RL_LOADCELL_OFFSET);
-    ADC_0.setChannelScaleAndOffset(RR_LOADCELL_CHANNEL, RL_LOADCELL_SCALE, RL_LOADCELL_OFFSET);
-    ADC_0.setChannelScaleAndOffset(RL_SUS_POT_CHANNEL, RL_SUS_POT_SCALE, RL_SUS_POT_OFFSET);
-    ADC_0.setChannelScaleAndOffset(RR_SUS_POT_CHANNEL, RR_SUS_POT_SCALE, RR_SUS_POT_OFFSET);
+    adc_0.setChannelScaleAndOffset(GLV_SENSE_CHANNEL, GLV_SENSE_SCALE, GLV_SENSE_OFFSET);
+    adc_0.setChannelScaleAndOffset(CURRENT_SENSE_CHANNEL, CURRENT_SENSE_SCALE, CURRENT_SENSE_OFFSET);
+    adc_0.setChannelScaleAndOffset(REFERENCE_SENSE_CHANNEL, REFERENCE_SENSE_SCALE, REFERENCE_SENSE_OFFSET);
+    adc_0.setChannelScaleAndOffset(RL_LOADCELL_CHANNEL, RL_LOADCELL_SCALE, RL_LOADCELL_OFFSET);
+    adc_0.setChannelScaleAndOffset(RR_LOADCELL_CHANNEL, RL_LOADCELL_SCALE, RL_LOADCELL_OFFSET);
+    adc_0.setChannelScaleAndOffset(RL_SUS_POT_CHANNEL, RL_SUS_POT_SCALE, RL_SUS_POT_OFFSET);
+    adc_0.setChannelScaleAndOffset(RR_SUS_POT_CHANNEL, RR_SUS_POT_SCALE, RR_SUS_POT_OFFSET);
 
     hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros);
 
@@ -83,13 +84,59 @@ bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
 bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
-    ADC_0.sample(); // Samples all eight channels.
-    ADC_0.convert(); // Converts all eight channels.
+    adc_0.sample(); // Samples all eight channels.
+    adc_0.convert(); // Converts all eight channels.
 
-    hal_printf("%4d, %8.2f\n", ADC_0.data.conversions[0].raw, ADC_0.data.conversions[0].conversion); // Prints channel 0.
+    interface_data.current_sensor_data.twentyfour_volt_sensor = adc_0.data.conversions[GLV_SENSE_CHANNEL].conversion;
+    interface_data.current_sensor_data.current_sensor_unfiltered = adc_0.data.conversions[CURRENT_SENSE_CHANNEL].conversion;
+    interface_data.current_sensor_data.current_refererence_unfiltered = adc_0.data.conversions[REFERENCE_SENSE_CHANNEL].conversion;
+    interface_data.rear_loadcells_unfiltered.RL_loadcell_unfiltered_pounds = adc_0.data.conversions[RL_LOADCELL_CHANNEL].conversion;
+    interface_data.rear_loadcells_unfiltered.RR_loadcell_unfiltered_pounds = adc_0.data.conversions[RR_LOADCELL_CHANNEL].conversion;
+    interface_data.rear_suspots_unfiltered.RL_sus_pot_unfiltered_analog = adc_0.data.conversions[RL_SUS_POT_CHANNEL].raw; // Just use raw for suspots
+    interface_data.rear_suspots_unfiltered.RR_sus_pot_unfiltered_analog = adc_0.data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
+
     return true;
 }
 
 HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_task, 10, 1000UL); // 1000us is 1kHz
+
+
+
+/**
+ * NOTE: These channels are UNUSED BY DEFAULT and exist ONLY FOR TESTING. You may edit this
+ * manually to add sensors.
+ * 
+ * The read_adc1 task will command adc0 to sample all eight channels, convert the outputs, and
+ * store them in a struct defined in shared_firmware_types. This function relies on adc_1 being
+ * defined in ADC_interface.h.
+ */
+bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+
+    // Initialize all eight channels to scale = 1, offset = 0
+    adc_1.setChannelScaleAndOffset(0, 1, 0);
+    adc_1.setChannelScaleAndOffset(1, 1, 0);
+    adc_1.setChannelScaleAndOffset(2, 1, 0);
+    adc_1.setChannelScaleAndOffset(3, 1, 0);
+    adc_1.setChannelScaleAndOffset(4, 1, 0);
+    adc_1.setChannelScaleAndOffset(5, 1, 0);
+    adc_1.setChannelScaleAndOffset(6, 1, 0);
+    adc_1.setChannelScaleAndOffset(7, 1, 0);
+
+    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros);
+
+    return true;
+}
+
+bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+
+    adc_1.sample(); // Samples all eight channels.
+    adc_1.convert(); // Converts all eight channels.
+
+    return true;
+}
+
+HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_task, 10, 40000UL); // 20000us is 25Hz
 
 #endif /* VCR_TASKS */

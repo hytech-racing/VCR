@@ -21,6 +21,7 @@
 
 /* Local includes */
 #include "VCR_Constants.h"
+#include "VCR_Globals.h"
 #include "VCR_Tasks.h"
 
 
@@ -48,6 +49,7 @@ void setup() {
     scheduler.setTimingFunction(stdMicros);
 
     scheduler.schedule(read_adc0_task);
+    scheduler.schedule(read_adc1_task);
 }
 
 void loop() {

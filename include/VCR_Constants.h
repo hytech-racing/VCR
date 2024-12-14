@@ -15,7 +15,7 @@ const int ADC1_CS = 11; // MCP3208. ADC1 in VCR schematic. Used for extra thermi
 /*                 ADC pins and configs               */
 /* -------------------------------------------------- */
 
-/* Channels on ADC_0 */
+/* Channels on adc_0 */
 const int GLV_SENSE_CHANNEL       = 0;
 const int CURRENT_SENSE_CHANNEL   = 1;
 const int REFERENCE_SENSE_CHANNEL = 2;
