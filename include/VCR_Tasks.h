@@ -38,6 +38,7 @@
 /* Local includes */
 #include "VCR_Constants.h"
 #include "VCR_Globals.h"
+#include "Buzzer.h"
 
 /**
  * This "Test" function is purely for validation of the HT_SCHED dependency. This is intended to be removed when
@@ -146,7 +147,7 @@ HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_
  */
 bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    system_data.buzzer_is_active = buzzer.buzzer_is_active(sysMicros / 1000); // pass in sysMillis into buzzer_is_active check
+    system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sysMicros / 1000); // pass in sysMillis into buzzer_is_active check
 }
 
 HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 5, 1000UL); // 1000us is 1kHz
