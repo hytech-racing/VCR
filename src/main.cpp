@@ -50,6 +50,7 @@ void setup() {
 
     scheduler.schedule(read_adc0_task);
     scheduler.schedule(read_adc1_task);
+    scheduler.schedule(update_buzzer_controller_task);
 }
 
 void loop() {
