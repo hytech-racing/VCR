@@ -20,12 +20,18 @@
 #include "QNEthernet.h"
 
 /* Local includes */
-#include "VCR_Constants.h"
 #include "VCR_Globals.h"
+#include "VCR_Constants.h"
 #include "VCR_Tasks.h"
-#include "VehicleStateMachine.h"
 
 
+
+/* Global definitions */
+VCRInterfaceData_s interface_data;
+VCRSystemData_s system_data;
+
+MCP_ADC<8> adc_0 = MCP_ADC<8>(ADC0_CS);
+MCP_ADC<8> adc_1 = MCP_ADC<8>(ADC1_CS);
 
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
@@ -49,6 +55,7 @@ qindesign::network::EthernetUDP protobuf_recv_socket;
 void setup() {
     scheduler.setTimingFunction(stdMicros);
 
+    scheduler.schedule(tick_state_machine_task);
     scheduler.schedule(read_adc0_task);
     scheduler.schedule(read_adc1_task);
     scheduler.schedule(update_buzzer_controller_task);

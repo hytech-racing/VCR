@@ -37,6 +37,7 @@
 
 /* Local includes */
 #include "VCR_Constants.h"
+#include "VehicleStateMachine.h"
 #include "VCR_Globals.h"
 #include "Buzzer.h"
 
@@ -58,6 +59,20 @@ bool run_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& task
 
 HT_TASK::Task test_task = HT_TASK::Task(init_test_task, run_test_task, 1, 100000UL); // 100,000us is 10hz
 
+
+
+/**
+ * The "tick state machine" task will simply call the state machine's tick function with the current
+ * timestamp in micros. No init function is necessary. The tick function makes use of the other systems'
+ * singleton classes to minimize the need for passing instances around.
+ */
+bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000); // tick function requires millis
+    return true;
+}
+
+HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_tick_state_machine_task, 2, 10000UL); // 10,000us is 100hz
 
 
 
