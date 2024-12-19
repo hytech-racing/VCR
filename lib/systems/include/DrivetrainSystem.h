@@ -6,7 +6,12 @@
 #include "stdint.h"
 #include "SysClock.h"
 
-
+/**
+ * As of now, only the minimum functions for VehicleStateMachine to compile have been implemented.
+ * TODO: Re-add the rest of the necessary functions
+ * TODO: Add DrivetrainSystem.tpp to implement all functions
+ * 
+ */
 template <typename InverterType>
 class DrivetrainSystem
 {

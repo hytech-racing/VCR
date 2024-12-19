@@ -4,6 +4,7 @@
 /* Local includes */
 #include "VehicleStateMachine.h"
 #include "DrivetrainSystem.h"
+#include "SafetySystem.h"
 #include "Buzzer.h"
 #include "VCR_Globals.h"
 
@@ -120,16 +121,16 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
             break;
         }
 
-        // if (SafetySystem::getInstance().get_software_is_ok() && !system_data.pedals_system_data.implausibility_has_exceeded_max_duration)
-        // {
-        //     // TODO: Fix with all references to singleton classes
-        //     // drivetrain.command_drivetrain(controller_mux_->getDrivetrainCommand(dashboard_->getDialMode(), dashboard_->getTorqueLimitMode(), current_car_state));
-        // }
-        // else
-        // {
-        //     // If software is not OK or some implausibility has exceeded max duration, command 0 torque (but stay in RTD mode)
-        //     drivetrain.command_drivetrain_no_torque();
-        // }
+        if (SafetySystem::getInstance().get_software_is_ok() && !system_data.pedals_system_data.implausibility_has_exceeded_max_duration)
+        {
+            // TODO: Fix with all references to singleton classes
+            // drivetrain.command_drivetrain(controller_mux_->getDrivetrainCommand(dashboard_->getDialMode(), dashboard_->getTorqueLimitMode(), current_car_state));
+        }
+        else
+        {
+            // If software is not OK or some implausibility has exceeded max duration, command 0 torque (but stay in RTD mode)
+            drivetrain.command_drivetrain_no_torque();
+        }
 
         break;
     }
