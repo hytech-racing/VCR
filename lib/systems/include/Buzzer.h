@@ -18,12 +18,19 @@ public:
     }
     
     /**
-     * Calling this command will activate the buzzer for the specified milliseconds. If this command
-     * is called while the buzzer is still active, the timer will reset to the given value.
+     * Calling this command will activate the buzzer for BUZZER_PERIOD_MS milliseconds.
      */
-    void activate_for_ms(unsigned long time)
+    void activate(unsigned long curr_millis)
     {
-        _buzzer_period = time;
+        _last_activation_time_ms = curr_millis;
+    }
+
+    /**
+     * Immediately kill the buzzer.
+     */
+    void deactivate()
+    {
+        _last_activation_time_ms = 0;
     }
 
     /**
@@ -31,18 +38,20 @@ public:
      */
     bool buzzer_is_active(unsigned long millis)
     {
-        return (millis - _last_activation_time_ms) < _buzzer_period;
+        return (millis - _last_activation_time_ms) < BUZZER_PERIOD_MS;
     }
 
 private:
+
     BuzzerController()
     {
-        _buzzer_period = 2000; // Default is 2000ms
         _last_activation_time_ms = 0;
     }
 
-    unsigned long _buzzer_period;
+    const unsigned long BUZZER_PERIOD_MS = 2000; // Default buzzer period is 2000ms
+
     unsigned long _last_activation_time_ms;
+
 };
 
 #endif /* BUZZER */

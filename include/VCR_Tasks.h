@@ -32,14 +32,6 @@
 /* From shared_firmware_types library */
 #include "SharedFirmwareTypes.h"
 
-<<<<<<< HEAD
-=======
-/* Local includes */
-#include "VCR_Constants.h"
-#include "VCR_Globals.h"
-#include "Buzzer.h"
-
->>>>>>> cb1b012 (Switched buzzer reference to use singleton pattern instead of global instance)
 /**
  * This "Test" function is purely for validation of the HT_SCHED dependency. This is intended to be removed when
  * further development occurs.
@@ -69,53 +61,17 @@ extern HT_TASK::Task read_adc0_task;
  * store them in a struct defined in shared_firmware_types. This function relies on adc_1 being
  * defined in ADC_interface.h.
  */
-<<<<<<< HEAD
 bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 extern HT_TASK::Task read_adc1_task;
-=======
-bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-
-    // Initialize all eight channels to scale = 1, offset = 0
-    adc_1.setChannelScaleAndOffset(0, 1, 0);
-    adc_1.setChannelScaleAndOffset(1, 1, 0);
-    adc_1.setChannelScaleAndOffset(2, 1, 0);
-    adc_1.setChannelScaleAndOffset(3, 1, 0);
-    adc_1.setChannelScaleAndOffset(4, 1, 0);
-    adc_1.setChannelScaleAndOffset(5, 1, 0);
-    adc_1.setChannelScaleAndOffset(6, 1, 0);
-    adc_1.setChannelScaleAndOffset(7, 1, 0);
-
-    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros);
-
-    return true;
-}
-
-bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-
-    adc_1.sample(); // Samples all eight channels.
-    adc_1.convert(); // Converts all eight channels.
-
-    return true;
-}
-
-HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_task, 100, 40000UL); // 20000us is 25Hz
 
 
 
 /**
- * Updates the BuzzerController system. No initialization necessary.
+ * This task will update the buzzer_is_active boolean in the VCRSystemData struct by calling the
+ * update function of the buzzer controller.
  */
-bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sysMicros / 1000); // pass in sysMillis into buzzer_is_active check
-}
-
-HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 5, 1000UL); // 1000us is 1kHz
-
-
->>>>>>> cb1b012 (Switched buzzer reference to use singleton pattern instead of global instance)
+bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+extern HT_TASK::Task update_buzzer_controller_task;
 
 #endif /* VCR_TASKS */

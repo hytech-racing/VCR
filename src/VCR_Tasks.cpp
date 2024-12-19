@@ -9,6 +9,7 @@
 
 /* Local includes */
 #include "VCR_Constants.h"
+#include "Buzzer.h"
 #include "VCR_Globals.h"
 
 bool init_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
@@ -92,3 +93,15 @@ bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
 }
 
 HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_task, 10, 40000UL); // 20000us is 25Hz
+
+
+
+bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+
+    system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sysMicros / 1000);
+
+    return true;
+}
+
+HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz
