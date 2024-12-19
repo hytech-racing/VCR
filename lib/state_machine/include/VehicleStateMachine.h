@@ -1,8 +1,6 @@
 #ifndef VEHICLE_STATE_MACHINE
 #define VEHICLE_STATE_MACHINE
 
-#include "Logger.h"
-
 /**
  * Enum representing possible states for the vehicle's state machine.
  * 
@@ -47,12 +45,11 @@ public:
      * of other classes as necessary.
      * @pre Other systems are updated properly
      * @pre All relevant data exists in the data structs (VCRInterfaceData, VCRSystemData, etc.)
+     * @param current_millis The system time, in millis. Passed in by the scheduler.
      */
     void tick_state_machine(unsigned long current_millis);
 
     CAR_STATE get_state() { return _current_state; }
-
-    bool car_in_ready_to_drive() { return _current_state == CAR_STATE::READY_TO_DRIVE; };
 
 private:
     VehicleStateMachine()
@@ -66,13 +63,13 @@ private:
      * The function run upon the entry of the car into a new state.
      * @param new_state The state in which we are entering.
      */
-    void handle_entry_logic_(CAR_STATE new_state, unsigned long curr_time);
+    void handle_entry_logic_(CAR_STATE new_state, unsigned long curr_millis);
 
     /**
      * The function run upon the exit of a state.
      * @param prev_state the state in which we are leaving.
      */
-    void handle_exit_logic_(CAR_STATE prev_state, unsigned long curr_time);
+    void handle_exit_logic_(CAR_STATE prev_state, unsigned long curr_millis);
 
     CAR_STATE _current_state;
 
