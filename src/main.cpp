@@ -20,10 +20,9 @@
 #include "QNEthernet.h"
 
 /* Local includes */
-#include "VCR_Constants.h"
 #include "VCR_Globals.h"
+#include "VCR_Constants.h"
 #include "VCR_Tasks.h"
-#include "VehicleStateMachine.h"
 
 
 
@@ -49,6 +48,7 @@ qindesign::network::EthernetUDP protobuf_recv_socket;
 void setup() {
     scheduler.setTimingFunction(stdMicros);
 
+    scheduler.schedule(tick_state_machine_task);
     scheduler.schedule(read_adc0_task);
     scheduler.schedule(read_adc1_task);
     scheduler.schedule(update_buzzer_controller_task);

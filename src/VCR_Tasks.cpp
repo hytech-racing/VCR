@@ -11,6 +11,7 @@
 #include "VCR_Constants.h"
 #include "Buzzer.h"
 #include "VCR_Globals.h"
+#include "VehicleStateMachine.h"
 
 bool init_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -62,6 +63,16 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
 }
 
 HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_task, 10, 1000UL); // 1000us is 1kHz
+
+
+
+bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000); // tick function requires millis
+    return true;
+}
+
+HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_tick_state_machine_task, 2, 10000UL); // 10,000us is 100hz
 
 
 
