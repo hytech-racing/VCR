@@ -169,5 +169,22 @@ bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_
 HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 5, 1000UL); // 1000us is 1kHz
 
 
+/**
+ * Update SafetySystem
+ */
+bool init_update_safety_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    
+    return true;
+}
+
+bool run_update_safety_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+   //store _software_is_ok in the system_data struct
+    system_data.safety_system_ok = SafetySystem::getInstance().get_software_is_ok();
+    return true;
+}
+
+HT_TASK::Task update_safety_system_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_safety_system_task, 1, 100000UL); //100,000UL is 10Hz
 
 #endif /* VCR_TASKS */
