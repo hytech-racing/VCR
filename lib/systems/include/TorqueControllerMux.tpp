@@ -1,9 +1,12 @@
-#include "TorqueControllerMux.h"
+#include "TorqueControllerMux.hpp"
+#include "PhysicalParameters.h"
+#include "BaseController.h"
 
+#include <iostream>
 template <std::size_t num_controllers>
 DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command(ControllerMode_e requested_controller_type,
                                                                                TorqueLimit_e requested_torque_limit,
-                                                                               const SharedCarState_s &input_state)
+                                                                               const VCRSystemData_s &input_state)
 {
 
     DrivetrainCommand_s empty_command = BaseControllerParams::TC_COMMAND_NO_TORQUE;
@@ -17,13 +20,13 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
 
     if ((std::size_t)req_controller_mode_index > ( _controller_evals.size() - 1 ))
     {
-        active_status_.active_error = TorqueControllerMuxError::ERROR_CONTROLLER_INDEX_OUT_OF_BOUNDS;
+        active_status_.active_error = TorqueControllerMuxError_e::ERROR_CONTROLLER_INDEX_OUT_OF_BOUNDS;
         return empty_command;
     }
 
-    if( (!(_controller_evals[active_controller_mode_index].empty())) || (!_controller_evals[req_controller_mode_index].empty()))
+    if( (!_controller_evals[active_controller_mode_index]) || (!_controller_evals[req_controller_mode_index]))
     {
-        active_status_.active_error = TorqueControllerMuxError::ERROR_CONTROLLER_NULL_POINTER;
+        active_status_.active_error = TorqueControllerMuxError_e::ERROR_CONTROLLER_NULL_POINTER;
         return empty_command;
     }
 
@@ -35,8 +38,8 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
     if (requesting_controller_change)
     {
         TorqueControllerOutput_s proposed_output = _controller_evals[req_controller_mode_index](input_state);
-        TorqueControllerMuxError error_state = can_switch_controller_(input_state.drivetrain_data, current_output.command, proposed_output.command);
-        if (error_state == TorqueControllerMuxError::NO_ERROR)
+        TorqueControllerMuxError_e error_state = can_switch_controller_(input_state.drivetrain_data, current_output.command, proposed_output.command);
+        if (error_state == TorqueControllerMuxError_e::NO_ERROR)
         {
             active_status_.active_controller_mode = requested_controller_type;
             active_controller_mode_index = req_controller_mode_index;
@@ -44,13 +47,19 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
         }
         active_status_.active_error = error_state;
     }
-    if (!mux_bypass_limits_[active_controller_mode_index])
+    if (!_mux_bypass_limits[active_controller_mode_index])
     {
         active_status_.active_torque_limit_enum = requested_torque_limit;
         current_output.command = apply_regen_limit_(current_output.command, input_state.drivetrain_data);
+        // std::cout << "output torques before " << current_output.command.inverter_torque_limit[0] << " " << current_output.command.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
+
         current_output.command = apply_torque_limit_(current_output.command, torque_limit_map_[requested_torque_limit]);
+        // std::cout << "output torques after " << current_output.command.inverter_torque_limit[0] << " " <<current_output.command.inverter_torque_limit[1] << " " <<current_output.command.inverter_torque_limit[2] << " " <<current_output.command.inverter_torque_limit[3] << std::endl;
         active_status_.active_torque_limit_value = torque_limit_map_[requested_torque_limit];
+        // std::cout << "output torques before pw " << current_output.command.inverter_torque_limit[0] << " " << current_output.command.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
+
         current_output.command = apply_power_limit_(current_output.command, input_state.drivetrain_data, max_power_limit_, torque_limit_map_[requested_torque_limit]);
+        // std::cout << "output torques after pw " << current_output.command.inverter_torque_limit[0] << " " << current_output.command.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
         current_output.command = apply_positive_speed_limit_(current_output.command);
         active_status_.output_is_bypassing_limits = false;
     }
@@ -65,7 +74,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
 }
 
 template <std::size_t num_controllers>
-TorqueControllerMuxError TorqueControllerMux<num_controllers>::can_switch_controller_(DrivetrainDynamicReport_s active_drivetrain_data,
+TorqueControllerMuxError_e TorqueControllerMux<num_controllers>::can_switch_controller_(DrivetrainDynamicReport_s active_drivetrain_data,
                                                                                       DrivetrainCommand_s previous_controller_command,
                                                                                       DrivetrainCommand_s desired_controller_out)
 {
@@ -79,14 +88,14 @@ TorqueControllerMuxError TorqueControllerMux<num_controllers>::can_switch_contro
         torqueDeltaPreventsModeChange = (desired_controller_out.inverter_torque_limit[i] - previous_controller_command.inverter_torque_limit[i]) > max_torque_pos_change_delta_;
         if (speedPreventsModeChange)
         {
-            return TorqueControllerMuxError::ERROR_SPEED_DIFF_TOO_HIGH;
+            return TorqueControllerMuxError_e::ERROR_SPEED_DIFF_TOO_HIGH;
         }
         if (torqueDeltaPreventsModeChange)
         {
-            return TorqueControllerMuxError::ERROR_TORQUE_DIFF_TOO_HIGH;
+            return TorqueControllerMuxError_e::ERROR_TORQUE_DIFF_TOO_HIGH;
         }
     }
-    return TorqueControllerMuxError::NO_ERROR;
+    return TorqueControllerMuxError_e::NO_ERROR;
 }
 
 /* Apply limit such that wheelspeed never goes negative */

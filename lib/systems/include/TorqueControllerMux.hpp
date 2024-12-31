@@ -5,7 +5,9 @@
 #include <array>
 #include <functional>
 
-#include "SharedDataTypes.h"
+#include "PhysicalParameters.h"
+#include "SharedFirmwareTypes.h"
+
 
 // notes:
 // 21 torque limit should be first
@@ -77,20 +79,21 @@ public:
     /// @param max_power_limit the max power limit defaults to TC_MUX_DEFAULT_PARAMS::MAX_POWER_LIMIT
     /// @param num_motors the number of motors. defaults to 4.
     /// @note TC Mux must be created with at least 1 controller.
-    explicit TorqueControllerMux(std::array<std::function<TorqueControllerOutput_s(const SharedCarState_s &state)>, num_controllers> controller_evals,
+    explicit TorqueControllerMux(std::array<std::function<TorqueControllerOutput_s(const VCRSystemData_s &state)>, num_controllers> controller_evals,
         std::array<bool, num_controllers> mux_bypass_limits,
         float max_change_speed = TC_MUX_DEFAULT_PARAMS::MAX_SPEED_FOR_MODE_CHANGE,
         float max_torque_pos_change_delta = TC_MUX_DEFAULT_PARAMS::MAX_TORQUE_DELTA_FOR_MODE_CHANGE,
-        float max_power_limit = TC_MUX_DEFAULT_PARAMS::MAX_POWER_LIMIT
+        float max_power_limit = TC_MUX_DEFAULT_PARAMS::MAX_POWER_LIMIT,
         size_t num_motors = 4) : _controller_evals(controller_evals),
                                                                         _mux_bypass_limits(mux_bypass_limits),
                                                                         max_change_speed_(max_change_speed),
                                                                         max_torque_pos_change_delta_(max_torque_pos_change_delta),
                                                                         max_power_limit_(max_power_limit),
-                                                                        _num_motors(num_motors)
+                                                                        _num_motors(num_motors) 
+    {}
         
     
-    const TorqueControllerMuxStatus &get_tc_mux_status() { return active_status_; }
+    const TorqueControllerMuxStatus_s &get_tc_mux_status() { return active_status_; }
 
     /// @brief function that evaluates the mux, controllers and gets the active command
     /// @param requested_controller_type the requested controller type from the dial state
@@ -99,11 +102,11 @@ public:
     /// @return the active DrivetrainCommand_s to be sent to the drivetrain to command increases and decreases in torque
     DrivetrainCommand_s get_drivetrain_command(ControllerMode_e requested_controller_type,
                                              TorqueLimit_e controller_command_torque_limit,
-                                             const SharedCarState_s &input_state);
+                                             const VCRSystemData_s &input_state);
 
 private:
 
-    std::array<std::function<TorqueControllerOutput_s(const SharedCarState_s &state)>, num_controllers> _controller_evals;
+    std::array<std::function<TorqueControllerOutput_s(const VCRSystemData_s &state)>, num_controllers> _controller_evals;
 
     std::array<bool, num_controllers> _mux_bypass_limits;
 
@@ -114,8 +117,8 @@ private:
     size_t _num_motors;
     float max_change_speed_, max_torque_pos_change_delta_, max_power_limit_;
     DrivetrainCommand_s prev_command_ = {};
-    TorqueControllerMuxStatus active_status_ = {};
-    TorqueControllerMuxError can_switch_controller_(DrivetrainDynamicReport_s active_drivetrain_data,
+    TorqueControllerMuxStatus_s active_status_ = {};
+    TorqueControllerMuxError_e can_switch_controller_(DrivetrainDynamicReport_s active_drivetrain_data,
                                                     DrivetrainCommand_s previous_controller_command,
                                                     DrivetrainCommand_s desired_controller_out);
 
