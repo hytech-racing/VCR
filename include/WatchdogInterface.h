@@ -9,11 +9,8 @@ class WatchdogInterface
 {
 private:
 
-    /*Declare private instance*/
-    static WatchdogInterface* instance;
-
     /*Private constructor*/
-    WatchdogInterface(int wd_input_pin): pin_watchdog_input_(wd_input_pin){};
+    WatchdogInterface(): pin_watchdog_input_(-1){};
 
     /* Watchdog last kicked time */
     unsigned long watchdog_time;
@@ -27,18 +24,17 @@ private:
 public:
 
     /*Getter to return the instance and make a new one if it hasn't been made yet*/
-    static WatchdogInterface* getInstance(int wd_input_pin){
-        if (instance == nullptr){
-            instance = new WatchdogInterface(wd_input_pin);
-        }
+    static WatchdogInterface& getInstance() {
+        static WatchdogInterface instance;
         return instance;
     }
+
+    /*Use to set the pin from default (-1) of the Watchdog after calling getInstance() the first time*/
+    void setPin(int Pin);
 
 
     /*Prevent copying*/
     WatchdogInterface(const WatchdogInterface&) = delete;
-    /*Prevent assignment*/
-    WatchdogInterface& operator=(const WatchdogInterface&) = delete;
 
 
     /* Initialize interface pin mode */

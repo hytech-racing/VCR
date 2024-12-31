@@ -1,9 +1,8 @@
 #include "WatchdogInterface.h"
 
-/*Initialize the instance and make it point to nothing*/
-WatchdogInterface* WatchdogInterface::instance = nullptr;
 
 /* Pin mode output to watchdog WD */
+/*Pin MUST be set with setPin() before calling init()*/
 void WatchdogInterface::init(unsigned long curr_millis) {
     // Set pin mode        
     pinMode(pin_watchdog_input_, OUTPUT);
@@ -40,3 +39,7 @@ void WatchdogInterface::set_watchdog_state(bool state) {
     watchdog_state = state;
 }
 
+/*Set the pin from default (-1) of the Watchdog after calling getInstance() the first time*/
+void WatchdogInterface::setPin(int pin){
+    pin_watchdog_input_ = pin;
+}
