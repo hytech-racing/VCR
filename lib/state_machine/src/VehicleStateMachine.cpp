@@ -3,9 +3,8 @@
 
 /* Local includes */
 #include "VehicleStateMachine.h"
-#include "VCR_Globals.h"
 
-void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
+void VehicleStateMachine::tick_state_machine(unsigned long current_millis, VCRSystemData_s &system_data)
 {
 
     switch (_current_state)

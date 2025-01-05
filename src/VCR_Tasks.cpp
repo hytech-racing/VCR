@@ -68,7 +68,7 @@ HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_
 
 bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000); // tick function requires millis
+    VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000, system_data); // tick function requires millis
     return true;
 }
 
