@@ -1,0 +1,3 @@
+Checks: bugprone-*, cppcoreguidelines-*
+WarningsAsErrors: 'cppcoreguidelines-*'
+FormatStyle: 'file'
