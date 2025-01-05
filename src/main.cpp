@@ -23,7 +23,7 @@
 #include "VCR_Constants.h"
 #include "VCR_Globals.h"
 #include "VCR_Tasks.h"
-
+#include "TorqueControllerMux.hpp"
 
 
 /* Scheduler setup */
