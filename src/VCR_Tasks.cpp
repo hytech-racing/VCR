@@ -72,7 +72,7 @@ bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::
     return true;
 }
 
-HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_tick_state_machine_task, 2, 10000UL); // 10,000us is 100hz
+HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_tick_state_machine_task, 2); // Idle (constant-update) task
 
 
 
