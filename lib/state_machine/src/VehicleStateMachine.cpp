@@ -3,16 +3,10 @@
 
 /* Local includes */
 #include "VehicleStateMachine.h"
-#include "DrivetrainSystem.h"
-#include "SafetySystem.h"
-#include "Buzzer.h"
 #include "VCR_Globals.h"
 
 void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
 {
-    // TODO: Make this NOT uint32_t (it was only specified to allow compilation)
-    DrivetrainSystem<uint32_t> &drivetrain = DrivetrainSystem<uint32_t>::getInstance();
-    BuzzerController &buzzer = BuzzerController::getInstance();
 
     switch (_current_state)
     {
@@ -27,8 +21,8 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
     case CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE:
     {
         // if TS is above HV threshold, move to Tractive System Active
-        drivetrain.disable_no_pins();
-        if (drivetrain.hv_over_threshold_on_drivetrain())
+        _drivetrain.disable_no_pins();
+        if (_drivetrain.hv_over_threshold_on_drivetrain())
         {
             set_state_(CAR_STATE::TRACTIVE_SYSTEM_ACTIVE, current_millis);
         }
@@ -37,14 +31,14 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
 
     case CAR_STATE::TRACTIVE_SYSTEM_ACTIVE:
     {
-        if (buzzer.buzzer_is_active(current_millis))
+        if (_buzzer.buzzer_is_active(current_millis))
         {
-            buzzer.deactivate();
+            _buzzer.deactivate();
         }
 
-        drivetrain.disable_no_pins();
+        _drivetrain.disable_no_pins();
 
-        if (!drivetrain.hv_over_threshold_on_drivetrain())
+        if (!_drivetrain.hv_over_threshold_on_drivetrain())
         {
             set_state_(CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
             break;
@@ -62,19 +56,19 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
     {
 
         // If HV is not active, go to TRACTIVE_SYSTEM_NOT_ACTIVE
-        if (drivetrain.hv_over_threshold_on_drivetrain())
+        if (_drivetrain.hv_over_threshold_on_drivetrain())
         {
             set_state_(CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
             break;
         }
 
         // If motor controllers have error, but HV still active
-        if (drivetrain.drivetrain_error_occured())
+        if (_drivetrain.drivetrain_error_occured())
         {
             set_state_(CAR_STATE::TRACTIVE_SYSTEM_ACTIVE, current_millis);
         }
 
-        if (drivetrain.handle_inverter_startup(current_millis))
+        if (_drivetrain.handle_inverter_startup(current_millis))
         {
             set_state_(CAR_STATE::WAITING_READY_TO_DRIVE_SOUND, current_millis);
             break;
@@ -86,16 +80,16 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
     {
 
         // If HV is no longer active, return to TRACTIVE_SYSTEM_NOT_ACTIVE
-        if (drivetrain.hv_over_threshold_on_drivetrain())
+        if (_drivetrain.hv_over_threshold_on_drivetrain())
         {
             set_state_(CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
             break;
         }
 
-        drivetrain.command_drivetrain_no_torque(); // While waiting for RTD sound to complete, always command 0 torque
+        _drivetrain.command_drivetrain_no_torque(); // While waiting for RTD sound to complete, always command 0 torque
 
         // If the ready-to-drive sound is done playing, move to ready to drive mode
-        if (!buzzer.buzzer_is_active(current_millis))
+        if (!_buzzer.buzzer_is_active(current_millis))
         {
             set_state_(CAR_STATE::READY_TO_DRIVE, current_millis);
         }
@@ -107,29 +101,29 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
     {
 
         // If HV is no longer active, return to TRACTIVE_SYSTEM_NOT_ACTIVE
-        if (!drivetrain.hv_over_threshold_on_drivetrain())
+        if (!_drivetrain.hv_over_threshold_on_drivetrain())
         {
             hal_println("Drivetrain not over threshold while in READY_TO_DRIVE");
             set_state_(CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
             break;
         }
 
-        if (drivetrain.drivetrain_error_occured())
+        if (_drivetrain.drivetrain_error_occured())
         {
             hal_println("Drivetrain error occurred while in READY_TO_DRIVE");
             set_state_(CAR_STATE::TRACTIVE_SYSTEM_ACTIVE, current_millis);
             break;
         }
 
-        if (SafetySystem::getInstance().get_software_is_ok() && !system_data.pedals_system_data.implausibility_has_exceeded_max_duration)
+        if (_safetysystem.get_software_is_ok() && !system_data.pedals_system_data.implausibility_has_exceeded_max_duration)
         {
             // TODO: Fix with all references to singleton classes
-            // drivetrain.command_drivetrain(controller_mux_->getDrivetrainCommand(dashboard_->getDialMode(), dashboard_->getTorqueLimitMode(), current_car_state));
+            // _drivetrain.command_drivetrain(controller_mux_->getDrivetrainCommand(dashboard_->getDialMode(), dashboard_->getTorqueLimitMode(), current_car_state));
         }
         else
         {
             // If software is not OK or some implausibility has exceeded max duration, command 0 torque (but stay in RTD mode)
-            drivetrain.command_drivetrain_no_torque();
+            _drivetrain.command_drivetrain_no_torque();
         }
 
         break;
@@ -180,7 +174,7 @@ void VehicleStateMachine::handle_entry_logic_(CAR_STATE new_state, unsigned long
         break;
     case CAR_STATE::WAITING_READY_TO_DRIVE_SOUND:
     {
-        BuzzerController::getInstance().activate(curr_millis);
+        _buzzer.activate(curr_millis);
         break;
     }
     case CAR_STATE::READY_TO_DRIVE:
