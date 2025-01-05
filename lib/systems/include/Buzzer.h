@@ -41,6 +41,16 @@ public:
         return (millis - _last_activation_time_ms) < BUZZER_PERIOD_MS;
     }
 
+    /**
+     * Mandatory for singleton classes to delete the copy constructor.
+     */
+    BuzzerController(const BuzzerController&) = delete;
+
+    /**
+     * Mandatory for singleton classes to prevent copying through the assignment operator.
+     */
+    BuzzerController& operator=(const BuzzerController&) = delete;
+
 private:
 
     BuzzerController()
