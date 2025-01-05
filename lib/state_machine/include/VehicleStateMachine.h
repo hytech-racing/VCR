@@ -53,7 +53,7 @@ public:
      * @param current_millis The system time, in millis. Passed in by the scheduler.
      * @param system_data A reference to the global system data struct.
      */
-    void tick_state_machine(unsigned long current_millis, VCRSystemData_s &system_data);
+    void tick_state_machine(unsigned long current_millis, const VCRSystemData_s &system_data);
 
     CAR_STATE get_state() { return _current_state; }
 
