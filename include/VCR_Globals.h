@@ -7,6 +7,9 @@
 /* From shared-firmware-types */
 #include "SharedFirmwareTypes.h"
 
+/* Local includes */
+#include "VCR_Constants.h"
+
 /* Interface and system data structs */
 extern VCRInterfaceData_s interface_data;
 extern VCRSystemData_s system_data;
