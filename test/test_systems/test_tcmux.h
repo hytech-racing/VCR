@@ -234,45 +234,51 @@ TEST(TorqueControllerMuxTesting, test_torque_diff_swap_limit)
 //     }
 // }
 
-// TEST(TorqueControllerMuxTesting, test_torque_limit)
-// {
+TEST(TorqueControllerMuxTesting, test_torque_limit)
+{
 
-//     TestControllerType inst1;
+    // TestControllerType inst1;
+    TorqueControllerOutput_s inst1;
+    auto test_func_1 = [&inst1](const VCRSystemData_s& state) -> TorqueControllerOutput_s {
+        return inst1;
+    };
+    set_outputs(inst1.command, 500, 10.0);
+    inst1.command.inverter_torque_limit[0] = 5;
+    TorqueControllerMux<1> test({test_func_1}, {false});
 
-//     set_output_rpm(inst1, 500, 10.0);
-//     inst1.output.command.inverter_torque_limit[0] = 5;
-//     TorqueControllerMux<1> test({static_cast<Controller *>(&inst1)}, {false});
+    DrivetrainDynamicReport_s drivetrain_data = {};
+    for (int i = 0; i < 4; i++)
+    {
+        drivetrain_data.measuredSpeeds[i] = 500.0f;
+    }
 
-//     DrivetrainDynamicReport_s drivetrain_data = {};
-//     for (int i = 0; i < 4; i++)
-//     {
-//         drivetrain_data.measuredSpeeds[i] = 500.0f;
-//     }
+    VCRSystemData_s mode_0_input_state;
+    mode_0_input_state.drivetrain_data = drivetrain_data;
+    mode_0_input_state.pedals_system_data.accel_percent = 0.5f;
+    mode_0_input_state.pedals_system_data.brake_percent = 0.0f;
+    mode_0_input_state.pedals_system_data.regen_percent = 0.0f;
+    auto drive_command = test.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_LOW_TORQUE, mode_0_input_state);
 
-//     VCRSystemData_s mode_0_input_state({}, {}, drivetrain_data, {}, {.accelPercent = 0.5f, .brakePercent = 0.0f, .regenPercent = 0.0}, {}, {}, {});
+    ASSERT_EQ(drive_command.inverter_torque_limit[0], 5.0f);
+    ASSERT_EQ(drive_command.inverter_torque_limit[1], 10.0f);
+    ASSERT_EQ(drive_command.inverter_torque_limit[2], 10.0f);
+    ASSERT_EQ(drive_command.inverter_torque_limit[3], 10.0f);
 
-//     auto drive_command = test.getDrivetrainCommand(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_LOW_TORQUE, mode_0_input_state);
+    set_outputs(inst1.command, 500, 20.0);
+    inst1.command.inverter_torque_limit[0] = 5;
 
-//     ASSERT_EQ(drive_command.inverter_torque_limit[0], 5.0f);
-//     ASSERT_EQ(drive_command.inverter_torque_limit[1], 10.0f);
-//     ASSERT_EQ(drive_command.inverter_torque_limit[2], 10.0f);
-//     ASSERT_EQ(drive_command.inverter_torque_limit[3], 10.0f);
+    drive_command = test.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_LOW_TORQUE, mode_0_input_state);
 
-//     set_output_rpm(inst1, 500, 20.0);
-//     inst1.output.command.inverter_torque_limit[0] = 5;
-
-//     drive_command = test.getDrivetrainCommand(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_LOW_TORQUE, mode_0_input_state);
-
-//     ASSERT_LT(drive_command.inverter_torque_limit[0], 3.5f);
-//     ASSERT_LT(drive_command.inverter_torque_limit[1], 12.5f);
-//     ASSERT_LT(drive_command.inverter_torque_limit[2], 12.5f);
-//     ASSERT_LT(drive_command.inverter_torque_limit[3], 12.5f);
+    ASSERT_LT(drive_command.inverter_torque_limit[0], 3.5f);
+    ASSERT_LT(drive_command.inverter_torque_limit[1], 12.5f);
+    ASSERT_LT(drive_command.inverter_torque_limit[2], 12.5f);
+    ASSERT_LT(drive_command.inverter_torque_limit[3], 12.5f);
     
-//     printf("torque 1: %.2f\n", drive_command.inverter_torque_limit[0]);
-//     printf("torque 2: %.2f\n", drive_command.inverter_torque_limit[1]);
-//     printf("torque 3: %.2f\n", drive_command.inverter_torque_limit[2]);
-//     printf("torque 4: %.2f\n", drive_command.inverter_torque_limit[3]);
-// }
+    printf("torque 1: %.2f\n", drive_command.inverter_torque_limit[0]);
+    printf("torque 2: %.2f\n", drive_command.inverter_torque_limit[1]);
+    printf("torque 3: %.2f\n", drive_command.inverter_torque_limit[2]);
+    printf("torque 4: %.2f\n", drive_command.inverter_torque_limit[3]);
+}
 
 TEST(TorqueControllerMuxTesting, test_null_pointer_error_state)
 {

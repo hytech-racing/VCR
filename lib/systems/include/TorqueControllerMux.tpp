@@ -2,7 +2,7 @@
 #include "PhysicalParameters.h"
 #include "BaseController.h"
 
-#include <iostream>
+// #include <iostream>
 template <std::size_t num_controllers>
 DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command(ControllerMode_e requested_controller_type,
                                                                                TorqueLimit_e requested_torque_limit,
