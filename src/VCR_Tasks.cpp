@@ -15,13 +15,14 @@
 
 bool init_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    hal_printf("Initialized function at %d (micros)\n", sysMicros);
+    hal_printf("Initialized function at %d (micros)\n", sysMicros);     // NOLINT
     return true;
 }
 
 bool run_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    hal_printf("Ran function at %d (micros) for the %dth time\n", sysMicros, taskInfo.executions);
+    
+    hal_printf("Ran function at %d (micros) for the %dth time\n", sysMicros, taskInfo.executions); // NOLINT
     return true;
 }
 
@@ -40,7 +41,7 @@ bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     adc_0.setChannelScaleAndOffset(RL_SUS_POT_CHANNEL, RL_SUS_POT_SCALE, RL_SUS_POT_OFFSET);
     adc_0.setChannelScaleAndOffset(RR_SUS_POT_CHANNEL, RR_SUS_POT_SCALE, RR_SUS_POT_OFFSET);
 
-    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros);
+    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros); // NOLINT
 
     return true;
 }
@@ -90,7 +91,7 @@ bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     adc_1.setChannelScaleAndOffset(7, 1, 0);
     /* NOLINTEND */
 
-    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros);
+    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros); // NOLINT
 
     return true;
 }
