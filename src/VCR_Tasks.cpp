@@ -9,7 +9,7 @@
 
 /* Local includes */
 #include "VCR_Constants.h"
-#include "Buzzer.h"
+#include "BuzzerController.h"
 #include "VCR_Globals.h"
 #include "VehicleStateMachine.h"
 

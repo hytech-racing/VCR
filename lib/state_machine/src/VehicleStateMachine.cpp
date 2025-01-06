@@ -140,6 +140,7 @@ void VehicleStateMachine::set_state_(CAR_STATE new_state, unsigned long curr_mil
 
 void VehicleStateMachine::handle_exit_logic_(CAR_STATE prev_state, unsigned long curr_millis)
 {
+    // NOLINTBEGIN
     switch (get_state())
     {
     case CAR_STATE::STARTUP:
@@ -157,10 +158,12 @@ void VehicleStateMachine::handle_exit_logic_(CAR_STATE prev_state, unsigned long
     default:
         break;
     }
+    // NOLINTEND
 }
 
 void VehicleStateMachine::handle_entry_logic_(CAR_STATE new_state, unsigned long curr_millis)
 {
+    // NOLINTBEGIN
     switch (new_state)
     {
     case CAR_STATE::STARTUP:
@@ -181,4 +184,5 @@ void VehicleStateMachine::handle_entry_logic_(CAR_STATE new_state, unsigned long
     default:
         break;
     }
+    // NOLINTEND
 }

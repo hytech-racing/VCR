@@ -1,5 +1,5 @@
-#ifndef __PHYSICALPARAMETERS_H__
-#define __PHYSICALPARAMETERS_H__
+#ifndef PHYSICALPARAMETERS
+#define PHYSICALPARAMETERS
 
 namespace PhysicalParameters
 {
@@ -17,4 +17,4 @@ constexpr const float METERS_PER_SECOND_TO_RPM    = 1.0 / RPM_TO_METERS_PER_SECO
 const float RPM_TO_RAD_PER_SECOND = 2 * 3.1415 / 60.0;
 const float RAD_PER_SECOND_TO_RPM = 1 / RPM_TO_RAD_PER_SECOND;
 
-#endif /* __PHYSICALPARAMETERS_H__ */
+#endif /* PHYSICALPARAMETERS */

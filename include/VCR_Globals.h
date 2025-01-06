@@ -11,8 +11,8 @@
 #include "VCR_Constants.h"
 
 /* Interface and system data structs */
-extern VCRInterfaceData_s interface_data;
-extern VCRSystemData_s system_data;
+extern VCRInterfaceData_s interface_data; // NOLINT
+extern VCRSystemData_s system_data; // NOLINT
 
 /* ADC setup */
 extern MCP_ADC<8> adc_0; // MCP3208. ADC0 in VCR schematic. Used for valuable telem data.

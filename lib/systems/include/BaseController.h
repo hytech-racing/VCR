@@ -4,7 +4,7 @@
 
 /// @brief defines namespace for definition of a drivetrain command with no torque for clearer code in the Muxer
 /// This can be used to define other specific car states in the future
-namespace BaseControllerParams
+const namespace BaseControllerParams
 {
     const DrivetrainCommand_s TC_COMMAND_NO_TORQUE = {
         .speeds_rpm = {0.0, 0.0, 0.0, 0.0},
