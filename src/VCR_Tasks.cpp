@@ -25,7 +25,7 @@ bool run_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& task
     return true;
 }
 
-HT_TASK::Task test_task = HT_TASK::Task(init_test_task, run_test_task, 1, 100000UL); // 100,000us is 10hz
+HT_TASK::Task test_task = HT_TASK::Task(init_test_task, run_test_task, 1, 100000UL); // 100,000us is 10hz //NOLINT
 
 
 
@@ -62,7 +62,7 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     return true;
 }
 
-HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_task, 10, 1000UL); // 1000us is 1kHz
+HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_task, 10, 1000UL); // 1000us is 1kHz //NOLINT
 
 
 
@@ -72,13 +72,13 @@ bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::
     return true;
 }
 
-HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_tick_state_machine_task, 2); // Idle (constant-update) task
+HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_tick_state_machine_task, 2); // Idle (constant-update) task //NOLINT
 
 
 
 bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-
+    /* NOLINTBEGIN */ // Thermistor channels are for testing purposes only, the pin numbers 0-7 are acceptable "magic numbers".
     // Initialize all eight channels to scale = 1, offset = 0
     adc_1.setChannelScaleAndOffset(0, 1, 0);
     adc_1.setChannelScaleAndOffset(1, 1, 0);
@@ -88,6 +88,7 @@ bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     adc_1.setChannelScaleAndOffset(5, 1, 0);
     adc_1.setChannelScaleAndOffset(6, 1, 0);
     adc_1.setChannelScaleAndOffset(7, 1, 0);
+    /* NOLINTEND */
 
     hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros);
 
@@ -103,7 +104,7 @@ bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     return true;
 }
 
-HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_task, 10, 40000UL); // 20000us is 25Hz
+HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_task, 10, 40000UL); // 20000us is 25Hz //NOLINT
 
 
 
@@ -115,4 +116,4 @@ bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_
     return true;
 }
 
-HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz
+HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz //NOLINT

@@ -115,8 +115,8 @@ private:
         {TorqueLimit_e::TCMUX_MID_TORQUE, 15.0f},
         {TorqueLimit_e::TCMUX_LOW_TORQUE, 10.0f}};
     size_t _num_motors;
-    float max_change_speed_, max_torque_pos_change_delta_, max_power_limit_;
-    DrivetrainCommand_s prev_command_ = {};
+    float _max_change_speed, _max_torque_pos_change_delta, _max_power_limit;
+    DrivetrainCommand_s _prev_command = {};
     TorqueControllerMuxStatus_s active_status_ = {};
     TorqueControllerMuxError_e can_switch_controller_(DrivetrainDynamicReport_s active_drivetrain_data,
                                                     DrivetrainCommand_s previous_controller_command,
