@@ -16,6 +16,8 @@ public:
         static BuzzerController instance;
         return instance;
     }
+
+    BuzzerController(BuzzerController&&) = default;
     
     /**
      * Calling this command will activate the buzzer for BUZZER_PERIOD_MS milliseconds.
@@ -32,6 +34,7 @@ public:
     {
         _last_activation_time_ms = 0;
     }
+    ~BuzzerController() = default;
 
     /**
      * Returns whether or not the buzzer should currently be active, according to the system.

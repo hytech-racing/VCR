@@ -39,7 +39,7 @@
  */
 bool init_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern const HT_TASK::Task test_task;
+extern HT_TASK::Task test_task;
 
 
 /**
@@ -48,7 +48,7 @@ extern const HT_TASK::Task test_task;
  * singleton classes to minimize the need for passing instances around.
  */
 bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern const HT_TASK::Task tick_state_machine_task;
+extern HT_TASK::Task tick_state_machine_task;
 
 
 
@@ -59,7 +59,7 @@ extern const HT_TASK::Task tick_state_machine_task;
  */
 bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern const HT_TASK::Task read_adc0_task;
+extern HT_TASK::Task read_adc0_task;
 
 
 
@@ -73,7 +73,7 @@ extern const HT_TASK::Task read_adc0_task;
  */
 bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern const HT_TASK::Task read_adc1_task;
+extern HT_TASK::Task read_adc1_task;
 
 
 
@@ -82,6 +82,6 @@ extern const HT_TASK::Task read_adc1_task;
  * update function of the buzzer controller.
  */
 bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern const HT_TASK::Task update_buzzer_controller_task;
+extern HT_TASK::Task update_buzzer_controller_task;
 
 #endif /* VCR_TASKS */
