@@ -38,7 +38,16 @@
  */
 bool init_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern HT_TASK::Task test_task;
+extern const HT_TASK::Task test_task;
+
+
+/**
+ * The "tick state machine" task will simply call the state machine's tick function with the current
+ * timestamp in micros. No init function is necessary. The tick function makes use of the other systems'
+ * singleton classes to minimize the need for passing instances around.
+ */
+bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+extern const HT_TASK::Task tick_state_machine_task;
 
 
 
@@ -49,7 +58,7 @@ extern HT_TASK::Task test_task;
  */
 bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern HT_TASK::Task read_adc0_task;
+extern const HT_TASK::Task read_adc0_task;
 
 
 
@@ -63,6 +72,15 @@ extern HT_TASK::Task read_adc0_task;
  */
 bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern HT_TASK::Task read_adc1_task;
+extern const HT_TASK::Task read_adc1_task;
+
+
+
+/**
+ * This task will update the buzzer_is_active boolean in the VCRSystemData struct by calling the
+ * update function of the buzzer controller.
+ */
+bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+extern const HT_TASK::Task update_buzzer_controller_task;
 
 #endif /* VCR_TASKS */
