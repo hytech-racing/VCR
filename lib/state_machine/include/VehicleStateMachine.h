@@ -19,7 +19,7 @@
  *                                enough time has passed, we enter the next state.
  * READY_TO_DRIVE               - While in this state, pedal inputs command the drivetrain.
  */
-enum class CAR_STATE //NOLINT
+enum class CAR_STATE
 {
     STARTUP = 0,
     TRACTIVE_SYSTEM_NOT_ACTIVE = 1,
@@ -36,7 +36,7 @@ enum class CAR_STATE //NOLINT
  * VehicleStateMachine uses instance data directly from other singleton classes (Buzzer, Pedals, etc)
  * and from the global structs (VCRInterfaceData_s, VCRSystemData_s, etc.).
  */
-class VehicleStateMachine //NOLINT
+class VehicleStateMachine
 {
 public:
     static VehicleStateMachine& getInstance()

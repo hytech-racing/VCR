@@ -26,8 +26,8 @@ public:
     void setup_retry()
     {
         reset_drivetrain();
-        hv_en_requested_ = false;
-        enable_requested_ = false;
+        _hv_en_requested = false;
+        _enable_requested = false;
     }
 
     bool handle_inverter_startup(unsigned long curr_time);
@@ -72,38 +72,38 @@ private:
     //     dynamic_data_ = {};
     // }
 
-    std::array<InverterType *, 4> inverters_;
+    std::array<InverterType *, 4> _inverters;
     // MCUInterface *mcu_interface_;
-    int init_time_limit_ms_;
-    uint16_t min_hv_voltage_;
-    int motor_pole_pairs_;
-    float lambda_magnetic_flux_wb_, L_d_inductance_H_;
+    int _init_time_limit_ms;
+    uint16_t _min_hv_voltage;
+    int _motor_pole_pairs;
+    float _lambda_magnetic_flux_wb, _L_d_inductance_H;
     // startup statuses:
-    bool hv_en_requested_, enable_requested_;
+    bool _hv_en_requested, _enable_requested;
     // reset inverters
-    bool reset_requested_;
-    unsigned long last_reset_pressed_time_;
-    unsigned long reset_interval_;
+    bool _reset_requested;
+    unsigned long _last_reset_pressed_time;
+    unsigned long _reset_interval;
     /// @param curr_time current system tick time (millis()) that sets the init phase start time
-    void enable_drivetrain_hv_(unsigned long curr_time);
-    void request_enable_();
+    void enable_drivetrain_hv(unsigned long curr_time);
+    void request_enable();
     // startup phase 1
     // status check for start of enable
-    bool drivetrain_ready_();
+    bool drivetrain_ready();
     // startup phase 2
-    bool check_drivetrain_quit_dc_on_();
+    bool check_drivetrain_quit_dc_on();
 
     // final check for drivetrain initialization to check if quit inverter on
-    bool drivetrain_enabled_();
+    bool drivetrain_enabled();
 
-    unsigned long curr_system_millis_;
-    unsigned int min_cmd_period_;
-    unsigned long last_no_torque_cmd_time_, last_reset_cmd_time_, last_disable_cmd_time_, last_general_cmd_time_;
+    unsigned long _curr_system_millis;
+    unsigned int _min_cmd_period;
+    unsigned long _last_no_torque_cmd_time, last_reset_cmd_time, last_disable_cmd_time, last_general_cmd_time;
 
-    unsigned long drivetrain_initialization_phase_start_time_;
+    unsigned long _drivetrain_initialization_phase_start_time;
     // DrivetrainCommand_s current_drivetrain_command_;
     // DrivetrainDynamicReport_s dynamic_data_;
-    float max_torque_setpoint_nm_;
+    float _max_torque_setpoint_nm;
 };
 
 #include "DrivetrainSystem.tpp"
