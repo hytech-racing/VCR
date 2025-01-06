@@ -4,7 +4,7 @@
 /* From local systems library */
 #include "DrivetrainSystem.h"
 #include "SafetySystem.h"
-#include "Buzzer.h"
+#include "BuzzerController.h"
 
 /**
  * Enum representing possible states for the vehicle's state machine.
@@ -19,7 +19,7 @@
  *                                enough time has passed, we enter the next state.
  * READY_TO_DRIVE               - While in this state, pedal inputs command the drivetrain.
  */
-const enum class CAR_STATE
+enum class CAR_STATE //NOLINT
 {
     STARTUP = 0,
     TRACTIVE_SYSTEM_NOT_ACTIVE = 1,
@@ -36,7 +36,7 @@ const enum class CAR_STATE
  * VehicleStateMachine uses instance data directly from other singleton classes (Buzzer, Pedals, etc)
  * and from the global structs (VCRInterfaceData_s, VCRSystemData_s, etc.).
  */
-const class VehicleStateMachine
+class VehicleStateMachine //NOLINT
 {
 public:
     static VehicleStateMachine& getInstance()

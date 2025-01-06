@@ -25,6 +25,7 @@
 
 #ifndef VCR_TASKS
 #define VCR_TASKS
+// NOLINTBEGIN // Allow tasks to be non-constant to avoid updating the HT_SCHED library.
 
 /* From HT_SCHED library */
 #include "ht_sched.hpp"
