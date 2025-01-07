@@ -27,15 +27,7 @@
 
 
 /* Scheduler setup */
-HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
-
-auto start_time = std::chrono::high_resolution_clock::now();
-unsigned long stdMicros()
-{
-    auto now = std::chrono::high_resolution_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - start_time).count();
-    return static_cast<unsigned long>(elapsed);
-}
+const HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
 
 
@@ -46,7 +38,7 @@ qindesign::network::EthernetUDP protobuf_recv_socket;
 
 
 void setup() {
-    scheduler.setTimingFunction(stdMicros);
+    scheduler.setTimingFunction(micros);
 
     scheduler.schedule(tick_state_machine_task);
     scheduler.schedule(read_adc0_task);

@@ -4,7 +4,7 @@
 /* From local systems library */
 #include "DrivetrainSystem.h"
 #include "SafetySystem.h"
-#include "Buzzer.h"
+#include "BuzzerController.h"
 
 /**
  * Enum representing possible states for the vehicle's state machine.

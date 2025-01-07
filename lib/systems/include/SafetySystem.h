@@ -1,7 +1,7 @@
 #ifndef SAFETY_SYSTEM
 #define SAFETY_SYSTEM
 
-class SafetySystem
+class SafetySystem //NOLINT
 {
 public:
     static SafetySystem& getInstance()
