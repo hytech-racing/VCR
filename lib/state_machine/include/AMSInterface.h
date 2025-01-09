@@ -68,36 +68,6 @@ public:
     */
     float initialize_charge();
 
-    // /**
-    //  * Calculates SoC based on the energy meter CAN message. Calling calculate_SoC_em()
-    //  * will update the SoC_ and charge_ member variables.
-    //  * 
-    //  * @param The current tick that the calculate_SoC_em function should use for integration.
-    //  * 
-    //  * @pre The last_tick_ member variable must be updated correctly.
-    //  * @post The charge_ field has the updated charge, and the SoC field contains an updated percentage.
-    // */
-    // void calculate_SoC_em(const SysTick_s &tick);
-
-    // /**
-    //  * Calculates SoC based on the ACU_SHUNT_MEASUREMENTS CAN message. Calling calculate_SoC_acu()
-    //  * will update the SoC_ and charge_ member variables.
-    //  * 
-    //  * @param The current tick that the calculate_SoC_em function should use for integration.
-    //  * 
-    //  * @pre The last_tick_ member variable must be updated correctly.
-    //  * @post The charge_ field has the updated charge, and the SoC field contains an updated percentage.
-    // */
-    // void calculate_SoC_acu(const SysTick_s &tick);
-
-    // /**
-    //  * Retrieves the value of the SoC member variable. This function does NOT recalculate
-    //  * the SoC_ variable, it only returns the value that is stored.
-    //  * 
-    //  * @return the current value stored in the SoC_ member variable.
-    // */
-    // float get_SoC() {return SoC_;}
-
     /**
      * This is AMSInterface's tick() function. It behaves correctly regardless of the
      * since the functions calculate the elapsed time between the given tick and the stored last_tick_.
@@ -184,9 +154,6 @@ private:
         cell_temp_alpha(temp_alpha),
         cell_voltage_alpha(volt_alpha),
         use_em_for_soc_(true),
-        // charge_(0.0f),
-        // SoC_(0.0f),
-        // has_initialized_charge_(false),
         has_received_bms_voltage_(false) {};
 
     /* Overloaded constructor that only takes in software OK pin and uses default voltages and temp*/
@@ -239,28 +206,10 @@ private:
      */
     bool use_em_for_soc_ = true;
 
-    // /**
-    //  * The charge stored on the accumulator. Stored in coulombs, ranging from
-    //  * zero to MAX_PACK_CHARGE.
-    // */
-    // float charge_;
-
-    // /**
-    //  * Stores the current state of charge of the accumulator. SoC is stored as a
-    //  * percentage of MAX_PACK_CHARGE. In every location, this is calculated as
-    //  * SoC = (charge / MAX_PACK_CHARGE) * 100;
-    // */
-    // float SoC_;
-    
     /**
      * Stores the last Sys_Tick_s struct from the last time the tick() function is called.
     */
     SysTick_s last_tick_;
-
-    // /**
-    //  * Stores whether or not this AMSInterface has initialized SoC_ or not.
-    // */
-    // bool has_initialized_charge_;
 
     /**
      * Stores whether or not this AMSInterface has properly received a bms_voltage CAN
