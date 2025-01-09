@@ -92,45 +92,45 @@ float AMSInterface::get_filtered_min_cell_voltage() {
     return filtered_min_cell_voltage;
 }
 
-float AMSInterface::initialize_charge() {
-    int i = 0;
-    float lowest_voltage = HYTECH_low_voltage_ro_fromS(bms_voltages_.low_voltage_ro);
+// float AMSInterface::initialize_charge() {
+//     int i = 0;
+//     float lowest_voltage = HYTECH_low_voltage_ro_fromS(bms_voltages_.low_voltage_ro);
 
-    while (lowest_voltage - VOLTAGE_LOOKUP_TABLE[i] < 0) {
-        i++;
-    }
-    charge_ = ( (100 - i) / 100.0) * MAX_PACK_CHARGE;
-    SoC_ = (charge_ / MAX_PACK_CHARGE) * 100;
+//     while (lowest_voltage - VOLTAGE_LOOKUP_TABLE[i] < 0) {
+//         i++;
+//     }
+//     charge_ = ( (100 - i) / 100.0) * MAX_PACK_CHARGE;
+//     SoC_ = (charge_ / MAX_PACK_CHARGE) * 100;
 
-    return charge_;
-}
+//     return charge_;
+// }
 
-void AMSInterface::calculate_SoC_em(const SysTick_s &tick) {
-    unsigned long delta_time_micros = tick.micros - last_tick_.micros;
+// void AMSInterface::calculate_SoC_em(const SysTick_s &tick) {
+//     unsigned long delta_time_micros = tick.micros - last_tick_.micros;
     
-    float current = HYTECH_em_current_ro_fromS(em_measurements_.em_current_ro); // Current in amps
+//     float current = HYTECH_em_current_ro_fromS(em_measurements_.em_current_ro); // Current in amps
     
-    // coulombs = amps * microseconds * (1sec / 1000000 microsec)
-    charge_ -= (current * delta_time_micros) / 1000000;
+//     // coulombs = amps * microseconds * (1sec / 1000000 microsec)
+//     charge_ -= (current * delta_time_micros) / 1000000;
     
-    SoC_ = (charge_ / MAX_PACK_CHARGE) * 100;
-}
+//     SoC_ = (charge_ / MAX_PACK_CHARGE) * 100;
+// }
 
-void AMSInterface::calculate_SoC_acu(const SysTick_s &tick) {
-    unsigned long delta_time_micros = tick.micros - last_tick_.micros;
+// void AMSInterface::calculate_SoC_acu(const SysTick_s &tick) {
+//     unsigned long delta_time_micros = tick.micros - last_tick_.micros;
 
-    // Converts analog read (from 0 to 4095) into some value (0.0 to 3.3)
-    // float current = HYTECH_current_shunt_read_ro_fromS(acu_shunt_measurements_.current_shunt_read_ro);
+//     // Converts analog read (from 0 to 4095) into some value (0.0 to 3.3)
+//     // float current = HYTECH_current_shunt_read_ro_fromS(acu_shunt_measurements_.current_shunt_read_ro);
 
-    // shunt_voltage ranges from -3.33 to 2.635
-    // float shunt_voltage = (current * (9.22 / 5.1)) - 3.3 - 0.03;
+//     // shunt_voltage ranges from -3.33 to 2.635
+//     // float shunt_voltage = (current * (9.22 / 5.1)) - 3.3 - 0.03;
 
-    // calc_current ranges from -666 to 527.176
-    // float calc_current = (shunt_voltage / 0.005);
-    charge_ -= (HYTECH_current_shunt_read_ro_fromS(acu_shunt_measurements_.current_shunt_read_ro) * delta_time_micros) / 1000000;
+//     // calc_current ranges from -666 to 527.176
+//     // float calc_current = (shunt_voltage / 0.005);
+//     charge_ -= (HYTECH_current_shunt_read_ro_fromS(acu_shunt_measurements_.current_shunt_read_ro) * delta_time_micros) / 1000000;
 
-    SoC_ = (charge_ / MAX_PACK_CHARGE) * 100;
-}
+//     SoC_ = (charge_ / MAX_PACK_CHARGE) * 100;
+// }
 
 void AMSInterface::tick(const SysTick_s &tick) {
 
