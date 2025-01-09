@@ -3,7 +3,7 @@
 template <typename InverterType>
 void DrivetrainSystem<InverterType>::tick(const SysTick_s &tick)
 {
-
+    
 }
 
 template <typename InverterType>

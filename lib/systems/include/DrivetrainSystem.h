@@ -6,6 +6,16 @@
 #include "stdint.h"
 #include "SysClock.h"
 
+enum class DRIVETRAIN_STATE
+{
+    TRACTIVE_SYSTEM_NOT_ACTIVE = 0,
+    TRACTIVE_SYSTEM_ACTIVE = 1,
+    ENABLING_INVERTERS = 2,
+    ENABLED = 3,
+    ERROR = 4
+};
+
+// #include "DrivetrainSystemStateMachine.h"
 /**
  * As of now, only the minimum functions for VehicleStateMachine to compile have been implemented.
  * TODO: Re-add the rest of the necessary functions
@@ -15,11 +25,7 @@ template <typename InverterType>
 class DrivetrainSystem
 {
 public:
-    static DrivetrainSystem& getInstance()
-    {
-        static DrivetrainSystem instance;
-        return instance;
-    }
+    DrivetrainSystem();
     
     void tick(const SysTick_s &tick);
 
