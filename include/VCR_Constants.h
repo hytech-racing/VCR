@@ -37,21 +37,21 @@ const int THERMISTOR_7 = 7; //8
 
 /* Scaling and offset */
 const float GLV_SENSE_SCALE = 24/((2.77149877/3.3)*4096); //unsure about the multiplication by 4.0865
-// const int GLV_SENSE_OFFSET = -1; //No offset for GLV
+const int GLV_SENSE_OFFSET = 0; //No offset for GLV
 const float CURRENT_SENSE_SCALE = 24/((2.77149877/3.3)*4096); //unsure about the multiplication by 4.0865
-// const int CURRENT_SENSE_OFFSET = -1; //No offset for CURRENT_SENSE
+const int CURRENT_SENSE_OFFSET = 0; //No offset for CURRENT_SENSE
 const float REFERENCE_SENSE_SCALE = 24/((2.77149877/3.3)*4096); //unsure about the multiplication by 4.0865
-// const int REFERENCE_SENSE_OFFSET = -1; //No offset for REFERENCE_SENSE
+const int REFERENCE_SENSE_OFFSET = 0; //No offset for REFERENCE_SENSE
 
 //Values are from the old MCU rev15
-const float LOADCELL_RL_SCALE = 0.1149;
-const float LOADCELL_RL_OFFSET = 13.526 / LOADCELL_RL_SCALE;
-const float LOADCELL_RR_SCALE = 0.118;
-const float LOADCELL_RR_OFFSET = 25.721 / LOADCELL_RR_SCALE;
+const float RL_LOADCELL_SCALE = 0.1149;
+const float RL_LOADCELL_OFFSET = 13.526 / RL_LOADCELL_SCALE;
+const float RR_LOADCELL_SCALE = 0.118;
+const float RR_LOADCELL_OFFSET = 25.721 / RR_LOADCELL_SCALE;
 
 //does not matter that much
 //5/((3/3.3)*4096); //not sure if this also needs to be multiplied by 4.0865
-const float RL_SUS_POT_SCALE = 1
+const float RL_SUS_POT_SCALE = 1;
 const int RL_SUS_POT_OFFSET = 1; //TODO: FIGURE THIS OUT
 const float RR_SUS_POT_SCALE = 1; //TODO: FIGURE THIS OUT
 const int RR_SUS_POT_OFFSET = 1; //TODO: FIGURE THIS OUT
