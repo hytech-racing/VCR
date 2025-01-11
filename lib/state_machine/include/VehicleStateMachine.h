@@ -58,9 +58,9 @@ public:
     CAR_STATE get_state() { return _current_state; }
 
 private:
-    VehicleStateMachine() :
+    VehicleStateMachine(DrivetrainSystem & drivetrain_system) :
         _current_state(CAR_STATE::STARTUP),
-        _drivetrain(DrivetrainSystem<uint32_t>::getInstance()),
+        _drivetrain(drivetrain_system),
         _buzzer(BuzzerController::getInstance()),
         _safetysystem(SafetySystem::getInstance()) {};
 

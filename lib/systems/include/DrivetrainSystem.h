@@ -1,18 +1,32 @@
 #ifndef DRIVETRAINSYSTEM
 #define DRIVETRAINSYSTEM
 
-#include "SharedFirmwareTypes.h"
+#include "etl/variant.h"
+
 #include <array>
+#include <functional>
 #include "stdint.h"
+
+#include "SharedFirmwareTypes.h"
 #include "SysClock.h"
 
-enum class DRIVETRAIN_STATE
+enum class DrivetrainState_e
 {
-    TRACTIVE_SYSTEM_NOT_ACTIVE = 0,
-    TRACTIVE_SYSTEM_ACTIVE = 1,
-    ENABLING_INVERTERS = 2,
-    ENABLED = 3,
-    ERROR = 4
+    NOT_CONNECTED = 0,
+    NOT_ENABLED_NO_HV_PRESENT = 1,
+    NOT_ENABLED_HV_PRESENT = 2,
+    ENABLING_INVERTERS_SPEED_MODE = 3,
+    ENABLING_INVERTERS_TORQUE_MODE = 4,
+    ENABLED_SPEED_MODE = 5,
+    ENABLED_TORQUE_MODE = 6,
+    ERROR = 7
+};
+
+enum class DrivetrainCmdResponse_e
+{
+    COMMAND_OK = 0,
+    CANNOT_INIT_NOT_CONNECTED = 1,
+    COMMAND_INVALID = 2
 };
 
 // #include "DrivetrainSystemStateMachine.h"
@@ -21,64 +35,87 @@ enum class DRIVETRAIN_STATE
  * TODO: Re-add the rest of the necessary functions
  * TODO: Add DrivetrainSystem.tpp to implement all functions
  */
-template <typename InverterType>
+
+struct DrivetrainSpeedCommand_s
+{
+    veh_vec<float> desired_speed_rpm;
+    veh_vec<float> torque_limit_nm;
+};
+
+struct DrivetrainTorqueCommand_s
+{
+    veh_vec<float> desired_torque_nm;
+};
+
+struct DrivetrainInit_s
+{
+    bool init_drivetrain;
+};
+
+
+
+struct InverterStatus_s
+{
+        float dc_bus_voltage;
+        float torque_nm;
+        float speed_rpm;
+        float mech_power_w;
+        float inverter_temp_c; 
+        float motor_temp_c;
+        float igbt_temp_c;
+        uint16_t error_status_id;
+        bool inverter_ready : 1;
+        bool quit_dc : 1;
+        bool quit_inverter : 1;
+        bool error_present : 1;
+        bool connected : 1;
+        bool hv_present : 1;
+};
+
+struct DrivetrainStatus_s
+{
+    bool all_inverters_connected;
+    veh_vec<InverterStatus_s> inverter_statuses;
+    DrivetrainCmdResponse_e cmd_resp;
+};
+
 class DrivetrainSystem
 {
 public:
-    DrivetrainSystem();
+    using CmdVariant = etl::variant<DrivetrainSpeedCommand_s, DrivetrainTorqueCommand_s, DrivetrainInit_s>;
+    DrivetrainSystem() = delete;
     
-    void tick(const SysTick_s &tick);
-
-    void setup_retry()
-    {
-        reset_drivetrain();
-        _hv_en_requested = false;
-        _enable_requested = false;
-    }
-
-    bool handle_inverter_startup(unsigned long curr_time);
-
-    // on entry logic
-    void command_drivetrain_no_torque();
-    void command_drivetrain_debug();
-
-    // check to see if init time limit has passed
-    bool inverter_init_timeout(unsigned long curr_time);
-
-    bool hv_over_threshold_on_drivetrain();
-    void disable();
-    void disable_no_pins();
-    bool drivetrain_error_occured();
-    void reset_drivetrain();
-    // void command_drivetrain(const DrivetrainCommand_s &data);
-
-    void enable_drivetrain_reset();
-    void check_reset_condition();
-
+    DrivetrainStatus_s evaluate_drivetrain(CmdVariant cmd);
+    DrivetrainState_e get_state();
     // DrivetrainDynamicReport_s get_dynamic_data();
 
-private:
-    // DrivetrainSystem(const std::array<InverterType *, 4> &inverters, MCUInterface *mcu_interface, int init_time_limit_ms, uint16_t min_hv_voltage = 60, int min_cmd_period_ms = 1, float max_torque_setpoint_nm = 21.42)
-    //     : inverters_(inverters), init_time_limit_ms_(init_time_limit_ms), min_hv_voltage_(min_hv_voltage), min_cmd_period_(min_cmd_period_ms), max_torque_setpoint_nm_(max_torque_setpoint_nm)
+    struct InverterFuncts {
+        std::function<void(float desired_rpm, float torque_limit_nm)> set_speed;
+        std::function<void(float torque_limit_nm)> set_torque;
+        std::function<void()> set_disable_inverter;
+        std::function<void()> set_no_torque;
+        std::function<void()> reset_inverter;
+        std::function<void()> set_enable_inverter;
+        std::function<void()> set_enable_hv;
+        std::function<InverterStatus_s()> get_status;
+    };
+    
+    // struct DrivetrainInterfaceState_s
     // {
-    //     // values from: https://www.amk-motion.com/amk-dokucd/dokucd/en/content/resources/pdf-dateien/fse/motor_data_sheet_a2370dd_dd5.pdf
-    //     motor_pole_pairs_ = 5;
-    //     lambda_magnetic_flux_wb_ = 1.0;
-    //     hv_en_requested_ = false;
-    //     enable_requested_ = false;
-    //     reset_requested_ = false;
-    //     last_reset_pressed_time_ = 0;
-    //     reset_interval_ = 5000;     // ms
-    //     curr_system_millis_ = 0;
-    //     last_no_torque_cmd_time_ = 0;
-    //     last_reset_cmd_time_ = 0;
-    //     last_disable_cmd_time_ = 0;
-    //     last_general_cmd_time_ = 0; // ms
-    //     mcu_interface_ = mcu_interface;
-    //     dynamic_data_ = {};
-    // }
 
-    std::array<InverterType *, 4> _inverters;
+    // };
+private:
+    bool _check_inverter_flags(std::function<bool(const InverterStatus_s&)> flag_check_func);
+private:
+    DrivetrainState_e _state;
+    veh_vec<InverterFuncts> _inverter_interfaces;
+    std::function<bool(const InverterStatus_s &)> _check_inverter_ready_flag;
+    std::function<bool(const InverterStatus_s &)> _check_inverter_connected_flag;
+    std::function<bool(const InverterStatus_s &)> _check_inverter_quit_dc_flag;
+    std::function<bool(const InverterStatus_s &)> _check_inverter_error_flag;
+    std::function<bool(const InverterStatus_s &)> _check_inverter_hv_present_flag;
+    std::function<bool(const InverterStatus_s &)> _check_inverter_hv_not_present_flag;
+
     // MCUInterface *mcu_interface_;
     int _init_time_limit_ms;
     uint16_t _min_hv_voltage;
@@ -112,5 +149,4 @@ private:
     float _max_torque_setpoint_nm;
 };
 
-#include "DrivetrainSystem.tpp"
 #endif /* DRIVETRAINSYSTEM */
