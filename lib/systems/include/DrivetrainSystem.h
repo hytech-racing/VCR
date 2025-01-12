@@ -30,11 +30,14 @@ enum class DrivetrainState_e
     NOT_CONNECTED = 0,
     NOT_ENABLED_NO_HV_PRESENT = 1,
     NOT_ENABLED_HV_PRESENT = 2,
-    ENABLING_INVERTERS_SPEED_MODE = 3,
-    ENABLING_INVERTERS_TORQUE_MODE = 4,
-    ENABLED_SPEED_MODE = 5,
-    ENABLED_TORQUE_MODE = 6,
-    ERROR = 7
+    INVERTERS_READY = 3,
+    INVERTERS_HV_ENABLED = 4,
+    INVERTERS_ENABLED = 5,
+    ENABLING_INVERTERS_SPEED_MODE = 6,
+    ENABLING_INVERTERS_TORQUE_MODE = 7,
+    ENABLED_SPEED_MODE = 8,
+    ENABLED_TORQUE_MODE = 9,
+    ERROR = 10
 };
 
 enum class DrivetrainCmdResponse_e
@@ -55,29 +58,36 @@ struct DrivetrainTorqueCommand_s
     veh_vec<float> desired_torque_nm;
 };
 
+enum class DrivetrainModeRequest_e
+{
+    UNINITIALIZED = 0,
+    INIT_SPEED_MODE = 1,
+    INIT_TORQUE_MODE =2
+};
+
 struct DrivetrainInit_s
 {
-    bool init_drivetrain;
+    DrivetrainModeRequest_e init_drivetrain;
 };
 
 
 
 struct InverterStatus_s
 {
-        float dc_bus_voltage;
-        float torque_nm;
-        float speed_rpm;
-        float mech_power_w;
-        float inverter_temp_c; 
-        float motor_temp_c;
-        float igbt_temp_c;
-        uint16_t error_status_id;
-        bool inverter_ready : 1;
-        bool quit_dc : 1;
-        bool quit_inverter : 1;
-        bool error_present : 1;
-        bool connected : 1;
-        bool hv_present : 1;
+    float dc_bus_voltage;
+    float torque_nm;
+    float speed_rpm;
+    float mech_power_w;
+    float inverter_temp_c; 
+    float motor_temp_c;
+    float igbt_temp_c;
+    uint16_t error_status_id;
+    bool inverter_ready : 1;
+    bool quit_dc : 1;
+    bool quit_inverter : 1;
+    bool error_present : 1;
+    bool connected : 1;
+    bool hv_present : 1;
 };
 
 struct DrivetrainStatus_s
@@ -85,6 +95,12 @@ struct DrivetrainStatus_s
     bool all_inverters_connected;
     veh_vec<InverterStatus_s> inverter_statuses;
     DrivetrainCmdResponse_e cmd_resp;
+};
+
+struct DrivetrainGPIO_s
+{
+    bool torque_mode_pin_state;
+    bool speed_mode_pin_state;
 };
 
 class DrivetrainSystem
@@ -123,7 +139,8 @@ private:
     std::function<bool(const InverterStatus_s &)> _check_inverter_error_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_present_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_not_present_flag;
-
+    
+    std::function<void(const DrivetrainGPIO_s &)> _set_gpio_states;
     // MCUInterface *mcu_interface_;
     int _init_time_limit_ms;
     uint16_t _min_hv_voltage;
