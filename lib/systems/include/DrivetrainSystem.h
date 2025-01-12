@@ -10,6 +10,21 @@
 #include "SharedFirmwareTypes.h"
 #include "SysClock.h"
 
+
+// requirements:
+// - [ ] must support ability to initialize the drivetrain 
+// - [ ] ability to command inverters individually and be able to return a failure status when attempting to send invalid command for a certain state
+// - [ ] contain a state machine for managing the state of the drivetrain as a whole (aka: all inverters have the same state)
+//  - [ ] initialization states included
+//  - [ ] different control mode states
+// - [ ] single point of interaction / control of the drivetrain that can receive "commands"
+//      (at least for now, need to see how this works out once we start using it)
+// - [ ] be decoupled from the inverter class
+//      std::function / etl::delegate registered functions for the inverter interface. mostly for ease of testing.
+// - [ ] be able to reset drivetrain
+    // - [ ] 
+
+
 enum class DrivetrainState_e
 {
     NOT_CONNECTED = 0,
@@ -28,13 +43,6 @@ enum class DrivetrainCmdResponse_e
     CANNOT_INIT_NOT_CONNECTED = 1,
     COMMAND_INVALID = 2
 };
-
-// #include "DrivetrainSystemStateMachine.h"
-/**
- * As of now, only the minimum functions for VehicleStateMachine to compile have been implemented.
- * TODO: Re-add the rest of the necessary functions
- * TODO: Add DrivetrainSystem.tpp to implement all functions
- */
 
 struct DrivetrainSpeedCommand_s
 {
