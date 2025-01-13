@@ -12,7 +12,8 @@ DrivetrainSystem::DrivetrainSystem(
     _check_inverter_quit_dc_flag([](const InverterStatus_s & status) -> bool {return status.quit_dc;}),
     _check_inverter_error_flag([](const InverterStatus_s & status) -> bool {return status.error_present;}),
     _check_inverter_hv_present_flag([](const InverterStatus_s & status) -> bool {return status.hv_present;}),
-    _check_inverter_hv_not_present_flag([](const InverterStatus_s & status) -> bool {return !status.hv_present;}) { };
+    _check_inverter_hv_not_present_flag([](const InverterStatus_s & status) -> bool {return !status.hv_present;}),
+    _check_inverter_enabled([](const InverterStatus_s & status) -> bool {return !status.quit_inverter;}) { };
 
 
 DrivetrainState_e DrivetrainSystem::get_state()
@@ -90,9 +91,8 @@ void DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::CmdVariant cmd)
         case DrivetrainState_e::INVERTERS_READY:
         {
             bool requesting_init = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED);
-            bool hv_enabled = _check_inverter_flags(_check_inverter_quit_dc_flag);
             bool inverters_ready = _check_inverter_flags(_check_inverter_ready_flag);
-
+            bool hv_enabled = _check_inverter_flags(_check_inverter_quit_dc_flag);
             if(requesting_init && inverters_ready && !hv_enabled)
             {
                 _set_enable_drivetrain_hv();
@@ -111,16 +111,41 @@ void DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::CmdVariant cmd)
         case DrivetrainState_e::INVERTERS_HV_ENABLED:
         {
             bool requesting_init = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED);
-            if()
+            bool requesting_speed_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain == DrivetrainModeRequest_e::INIT_SPEED_MODE);
+            bool requesting_torque_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain == DrivetrainModeRequest_e::INIT_TORQUE_MODE);
+
+            bool hv_enabled = _check_inverter_flags(_check_inverter_quit_dc_flag);
+            bool inverters_ready = _check_inverter_flags(_check_inverter_ready_flag);
+            bool inverters_enabled = _check_inverter_flags(_check_inverter_enabled);
+
+            if(requesting_init && hv_enabled && inverters_ready && hv_enabled && !inverters_enabled)
+            {
+                _set_enable_drivetrain();
+            } else if(requesting_speed_mode && hv_enabled && inverters_ready && hv_enabled && inverters_enabled);
+            {
+                _set_enable_drivetrain();
+                _set_state(DrivetrainState_e::ENABLING_INVERTERS_SPEED_MODE);
+            } else if(requesting_torque_mode && hv_enabled && inverters_ready && hv_enabled && inverters_enabled);
+            {
+                _set_enable_drivetrain();
+                _set_state(DrivetrainState_e::ENABLING_INVERTERS_TORQUE_MODE);
+            }
+            // TODO need to see if we need more checks to go back to previous states
             break;
         }
 
         case DrivetrainState_e::ENABLING_INVERTERS_SPEED_MODE:
         {
+            bool requesting_speed_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain == DrivetrainModeRequest_e::INIT_SPEED_MODE);
+            bool inverters_enabled = _check_inverter_flags(_check_inverter_enabled);
             DrivetrainGPIO_s states;
             states.torque_mode_pin_state = false;
             states.speed_mode_pin_state = true;
             _set_gpio_states(states);
+
+            // TODO check some flag for torque mode to make sure we are in the speed mode
+
+            _set_state(DrivetrainState_e::ENABLED_SPEED_MODE);
             break;
         }
 
@@ -151,6 +176,15 @@ void DrivetrainSystem::_set_enable_drivetrain_hv()
     for(const auto & func : funcs_arr)
     {
         func.set_enable_hv();
+    }
+}
+
+void DrivetrainSystem::_set_enable_drivetrain()
+{
+    auto funcs_arr = _inverter_interfaces.as_array();
+    for(const auto & func : funcs_arr)
+    {
+        func.set_enable_inverter();
     }
 }
 

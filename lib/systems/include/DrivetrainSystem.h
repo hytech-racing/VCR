@@ -70,8 +70,6 @@ struct DrivetrainInit_s
     DrivetrainModeRequest_e init_drivetrain;
 };
 
-
-
 struct InverterStatus_s
 {
     float dc_bus_voltage;
@@ -139,9 +137,11 @@ private:
     std::function<bool(const InverterStatus_s &)> _check_inverter_error_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_present_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_not_present_flag;
+    std::function<bool(const InverterStatus_s &)> _check_inverter_enabled;
     
     std::function<void(const DrivetrainGPIO_s &)> _set_gpio_states;
-    // MCUInterface *mcu_interface_;
+    
+    
     int _init_time_limit_ms;
     uint16_t _min_hv_voltage;
     int _motor_pole_pairs;
@@ -152,6 +152,8 @@ private:
     bool _reset_requested;
     unsigned long _last_reset_pressed_time;
     unsigned long _reset_interval;
+    
+    
     /// @param curr_time current system tick time (millis()) that sets the init phase start time
     void enable_drivetrain_hv(unsigned long curr_time);
     void request_enable();
