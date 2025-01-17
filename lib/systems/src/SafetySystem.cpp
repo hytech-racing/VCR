@@ -1,28 +1,37 @@
 #include "SafetySystem.h"
-//include AMS and Watchdog Interfaces
+
+
 
 void SafetySystem::init()
 {    
-    _software_is_ok = true; 
+    _software_is_ok = true;  
 
-    // AMS and Watchdog objects that are each an instance of their respective interfaces 
-    // will be defined when AMSInterface and WatchdogInterface files are included
-    ams = AMSInterface.getInstance();
-    watchdog = WatchdogInterface.getInstance();
+    _ams -> set_start_state();
+    _watchdog -> set_state_state();
+
+
+    
 }
 
 void SafetySystem::update_software_shutdown(unsigned long curr_millis)
 {
     /** 
      * Updates _software_is_ok by updating AMS interface and Watchdog interface. If either
-     * of those have problems, then _software_is_ok goes to false. - need AMS and Watchdog files to do this
+     * of those have problems, then _software_is_ok goes to false. 
     */
 
    _software_is_ok = true;
 
-   //if the ams doesn't send a signal back within the curr_millis, set _software_is_ok to false
+   //kick watchdog every cycle
+   _watchdog -> kick_watchdog(curr_millis); 
 
-   //kick the watchdog by curr_millis - if it's greater than the time it was last kicked, set software_is_ok to false??
-   //otherwise, look at watchdog functions and see if there's something like it sends back a false signal after being kicked for curr_millis
+   //1. checks whether watchdog state is HIGH (true?) after watchdog is kicked; 
+   //2. checks if the last AMS heartbeat was recieved  
+   if (!(_watchdog -> get_watchdog_state()) && !(_ams -> heartbeat_recieved(curr_millis))) {
+     _software_is_ok = false;
+   }
+
+   
+
 
 }

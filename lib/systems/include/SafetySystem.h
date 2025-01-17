@@ -1,5 +1,7 @@
 #ifndef SAFETY_SYSTEM
 #define SAFETY_SYSTEM
+#include "WatchdogInterface.h"
+#include "AMSInterface.h"
 
 class SafetySystem
 {
@@ -23,15 +25,26 @@ public:
 
     bool get_software_is_ok() {return _software_is_ok;}
 
+    /**
+     * Mandatory for singleton classes to delete the copy constructor.
+     */
+    SafetySystem(const SafetySystem&) = delete;
+
+    /**
+     * Mandatory for singleton classes to prevent copying through the assignment operator.
+     */
+    SafetySystem& operator=(const SafetySystem&) = delete;
+
 
 private:
-    SafetySystem()
-    {
-        _software_is_ok = false;
-    }
+    SafetySystem():
+    _watchdog{WatchdogInterface::getInstance()},
+    _ams{AMSInterface::getInstance()},
+    _software_is_ok(false) {};
 
     /* Software ok status */
     bool _software_is_ok;
+
 };
 
 #endif /* SAFETY_SYSTEM */
