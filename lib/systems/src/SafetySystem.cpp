@@ -22,14 +22,21 @@ void SafetySystem::update_software_shutdown(unsigned long curr_millis)
 
    _software_is_ok = true;
 
-   //kick watchdog every cycle
-   _watchdog -> kick_watchdog(curr_millis); 
-
    //1. checks whether watchdog state is HIGH (true?) after watchdog is kicked; 
    //2. checks if the last AMS heartbeat was recieved  
    if (!(_watchdog -> get_watchdog_state()) && !(_ams -> heartbeat_recieved(curr_millis))) {
      _software_is_ok = false;
    }
+
+   if (_software_is_ok) {
+      _ams -> set_state_ok_high(true);
+   } else {
+      _ams -> set_state_ok_high(false);
+   }
+
+   //kick watchdog every cycle
+   _watchdog -> kick_watchdog(curr_millis);
+
 
    
 
