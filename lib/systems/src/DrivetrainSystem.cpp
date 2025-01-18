@@ -98,7 +98,7 @@ void DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::CmdVariant cmd)
                 _set_enable_drivetrain_hv();
             } else if(requesting_init && inverters_ready && hv_enabled)
             {
-                _set_enable_drivetrain_hv(); // TODO determine if this still needs to be here, i dont think it does
+                _send_enable_drivetrain_hv();
                 _set_state(DrivetrainState_e::INVERTERS_HV_ENABLED);
             } else if(!inverters_ready)
             {
@@ -111,8 +111,8 @@ void DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::CmdVariant cmd)
         case DrivetrainState_e::INVERTERS_HV_ENABLED:
         {
             bool requesting_init = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED);
-            bool requesting_speed_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain == DrivetrainModeRequest_e::INIT_SPEED_MODE);
-            bool requesting_torque_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain == DrivetrainModeRequest_e::INIT_TORQUE_MODE);
+            // bool requesting_speed_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain == DrivetrainModeRequest_e::INIT_SPEED_MODE);
+            // bool requesting_torque_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain == DrivetrainModeRequest_e::INIT_TORQUE_MODE);
 
             bool hv_enabled = _check_inverter_flags(_check_inverter_quit_dc_flag);
             bool inverters_ready = _check_inverter_flags(_check_inverter_ready_flag);
@@ -120,17 +120,25 @@ void DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::CmdVariant cmd)
 
             if(requesting_init && hv_enabled && inverters_ready && hv_enabled && !inverters_enabled)
             {
-                _set_enable_drivetrain();
-            } else if(requesting_speed_mode && hv_enabled && inverters_ready && hv_enabled && inverters_enabled);
+                _set_enable_drivetrain(); // should be done on entry of this state
+            } else if(hv_enabled && inverters_ready && hv_enabled && inverters_enabled);
             {
                 _set_enable_drivetrain();
-                _set_state(DrivetrainState_e::ENABLING_INVERTERS_SPEED_MODE);
-            } else if(requesting_torque_mode && hv_enabled && inverters_ready && hv_enabled && inverters_enabled);
-            {
-                _set_enable_drivetrain();
-                _set_state(DrivetrainState_e::ENABLING_INVERTERS_TORQUE_MODE);
+                _set_state(DrivetrainState_e::INVERTERS_ENABLED);
             }
             // TODO need to see if we need more checks to go back to previous states
+            break;
+        }
+
+        case DrivetrainState_e::INVERTERS_ENABLED:
+        {
+            bool requesting_speed_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain == DrivetrainModeRequest_e::INIT_SPEED_MODE);
+            bool requesting_torque_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain == DrivetrainModeRequest_e::INIT_TORQUE_MODE);
+            
+            bool inverters_enabled = _check_inverter_flags(_check_inverter_enabled);
+
+
+
             break;
         }
 
@@ -138,14 +146,13 @@ void DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::CmdVariant cmd)
         {
             bool requesting_speed_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (cmd.get<DrivetrainInit_s>().init_drivetrain == DrivetrainModeRequest_e::INIT_SPEED_MODE);
             bool inverters_enabled = _check_inverter_flags(_check_inverter_enabled);
-            DrivetrainGPIO_s states;
-            states.torque_mode_pin_state = false;
-            states.speed_mode_pin_state = true;
-            _set_gpio_states(states);
-
             // TODO check some flag for torque mode to make sure we are in the speed mode
-
-            _set_state(DrivetrainState_e::ENABLED_SPEED_MODE);
+            auto gpio_state = _get_gpio_state();
+            if((!gpio_state.torque_mode_enabled_pin_state) && inverters_enabled && requesting_speed_mode)
+            {
+                _set_state(DrivetrainState_e::ENABLED_SPEED_MODE);    
+            }
+            
             break;
         }
 
@@ -165,12 +172,82 @@ void DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::CmdVariant cmd)
         {
             break;
         }
+        default:
+            break;
     }
 
     return get_state();
 }
 
-void DrivetrainSystem::_set_enable_drivetrain_hv()
+void DrivetrainSystem::_set_state(DrivetrainState_e new_state)
+{
+    _handle_exit_logic(_state);
+    _state = new_state;
+    _handle_entry_logic(new_state);
+}
+
+void DrivetrainSystem::_handle_exit_logic(DrivetrainState_e prev_state)
+{
+    switch (prev_state)
+    {
+    case DrivetrainState_e::NOT_CONNECTED:
+    case DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT:
+    case DrivetrainState_e::NOT_ENABLED_HV_PRESENT:
+    case DrivetrainState_e::INVERTERS_READY:
+    case DrivetrainState_e::INVERTERS_HV_ENABLED:
+    case DrivetrainState_e::INVERTERS_ENABLED:
+    case DrivetrainState_e::ENABLING_INVERTERS_SPEED_MODE:
+    case DrivetrainState_e::ENABLING_INVERTERS_TORQUE_MODE:
+    case DrivetrainState_e::ENABLED_SPEED_MODE:
+    case DrivetrainState_e::ENABLED_TORQUE_MODE:
+    case DrivetrainState_e::ERROR:
+        break;
+    default:
+        break;
+    }
+}
+
+void DrivetrainSystem::_handle_entry_logic(DrivetrainState_e new_state)
+{
+    switch (new_state)
+    {
+    case DrivetrainState_e::NOT_CONNECTED:
+        break;
+    case DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT:
+        break;
+    case DrivetrainState_e::NOT_ENABLED_HV_PRESENT:
+        break;
+    case DrivetrainState_e::INVERTERS_READY:
+        break;
+    case DrivetrainState_e::INVERTERS_HV_ENABLED:
+        break;
+    case DrivetrainState_e::INVERTERS_ENABLED:
+        break;
+    case DrivetrainState_e::ENABLING_INVERTERS_SPEED_MODE:
+    {
+        // set the torque mode pin state to false (aka: keep the inverter in the main control mode which is speed mode)
+        _set_gpio_state({false}); 
+        break;
+    }
+        
+    case DrivetrainState_e::ENABLING_INVERTERS_TORQUE_MODE:
+    {
+        _set_gpio_state({true});
+        break;
+    }
+        break;
+    case DrivetrainState_e::ENABLED_SPEED_MODE:
+        break;
+    case DrivetrainState_e::ENABLED_TORQUE_MODE:
+        break;
+    case DrivetrainState_e::ERROR:
+        break;
+    default:
+        break;
+    }
+}
+
+void DrivetrainSystem::_send_enable_drivetrain_hv()
 {
     auto funcs_arr = _inverter_interfaces.as_array();
     for(const auto & func : funcs_arr)
@@ -210,4 +287,8 @@ void DrivetrainSystem::_keepalive_disabled()
     {
         func.set_disable_inverter();
     }
+
+    DrivetrainGPIO_s states;
+    states.torque_mode_pin_state = false;
+    _set_gpio_states(states);
 }

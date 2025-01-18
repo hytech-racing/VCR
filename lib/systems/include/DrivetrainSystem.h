@@ -25,6 +25,8 @@
     // - [ ] 
 
 
+
+// TODO move these into the shared types after finishing the system 
 enum class DrivetrainState_e
 {
     NOT_CONNECTED = 0,
@@ -95,10 +97,17 @@ struct DrivetrainStatus_s
     DrivetrainCmdResponse_e cmd_resp;
 };
 
-struct DrivetrainGPIO_s
+// output pin of micro, read by inverters
+struct DrivetrainOutputPins_s
 {
-    bool torque_mode_pin_state;
-    bool speed_mode_pin_state;
+    bool torque_mode_pin_state : 1;
+};
+
+
+// the pin set by the inverters themselves ("input": pin being read by micro)
+struct DrivetrainInputPins_s
+{
+    bool torque_mode_enabled_pin_state : 1;
 };
 
 class DrivetrainSystem
@@ -122,12 +131,10 @@ public:
         std::function<InverterStatus_s()> get_status;
     };
     
-    // struct DrivetrainInterfaceState_s
-    // {
-
-    // };
 private:
     bool _check_inverter_flags(std::function<bool(const InverterStatus_s&)> flag_check_func);
+    void _handle_exit_logic(DrivetrainState_e prev_state);
+    void _handle_entry_logic(DrivetrainState_e new_state);
 private:
     DrivetrainState_e _state;
     veh_vec<InverterFuncts> _inverter_interfaces;
@@ -139,8 +146,8 @@ private:
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_not_present_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_enabled;
     
-    std::function<void(const DrivetrainGPIO_s &)> _set_gpio_states;
-    
+    std::function<void(const DrivetrainOutputPins_s &)> _set_gpio_state;
+    std::function<DrivetrainInputPins_s()> _get_gpio_state;
     
     int _init_time_limit_ms;
     uint16_t _min_hv_voltage;
@@ -152,16 +159,6 @@ private:
     bool _reset_requested;
     unsigned long _last_reset_pressed_time;
     unsigned long _reset_interval;
-    
-    
-    /// @param curr_time current system tick time (millis()) that sets the init phase start time
-    void enable_drivetrain_hv(unsigned long curr_time);
-    void request_enable();
-    // startup phase 1
-    // status check for start of enable
-    bool drivetrain_ready();
-    // startup phase 2
-    bool check_drivetrain_quit_dc_on();
 
     // final check for drivetrain initialization to check if quit inverter on
     bool drivetrain_enabled();
