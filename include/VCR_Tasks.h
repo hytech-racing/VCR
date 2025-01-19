@@ -105,4 +105,19 @@ extern HT_TASK::Task read_adc1_task;
 bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 extern HT_TASK::Task update_buzzer_controller_task;
 
+
+
+bool init_update_safetysystem(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    return true;
+}
+
+bool run_update_safetysystem(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    SafetySystem::getInstance().update_software_shutdown(sysMicros / 1000);
+    return true;
+}
+
+HT_TASK::Task update_safetysystem = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_safetysystem, 1, 10000UL); // 10,000us is 100hz
+
 #endif /* VCR_TASKS */

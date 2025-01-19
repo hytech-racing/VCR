@@ -38,7 +38,7 @@ void SafetySystem::update_software_shutdown(unsigned long curr_millis)
    _watchdog -> kick_watchdog(curr_millis);
 
 
-   
+
 
 
 }
