@@ -1,8 +1,6 @@
 #ifndef __AMSINTERFACE_H__
 #define __AMSINTERFACE_H__
 
-#include "hytech.h"
-
 /* Heartbeat Interval is the allowable amount of time between BMS status messages before car delatches */
 const unsigned long HEARTBEAT_INTERVAL                      = 2000;   // milliseconds
 /* The total pcc threshold is the lowest allowable voltage of the entire pack (in Volts)*/
@@ -16,6 +14,8 @@ const float DEFAULT_TEMP_ALPHA      = 0.8;
 const float DEFAULT_VOLTAGE_ALPHA   = 0.8;
 const uint16_t MAX_PACK_CHARGE      = 48600;
 const unsigned long DEFAULT_INITIALIZATION_WAIT_INTERVAL = 5000;
+//SW_OK_PIN should be initialized to but for now, using -1.
+const int DEFAULT_SW_OK_PIN_ = 37; //number from scehmatic for VCR
 
 
 /// @brief this class is for interfacing with the AMS (accumulator management system) 
@@ -80,8 +80,8 @@ private:
         cell_voltage_alpha(volt_alpha) {};
 
     /* Overloaded constructor that only takes in software OK pin and uses default voltages and temp*/
-    AMSInterface(int sw_ok_pin):
-        AMSInterface(sw_ok_pin, DEFAULT_INIT_TEMP, DEFAULT_INIT_VOLTAGE, DEFAULT_TEMP_ALPHA, DEFAULT_VOLTAGE_ALPHA) {};
+    AMSInterface():
+        AMSInterface(DEFAULT_SW_OK_PIN_, DEFAULT_INIT_TEMP, DEFAULT_INIT_VOLTAGE, DEFAULT_TEMP_ALPHA, DEFAULT_VOLTAGE_ALPHA) {};
 
     /* software OK pin */
     int _pin_software_ok;
