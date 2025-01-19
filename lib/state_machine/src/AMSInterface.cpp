@@ -1,42 +1,27 @@
 #include "AMSInterface.h"
-#include "SysClock.h"
 
 // Define the static instance pointer
 AMSInterface* AMSInterface::instance_ = nullptr;
 
 // Singleton access method
-AMSInterface& AMSInterface::getInstance(CANBufferType *msg_output_queue, int sw_ok_pin) {
+AMSInterface& AMSInterface::getInstance(int sw_ok_pin) {
     if (instance_ == nullptr) {
-        if (msg_output_queue == nullptr || sw_ok_pin == -1) {
+        if (sw_ok_pin == -1) {
             // Handle invalid initialization attempt
             throw std::runtime_error("AMSInterface must be initialized with valid arguments!");
         }
-        instance_ = new AMSInterface(msg_output_queue, sw_ok_pin);
+        instance_ = new AMSInterface(sw_ok_pin);
     }
     return *instance_;
 }
 
 
-/* Send inverter CAN messages with new CAN library */
-template<typename U>
-void AMSInterface::enqueue_new_CAN(U* structure, uint32_t (* pack_function)(U*, uint8_t*, uint8_t*, uint8_t*)) {
-    CAN_message_t can_msg;
-    can_msg.id = pack_function(structure, can_msg.buf, &can_msg.len, (uint8_t*) &can_msg.flags.extended);
-    uint8_t buf[sizeof(CAN_message_t)] = {};
-    memmove(buf, &can_msg, sizeof(CAN_message_t));
-    msg_queue_->push_back(buf, sizeof(CAN_message_t));
-}
-
-void AMSInterface::init(SysTick_s &initial_tick) {
+void AMSInterface::init(unsigned long curr_micros) {
     
     // Set pin mode
     pinMode(pin_software_ok_, OUTPUT);
 
-    set_heartbeat(initial_tick.millis);
-
-    last_tick_ = initial_tick;
-
-    timestamp_start_ = -1; //starts at -1
+    set_heartbeat(curr_micros);
 
     // Initializes the bms_voltages_ member variable to an invalid state. This will
     // get overridden once retrieve_voltage_CAN() has been called at least once.
@@ -47,20 +32,20 @@ void AMSInterface::init(SysTick_s &initial_tick) {
 
 void AMSInterface::set_start_state() {
     
-    digitalWrite(pin_software_ok_, HIGH);
+    digitalWrite(_pin_software_ok, HIGH);
     
 }
 
 //SETTERS//
 void AMSInterface::set_state_ok_high(bool ok_high) {
     if (ok_high)
-        digitalWrite(pin_software_ok_, HIGH);
+        digitalWrite(_pin_software_ok, HIGH);
     else
-        digitalWrite(pin_software_ok_, LOW);
+        digitalWrite(_pin_software_ok, LOW);
 }
 
-void AMSInterface::set_heartbeat(unsigned long curr_millis) {
-    last_heartbeat_time_ = curr_millis;
+void AMSInterface::set_heartbeat(unsigned long curr_micros) {
+    last_heartbeat_time_ = curr_micros;
 }
 
 bool AMSInterface::heartbeat_received(unsigned long curr_millis) {
@@ -90,67 +75,6 @@ float AMSInterface::get_filtered_min_cell_voltage() {
     bms_low_voltage = HYTECH_low_voltage_ro_fromS(bms_voltages_.low_voltage_ro);
     filtered_min_cell_voltage = filtered_min_cell_voltage * cell_temp_alpha + (1.0 - cell_voltage_alpha) * bms_low_voltage;
     return filtered_min_cell_voltage;
-}
-
-void AMSInterface::tick(const SysTick_s &tick) {
-
-    // Only calculate the updated SoC if charge has been properly initialized.
-    if (has_initialized_charge_) {
-        // Do not edit this block! If both calculate_SoC_em AND calculate_SoC_acu are run,
-        // then the charge will be subtracted from the SoC member variable twice.
-        if (use_em_for_soc_) {
-            calculate_SoC_em(tick);
-        } else {
-            calculate_SoC_acu(tick);
-        }
-    }
-
-    // If AMSInterface has a valid reading in bms_voltages_ and enough time has passed since init(), then initialize charge
-    if (!has_initialized_charge_ && ((tick.millis - timestamp_start_) >= DEFAULT_INITIALIZATION_WAIT_INTERVAL)) {
-    
-        initialize_charge();
-        has_initialized_charge_ = true;
-
-    }
-
-    // Send CAN message
-    // enqueue_state_of_charge_CAN();
-    STATE_OF_CHARGE_t soc_struct;
-    soc_struct.charge_percentage_ro = HYTECH_charge_percentage_ro_toS(SoC_);
-    soc_struct.charge_coulombs_ro = HYTECH_charge_coulombs_ro_toS(charge_);
-    soc_struct.min_cell_voltage_est_ro = HYTECH_min_cell_voltage_est_ro_toS(VOLTAGE_LOOKUP_TABLE[100 - (int) SoC_]);
-    enqueue_new_CAN<STATE_OF_CHARGE_t>(&soc_struct, Pack_STATE_OF_CHARGE_hytech);
-
-    last_tick_ = tick;
-}
-
-//RETRIEVE CAN MESSAGES//
-void AMSInterface::retrieve_status_CAN(unsigned long curr_millis, CAN_message_t &recvd_msg) {
-    bms_status_.load(recvd_msg.buf);
-    set_heartbeat(curr_millis);
-}
-
-void AMSInterface::retrieve_temp_CAN(CAN_message_t &recvd_msg) {
-    bms_temperatures_.load(recvd_msg.buf);
-}
-
-void AMSInterface::retrieve_voltage_CAN(CAN_message_t &can_msg) {
-    Unpack_BMS_VOLTAGES_hytech(&bms_voltages_, can_msg.buf, can_msg.len);
-
-    if (!has_received_bms_voltage_)
-    {
-        has_received_bms_voltage_ = true;
-        timestamp_start_ = last_tick_.millis;
-    }
-    
-}
-
-void AMSInterface::retrieve_em_measurement_CAN(CAN_message_t &can_msg) {
-    Unpack_EM_MEASUREMENT_hytech(&em_measurements_, can_msg.buf, can_msg.len);
-}
-
-void AMSInterface::retrieve_current_shunt_CAN(const CAN_message_t &can_msg) {
-    Unpack_ACU_SHUNT_MEASUREMENTS_hytech(&acu_shunt_measurements_, can_msg.buf, can_msg.len);
 }
 
 void AMSInterface::calculate_acc_derate_factor() {
