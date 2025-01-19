@@ -2,6 +2,8 @@
 #include <gmock/gmock.h>
 #include "test_scheduler.h"
 #include "test_tcmux.h"
+#include "test_vsm.h"
+#include "test_buzzer.h"
 
 int main(int argc, char **argv)
 {
