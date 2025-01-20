@@ -97,7 +97,6 @@ message 2346 'Converter temperature error' after the warning time1) (ID32943) ha
     - `int16_t igbt_temp`
         - temp of the IGBTs in units of 0.1 degrees celcius
         - AKA (`AMK_TempIGBT`) / Special Signal index 27 / SERCOS parameter ID34215
-    
 
 - inverter dynamics data (will be periodically sent from the inverter every 5ms)
     - `uint32_t actual_power_w`
