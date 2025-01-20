@@ -2,12 +2,9 @@
 #define __VCR_INTERFACE_H__
 
 #include "hytech_msgs.pb.h"
+
 // #include equivalent of "DrivebrainData.h"
 #include "SharedFirmwareTypes.h"
-
-
-
-
 
 class VCREthernetInterface 
 {
