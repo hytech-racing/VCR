@@ -1,25 +1,10 @@
 #include "AMSInterface.h"
 
-// Define the static instance pointer
-AMSInterface* AMSInterface::instance_ = nullptr;
-
-// Singleton access method
-AMSInterface& AMSInterface::getInstance(int sw_ok_pin) {
-    if (instance_ == nullptr) {
-        if (sw_ok_pin == -1) {
-            // Handle invalid initialization attempt
-            throw std::runtime_error("AMSInterface must be initialized with valid arguments!");
-        }
-        instance_ = new AMSInterface(sw_ok_pin);
-    }
-    return *instance_;
-}
-
 
 void AMSInterface::init(unsigned long curr_micros) {
     
     // Set pin mode
-    pinMode(pin_software_ok_, OUTPUT);
+    pinMode(_pin_software_ok, OUTPUT);
 
     set_heartbeat(curr_micros);
 
