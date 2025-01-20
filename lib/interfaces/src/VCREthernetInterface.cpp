@@ -207,9 +207,20 @@ hytech_msgs_VCRInterfaceData_s VCREthernetInterface::make_vcrinterfacedata_msg(c
 
 }
 
-void VCREthernetInterface::receive_pb_msg(const hytech_msgs_VCRSystemData_s &msg_in, unsigned long curr_millis)
+//
+void VCREthernetInterface::receive_pb_msg_acu(const hytech_msgs_BMSData &msg_in)
 {
 
+}
+
+void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_BMSData &msg_in)
+{
+    
+}
+
+void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_BMSData &msg_in)
+{
+    
 }
 	
 
