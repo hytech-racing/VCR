@@ -37,10 +37,21 @@ below is the description of the control messages that will be configured within 
         - __NOTE: active only when in torque control mode.__
         - AKA SERCOS parameter ID80 / Special Signal index 17
         - the torque setpoint for the inverter in units of percentage as described in the `positive_torque_limit` message member above
-        
+
+- Control parameter message (will be sent intermitently, not monitored by the inverter to be expected at any regular period)
+    - `uint16_t speed_control_kp`
+        - P for the speed control mode
+        - AKA SERCOS parameter ID100
+    - `uint16_t speed_control_ki`
+        - I parameter to be set internally on the inverter
+        - AKA SERCOS parameter ID101
+    - `uint16_t speed_control_kd`
+        - D parameter to be set internally on the inverter
+        - AKA SERCOS parameter ID102
+
 #### inverter messages
 
-- inverter status / ( `AMK_Status` (16 bit) +  + DC bus voltage (16 bit) + `AMK_ErrorInfo` (16 bit kinda(?)))
+- inverter status / ( `AMK_Status` (16 bit) +  + DC bus voltage (16 bit) + `AMK_ErrorInfo` (16 bit kinda(?))) (will be periodically sent from the inverter every 20ms)
     - `bool system_ready`
         - AKA (`AMK_bSystemReady`) / bit 9 within Special Signal Status word formula student (System Ready (SBM)) / 
         - displays when the system is error free / ready to be initialized
@@ -71,7 +82,7 @@ below is the description of the control messages that will be configured within 
     - `uint16_t diagnostic_number`
         - AKA (`AMK_ErrorInfo`)
 
-- inverter temps
+- inverter temps (will be periodically sent from the inverter every 20ms)
     - `int16_t motor_temp`
         - temperature of the motor in units of 0.1 degrees celcius
         - AKA (`AMK_TempMotor`) / Special Signal index 7 / SERCOS parameter ID33117 
@@ -88,7 +99,7 @@ message 2346 'Converter temperature error' after the warning time1) (ID32943) ha
         - AKA (`AMK_TempIGBT`) / Special Signal index 27 / SERCOS parameter ID34215
     
 
-- inverter dynamics data
+- inverter dynamics data (will be periodically sent from the inverter every 5ms)
     - `uint32_t actual_power_w`
         - mechanical motor power in watts (from actual torque and actual speed)
         - AKA SERCOS parameter ID33100
@@ -99,7 +110,7 @@ message 2346 'Converter temperature error' after the warning time1) (ID32943) ha
         - motor speed in units of rpm
         - AKA Special Signal value index 6
 
-- inverter electrical power data
+- inverter electrical power data (will be periodically sent from the inverter every 5ms)
     - `int32_t active_power_w`
         - electrical power (use / creation) in watts of the inverter
         - can be negative when in regen / positive when driving motor
@@ -109,4 +120,13 @@ message 2346 'Converter temperature error' after the warning time1) (ID32943) ha
         - positive value = inductive consumer, negative value = capacitive consumer
         - AKA SERCOS parameter ID33172
     
-    
+- inverter parameter feedback (inverter's speed PID vals) (will be sent periodically from the inverter every 20ms)
+    - `uint16_t speed_control_kp`
+        - inverter's internal value of kp
+        - AKA SERCOS parameter ID100
+    - `uint16_t speed_control_ki`
+        - inverter's internal value of (TN) ki
+        - AKA SERCOS parameter ID101
+    - `uint16_t speed_control_kd`
+        - inverter's internal value of (TD) kd
+        - AKA SERCOS parameter ID102
