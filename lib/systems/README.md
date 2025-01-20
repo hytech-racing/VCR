@@ -21,7 +21,8 @@ Instead of the drivetrain system being a direct api interface on top of the inve
 
 This is being done to simplify the interaction between the inverters and the rest of our firmware and to resolve the CAN saturation issues that were occuring with the last drivetrain system / inverter interface issues that were hackily solved with a metro timer dictating when the queue of CAN messages that were being sent out from the inverter could be appended to.
 
-```mermaid
+
+```
 ---
 title: drivetrain state machine
 ---
@@ -39,18 +40,46 @@ stateDiagram-v2
     torq_mode : ENABLED_TORQUE_MODE
     err: ERROR
     clear_err: CLEARING_ERRORS
-
+    note2: note that that note shown is that any state other than NOT_CONNECTED can go to the ERROR state if in any of the states any inverter has an error flag present
+    
     note right of err
-        during this state the inverters will be not be sent any control setpoints
+        during this state all setpoints will be set to 0 and the inverter control word will have the inverter_enable flag set to false
     end note
 
+    note right of clear_err
+        during this state all setpoints will be set to 0, (inverter_enable: false, hv_enable: true, driver_enable: true, remove_error: true)
+    end note
+
+    note right of speed_mode
+        during this mode the drivetrain is free to receive speed commands and car will move
+    end note
+
+    note right of torq_mode
+        during this mode the drivetrain is free to receive torque commands and car will move
+    end note
+
+    note right of en_sp_mode
+        during this mode the VCR sets the enable torque mode GPIO pin to be off and waits for the inverter's GPIO for signaling that the secondary control is not in control 
+    end note
+
+    note right of en_torq_mode
+        same as the ENABLING_SPEED_MODE, however the VCR is turning on its GPIO pin and waits for the inverter's GPIO to be signaled on
+    end note
+
+    
     nc --> not_en: received data from all inverters
     nc --> not_en_hv: received data from all inverters AND the inverters have a voltage above HV level
+    
     not_en --> not_en_hv: HV present to all inverters
     not_en_hv --> ready: all inverters have their ready flag set
+
+    hv_en --> ready: on quit dc flag off
+
     ready --> hv_en: requesting initialization of drivetrain AND all inverters have their quit dc flag on
     ready --> not_en_hv: if any of the inverters have their ready flags not set
     hv_en --> en: on set of all inverters enabled flags
+    en --> hv_en: on inverter enabled flag off
+
     en --> en_sp_mode: on command request of speed mode
     en_sp_mode --> speed_mode: on verification of inverters GPIO of speed mode set
     en --> en_torq_mode: on command request of torque mode    
@@ -62,5 +91,5 @@ stateDiagram-v2
     speed_mode --> err: incorrect user command type OR any inverter error
     torq_mode --> err: incorrect user command type OR any inverter error
     err --> clear_err: on user request of error reset 
-    clear_err --> not_en_hv: on successful reset of errors
+    clear_err --> not_en_hv: on successful reset of errors (either internally to the drivetrain system or of the inverters themselves)
 ```
