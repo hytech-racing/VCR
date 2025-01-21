@@ -135,6 +135,12 @@ private:
     bool _check_inverter_flags(std::function<bool(const InverterStatus_s&)> flag_check_func);
     void _handle_exit_logic(DrivetrainState_e prev_state);
     void _handle_entry_logic(DrivetrainState_e new_state);
+    
+    void _set_drivetrain_disabled();
+    void _set_enable_drivetrain_hv();
+    void _set_enable_drivetrain();
+
+    void _set_drivetrain_speed_command(DrivetrainSpeedCommand_s cmd);
 private:
     DrivetrainState_e _state;
     veh_vec<InverterFuncts> _inverter_interfaces;

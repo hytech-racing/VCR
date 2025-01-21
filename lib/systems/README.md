@@ -1,10 +1,19 @@
 
 ## Drivetrain System (tentative design docs)
 
+### list of features
+
+- [ ] ability to initialize inverters 
+- [ ] ability to command inverters 
+- [ ] ability to switch inverter control modes
+- [ ] ability to detect timeout of initialization of inverters
+- [ ] ability to change parameters of inverters
+- [ ] detailed error status for invalid usage of drivetrain system
+- [ ] ability to get all data available from inverter
+
 ### interface / usage description
 
 the user of the drivetrain system will be expected to use the `evaluate_drivetrain` function to interact / command and receive the current status of the drivetrain. 
-
 
 #### initialization
 the user shall call the `evaluate_drivetrain` function with the cmdvariant type set to the initialization struct and populated with desired mode to put the drivetrain into. the user should continuously call the `evaluate_drivetrain` with this struct until the drivetrain's state reaches the initialization state expected.
