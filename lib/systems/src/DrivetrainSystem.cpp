@@ -51,8 +51,10 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         // TODO need to ensure that the inverter outputs CAN messages on idle even not when being sent msgs
         case DrivetrainState_e::NOT_CONNECTED:
         {
-            bool connected_no_hv_present = (_check_inverter_flags(_check_inverter_connected_flag) && _check_inverter_flags(_check_inverter_hv_not_present_flag) );
-            bool connected_hv_present = (_check_inverter_flags(_check_inverter_connected_flag) && _check_inverter_flags(_check_inverter_hv_present_flag)); 
+            bool connected_no_hv_present = false;
+            connected_no_hv_present = (_check_inverter_flags(_check_inverter_connected_flag) && _check_inverter_flags(_check_inverter_hv_not_present_flag) );
+            bool connected_hv_present = false;
+            connected_hv_present = (_check_inverter_flags(_check_inverter_connected_flag) && _check_inverter_flags(_check_inverter_hv_present_flag)); 
             
             if(connected_no_hv_present)
             {
@@ -78,7 +80,8 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
         case DrivetrainState_e::NOT_ENABLED_HV_PRESENT:
         {   
-            bool inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            bool inverter_error_present = false;
+            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
             if(inverter_error_present)
             {
                 _set_state(DrivetrainState_e::ERROR);
@@ -94,12 +97,16 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
         case DrivetrainState_e::INVERTERS_READY:
         {
-            bool inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            bool inverter_error_present = false;
+            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
             
             // in this state, we are requesting inverters to enable HV
-            bool requesting_init = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED);
-            bool inverters_ready = _check_inverter_flags(_check_inverter_ready_flag);
-            bool hv_enabled = _check_inverter_flags(_check_inverter_quit_dc_flag);
+            bool requesting_init = false;
+            requesting_init = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED);
+            bool inverters_ready = false;
+            inverters_ready = _check_inverter_flags(_check_inverter_ready_flag);
+            bool hv_enabled = false;
+            hv_enabled = _check_inverter_flags(_check_inverter_quit_dc_flag);
             
             if(inverter_error_present)
             {
@@ -126,13 +133,18 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             // - [x] if the user stops requesting init -> go back to inverters ready state
             // - [x] error present on an inverter -> go to error state
 
-            bool inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            bool inverter_error_present = false;
+            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
             
-            bool requesting_init = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED);
+            bool requesting_init = false;
+            requesting_init = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED);
 
-            bool hv_enabled = _check_inverter_flags(_check_inverter_quit_dc_flag);
-            bool inverters_ready = _check_inverter_flags(_check_inverter_ready_flag);
-            bool inverters_enabled = _check_inverter_flags(_check_inverter_enabled);
+            bool hv_enabled = false;
+            hv_enabled = _check_inverter_flags(_check_inverter_quit_dc_flag);
+            bool inverters_ready = false;
+            inverters_ready = _check_inverter_flags(_check_inverter_ready_flag);
+            bool inverters_enabled = false;
+            inverters_enabled = _check_inverter_flags(_check_inverter_enabled);
 
             if(inverter_error_present)
             {
@@ -160,10 +172,13 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
         case DrivetrainState_e::INVERTERS_ENABLED:
         {
-            bool inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            bool inverter_error_present = false; 
+            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
             
-            bool requesting_speed_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain == DrivetrainModeRequest_e::INIT_SPEED_MODE);
-            bool requesting_torque_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain == DrivetrainModeRequest_e::INIT_TORQUE_MODE);
+            bool requesting_speed_mode = false;
+            requesting_speed_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain == DrivetrainModeRequest_e::INIT_SPEED_MODE);
+            bool requesting_torque_mode = false;
+            requesting_torque_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain == DrivetrainModeRequest_e::INIT_TORQUE_MODE);
             
             // for now i wont worry about checking whether or not the inverters are still enabled.
             // bool inverters_enabled = _check_inverter_flags(_check_inverter_enabled);
@@ -191,8 +206,10 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
         case DrivetrainState_e::ENABLING_INVERTERS_SPEED_MODE:
         {    
-            bool inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
-            bool inverters_in_speed_mode = (!_get_gpio_state().torque_mode_enabled_pin_state);
+            bool inverter_error_present = false;
+            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            bool inverters_in_speed_mode = false;
+            inverters_in_speed_mode = (!_get_gpio_state().torque_mode_enabled_pin_state);
             
             if(inverter_error_present)
             {
@@ -209,8 +226,10 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         case DrivetrainState_e::ENABLING_INVERTERS_TORQUE_MODE:
         {
 
-            bool inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
-            bool inverters_in_torque_mode = _get_gpio_state().torque_mode_enabled_pin_state;
+            bool inverter_error_present = false;
+            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            bool inverters_in_torque_mode = false;
+            inverters_in_torque_mode = _get_gpio_state().torque_mode_enabled_pin_state;
             
             if(inverter_error_present)
             {
@@ -234,13 +253,14 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             }
 
             // TODO may need to verify that the gpio state is correct while in this state (GPIO torque mode low)
-            bool inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            bool inverter_error_present = false;
+            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
             // now finally in this mode and the ENABLED_TORQUE_MODE can we command the drivetrain
-            bool user_requesting_speed_command = etl::holds_alternative<DrivetrainSpeedCommand_s>(cmd);
-            bool user_requesting_torque_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain == DrivetrainModeRequest_e::INIT_TORQUE_MODE);
-
+            bool user_requesting_speed_command = false;
+            user_requesting_speed_command = etl::holds_alternative<DrivetrainSpeedCommand_s>(cmd);
+            bool user_requesting_torque_mode = false;
+            user_requesting_torque_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain == DrivetrainModeRequest_e::INIT_TORQUE_MODE);            
             
-
             if(inverter_error_present)
             {
                 _set_drivetrain_disabled();
@@ -250,7 +270,8 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             else if(user_requesting_speed_command)
             {
                 _set_drivetrain_speed_command(etl::get<DrivetrainSpeedCommand_s>(cmd));
-            } else if(user_requesting_torque_mode && !_drivetrain_active(100))
+                
+            } else if(user_requesting_torque_mode && !_drivetrain_active(_active_rpm_level))
             {
                 _set_drivetrain_keepalive_idle();
                 _set_state(DrivetrainState_e::ENABLING_INVERTERS_TORQUE_MODE);
@@ -260,7 +281,8 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         case DrivetrainState_e::ENABLED_TORQUE_MODE:
         {
             // TODO may need to verify that the gpio state is correct while in this state (GPIO torque mode high)
-            bool inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            bool inverter_error_present = false;
+            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
             
             bool user_requesting_torque_command = etl::holds_alternative<DrivetrainTorqueCommand_s>(cmd);
             bool user_requesting_speed_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain == DrivetrainModeRequest_e::INIT_SPEED_MODE);
@@ -273,7 +295,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             else if(user_requesting_torque_command)
             {
                 _set_drivetrain_torque_command(etl::get<DrivetrainTorqueCommand_s>(cmd));
-            } else if(user_requesting_speed_mode && !_drivetrain_active(100))
+            } else if(user_requesting_speed_mode && !_drivetrain_active(_active_rpm_level))
             {
                 _set_drivetrain_keepalive_idle();
                 _set_state(DrivetrainState_e::ENABLING_INVERTERS_TORQUE_MODE);
@@ -283,7 +305,8 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         case DrivetrainState_e::ERROR:
         {
             bool user_requesting_error_reset = etl::holds_alternative<DrivetrainResetError_s>(cmd) && (etl::get<DrivetrainResetError_s>(cmd).reset_errors); 
-            bool inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            bool inverter_error_present = false;
+            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
             
             if(user_requesting_error_reset && inverter_error_present)
             {

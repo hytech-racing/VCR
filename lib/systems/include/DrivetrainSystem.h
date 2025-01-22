@@ -161,6 +161,7 @@ private:
     DrivetrainState_e _evaluate_state_machine(CmdVariant cmd);
 
 private:
+    const float _active_rpm_level = 100;
     veh_vec<InverterFuncts> _inverter_interfaces;
     DrivetrainState_e _state;
     std::function<bool(const InverterStatus_s &)> _check_inverter_ready_flag;
@@ -174,26 +175,6 @@ private:
     std::function<void(const DrivetrainOutputPins_s &)> _set_gpio_state;
     std::function<DrivetrainInputPins_s()> _get_gpio_state;
     
-    int _init_time_limit_ms;
-    uint16_t _min_hv_voltage;
-    int _motor_pole_pairs;
-    float _lambda_magnetic_flux_wb, _L_d_inductance_H;
-    // startup statuses:
-    bool _hv_en_requested, _enable_requested;
-    // reset inverters
-    bool _reset_requested;
-    unsigned long _last_reset_pressed_time;
-    unsigned long _reset_interval;
-
-
-    unsigned long _curr_system_millis;
-    unsigned int _min_cmd_period;
-    unsigned long _last_no_torque_cmd_time, last_reset_cmd_time, last_disable_cmd_time, last_general_cmd_time;
-
-    unsigned long _drivetrain_initialization_phase_start_time;
-    // DrivetrainCommand_s current_drivetrain_command_;
-    // DrivetrainDynamicReport_s dynamic_data_;
-    float _max_torque_setpoint_nm;
 };
 
 #endif /* DRIVETRAINSYSTEM */

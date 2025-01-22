@@ -1,5 +1,5 @@
-#ifndef __INVERTERINTERFACE_H__
-#define __INVERTERINTERFACE_H__
+#ifndef INVERTERINTERFACE_H
+#define INVERTERINTERFACE_H
 #include <stdint.h>
 
 namespace HTUnits
