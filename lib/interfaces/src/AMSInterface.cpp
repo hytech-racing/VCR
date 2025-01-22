@@ -10,6 +10,7 @@ void AMSInterface::init(unsigned long curr_micros) {
 
     // Initializes the bms_voltages_ member variable to an invalid state. This will
     // get overridden once retrieve_voltage_CAN() has been called at least once.
+    // we will be using receive_voltage_Ethernet() instead.
     bms_voltages_.low_voltage_ro = 0xFFFFU;
     bms_voltages_.high_voltage_ro = 0x1111U;
 
@@ -29,6 +30,7 @@ void AMSInterface::set_state_ok_high(bool ok_high) {
         digitalWrite(_pin_software_ok, LOW);
 }
 
+//recieve heartbeat
 void AMSInterface::set_heartbeat(unsigned long curr_micros) {
     last_heartbeat_time_ = curr_micros;
 }
@@ -90,6 +92,5 @@ float AMSInterface::get_acc_derate_factor() {
     calculate_acc_derate_factor();
     return acc_derate_factor;
 }
-
 
 

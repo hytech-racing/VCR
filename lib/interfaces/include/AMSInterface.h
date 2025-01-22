@@ -1,6 +1,9 @@
 #ifndef __AMSINTERFACE_H__
 #define __AMSINTERFACE_H__
 
+#include <Arduino.h>
+#include <cstdint>
+
 /* Heartbeat Interval is the allowable amount of time between BMS status messages before car delatches */
 const unsigned long HEARTBEAT_INTERVAL                      = 2000;   // milliseconds
 /* The total pcc threshold is the lowest allowable voltage of the entire pack (in Volts)*/
