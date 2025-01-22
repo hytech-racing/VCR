@@ -39,11 +39,12 @@ enum class CAR_STATE
 class VehicleStateMachine
 {
 public:
-    static VehicleStateMachine& getInstance()
-    {
-        static VehicleStateMachine instance;
-        return instance;
-    }
+    VehicleStateMachine(DrivetrainSystem & drivetrain_system) :
+        _current_state(CAR_STATE::STARTUP),
+        _drivetrain(drivetrain_system),
+        _buzzer(BuzzerController::getInstance()),
+        _safetysystem(SafetySystem::getInstance()) {};
+
 
     /**
      * This tick() function handles all the update logic for traversing states, and calls the functions
@@ -58,12 +59,6 @@ public:
     CAR_STATE get_state() { return _current_state; }
 
 private:
-    VehicleStateMachine(DrivetrainSystem & drivetrain_system) :
-        _current_state(CAR_STATE::STARTUP),
-        _drivetrain(drivetrain_system),
-        _buzzer(BuzzerController::getInstance()),
-        _safetysystem(SafetySystem::getInstance()) {};
-
     void set_state_(CAR_STATE new_state, unsigned long curr_time);
 
     /**
@@ -81,7 +76,7 @@ private:
     CAR_STATE _current_state;
 
     /* System references to show dependence on systems library */
-    DrivetrainSystem<uint32_t> &_drivetrain; //TODO: Make this InverterInterface instead of uint32_t
+    DrivetrainSystem &_drivetrain; //TODO: Make this InverterInterface instead of uint32_t
     BuzzerController &_buzzer;
     SafetySystem &_safetysystem;
 

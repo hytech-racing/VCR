@@ -97,12 +97,16 @@ struct DrivetrainStatus_s
     DrivetrainCmdResponse_e cmd_resp;
 };
 
+struct DrivetrainResetError_s
+{
+    bool reset_errors; // true: reset the errors present on inverters, false: dont
+};
+
 // output pin of micro, read by inverters
 struct DrivetrainOutputPins_s
 {
     bool torque_mode_pin_state : 1;
 };
-
 
 // the pin set by the inverters themselves ("input": pin being read by micro)
 struct DrivetrainInputPins_s
@@ -110,40 +114,55 @@ struct DrivetrainInputPins_s
     bool torque_mode_enabled_pin_state : 1;
 };
 
+struct InverterControlWord_s
+{
+    bool inverter_enable;
+    bool hv_enable;
+    bool driver_enable;
+    bool remove_error;
+};
+
 class DrivetrainSystem
 {
 public:
-    using CmdVariant = etl::variant<DrivetrainSpeedCommand_s, DrivetrainTorqueCommand_s, DrivetrainInit_s>;
+    using CmdVariant = etl::variant<DrivetrainSpeedCommand_s, DrivetrainTorqueCommand_s, DrivetrainInit_s, DrivetrainResetError_s>;
     DrivetrainSystem() = delete;
-    
+
     DrivetrainStatus_s evaluate_drivetrain(CmdVariant cmd);
     DrivetrainState_e get_state();
     // DrivetrainDynamicReport_s get_dynamic_data();
 
     struct InverterFuncts {
         std::function<void(float desired_rpm, float torque_limit_nm)> set_speed;
-        std::function<void(float torque_limit_nm)> set_torque;
-        std::function<void()> set_disable_inverter;
-        std::function<void()> set_no_torque;
-        std::function<void()> reset_inverter;
-        std::function<void()> set_enable_inverter;
-        std::function<void()> set_enable_hv;
+        std::function<void(float torque_nm)> set_torque;
+        std::function<void()> set_idle;
+        std::function<void(InverterControlWord_s control_word)> set_inverter_control_word;
         std::function<InverterStatus_s()> get_status;
     };
     
+    DrivetrainSystem(veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces);
 private:
     bool _check_inverter_flags(std::function<bool(const InverterStatus_s&)> flag_check_func);
+    bool _drivetrain_active(float max_active_rpm);
+
+    void _set_state(DrivetrainState_e state);
     void _handle_exit_logic(DrivetrainState_e prev_state);
     void _handle_entry_logic(DrivetrainState_e new_state);
     
     void _set_drivetrain_disabled();
+    void _set_drivetrain_keepalive_idle();
     void _set_enable_drivetrain_hv();
     void _set_enable_drivetrain();
-
+    void _set_drivetrain_error_reset();
+    
     void _set_drivetrain_speed_command(DrivetrainSpeedCommand_s cmd);
+    void _set_drivetrain_torque_command(DrivetrainTorqueCommand_s cmd);
+
+    DrivetrainState_e _evaluate_state_machine(CmdVariant cmd);
+
 private:
-    DrivetrainState_e _state;
     veh_vec<InverterFuncts> _inverter_interfaces;
+    DrivetrainState_e _state;
     std::function<bool(const InverterStatus_s &)> _check_inverter_ready_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_connected_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_quit_dc_flag;
@@ -166,8 +185,6 @@ private:
     unsigned long _last_reset_pressed_time;
     unsigned long _reset_interval;
 
-    // final check for drivetrain initialization to check if quit inverter on
-    bool drivetrain_enabled();
 
     unsigned long _curr_system_millis;
     unsigned int _min_cmd_period;
