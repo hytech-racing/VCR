@@ -43,7 +43,7 @@ hytech_msgs_VCRSystemData_s VCREthernetInterface::make_vcrsystemdata_msg(const V
 
     out.steering_filtered = {shared_state.steering_filtered.steering_filtered_degrees,
                              shared_state.steering_filtered.steering_FIR_is_saturated};
-
+ 
     
     //DashDisplayState_s
     out.dash_display.dash_data;
@@ -213,14 +213,28 @@ void VCREthernetInterface::receive_pb_msg_acu(const hytech_msgs_BMSData &msg_in)
 
 }
 
-void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_BMSData &msg_in)
+void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in)
 {
-    
+    veh_vec<float> speed_desired_rpms(msg_in.desired_rpms.FL, msg_in.desired_rpms.FR, msg_in.desired_rpms.RL, msg_in.desired_rpms.RR);
+    veh_vec<float> torque_lim_nm(msg_in.torque_limit_nm.FL, msg_in.torque_limit_nm.FR, msg_in.torque_limit_nm.RL, msg_in.torque_limit_nm.RR);
+
+    _latest_db_data.desired_rpms = speed_desired_rpms; 
+    _latest_db_data.torque_limit_nm = torque_lim_nm; 
+
+    _latest_db_data.prev_MCU_recv_millis = msg_in.prev_MCU_recv_millis; 
 }
 
-void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_BMSData &msg_in)
+void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFSystemData_s &msg_in)
 {
+    //PedalsSystemData_s pedals_system_data_bool(msg_in.)
+    //examples of shallow and deep copy will figure out later which one is right (probably neither??)
     
+    //shallow
+    _latest_vcf_data.pedals_system_data = msg_in.pedals_system_data;
+
+    //deep
+    _latest_vcf_data.pedals_system_data.accel_is_implausible = msg_in.pedals_system_data.accel_is_implausible; // --> through regen_percent
+
 }
 	
 
