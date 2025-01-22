@@ -4,14 +4,8 @@
 
 
 
-/* From C++ standard library */
-#include <chrono>
-
 /* From shared_firmware_types libdep */
 #include "SharedFirmwareTypes.h"
-
-/* From shared-systems-lib libdep */
-#include "SysClock.h"
 
 /* From HT_SCHED libdep */
 #include "ht_sched.hpp"
