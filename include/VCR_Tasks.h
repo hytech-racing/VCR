@@ -25,7 +25,6 @@
 
 #ifndef VCR_TASKS
 #define VCR_TASKS
-// NOLINTBEGIN // Allow tasks to be non-constant to avoid updating the HT_SCHED library.
 
 /* From HT_SCHED library */
 #include "ht_sched.hpp"
@@ -33,13 +32,6 @@
 /* From shared_firmware_types library */
 #include "SharedFirmwareTypes.h"
 
-/**
- * This "Test" function is purely for validation of the HT_SCHED dependency. This is intended to be removed when
- * further development occurs.
- */
-bool init_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-bool run_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern HT_TASK::Task test_task;
 
 
 /**
