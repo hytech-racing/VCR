@@ -47,7 +47,7 @@ extern HT_TASK::Task tick_state_machine_task;
 /**
  * The read_adc0 task will command adc0 to sample all eight channels, convert the outputs, and
  * store them in structs defined in shared_firmware_types. This function relies on adc_0 being
- * defined in ADC_interface.h.
+ * defined in VCRGlobals.h.
  */
 bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
@@ -61,7 +61,7 @@ extern HT_TASK::Task read_adc0_task;
  * 
  * The read_adc1 task will command adc0 to sample all eight channels, convert the outputs, and
  * store them in a struct defined in shared_firmware_types. This function relies on adc_1 being
- * defined in ADC_interface.h.
+ * defined in VCRGlobals.h.
  */
 bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
