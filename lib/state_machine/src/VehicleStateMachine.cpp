@@ -124,7 +124,7 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
             // _drivetrain.command_drivetrain(controller_mux_->getDrivetrainCommand(dashboard_->getDialMode(), dashboard_->getTorqueLimitMode(), current_car_state));
             DrivetrainTorqueCommand_s example_cmd = {}; // will need to do a variant check from the controller mux to see what type it is (torque / speed)
             
-            auto status = _drivetrain.evaluate_drivetrain(example_cmd);
+            (void)_drivetrain.evaluate_drivetrain(example_cmd);
 
         }
         else
@@ -133,7 +133,7 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
             
             // TODO: make this check to see exactly what drive mode the drivetrain is in and send its associated empty command.
             DrivetrainTorqueCommand_s example_cmd = {}; // will need to do a variant check from the controller mux to see what type it is (torque / speed)
-            auto status = _drivetrain.evaluate_drivetrain(example_cmd);
+            (void)_drivetrain.evaluate_drivetrain(example_cmd);
         }
 
         break;
