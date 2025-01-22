@@ -7,6 +7,8 @@
 // #include equivalent of "DrivebrainData.h"
 #include "SharedFirmwareTypes.h"
 
+//make variables references to structs
+
 struct DrivebrainData_VCR
 {
 	veh_vec<float> desired_rpms;
@@ -52,7 +54,10 @@ struct VCFData_VCR
 class VCREthernetInterface 
 {
 public:
-	VCREthernetInterface() {
+	VCREthernetInterface(DrivebrainData_VCR &drivebraindata, VCFData_VCR &vcfdata, ACUData_VCR &acudata): 
+	_latest_db_data(drivebraindata), 
+	_latest_acu_data(acudata),
+	_latest_vcf_data(vcfdata) {
 		//_latest_data.last_receive_time_millis = -1;
         
 	//_latest_data.DB_prev>VCR_recv_millis
@@ -70,9 +75,9 @@ void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFSystemData &m
 
 
 private:
-    DrivebrainData_VCR _latest_db_data = {};
-	ACUData_VCR _latest_acu_data = {};
-	VCFData_VCR _latest_vcf_data = {};
+    DrivebrainData_VCR &_latest_db_data = {};
+	ACUData_VCR &_latest_acu_data = {};
+	VCFData_VCR &_latest_vcf_data = {};
 }
 
 #endif //__VCR_INTERFACE_H__
