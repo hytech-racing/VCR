@@ -210,6 +210,30 @@ hytech_msgs_VCRInterfaceData_s VCREthernetInterface::make_vcrinterfacedata_msg(c
 //
 void VCREthernetInterface::receive_pb_msg_acu(const hytech_msgs_BMSData &msg_in)
 {
+    std::array<std::array<std::optional<volt>, 12>, num_chips> voltages;
+    std::array<celcius, 4 * num_chips> cell_temperatures;
+    std::array<float, num_humidity_sensors> humidity;
+    std::array<float, num_board_thermistors> board_temperatures;
+
+    //TEMPORARY!!! ____________________________________________________
+    _latest_acu_data.voltages = msg_in.voltages;
+    _latest_acu_data.cell_temperatures = msg_in.cell_temperatures
+    _latest_acu_data.humidity = msg_in.humidity;
+    _latest_acu_data.board_temperatures = msg_in.board_temperatures;
+    //_________________________________________________________________
+
+
+
+    _latest_acu_data.min_voltage = msg_in.min_voltage;
+    _latest_acu_data.max_voltage = msg_in.max_voltage;
+    _latest_acu_data.min_voltage_cell_id = msg_in.min_voltage_cell_id;
+    _latest_acu_data.max_voltage_cell_id = msg_in.max_voltage_cell_id;
+    _latest_acu_data.max_board_temperature_segment_id = msg_in.max_board_temperature_segment_id;
+    _latest_acu_data.max_humidity_segment_id = msg_in.max_humidity_segment_id;
+    _latest_acu_data.max_cell_temperature_cell_id = msg_in.max_cell_temperature_cell_id;
+    _latest_acu_data.total_voltage = msg_in.total_voltage;
+    _latest_acu_data.average_cell_temperature = msg_in.average_cell_temperature;
+    
 
 }
 
@@ -226,15 +250,37 @@ void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &m
 
 void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFSystemData_s &msg_in)
 {
-    //PedalsSystemData_s pedals_system_data_bool(msg_in.)
-    //examples of shallow and deep copy will figure out later which one is right (probably neither??)
-    
-    //shallow
-    _latest_vcf_data.pedals_system_data = msg_in.pedals_system_data;
-
-    //deep
+     //deep
+     //PedalsSystemData_s
     _latest_vcf_data.pedals_system_data.accel_is_implausible = msg_in.pedals_system_data.accel_is_implausible; // --> through regen_percent
+    _latest_vcf_data.pedals_system_data.brake_is_implausible = msg_in.pedals_system_data.brake_is_implausible;
+    _latest_vcf_data.pedals_system_data.brake_is_pressed = msg_in.pedals_system_data.brake_is_pressed;
+    _latest_vcf_data.pedals_system_data.accel_is_pressed = msg_in.pedals_system_data.accel_is_pressed
+    _latest_vcf_data.pedals_system_data.mech_brake_is_active = msg_in.pedals_system_data.mech_brake_is_active;
+    _latest_vcf_data.pedals_system_data.brake_and_accel_pressed_implausibility_high = msg_in.pedals_system_data.brake_and_accel_pressed_implausibility_high
+    _latest_vcf_data.pedals_system_data.implausibility_has_exceeded_max_duration = msg_in.pedals_system_data.implausibility_has_exceeded_max_duration;
+    _latest_vcf_data.pedals_system_data.accel_percent = msg_in.pedals_system_data.accel_percent;
+    _latest_vcf_data.pedals_system_data.brake_percent = msg_in.pedals_system_data.brake_percent;
+    _latest_vcf_data.pedals_system_data.regen_percent = msg_in.pedals_system_data.regen_percent;
 
+    //struct FrontLoadCellsFiltered_s
+
+   _latest_vcf_data.front_loadcells_filtered.FL_loadcell_filtered_pounds = msg_in.front_loadcells_filtered.FL_loadcell_filtered_pounds;
+   _latest_vcf_data.front_loadcells_filtered.FR_loadcell_filtered_pounds = msg_in.front_loadcells_filtered.FR_loadcell_filtered_pounds;
+   _latest_vcf_data.front_loadcells_filtered.front_loadcell_FIR_is_saturated = msg_in.front_loadcells_filtered.front_loadcell_FIR_is_saturated;
+
+   //FrontSusPotsFiltered_s
+   _latest_vcf_data.front_suspots_filtered.FL_sus_pot_filtered_analog = msg_in.front_suspots_filtered.FL_sus_pot_filtered_analog;
+   _latest_vcf_data.front_suspots_filtered.FR_sus_pot_filtered_analog = msg_in.front_suspots_filtered.FR_sus_pot_filtered_analog;
+   _latest_vcf_data.front_suspots_filtered.front_loadcell_FIR_is_saturated = msg_in.front_suspots_filtered.front_loadcell_FIR_is_saturated;
+
+   //SteeringFiltered_s steering_filtered
+
+   _latest_vcf_data.steering_filtered.steering_filtered_degrees = msg_in.steering_filtered.steering_filtered_degrees;
+   _latest_vcf_data.steering_filtered.steering_FIR_is_saturated = msg_in.steering_filtered.steering_FIR_is_saturated;
+
+   //DashDisplayState_s dash_display
+   _latest_vcf_data.dash_display.dash_data = msg_in.dash_display.dash_data;
 }
 	
 

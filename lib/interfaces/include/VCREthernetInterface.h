@@ -35,15 +35,7 @@ struct ACUData_VCR
 };
 
 struct VCFData_VCR
-{	//this is a work around, probably is not the right way to go about it
-	/* PedalsSystemData_s pedals_system_data_float;
-	PedalsSystemData_s pedals_system_data_bool;
-    FrontLoadCellsFiltered_s front_loadcells_filtered_float;
-	FrontLoadCellsFiltered_s front_loadcells_filtered_bool;
-    FrontSusPotsFiltered_s front_suspots_filtered;
-    SteeringFiltered_s steering_filtered_float;
-	SteeringFiltered_s steering_filtered_bool;
-    DashDisplayState_s dash_display; */
+{	
 	PedalsSystemData_s pedals_system_data;
     FrontLoadCellsFiltered_s front_loadcells_filtered;
     FrontSusPotsFiltered_s front_suspots_filtered;
@@ -63,14 +55,16 @@ public:
 	//_latest_data.DB_prev>VCR_recv_millis
 	};
 
-//void VCREthernetInterface::receive_pb_msg(const hytech_msgs_VCRSystemData_s &msg_in, unsigned long curr_millis);
 hytech_msgs_VCRSystemData_s VCREthernetInterface::make_vcrsystemdata_msg(const VCRSystemData_s &shared_state);
-//hytech_msgs_VCRSystemData_s make_vcr_msg(const VCRSystemData_s &shared_state);
 hytech_msgs_VCRInterfaceData_s VCREthernetInterface::make_vcrinterfacedata_msg(const VCRInterfaceData_s &shared_state);
 void VCREthernetInterface::receive_pb_msg_acu(const hytech_msgs_BMSData &msg_in);
 void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in);
 void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFSystemData &msg_in);
+
 //VCRData_s get_latest_data() { return _latest_data; }
+DrivebrainData_VCR get_latest_db_data() { return _latest_db_data; }
+ACUData_VCR get_latest_acu_data() { return _latest_acu_data; }
+VCFData_VCR get_latest_vcf_data() { return _latest_vcf_data; }
 
 
 
