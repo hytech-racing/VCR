@@ -1,5 +1,7 @@
-#ifndef __AMSINTERFACE_H__
-#define __AMSINTERFACE_H__
+//Previously known as AMS Interface in MCU (HT08)
+
+#ifndef __AMSSYSTEM_H__
+#define __AMSSYSTEM_H__
 
 #include <Arduino.h>
 #include <cstdint>
@@ -17,18 +19,17 @@ const float DEFAULT_TEMP_ALPHA      = 0.8;
 const float DEFAULT_VOLTAGE_ALPHA   = 0.8;
 const uint16_t MAX_PACK_CHARGE      = 48600;
 const unsigned long DEFAULT_INITIALIZATION_WAIT_INTERVAL = 5000;
-//SW_OK_PIN should be initialized to but for now, using -1.
 const int DEFAULT_SW_OK_PIN_ = 37; //number from scehmatic for VCR
 
 
 /// @brief this class is for interfacing with the AMS (accumulator management system) 
-class AMSInterface
+class AMSSystem
 {
 public:
     /* Method to get instance of object */
-    static AMSInterface& getInstance()
+    static AMSSystem& getInstance()
     {
-        static AMSInterface instance;
+        static AMSSystem instance;
         return instance;
     }
 
@@ -75,7 +76,7 @@ private:
         @param sw_ok_pin The software ok pin number.
         This pin is connected to the shutdown line and will go low if the AMS times out
     */
-    AMSInterface(int sw_ok_pin, float init_temp, float init_volt, float temp_alpha, float volt_alpha):        
+    AMSSystem(int sw_ok_pin, float init_temp, float init_volt, float temp_alpha, float volt_alpha):        
         _pin_software_ok(sw_ok_pin),
         filtered_max_cell_temp(init_temp),
         filtered_min_cell_voltage(init_volt),
@@ -83,8 +84,8 @@ private:
         cell_voltage_alpha(volt_alpha) {};
 
     /* Overloaded constructor that only takes in software OK pin and uses default voltages and temp*/
-    AMSInterface():
-        AMSInterface(DEFAULT_SW_OK_PIN_, DEFAULT_INIT_TEMP, DEFAULT_INIT_VOLTAGE, DEFAULT_TEMP_ALPHA, DEFAULT_VOLTAGE_ALPHA) {};
+    AMSSystem():
+        AMSSystem(DEFAULT_SW_OK_PIN_, DEFAULT_INIT_TEMP, DEFAULT_INIT_VOLTAGE, DEFAULT_TEMP_ALPHA, DEFAULT_VOLTAGE_ALPHA) {};
 
     /* software OK pin */
     int _pin_software_ok;
@@ -109,8 +110,7 @@ private:
 
 };
 
-#endif /* __AMSINTERFACE_H__ */
+#endif /* __AMSSYSTEM_H__ */
 
 //chage all private variables to be preceded
 //look at linter from main branch
-//pio check -e /teensy41 in the platformIO new terminal

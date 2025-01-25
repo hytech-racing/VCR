@@ -1,7 +1,7 @@
-#include "AMSInterface.h"
+#include "AMSSystem.h"
 
 
-void AMSInterface::init(unsigned long curr_micros) {
+void AMSSystem::init(unsigned long curr_micros) {
     
     // Set pin mode
     pinMode(_pin_software_ok, OUTPUT);
@@ -16,14 +16,14 @@ void AMSInterface::init(unsigned long curr_micros) {
 
 }
 
-void AMSInterface::set_start_state() {
+void AMSSystem::set_start_state() {
     
     digitalWrite(_pin_software_ok, HIGH);
     
 }
 
 //SETTERS//
-void AMSInterface::set_state_ok_high(bool ok_high) {
+void AMSSystem::set_state_ok_high(bool ok_high) {
     if (ok_high)
         digitalWrite(_pin_software_ok, HIGH);
     else
@@ -31,40 +31,43 @@ void AMSInterface::set_state_ok_high(bool ok_high) {
 }
 
 //recieve heartbeat
-void AMSInterface::set_heartbeat(unsigned long curr_micros) {
+void AMSSystem::set_heartbeat(unsigned long curr_micros) {
     last_heartbeat_time_ = curr_micros;
 }
 
-bool AMSInterface::heartbeat_received(unsigned long curr_millis) {
+bool AMSSystem::heartbeat_received(unsigned long curr_millis) {
     return ((curr_millis - last_heartbeat_time_) < HEARTBEAT_INTERVAL);
 }
 
-bool AMSInterface::is_below_pack_charge_critical_low_thresh() {
+//will receive from ethernet
+bool AMSSystem::is_below_pack_charge_critical_low_thresh() {
     return (HYTECH_low_voltage_ro_fromS(bms_voltages_.low_voltage_ro) < PACK_CHARGE_CRIT_LOWEST_CELL_THRESHOLD);
 }
 
-bool AMSInterface::is_below_pack_charge_critical_total_thresh() {
+//will receive from ethernet
+bool AMSSystem::is_below_pack_charge_critical_total_thresh() {
     return (HYTECH_total_voltage_ro_fromS(bms_voltages_.total_voltage_ro) < PACK_CHARGE_CRIT_TOTAL_THRESHOLD);
 }
 
-bool AMSInterface::pack_charge_is_critical() {
+bool AMSSystem::pack_charge_is_critical() {
     return (is_below_pack_charge_critical_low_thresh() || is_below_pack_charge_critical_total_thresh());
 }
 
 //GETTERS//
-float AMSInterface::get_filtered_max_cell_temp() {
+float AMSSystem::get_filtered_max_cell_temp() {
     bms_high_temp = bms_temperatures_.get_high_temperature() / 100.0;
     filtered_max_cell_temp = filtered_max_cell_temp * cell_temp_alpha + (1.0 - cell_temp_alpha) * bms_high_temp;
     return filtered_max_cell_temp;
 }
 
-float AMSInterface::get_filtered_min_cell_voltage() {
+//will receive from ethernet
+float AMSSystem::get_filtered_min_cell_voltage() {
     bms_low_voltage = HYTECH_low_voltage_ro_fromS(bms_voltages_.low_voltage_ro);
     filtered_min_cell_voltage = filtered_min_cell_voltage * cell_temp_alpha + (1.0 - cell_voltage_alpha) * bms_low_voltage;
     return filtered_min_cell_voltage;
 }
 
-void AMSInterface::calculate_acc_derate_factor() {
+void AMSSystem::calculate_acc_derate_factor() {
     float voltage_lim_factor = 1.0;
     float startDerateVoltage = 3.5;
     float endDerateVoltage = 3.2;
@@ -88,7 +91,7 @@ void AMSInterface::calculate_acc_derate_factor() {
     acc_derate_factor = min(temp_lim_factor,voltage_lim_factor);
 }
 
-float AMSInterface::get_acc_derate_factor() {
+float AMSSystem::get_acc_derate_factor() {
     calculate_acc_derate_factor();
     return acc_derate_factor;
 }
