@@ -1,6 +1,8 @@
 #ifndef __AMSINTERFACE_H__
 #define __AMSINTERFACE_H__
 
+#include <stdint.h>
+
 /* Heartbeat Interval is the allowable amount of time between BMS status messages before car delatches */
 const unsigned long HEARTBEAT_INTERVAL                      = 2000;   // milliseconds
 /* The total pcc threshold is the lowest allowable voltage of the entire pack (in Volts)*/
@@ -29,10 +31,8 @@ public:
         return instance;
     }
 
-    // ***Only use if needed***
-    // // Delete copy constructor and assignment operator to prevent duplication. // Added
-    // AMSInterface(const AMSInterface&) = delete; // Added
-    // AMSInterface& operator=(const AMSInterface&) = delete; // Added
+    AMSInterface(const AMSInterface&) = delete;
+    AMSInterface& operator=(const AMSInterface&) = delete;
 
     /* Initialize the heartbeat timer */
     void init(unsigned long curr_micros);//unsigned long micros
@@ -46,9 +46,7 @@ public:
     /* Check if either lowest cell or total pack is below threshold*/
     bool pack_charge_is_critical(); 
 
-    //SETTERS//    
-    /* set software OK pin */
-    void set_state_ok_high(bool ok_high);    
+    //SETTERS//
     /* set the last heartbeat to the current millis time */
     void set_heartbeat(unsigned long curr_millis);
 

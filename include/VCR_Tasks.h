@@ -39,26 +39,6 @@
 #include "Buzzer.h"
 
 /**
- * This "Test" function is purely for validation of the HT_SCHED dependency. This is intended to be removed when
- * further development occurs.
- */
-bool init_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    hal_printf("Initialized function at %d (micros)\n", sysMicros);
-    return true;
-}
-
-bool run_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    hal_printf("Ran function at %d (micros) for the %dth time\n", sysMicros, taskInfo.executions);
-    return true;
-}
-
-HT_TASK::Task test_task = HT_TASK::Task(init_test_task, run_test_task, 1, 100000UL); // 100,000us is 10hz
-
-
-
-/**
  * The "tick state machine" task will simply call the state machine's tick function with the current
  * timestamp in micros. No init function is necessary. The tick function makes use of the other systems'
  * singleton classes to minimize the need for passing instances around.
