@@ -1,0 +1,13 @@
+{
+    "name": "interfaces-lib",
+    "version": "1.0.0",
+    "license": "MIT",
+    "dependencies": {
+        "can_lib": "*",
+        "shared_data": "*",
+        "CASE_lib": "*",
+        "nanopb": "*"
+    },
+    "frameworks": "*",
+    "platforms": "*"
+  }

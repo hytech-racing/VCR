@@ -109,13 +109,13 @@ class InverterInterface
     public: 
 
         InverterInterface(
-            CANBufferType msg_queue,
+            CANBufferType *msg_output_queue, 
             uint32_t mc_energy_id, 
             uint32_t mc_status_id,
             uint32_t mc_temps_id,
             uint32_t mc_setpoint_commands_id,
-            uint32_t mc_torque_command_id)  : msg_queue_(msg_queue)
-        {
+            uint32_t mc_torque_command_id) : msg_queue_(msg_output_queue) 
+        { 
             inverter_ids.mc_energy_id = mc_energy_id;
             inverter_ids.mc_status_id = mc_status_id;
             inverter_ids.mc_temps_id = mc_temps_id;
@@ -167,8 +167,7 @@ class InverterInterface
 
         void send_MC_TORQUE_COMMAND();
 
-        CANBufferType msg_queue_;
-
+        CANBufferType *msg_queue_;
 };
 #endif // __INVERTERINTERFACE_H__
 

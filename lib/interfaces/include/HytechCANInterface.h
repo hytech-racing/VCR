@@ -3,6 +3,7 @@
 
 #include <FlexCAN_T4.h>
 #include <hytech.h>
+#include <etl/delegate.h>
 
 template <uint32_t... can_ids>
 class HytechCANInterface {
@@ -13,13 +14,13 @@ class HytechCANInterface {
         /** 
          * Registers CAN id to the handlers delegate
          */
-        template <uint16_t can_id>
+        template <uint32_t can_id>
         void register_handler(void (callback)(CAN_message_t &msg))
         {
-            if constexpr ((can_id == can_ids) || ...) {
-                handlers[CAN_ID] = etl::delegate<void(const uint8_t*, size_t)>::create(callback);
+            if constexpr (((can_id == can_ids) || ...)) {
+                handlers[can_id] = callback;
             } else {
-                static_assert(((can_id ==can_ids) || ...), "CAN id not registered.")
+                static_assert(((can_id == can_ids) || ...), "CAN id not registered.");
             }
         }
 
@@ -93,7 +94,7 @@ class HytechCANInterface {
         void dispatch_msg(CAN_message_t &msg)
         {   
             if constexpr (sizeof...(can_ids) > 0) {
-                (void)((can_id == can_ids && handlers[msg.id](msg)) || ...);
+                (void)((msg.id == can_ids && handlers[msg.id](msg)) || ...);
             }
         }
 

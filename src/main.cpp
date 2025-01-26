@@ -25,6 +25,9 @@
 #include "VCR_Tasks.h"
 #include "TorqueControllerMux.hpp"
 
+#include <InverterInterface.h>
+#include <HytechCANInterface.h>
+
 
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
