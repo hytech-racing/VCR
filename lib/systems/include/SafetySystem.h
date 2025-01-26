@@ -1,7 +1,8 @@
 #ifndef SAFETY_SYSTEM
 #define SAFETY_SYSTEM
-#include "WatchdogInterface.h"
+#include "WatchdogSystem.h"
 #include "AMSInterface.h"
+#include "DrivetrainSystem.h"
 
 class SafetySystem
 {
@@ -21,7 +22,7 @@ public:
      * Updates _software_is_ok by updating AMS interface and Watchdog interface. If either
      * of those have problems, then _software_is_ok goes to false.
      */
-    void update_software_shutdown(unsigned long curr_millis);
+    bool update_software_shutdown(unsigned long curr_millis);
 
     bool get_software_is_ok() {return _software_is_ok;}
 
@@ -38,7 +39,7 @@ public:
 
 private:
     SafetySystem():
-    _watchdog{WatchdogInterface::getInstance()},
+    _watchdog{WatchdogSystem::getInstance()},
     _ams{AMSInterface::getInstance()},
     _software_is_ok(false) {};
 

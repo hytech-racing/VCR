@@ -18,4 +18,7 @@ extern VCRSystemData_s system_data;
 extern MCP_ADC<8> adc_0; // MCP3208. ADC0 in VCR schematic. Used for valuable telem data.
 extern MCP_ADC<8> adc_1; // MCP3208. ADC1 in VCR schematic. Used for extra thermistors or extra sensors while testing.
 
+/* Watchdog pin */
+extern const int watchdog_pin;
+
 #endif /* VCR_GLOBALS */
