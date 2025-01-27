@@ -210,17 +210,11 @@ hytech_msgs_VCRInterfaceData_s VCREthernetInterface::make_vcrinterfacedata_msg(c
 //
 void VCREthernetInterface::receive_pb_msg_acu(const hytech_msgs_BMSData &msg_in)
 {
-    std::array<std::array<std::optional<volt>, 12>, num_chips> voltages;
-    std::array<celcius, 4 * num_chips> cell_temperatures;
-    std::array<float, num_humidity_sensors> humidity;
-    std::array<float, num_board_thermistors> board_temperatures;
-
-    //TEMPORARY!!! ____________________________________________________
+    
     _latest_acu_data.voltages = msg_in.voltages;
     _latest_acu_data.cell_temperatures = msg_in.cell_temperatures
     _latest_acu_data.humidity = msg_in.humidity;
     _latest_acu_data.board_temperatures = msg_in.board_temperatures;
-    //_________________________________________________________________
 
 
 
