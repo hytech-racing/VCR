@@ -22,9 +22,6 @@ namespace HTUnits
  */
 struct InverterIds_s
 {
-    uint32_t mc_energy_id; 
-    uint32_t mc_status_id; 
-    uint32_t mc_temps_id;
     uint32_t mc_setpoint_commands_id; 
     uint32_t mc_torque_command_id; 
 };
@@ -55,6 +52,7 @@ struct InverterTorqueCommand_s
 **/
 struct InverterStatus_s
 {
+    bool new_data : 1;
     bool system_ready : 1;
     bool error : 1;
     bool warning : 1;
@@ -69,6 +67,7 @@ struct InverterStatus_s
 
 struct InverterTemps_s
 {
+    bool new_data : 1;
     HTUnits::celcius motor_temp;
     HTUnits::celcius inverter_temp;
     HTUnits::celcius igbt_temp;
@@ -76,12 +75,14 @@ struct InverterTemps_s
 
 struct InverterPower_s
 {
+    bool new_data : 1;
     HTUnits::watts active_power;
     HTUnits::var reactive_power;
 };
 
 struct MotorMechanics_s
 {
+    bool new_data : 1;
     HTUnits::watts actual_power;
     HTUnits::torque_nm actual_torque;
     HTUnits::speed_rpm actual_speed;
@@ -89,6 +90,7 @@ struct MotorMechanics_s
 
 struct InverterControlParams_s
 {
+    bool new_data : 1;
     uint16_t speed_control_kp;
     uint16_t speed_control_ki;
     uint16_t speed_control_kd;
@@ -103,6 +105,9 @@ struct InverterFeedbackData_s
     InverterControlParams_s control_params;
 };
 
+/**
+ * Inverter interface
+ */
 class InverterInterface
 {
 
@@ -110,15 +115,9 @@ class InverterInterface
 
         InverterInterface(
             CANBufferType *msg_output_queue, 
-            uint32_t mc_energy_id, 
-            uint32_t mc_status_id,
-            uint32_t mc_temps_id,
             uint32_t mc_setpoint_commands_id,
             uint32_t mc_torque_command_id) : msg_queue_(msg_output_queue) 
         { 
-            inverter_ids.mc_energy_id = mc_energy_id;
-            inverter_ids.mc_status_id = mc_status_id;
-            inverter_ids.mc_temps_id = mc_temps_id;
             inverter_ids.mc_setpoint_commands_id = mc_setpoint_commands_id;
             inverter_ids.mc_torque_command_id = mc_torque_command_id;
         }
@@ -138,6 +137,19 @@ class InverterInterface
             uint16_t torque_command
         );
 
+        // TODO un-public these (they are public for testing)
+
+        /* Recieving callbacks */
+        void recieve_MCI_STATUS(CAN_message_t &can_msg);
+
+        void recieve_MCI_TEMPS(CAN_message_t &can_msg);
+
+        void recieve_MCI_DYNAMICS(CAN_message_t &can_msg);
+
+        void recieve_MCI_POWER(CAN_message_t &can_msg);
+
+        void recieve_MCI_FEEDBACK(CAN_message_t &can_msg);
+
 
     private: 
 
@@ -146,18 +158,18 @@ class InverterInterface
         InverterSetpoints_s _inverter_setpoints;
         InverterTorqueCommand_s _inverter_torque_command;
 
-        InverterStatus_s _inverter_status;
-        InverterTemps_s _inverter_temps;
-        InverterPower_s _inverter_power;
-        InverterControlParams_s _control_params;
+        // InverterStatus_s _inverter_status;
+        // InverterTemps_s _inverter_temps;
+        // InverterPower_s _inverter_power;
+        // InverterControlParams_s _control_params;
         InverterFeedbackData_s _feedback_data;
 
-        /* Recieving callbacks */
-        void recieve_MC_ENERGY(CAN_message_t &can_msg);
-
-        void recieve_MC_STATUS(CAN_message_t &can_msg);
-
-        void recieve_MC_TEMPS(CAN_message_t &can_msg);
+        /* Getters */
+        InverterStatus_s get_status(); 
+        InverterTemps_s get_temps();
+        InverterPower_s get_power();
+        MotorMechanics_s get_motor_mechanics();
+        InverterControlParams_s get_control_params();
 
         /* Sending */
         template <typename U>

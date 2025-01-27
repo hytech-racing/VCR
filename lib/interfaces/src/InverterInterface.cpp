@@ -1,6 +1,34 @@
 #include <InverterInterface.h>
 
-// TODO Parameterize this so it works for all motor controllers
+/**
+ * Getters for the data
+ */
+
+InverterStatus_s InverterInterface::get_status() {
+    _feedback_data.status.new_data = false;
+    return _feedback_data.status;
+}
+
+InverterTemps_s InverterInterface::get_temps() {
+    _feedback_data.temps.new_data = false;
+    return _feedback_data.temps;
+}
+
+InverterPower_s InverterInterface::get_power() {
+    _feedback_data.power.new_data = false;
+    return _feedback_data.power;
+}
+
+MotorMechanics_s InverterInterface::get_motor_mechanics() {
+    _feedback_data.motor_mechanics.new_data = false;
+    return _feedback_data.motor_mechanics;
+}
+
+
+InverterControlParams_s InverterInterface::get_control_params() {
+    _feedback_data.control_params.new_data = false;
+    return _feedback_data.control_params;
+}
 
 /** 
  * Request change of state
@@ -34,52 +62,81 @@ void InverterInterface::set_torque_command(uint16_t torque_command)
 /**
  * Recieving CAN messages
  */
-void InverterInterface::recieve_MC_ENERGY(CAN_message_t &can_msg) 
+
+void InverterInterface::recieve_MCI_STATUS(CAN_message_t &can_msg)
 {
     // Unpack the message
-    MC1_ENERGY_t unpacked_msg;
-    Unpack_MC1_ENERGY_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
-
-    // Update inverter interface with new data
-    _inverter_status.dc_bus_voltage = unpacked_msg.dc_bus_voltage;
-    _feedback_data.motor_mechanics.actual_torque = unpacked_msg.feedback_torque;
-    _feedback_data.motor_mechanics.actual_power = unpacked_msg.motor_power;
-
-}
-
-void InverterInterface::recieve_MC_STATUS(CAN_message_t &can_msg) 
-{
-
-    // Unpack the message
-    MC1_STATUS_t unpacked_msg;
-    Unpack_MC1_STATUS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    MCI1_STATUS_t unpacked_msg;
+    Unpack_MCI1_STATUS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
     
     // Update inverter interface with new data
-    _inverter_status.system_ready = unpacked_msg.system_ready;
-    _inverter_status.error = unpacked_msg.error;
-    _inverter_status.warning = unpacked_msg.warning;
-    _inverter_status.quit_dc_on = unpacked_msg.quit_dc_on;
-    _inverter_status.dc_on = unpacked_msg.dc_on;
-    _inverter_status.quit_inverter_on = unpacked_msg.quit_inverter_on;
-    _inverter_status.derating_on = unpacked_msg.derating_on;
-
+    _feedback_data.status.system_ready = unpacked_msg.system_ready;
+    _feedback_data.status.error = unpacked_msg.error;
+    _feedback_data.status.warning = unpacked_msg.warning;
+    _feedback_data. status.quit_dc_on = unpacked_msg.quit_dc_on;
+    _feedback_data.status.dc_on = unpacked_msg.dc_on;
+    _feedback_data.status.quit_inverter_on = unpacked_msg.quit_inverter_on;
+    _feedback_data.status.derating_on = unpacked_msg.derating_on;
+    _feedback_data.status.dc_bus_voltage = unpacked_msg.dc_bus_voltage;
+    _feedback_data.status.diagnostic_number = unpacked_msg.diagnostic_number;
 }
 
-void InverterInterface::recieve_MC_TEMPS(CAN_message_t &can_msg)
+void InverterInterface::recieve_MCI_TEMPS(CAN_message_t &can_msg)
 {
 
     // Unpack the message
-    MC1_TEMPS_t unpacked_msg;
-    Unpack_MC1_TEMPS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    MCI1_TEMPS_t unpacked_msg;
+    Unpack_MCI1_TEMPS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
 
     // Update inverter interface with new data
-    _inverter_status.diagnostic_number = unpacked_msg.diagnostic_number;
-    _inverter_temps.igbt_temp = HYTECH_igbt_temp_ro_fromS(unpacked_msg.igbt_temp_ro);
-    _inverter_temps.inverter_temp = HYTECH_inverter_temp_ro_fromS(unpacked_msg.inverter_temp_ro);
-    _inverter_temps.motor_temp = HYTECH_motor_temp_ro_fromS(unpacked_msg.motor_temp_ro);
+    _feedback_data.temps.igbt_temp = HYTECH_igbt_temp_ro_fromS(unpacked_msg.igbt_temp_ro);
+    _feedback_data.temps.inverter_temp = HYTECH_inverter_temp_ro_fromS(unpacked_msg.inverter_temp_ro);
+    _feedback_data.temps.motor_temp = HYTECH_motor_temp_ro_fromS(unpacked_msg.motor_temp_ro);
+    _feedback_data.temps.new_data = true;
 
 }
 
+void InverterInterface::recieve_MCI_DYNAMICS(CAN_message_t &can_msg) 
+{
+
+    // Unpack the message
+    MCI1_DYNAMICS_t unpacked_msg;
+    Unpack_MCI1_DYNAMICS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+
+    // Update inverter interface with new data
+    _feedback_data.motor_mechanics.actual_power = unpacked_msg.actual_power_w;
+    _feedback_data.motor_mechanics.actual_torque = unpacked_msg.actual_torque_nm;
+    _feedback_data.motor_mechanics.actual_speed = unpacked_msg.actual_speed_rpm;
+    _feedback_data.motor_mechanics.new_data = true;
+
+}
+
+void InverterInterface::recieve_MCI_POWER(CAN_message_t &can_msg) 
+{
+    // Unpack the message
+    MCI1_POWER_t unpacked_msg;
+    Unpack_MCI1_POWER_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+
+    // Update inverter interface with new data
+    _feedback_data.power.active_power = unpacked_msg.active_power_w;
+    _feedback_data.power.reactive_power = unpacked_msg.reactive_power_var;
+    _feedback_data.power.new_data = true;
+
+}
+
+void InverterInterface::recieve_MCI_FEEDBACK(CAN_message_t &can_msg) 
+{
+    // Unpack the message
+    MCI1_FEEDBACK_t unpacked_msg;
+    Unpack_MCI1_FEEDBACK_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+
+    // Update inverter interface with new data
+    _feedback_data.control_params.speed_control_kp = unpacked_msg.speed_control_kp;
+    _feedback_data.control_params.speed_control_ki = unpacked_msg.speed_control_ki;
+    _feedback_data.control_params.speed_control_kd = unpacked_msg.speed_control_kd;
+    _feedback_data.control_params.new_data = true;
+
+}
 
 /**
  * Sending CAN messages

@@ -4,105 +4,154 @@
 #include <FlexCAN_T4.h>
 #include <hytech.h>
 #include <etl/delegate.h>
+#include <stdint.h>
+#include <InverterInterface.h>
+#include <MessageQueueDefine.h>
 
-template <uint32_t... can_ids>
-class HytechCANInterface {
-    public: 
+/* Recieve Buffers */
+extern CANBufferType CAN1_rxBuffer;
+extern CANBufferType CAN2_rxBuffer;
+extern CANBufferType CAN3_rxBuffer;
 
-        HytechCANInterface() { }
+/* Transfer Buffers */
+extern CANBufferType CAN1_txBuffer;
+extern CANBufferType CAN2_txBuffer;
+extern CANBufferType CAN3_txBuffer;
 
-        /** 
-         * Registers CAN id to the handlers delegate
-         */
-        template <uint32_t can_id>
-        void register_handler(void (callback)(CAN_message_t &msg))
-        {
-            if constexpr (((can_id == can_ids) || ...)) {
-                handlers[can_id] = callback;
-            } else {
-                static_assert(((can_id == can_ids) || ...), "CAN id not registered.");
-            }
-        }
+/**
+ * Struct holding the interfaces processed by the ring buffer
+ */
 
-        /**
-         * Dispatches CAN messages from the specified buffer 
-         * (Should be called in a loop)
-         */
-        template <typename bufferType>
-        void dispatch_buffer(bufferType &rx_buffer) 
-        {
-            while (rx_buffer.available())
-            {
-                CAN_message_t recvd_msg;
-                uint8_t buf[sizeof(CAN_message_t)];
-                rx_buffer.pop_front(buf, sizeof(CAN_message_t));
-                memmove(&recvd_msg, buf, sizeof(recvd_msg));
-                dispatch_msg(recvd_msg.id);
-            }
-        }
-
-        /**
-         * Sending CAN messages 
-         * (needs to be called in loop)
-         * */
-        template <typename bufferType> 
-        void send_all_CAN_msgs(bufferType &buffer, FlexCAN_T4_Base *can_interface)
-        {
-            CAN_message_t msg;
-            while (buffer.available()) 
-            {
-                CAN_message_t msg;
-                uint8_t buf[sizeof(CAN_message_t)];
-                buffer.pop_front(buf, sizeof(CAN_message_t));
-                memmove(&msg, buf, sizeof(msg));
-                can_interface->write(msg);
-            }
-        }
-
-        /**
-         * Recieve Buffers
-         */
-
-        /* Recieve buffer for CAN 1 */
-        Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)> CAN1_rxBuffer;
-
-        /* Recieve buffer for CAN 2 */
-        Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)> CAN2_rxBuffer;
-
-        /* Recieve buffer for CAN 3 */
-        Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)> CAN3_rxBuffer;
-
-        /**
-         * Transfer buffers
-         */
-
-        /* Transfer buffer for CAN 1 */
-        Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)> CAN1_txBuffer;
-
-        /* Transfer buffer for CAN 2 */
-        Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)> CAN2_txBuffer;
-
-        /* Transfer buffer for CAN 3 */
-        Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)> CAN3_txBuffer;
-
-    private: 
-
-        /**
-         * Tries to dispatch CAN message out to the correct handler
-         * if there are more than 0 CAN ids
-         */
-        void dispatch_msg(CAN_message_t &msg)
-        {   
-            if constexpr (sizeof...(can_ids) > 0) {
-                (void)((msg.id == can_ids && handlers[msg.id](msg)) || ...);
-            }
-        }
-
-        /**
-         * Stores recieve callbacks
-         */
-        etl::delegate<void(CAN_message_t &msg)> handlers[sizeof...(can_ids)] = {};
-
+struct CANInterfaces
+{
+    InverterInterface front_left_inv;
+    InverterInterface front_right_inv;
+    InverterInterface back_left_inv;
+    InverterInterface back_right_inv;
 };
+
+/** Methods called on can recieve */
+void on_can1_recieve(const CAN_message_t &msg); 
+
+void on_can2_recieve(const CAN_message_t &msg); 
+
+void on_can3_recieve(const CAN_message_t &msg); 
+
+/**
+ * Recieving CAN messages
+ * (needs to be called in a loop)
+ */
+template <typename BufferType>
+void process_ring_buffer(BufferType &rx_buffer, CANInterfaces interfaces) {
+    while (rx_buffer.available()) 
+    {
+        CAN_message_t recvd_msg;
+        uint8_t buf[sizeof(CAN_message_t)];
+        rx_buffer.pop_front(buf, sizeof(CAN_message_t));
+        memmove(&recvd_msg, buf, sizeof(recvd_msg));
+        switch (recvd_msg.id)
+        {
+            // FL Inverter
+            case (MCI1_STATUS_CANID):
+                interfaces.front_left_inv.recieve_MCI_STATUS(recvd_msg);
+                break;
+
+            case (MCI1_TEMPS_CANID):
+                interfaces.front_left_inv.recieve_MCI_TEMPS(recvd_msg);
+                break;
+
+            case (MCI1_DYNAMICS_CANID):
+                interfaces.front_left_inv.recieve_MCI_DYNAMICS(recvd_msg);
+                break;
+
+            case (MCI1_POWER_CANID):
+                interfaces.front_left_inv.recieve_MCI_POWER(recvd_msg);
+                break;
+
+            case (MCI1_FEEDBACK_CANID):
+                interfaces.front_left_inv.recieve_MCI_FEEDBACK(recvd_msg);
+
+            // FR inverter
+            case (MCI2_STATUS_CANID):
+                interfaces.front_right_inv.recieve_MCI_STATUS(recvd_msg);
+                break;
+
+            case (MCI2_TEMPS_CANID):
+                interfaces.front_right_inv.recieve_MCI_TEMPS(recvd_msg);
+                break;
+
+            case (MCI2_DYNAMICS_CANID):
+                interfaces.front_right_inv.recieve_MCI_DYNAMICS(recvd_msg);
+                break;
+
+            case (MCI2_POWER_CANID):
+                interfaces.front_right_inv.recieve_MCI_POWER(recvd_msg);
+                break;
+                
+            case (MCI2_FEEDBACK_CANID):
+                interfaces.front_right_inv.recieve_MCI_FEEDBACK(recvd_msg);
+
+            // RL Inverter
+            case (MCI3_STATUS_CANID):
+                interfaces.back_left_inv.recieve_MCI_STATUS(recvd_msg);
+                break;
+
+            case (MCI3_TEMPS_CANID):
+                interfaces.back_left_inv.recieve_MCI_TEMPS(recvd_msg);
+                break;
+
+            case (MCI3_DYNAMICS_CANID):
+                interfaces.back_left_inv.recieve_MCI_DYNAMICS(recvd_msg);
+                break;
+
+            case (MCI3_POWER_CANID):
+                interfaces.back_left_inv.recieve_MCI_POWER(recvd_msg);
+                break;
+
+            case (MCI3_FEEDBACK_CANID):
+                interfaces.back_left_inv.recieve_MCI_FEEDBACK(recvd_msg);
+
+            // RR Inverter
+            case (MCI4_STATUS_CANID):
+                interfaces.back_right_inv.recieve_MCI_STATUS(recvd_msg);
+                break;
+
+            case (MCI4_TEMPS_CANID):
+                interfaces.back_right_inv.recieve_MCI_TEMPS(recvd_msg);
+                break;
+
+            case (MCI4_DYNAMICS_CANID):
+                interfaces.back_right_inv.recieve_MCI_DYNAMICS(recvd_msg);
+                break;
+
+            case (MCI4_POWER_CANID):
+                interfaces.back_right_inv.recieve_MCI_POWER(recvd_msg);
+                break;
+
+            case (MCI4_FEEDBACK_CANID):
+                interfaces.back_right_inv.recieve_MCI_FEEDBACK(recvd_msg);
+
+        }
+    
+    }
+}
+
+/**
+* Sending CAN messages 
+* (needs to be called in loop)
+* */
+template <typename bufferType> 
+void send_all_CAN_msgs(bufferType &tx_buffer, FlexCAN_T4_Base *can_interface)
+{
+    CAN_message_t msg;
+    while (tx_buffer.available()) 
+    {
+        CAN_message_t msg;
+        uint8_t buf[sizeof(CAN_message_t)];
+        tx_buffer.pop_front(buf, sizeof(CAN_message_t));
+        memmove(&msg, buf, sizeof(msg));
+        can_interface->write(msg);
+    }
+}
 
 #endif /* HYTECHCANINTERFACE */
