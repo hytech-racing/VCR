@@ -2,6 +2,7 @@
 #define __AMSSYSTEM_H__
 
 #include <stdint.h>
+#include <SharedFirmwareTypes.h>
 
 /* Heartbeat Interval is the allowable amount of milliseconds between BMS status messages before car delatches */
 const unsigned long HEARTBEAT_INTERVAL_MS                  = 2000;    // milliseconds
@@ -76,6 +77,14 @@ private:
     float _cell_temp_alpha;
     float _cell_voltage_alpha;
 
+    /* IIR filter parameters */
+    float bms_high_temp;
+    float bms_low_voltage;
+
+    /*Storage of BMS Struct*/
+    BMSData_s bms_container;
+
+
     /* Check if lowest cell temperature is below threshold */
     bool is_below_pack_charge_critical_low_thresh();
 
@@ -86,6 +95,20 @@ private:
     float get_filtered_max_cell_temp();
     /* IIR filter and return filtered min cell voltage */
     float get_filtered_min_cell_voltage();    
+
+    /* Helper method to find the bms high temp by searching temp array */
+    float get_high_temp();
+
+    /* Finds the minimum cell volatage in the struct */
+    float get_min_cell_voltage();
+
+
+    //Checkers (return true if everything is good)
+    /* Checks if "Total pack voltage is below critical threshold" */
+    bool check_voltage();
+
+    /* Check if heartbeat received is within interval allowance */
+    bool check_heartbeat(unsigned long curr_micros);
 
 };
 
