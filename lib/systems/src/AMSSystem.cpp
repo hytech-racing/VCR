@@ -1,4 +1,19 @@
 #include "AMSSystem.h"
+<<<<<<< HEAD:lib/systems/src/AMSSystem.cpp
+=======
+
+// Singleton access method
+AMSSystem& AMSSystem::getInstance(int sw_ok_pin) {
+    if (instance_ == nullptr) {
+        if (sw_ok_pin == -1) {
+            // Handle invalid initialization attempt
+            throw std::runtime_error("AMSSystem must be initialized with valid arguments!");
+        }
+        instance_ = new AMSSystem(sw_ok_pin);
+    }
+    return *instance_;
+}
+>>>>>>> 4c7842f (Updated amssystem.h):lib/state_machine/src/AMSInterface.cpp
 
 
 void AMSSystem::init(unsigned long curr_micros) {
@@ -30,7 +45,10 @@ void AMSSystem::set_state_ok_high(bool ok_high) {
         digitalWrite(_pin_software_ok, LOW);
 }
 
+<<<<<<< HEAD:lib/systems/src/AMSSystem.cpp
 //recieve heartbeat
+=======
+>>>>>>> 4c7842f (Updated amssystem.h):lib/state_machine/src/AMSInterface.cpp
 void AMSSystem::set_heartbeat(unsigned long curr_micros) {
     last_heartbeat_time_ = curr_micros;
 }
@@ -39,12 +57,18 @@ bool AMSSystem::heartbeat_received(unsigned long curr_millis) {
     return ((curr_millis - last_heartbeat_time_) < HEARTBEAT_INTERVAL);
 }
 
+<<<<<<< HEAD:lib/systems/src/AMSSystem.cpp
 //will receive from ethernet
+=======
+>>>>>>> 4c7842f (Updated amssystem.h):lib/state_machine/src/AMSInterface.cpp
 bool AMSSystem::is_below_pack_charge_critical_low_thresh() {
     return (HYTECH_low_voltage_ro_fromS(bms_voltages_.low_voltage_ro) < PACK_CHARGE_CRIT_LOWEST_CELL_THRESHOLD);
 }
 
+<<<<<<< HEAD:lib/systems/src/AMSSystem.cpp
 //will receive from ethernet
+=======
+>>>>>>> 4c7842f (Updated amssystem.h):lib/state_machine/src/AMSInterface.cpp
 bool AMSSystem::is_below_pack_charge_critical_total_thresh() {
     return (HYTECH_total_voltage_ro_fromS(bms_voltages_.total_voltage_ro) < PACK_CHARGE_CRIT_TOTAL_THRESHOLD);
 }
@@ -60,11 +84,15 @@ float AMSSystem::get_filtered_max_cell_temp() {
     return filtered_max_cell_temp;
 }
 
+<<<<<<< HEAD:lib/systems/src/AMSSystem.cpp
 //will receive from ethernet
+=======
+>>>>>>> 4c7842f (Updated amssystem.h):lib/state_machine/src/AMSInterface.cpp
 float AMSSystem::get_filtered_min_cell_voltage() {
     bms_low_voltage = HYTECH_low_voltage_ro_fromS(bms_voltages_.low_voltage_ro);
     filtered_min_cell_voltage = filtered_min_cell_voltage * cell_temp_alpha + (1.0 - cell_voltage_alpha) * bms_low_voltage;
     return filtered_min_cell_voltage;
+<<<<<<< HEAD:lib/systems/src/AMSSystem.cpp
 }
 
 void AMSSystem::calculate_acc_derate_factor() {
@@ -97,3 +125,6 @@ float AMSSystem::get_acc_derate_factor() {
 }
 
 
+=======
+}
+>>>>>>> 4c7842f (Updated amssystem.h):lib/state_machine/src/AMSInterface.cpp
