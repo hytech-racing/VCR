@@ -3,7 +3,6 @@
 
 /* From local systems library */
 #include "DrivetrainSystem.h"
-#include "SafetySystem.h"
 #include "BuzzerController.h"
 
 /**
@@ -61,8 +60,7 @@ private:
     VehicleStateMachine() :
         _current_state(CAR_STATE::STARTUP),
         _drivetrain(DrivetrainSystem<uint32_t>::getInstance()),
-        _buzzer(BuzzerController::getInstance()),
-        _safetysystem(SafetySystem::getInstance()) {};
+        _buzzer(BuzzerController::getInstance()) {};
 
     void set_state_(CAR_STATE new_state, unsigned long curr_time);
 
@@ -83,8 +81,7 @@ private:
     /* System references to show dependence on systems library */
     DrivetrainSystem<uint32_t> &_drivetrain; //TODO: Make this InverterInterface instead of uint32_t
     BuzzerController &_buzzer;
-    SafetySystem &_safetysystem;
-
+    // AMSSystem &_ams_system;
 };
 
 #endif /* VEHICLE_STATE_MACHINE */

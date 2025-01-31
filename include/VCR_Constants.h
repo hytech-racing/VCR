@@ -55,6 +55,7 @@ const int RL_SUS_POT_OFFSET = 1;
 const float RR_SUS_POT_SCALE = 1;
 const int RR_SUS_POT_OFFSET = 1;
 
+const int WATCHDOG_PIN = 36;
 
 
 #endif /* VCR_CONSTANTS */

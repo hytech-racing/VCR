@@ -1,3 +1,5 @@
+#include "VCR_Tasks.h"
+
 /* From HT_SCHED library */
 #include "ht_sched.hpp"
 
@@ -40,10 +42,10 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     interface_data.current_sensor_data.twentyfour_volt_sensor = adc_0.data.conversions[GLV_SENSE_CHANNEL].conversion;
     interface_data.current_sensor_data.current_sensor_unfiltered = adc_0.data.conversions[CURRENT_SENSE_CHANNEL].conversion;
     interface_data.current_sensor_data.current_refererence_unfiltered = adc_0.data.conversions[REFERENCE_SENSE_CHANNEL].conversion;
-    interface_data.rear_loadcells_unfiltered.RL_loadcell_unfiltered_pounds = adc_0.data.conversions[RL_LOADCELL_CHANNEL].conversion;
-    interface_data.rear_loadcells_unfiltered.RR_loadcell_unfiltered_pounds = adc_0.data.conversions[RR_LOADCELL_CHANNEL].conversion;
-    interface_data.rear_suspots_unfiltered.RL_sus_pot_unfiltered_analog = adc_0.data.conversions[RL_SUS_POT_CHANNEL].raw; // Just use raw for suspots
-    interface_data.rear_suspots_unfiltered.RR_sus_pot_unfiltered_analog = adc_0.data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
+    interface_data.rear_loadcell_data.RL_loadcell_analog = adc_0.data.conversions[RL_LOADCELL_CHANNEL].conversion;
+    interface_data.rear_loadcell_data.RR_loadcell_analog = adc_0.data.conversions[RR_LOADCELL_CHANNEL].conversion;
+    interface_data.rear_suspot_data.RL_sus_pot_analog = adc_0.data.conversions[RL_SUS_POT_CHANNEL].raw; // Just use raw for suspots
+    interface_data.rear_suspot_data.RR_sus_pot_analog = adc_0.data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
 
     return true;
 }
@@ -103,3 +105,12 @@ bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_
 }
 
 HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz //NOLINT
+
+
+
+bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    digitalWrite(WATCHDOG_PIN, WatchdogSystem::getInstance().get_watchdog_state(sysMicros / 1000)); //NOLINT
+    return true;
+}
+HT_TASK::Task kick_watchdog_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_kick_watchdog, 3, 2000UL); // 2000us is 500hz //NOLINT

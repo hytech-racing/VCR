@@ -114,10 +114,10 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
             break;
         }
 
-        if (_safetysystem.get_software_is_ok() && !system_data.pedals_system_data.implausibility_has_exceeded_max_duration)
+        if (/* _ams_system.ams_ok() && */ !system_data.pedals_system_data.implausibility_has_exceeded_max_duration)
         {
             // TODO: Fix with all references to singleton classes
-            // _drivetrain.command_drivetrain(controller_mux_->getDrivetrainCommand(dashboard_->getDialMode(), dashboard_->getTorqueLimitMode(), current_car_state));
+            // drivetrain.command_drivetrain(controller_mux_->getDrivetrainCommand(dashboard_->getDialMode(), dashboard_->getTorqueLimitMode(), current_car_state));
         }
         else
         {
