@@ -21,7 +21,7 @@
 
 
 /* Scheduler setup */
-const HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
+HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
 
 

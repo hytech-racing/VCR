@@ -26,7 +26,7 @@ bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     adc_0.setChannelScaleAndOffset(RL_SUS_POT_CHANNEL, RL_SUS_POT_SCALE, RL_SUS_POT_OFFSET);
     adc_0.setChannelScaleAndOffset(RR_SUS_POT_CHANNEL, RR_SUS_POT_SCALE, RR_SUS_POT_OFFSET);
 
-    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros);
+    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros); // NOLINT
 
     return true;
 }
@@ -37,13 +37,13 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     adc_0.sample(); // Samples all eight channels.
     adc_0.convert(); // Converts all eight channels.
 
-    interface_data.current_sensor_data.twentyfour_volt_sensor = adc_0.data.conversions[GLV_SENSE_CHANNEL].conversion;
-    interface_data.current_sensor_data.current_sensor_unfiltered = adc_0.data.conversions[CURRENT_SENSE_CHANNEL].conversion;
-    interface_data.current_sensor_data.current_refererence_unfiltered = adc_0.data.conversions[REFERENCE_SENSE_CHANNEL].conversion;
-    interface_data.rear_loadcells_unfiltered.RL_loadcell_unfiltered_pounds = adc_0.data.conversions[RL_LOADCELL_CHANNEL].conversion;
-    interface_data.rear_loadcells_unfiltered.RR_loadcell_unfiltered_pounds = adc_0.data.conversions[RR_LOADCELL_CHANNEL].conversion;
-    interface_data.rear_suspots_unfiltered.RL_sus_pot_unfiltered_analog = adc_0.data.conversions[RL_SUS_POT_CHANNEL].raw; // Just use raw for suspots
-    interface_data.rear_suspots_unfiltered.RR_sus_pot_unfiltered_analog = adc_0.data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
+    // interface_data.current_sensor_data.twentyfour_volt_sensor = adc_0.data.conversions[GLV_SENSE_CHANNEL].conversion;
+    // interface_data.current_sensor_data.current_sensor_unfiltered = adc_0.data.conversions[CURRENT_SENSE_CHANNEL].conversion;
+    // interface_data.current_sensor_data.current_refererence_unfiltered = adc_0.data.conversions[REFERENCE_SENSE_CHANNEL].conversion;
+    // interface_data.rear_loadcells_unfiltered.RL_loadcell_unfiltered_pounds = adc_0.data.conversions[RL_LOADCELL_CHANNEL].conversion;
+    // interface_data.rear_loadcells_unfiltered.RR_loadcell_unfiltered_pounds = adc_0.data.conversions[RR_LOADCELL_CHANNEL].conversion;
+    // interface_data.rear_suspots_unfiltered.RL_sus_pot_unfiltered_analog = adc_0.data.conversions[RL_SUS_POT_CHANNEL].raw; // Just use raw for suspots
+    // interface_data.rear_suspots_unfiltered.RR_sus_pot_unfiltered_analog = adc_0.data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
 
     return true;
 }
@@ -54,7 +54,7 @@ HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_
 
 bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000, system_data); // tick function requires millis //NOLINT
+    // VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000, system_data); // tick function requires millis //NOLINT
     return true;
 }
 
@@ -76,7 +76,7 @@ bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     adc_1.setChannelScaleAndOffset(7, 1, 0);
     /* NOLINTEND */
 
-    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros);
+    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros); // NOLINT
 
     return true;
 }
