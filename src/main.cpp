@@ -7,9 +7,6 @@
 /* From shared_firmware_types libdep */
 #include "SharedFirmwareTypes.h"
 
-/* From shared-systems-lib libdep */
-#include "SysClock.h"
-
 /* From HT_SCHED libdep */
 #include "ht_sched.hpp"
 
@@ -20,7 +17,7 @@
 #include "VCR_Globals.h"
 #include "VCR_Constants.h"
 #include "VCR_Tasks.h"
-
+#include "TorqueControllerMux.hpp"
 
 
 /* Global definitions */

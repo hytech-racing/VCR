@@ -16,5 +16,11 @@ If you are not already familiar with PlatformIO, please read [Module 4](https://
 
 To TEST code, open a PlatformIO terminal (CTRL-SHIFT-P, then `PlatformIO: New Terminal`). Then, to test systems (non hardware-specific logic), call `pio test -e test_systems_env`. This will run all unit tests in the `test/test_systems` directory.
 
+## Check code
+
+in the PlatformIO terminal:
+
+`pio check -e teensy41 --fail-on-defect high`
+
 ## FAQ: Why red squiggles?
 See [this](https://wiki.hytechracing.org/books/hytech-racing-general-info/page/vscode-setup-for-auto-completion-and-code-navigation) page on our BookStack for help configuring VSCode for auto completion and code navigation within external library dependencies.

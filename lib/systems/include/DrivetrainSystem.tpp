@@ -22,13 +22,13 @@ bool DrivetrainSystem<InverterType>::handle_inverter_startup(unsigned long curr_
 }
 
 template <typename InverterType>
-void DrivetrainSystem<InverterType>::enable_drivetrain_hv_(unsigned long curr_time)
+void DrivetrainSystem<InverterType>::enable_drivetrain_hv(unsigned long curr_time)
 {
 
 }
 
 template <typename InverterType>
-void DrivetrainSystem<InverterType>::request_enable_()
+void DrivetrainSystem<InverterType>::request_enable()
 {
 
 }
@@ -88,19 +88,19 @@ bool DrivetrainSystem<InverterType>::hv_over_threshold_on_drivetrain()
     return false;
 }
 template <typename InverterType>
-bool DrivetrainSystem<InverterType>::drivetrain_ready_()
+bool DrivetrainSystem<InverterType>::drivetrain_ready()
 {
     return false;
 }
 
 template <typename InverterType>
-bool DrivetrainSystem<InverterType>::check_drivetrain_quit_dc_on_()
+bool DrivetrainSystem<InverterType>::check_drivetrain_quit_dc_on()
 {
     return false;
 }
 
 template <typename InverterType>
-bool DrivetrainSystem<InverterType>::drivetrain_enabled_()
+bool DrivetrainSystem<InverterType>::drivetrain_enabled()
 {
     return false;
 }

@@ -36,21 +36,26 @@ const int THERMISTOR_6 = 6;
 const int THERMISTOR_7 = 7;
 
 /* Scaling and offset */
-const float GLV_SENSE_SCALE = -1; //TODO: FIGURE THIS OUT
-const int GLV_SENSE_OFFSET = -1; //TODO: FIGURE THIS OUT
-const float CURRENT_SENSE_SCALE = -1; //TODO: FIGURE THIS OUT
-const int CURRENT_SENSE_OFFSET = -1; //TODO: FIGURE THIS OUT
-const float REFERENCE_SENSE_SCALE = -1; //TODO: FIGURE THIS OUT
-const int REFERENCE_SENSE_OFFSET = -1; //TODO: FIGURE THIS OUT
-const float RL_LOADCELL_SCALE = -1; //TODO: FIGURE THIS OUT
-const int RL_LOADCELL_OFFSET = -1; //TODO: FIGURE THIS OUT
-const float RR_LOADCELL_SCALE = -1; //TODO: FIGURE THIS OUT
-const int RR_LOADCELL_OFFSET = -1; //TODO: FIGURE THIS OUT
-const float RL_SUS_POT_SCALE = -1; //TODO: FIGURE THIS OUT
-const int RL_SUS_POT_OFFSET = -1; //TODO: FIGURE THIS OUT
-const float RR_SUS_POT_SCALE = -1; //TODO: FIGURE THIS OUT
-const int RR_SUS_POT_OFFSET = -1; //TODO: FIGURE THIS OUT
+const float GLV_SENSE_SCALE = (float)(24.0/((2.77149877/3.3)*4096.0)); //unsure about the multiplication by 4.0865
+const int GLV_SENSE_OFFSET = 0; //No offset for GLV
+const float CURRENT_SENSE_SCALE = (float)(24/((2.77149877/3.3)*4096)); //unsure about the multiplication by 4.0865
+const int CURRENT_SENSE_OFFSET = 0; //No offset for CURRENT_SENSE
+const float REFERENCE_SENSE_SCALE = (float)(24/((2.77149877/3.3)*4096)); //unsure about the multiplication by 4.0865
+const int REFERENCE_SENSE_OFFSET = 0; //No offset for REFERENCE_SENSE
 
+//Values are from the old MCU rev15
+const float RL_LOADCELL_SCALE = 0.1149f;
+const float RL_LOADCELL_OFFSET = 13.526f / RL_LOADCELL_SCALE;
+const float RR_LOADCELL_SCALE = 0.118f;
+const float RR_LOADCELL_OFFSET = 25.721f / RR_LOADCELL_SCALE;
+
+//does not matter that much
+const float RL_SUS_POT_SCALE = 1;
+const int RL_SUS_POT_OFFSET = 1;
+const float RR_SUS_POT_SCALE = 1;
+const int RR_SUS_POT_OFFSET = 1;
+
+const int WATCHDOG_PIN = 36;
 
 
 #endif /* VCR_CONSTANTS */

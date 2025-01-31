@@ -11,9 +11,11 @@
 
 /* Local includes */
 #include "VCR_Constants.h"
-#include "Buzzer.h"
+#include "BuzzerController.h"
 #include "VCR_Globals.h"
 #include "VehicleStateMachine.h"
+
+
 
 bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -48,7 +50,17 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     return true;
 }
 
-HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_task, 10, 1000UL); // 1000us is 1kHz
+HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_task, 10, 1000UL); // 1000us is 1kHz //NOLINT
+
+
+
+bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000, system_data); // tick function requires millis //NOLINT
+    return true;
+}
+
+HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_tick_state_machine_task, 2); // Idle (constant-update) task //NOLINT
 
 
 
@@ -64,7 +76,7 @@ HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, r
 
 bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-
+    /* NOLINTBEGIN */ // Thermistor channels are for testing purposes only, the pin numbers 0-7 are acceptable "magic numbers".
     // Initialize all eight channels to scale = 1, offset = 0
     adc_1.setChannelScaleAndOffset(0, 1, 0);
     adc_1.setChannelScaleAndOffset(1, 1, 0);
@@ -74,6 +86,7 @@ bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     adc_1.setChannelScaleAndOffset(5, 1, 0);
     adc_1.setChannelScaleAndOffset(6, 1, 0);
     adc_1.setChannelScaleAndOffset(7, 1, 0);
+    /* NOLINTEND */
 
     hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros);
 
@@ -89,14 +102,14 @@ bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     return true;
 }
 
-HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_task, 10, 40000UL); // 20000us is 25Hz
+HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_task, 10, 40000UL); // 20000us is 25Hz //NOLINT
 
 
 
 bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
-    system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sysMicros / 1000);
+    system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sysMicros / 1000); //NOLINT
 
     return true;
 }
