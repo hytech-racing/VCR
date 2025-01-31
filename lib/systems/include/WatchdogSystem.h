@@ -1,5 +1,5 @@
-#ifndef __WATCHDOG_INTERFACE_H__
-#define __WATCHDOG_INTERFACE_H__
+#ifndef WATCHDOG_SYSTEM_H
+#define WATCHDOG_SYSTEM_H
 
 
 /**
@@ -48,4 +48,4 @@ public:
 
 };
 
-#endif /* __WATCHDOG_INTERFACE_H__ */
+#endif /* WATCHDOG_SYSTEM_H */

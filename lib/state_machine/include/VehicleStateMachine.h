@@ -3,7 +3,6 @@
 
 /* From local systems library */
 #include "DrivetrainSystem.h"
-#include "SafetySystem.h"
 #include "BuzzerController.h"
 
 /**

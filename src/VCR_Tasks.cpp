@@ -64,16 +64,6 @@ HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, r
 
 
 
-bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000); // tick function requires millis
-    return true;
-}
-
-HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_tick_state_machine_task, 2, 10000UL); // 10,000us is 100hz
-
-
-
 bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     /* NOLINTBEGIN */ // Thermistor channels are for testing purposes only, the pin numbers 0-7 are acceptable "magic numbers".
@@ -114,13 +104,13 @@ bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_
     return true;
 }
 
-HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz
+HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz //NOLINT
 
 
 
 bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    digitalWrite(watchdog_pin, WatchdogSystem::getInstance().get_watchdog_state(sysMicros / 1000));
+    digitalWrite(WATCHDOG_PIN, WatchdogSystem::getInstance().get_watchdog_state(sysMicros / 1000)); //NOLINT
     return true;
 }
-HT_TASK::Task kick_watchdog_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_kick_watchdog, 3, 2000UL); // 2000us is 500hz
+HT_TASK::Task kick_watchdog_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_kick_watchdog, 3, 2000UL); // 2000us is 500hz //NOLINT

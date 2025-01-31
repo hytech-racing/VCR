@@ -20,12 +20,6 @@
 #include "TorqueControllerMux.hpp"
 
 
-/* Global definitions */
-VCRInterfaceData_s interface_data;
-VCRSystemData_s system_data;
-
-MCP_ADC<8> adc_0 = MCP_ADC<8>(ADC0_CS);
-MCP_ADC<8> adc_1 = MCP_ADC<8>(ADC1_CS);
 
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
