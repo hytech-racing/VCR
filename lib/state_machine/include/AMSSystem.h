@@ -74,12 +74,15 @@ private:
     float _filtered_max_cell_temp;
     float _filtered_min_cell_voltage;
 
+    /* extra filtered information */
+    float _filtered_average_cell_voltage;
+    float _filtered_max_cell_voltage;
+    float _filtered_average_cell_temp;
+    float _filtered_min_cell_temp;
+
+    /* IIR alpha values */
     float _cell_temp_alpha;
     float _cell_voltage_alpha;
-
-    /* IIR filter parameters */
-    float bms_high_temp;
-    float bms_low_voltage;
 
     /*Storage of BMS Struct*/
     BMSData_s bms_container;
@@ -96,11 +99,15 @@ private:
     /* IIR filter and return filtered min cell voltage */
     float get_filtered_min_cell_voltage();    
 
-    /* Helper method to find the bms high temp by searching temp array */
-    float get_high_temp();
 
-    /* Finds the minimum cell volatage in the struct */
-    float get_min_cell_voltage();
+    /* IIR filter and return filtered average cell voltage */
+    float get_filtered_average_cell_voltage();
+    /* IIR filter and return filtered max cell voltage */
+    float get_filtered_max_cell_voltage();
+    /* IIR filter and return filtered average cell temp */
+    float get_filtered_average_cell_temp();
+    /* IIR filter and return filtered min cell temp */
+    float get_filtered_min_cell_temp();
 
 
     //Checkers (return true if everything is good)

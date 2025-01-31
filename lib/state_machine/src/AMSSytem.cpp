@@ -11,49 +11,29 @@ AMSSystemData_s AMSSystem::update_ams_system(unsigned long curr_micros, BMSData_
     bms_container = bms_data;
     bool heartbeat_check = check_heartbeat(curr_micros); //process heartbeat method
 
-    system_data.min_cell_voltage = _filtered_min_cell_voltage;
-    system_data.average_cell_voltage = -1;
-    system_data.max_cell_voltage = -1;
+    system_data.min_cell_voltage = get_filtered_min_cell_voltage();
+    system_data.average_cell_voltage = get_filtered_average_cell_voltage();
+    system_data.max_cell_voltage = get_filtered_max_cell_voltage();
 
-    system_data.min_temp = -1;
-    system_data.average_temp = -1;
-    system_data.max_temp = _filtered_max_cell_temp;
+    system_data.min_temp = get_filtered_min_cell_temp();
+    system_data.average_temp = get_filtered_average_cell_temp();
+    system_data.max_temp = get_filtered_max_cell_temp();
 
     system_data.ams_ok = heartbeat_check && check_voltage();
-
-    /*
-    float min_cell_voltage;
-    float average_cell_voltage;
-    float max_cell_voltage;
-    float min_temp; // Degrees celsius
-    float average_temp; // Degrees celsius
-    float max_temp; // Degrees celsius
-    */
-
 }
 
-float AMSSystem::get_filtered_max_cell_temp() {
-    bms_high_temp = get_high_temp();
-    _filtered_max_cell_temp = _filtered_max_cell_temp * _cell_temp_alpha + (1.0 - _cell_temp_alpha) * bms_high_temp;
-    return _filtered_max_cell_temp;
-}
 
-float AMSSystem::get_filtered_min_cell_voltage() {
-    bms_low_voltage = get_min_cell_voltage();
-    _filtered_min_cell_voltage = _filtered_min_cell_voltage * _cell_temp_alpha + (1.0 - _cell_voltage_alpha) * bms_low_voltage;
-    return _filtered_min_cell_voltage;
-}
 
 //checkers
 bool AMSSystem::check_voltage() {
-    float temp_arr[] = bms_container.voltages;
     float sum = 0;
-    for (int i = 0; i < temp_arr.size(); i++) {
-        if (temp_arr[i] < PACK_CHARGE_CRIT_LOWEST_CELL_THRESHOLD) {
+    for (float num : bms_container.voltages) {
+        if (num < PACK_CHARGE_CRIT_LOWEST_CELL_THRESHOLD) {
             return false;
         }
-        sum += temp_arr[i];
+        sum += num;
     }
+    sum = sum / 1000000;
     if (sum < PACK_CHARGE_CRIT_TOTAL_THRESHOLD_VOLTS) {
         return false;
     }
@@ -71,24 +51,67 @@ bool AMSSystem::check_heartbeat(unsigned long curr_micros) {
 
 
 //getters
-float AMSSystem::get_high_temp() {
-    float temp_arr[] = bms_container.temperatures;
-    float max = temp_arr[0];
-    for (int i = 1; i < temp_arr.size(); i++) {
-        if (temp_arr[i] >= max) {
-            max = temp_arr[i];
+float AMSSystem::get_filtered_max_cell_temp() {
+    float bms_high_temp = bms_container.temperatures[0];
+    for (float num : bms_container.temperatures) {
+        if (num >= bms_high_temp) {
+            bms_high_temp = num;
         }
     }
-    return max;
+    _filtered_max_cell_temp = _filtered_max_cell_temp * _cell_temp_alpha + (1.0 - _cell_temp_alpha) * bms_high_temp;
+    return _filtered_max_cell_temp;
 }
 
-float AMSSystem::get_min_cell_voltage() {
-    float temp_arr[] = bms_container.voltages;
-    float min = temp_arr[0];
-    for (int i = 1; i < temp_arr.size(); i++) {
-        if (temp_arr[i] <= min) {
-            min = temp_arr[i];
+float AMSSystem::get_filtered_min_cell_voltage() {
+    float bms_low_voltage = bms_container.voltages[0];
+    for (float num : bms_container.voltages) {
+        if (num <= bms_low_voltage) {
+            bms_low_voltage = num;
         }
     }
-    return min;
+    _filtered_min_cell_voltage = _filtered_min_cell_voltage * _cell_voltage_alpha + (1.0 - _cell_voltage_alpha) * bms_low_voltage;
+    return _filtered_min_cell_voltage;
+}
+
+
+//Extra filtered getters
+float AMSSystem::get_filtered_average_cell_voltage() {
+    float sum = 0;
+    for (float num : bms_container.voltages) {
+        sum += num;
+    }
+    float avg = sum / 126;
+    _filtered_average_cell_voltage = _filtered_average_cell_voltage * _cell_voltage_alpha + (1.0 - _cell_voltage_alpha) * avg;
+    return _filtered_average_cell_voltage;
+}
+
+
+float AMSSystem::get_filtered_average_cell_temp() {
+    float sum = 0;
+    for (float num : bms_container.temperatures) {
+        sum += num;
+    }
+    float avg = sum / 12;
+    _filtered_average_cell_temp = _filtered_average_cell_temp * _cell_temp_alpha + (1.0 - _cell_temp_alpha) * avg;
+    return _filtered_average_cell_temp;
+}
+
+float AMSSystem::get_filtered_min_cell_temp() {
+    float min = bms_container.temperatures[0];
+    for (float num : bms_container.temperatures) {
+        if (num <= min) {
+            min = num;
+        }
+    }
+    _filtered_min_cell_temp = _filtered_min_cell_temp * _cell_temp_alpha + (1.0 - _cell_temp_alpha) * min;
+}
+
+float AMSSystem::get_filtered_max_cell_voltage() {
+    float max = bms_container.voltages[0];
+    for (float num : bms_container.voltages) {
+        if (num >= max) {
+            max = num;
+        }
+    }
+    _filtered_max_cell_voltage = _filtered_max_cell_voltage * _cell_voltage_alpha + (1.0 - _cell_voltage_alpha) * max;
 }
