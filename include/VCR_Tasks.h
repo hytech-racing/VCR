@@ -33,6 +33,7 @@
 #include "SharedFirmwareTypes.h"
 
 /* Local includes */
+#include "WatchdogSystem.h"
 #include "VCR_Constants.h"
 #include "VehicleStateMachine.h"
 #include "VCR_Globals.h"
@@ -87,34 +88,10 @@ extern HT_TASK::Task update_buzzer_controller_task;
 
 
 
-bool init_update_safetysystem(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    return true;
-}
-
-bool run_update_safetysystem(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    SafetySystem::getInstance().update_software_shutdown(sysMicros / 1000);
-    return true;
-}
-
-HT_TASK::Task update_safetysystem = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_safetysystem, 1, 10000UL); // 10,000us is 100hz
-
 /**
  * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin
  */
-
-bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    return true;
-}
-
-bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    digitalWrite(watchdog_pin, WatchdogSystem::getInstance().get_watchdog_state(sysMicros / 1000));
-    return true;
-}
-
-HT_TASK::Task kick_watchdog_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_kick_watchdog, 3, 2000UL);
+bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+extern HT_TASK::Task kick_watchdog_task;
 
 #endif /* VCR_TASKS */

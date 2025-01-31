@@ -4,9 +4,6 @@
 
 
 
-/* From C++ standard library */
-#include <chrono>
-
 /* From shared_firmware_types libdep */
 #include "SharedFirmwareTypes.h"
 
@@ -36,14 +33,6 @@ MCP_ADC<8> adc_1 = MCP_ADC<8>(ADC1_CS);
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
-auto start_time = std::chrono::high_resolution_clock::now();
-unsigned long stdMicros()
-{
-    auto now = std::chrono::high_resolution_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - start_time).count();
-    return static_cast<unsigned long>(elapsed);
-}
-
 
 
 /* Ethernet message sockets */ // TODO: Move this into its own interface
@@ -53,7 +42,7 @@ qindesign::network::EthernetUDP protobuf_recv_socket;
 
 
 void setup() {
-    scheduler.setTimingFunction(stdMicros);
+    scheduler.setTimingFunction(micros);
 
     scheduler.schedule(tick_state_machine_task);
     scheduler.schedule(read_adc0_task);
