@@ -99,10 +99,9 @@ bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_
 HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz //NOLINT
 
 
-inline bool create_watchdog(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
+bool create_watchdog(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
 {
-    const unsigned long kick_interval = 10
-    WatchdogInstance::create(kick_interval);
+    WatchdogInstance::create(default_system_params::KICK_INTERVAL_MS); // this has issues for some reason with clang-tidy // NOLINT
     return true;
 }
 
