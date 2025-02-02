@@ -2,71 +2,29 @@
 #include "gtest/gtest.h"
 #include "WatchdogSystem.h"
 
-WatchdogSystem &watchdog = WatchdogSystem::getInstance();
-int time_var = 0; // starting time
-int time_arb = 2500; // arbitrary number greater than 2000
+#include "VCR_Constants.h"
 
-//Test case where time is 0 millisecs
-TEST (WatchdogSystemTesting, initial_state) {
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), false);
-}
+TEST(WatchdogSystemTesting, test_watchdog) {
+    WatchdogInstance::create(10);
 
-//Test consecutive steps
-TEST (WatchdogSystemTesting, next_state1) {
-    time_var += 1; // time_var = 1
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), false);
-}
-TEST (WatchdogSystemTesting, next_state2) {
-    time_var += 1; // time_var = 2
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), false);
-}
-TEST (WatchdogSystemTesting, next_state3) {
-    time_var += 1; // time_var = 3
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), false);
-}
-TEST (WatchdogSystemTesting, next_state4) {
-    time_var += 1; // time_var = 4
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), false);
-}
-TEST (WatchdogSystemTesting, next_state5) {
-    time_var += 1; // time_var = 5
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), false);
-}
-TEST (WatchdogSystemTesting, next_state6) {
-    time_var += 1; // time_var = 6
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), false);
-}
-TEST (WatchdogSystemTesting, next_state7) {
-    time_var += 1; // time_var = 7
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), false);
-}
-TEST (WatchdogSystemTesting, next_state8) {
-    time_var += 1; // time_var = 8
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), false);
-}
-TEST (WatchdogSystemTesting, next_state9) {
-    time_var += 1; // time_var = 9
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), false);
-}
-TEST (WatchdogSystemTesting, next_state10) {
-    time_var += 1; // time_var = 10
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), false);
-}
-TEST (WatchdogSystemTesting, next_state11) {
-    time_var += 1; // time_var = 11
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), true);
-}
-TEST (WatchdogSystemTesting, next_state12) {
-    time_var += 1; // time_var = 12
-    ASSERT_EQ(watchdog.get_watchdog_state(time_var), true);
-}
+    WatchdogSystem &watchdog = WatchdogInstance::instance();
+    const int time_var = 0; // starting time
+    const int time_arb = 2500; // arbitrary number greater than 2000
 
-//Test an arbituary time above 10 millisecs from previous time
-TEST (WatchdogSystemTesting, instance_state1) {
+    const int end_time = 13;
+
+    for(int time = 0; time < end_time; time++)
+    {
+        if(time <= 10)
+        {   
+            ASSERT_EQ(watchdog.get_watchdog_state(time), false);
+        } else {
+            ASSERT_EQ(watchdog.get_watchdog_state(time), true);
+        }
+    }
+    
     ASSERT_EQ(watchdog.get_watchdog_state(time_arb), false);
-}
-
-//Test second arbituary time above 10 millisecs from previous time
-TEST (WatchdogSystemTesting, instance_state2) {
+    
+    //Test an arbituary time above 1000 millisecs from previous time
     ASSERT_EQ(watchdog.get_watchdog_state(time_arb + 1000), true);
 }

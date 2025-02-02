@@ -50,12 +50,11 @@ const float RR_LOADCELL_SCALE = 0.118f;
 const float RR_LOADCELL_OFFSET = 25.721f / RR_LOADCELL_SCALE;
 
 //does not matter that much
-const float RL_SUS_POT_SCALE = 1;
-const int RL_SUS_POT_OFFSET = 1;
-const float RR_SUS_POT_SCALE = 1;
-const int RR_SUS_POT_OFFSET = 1;
+constexpr float RL_SUS_POT_SCALE = 1;
+constexpr int RL_SUS_POT_OFFSET = 1;
+constexpr float RR_SUS_POT_SCALE = 1;
+constexpr int RR_SUS_POT_OFFSET = 1;
 
-const int WATCHDOG_PIN = 36;
-
+constexpr int WATCHDOG_PIN = 36;
 
 #endif /* VCR_CONSTANTS */
