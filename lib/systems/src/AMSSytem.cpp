@@ -104,6 +104,7 @@ float AMSSystem::get_filtered_min_cell_temp() {
         }
     }
     _filtered_min_cell_temp = _filtered_min_cell_temp * _cell_temp_alpha + (1.0 - _cell_temp_alpha) * min;
+    return _filtered_min_cell_temp;
 }
 
 float AMSSystem::get_filtered_max_cell_voltage() {
@@ -114,4 +115,7 @@ float AMSSystem::get_filtered_max_cell_voltage() {
         }
     }
     _filtered_max_cell_voltage = _filtered_max_cell_voltage * _cell_voltage_alpha + (1.0 - _cell_voltage_alpha) * max;
+    return _filtered_max_cell_voltage;
 }
+
+//Vansh Aggarwal
