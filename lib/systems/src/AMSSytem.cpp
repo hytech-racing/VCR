@@ -4,22 +4,22 @@ void AMSSystem::init(unsigned long curr_micros) {
     _last_heartbeat_time = curr_micros;
 }
 
-AMSSystemData_s AMSSystem::update_ams_system(unsigned long curr_micros, BMSData_s &bms_data) {
+void AMSSystem::update_ams_system(unsigned long curr_micros, BMSData_s &bms_data, VCRSystemData_s &system_data) {
     //calculate all the vars and return
     //check for the 3 conditions
     AMSSystemData_s system_data;
     bms_container = bms_data;
     bool heartbeat_check = check_heartbeat(curr_micros); //process heartbeat method
 
-    system_data.min_cell_voltage = get_filtered_min_cell_voltage();
-    system_data.average_cell_voltage = get_filtered_average_cell_voltage();
-    system_data.max_cell_voltage = get_filtered_max_cell_voltage();
+    system_data.ams_data.min_cell_voltage = get_filtered_min_cell_voltage();
+    system_data.ams_data.average_cell_voltage = get_filtered_average_cell_voltage();
+    system_data.ams_data.max_cell_voltage = get_filtered_max_cell_voltage();
 
-    system_data.min_temp = get_filtered_min_cell_temp();
-    system_data.average_temp = get_filtered_average_cell_temp();
-    system_data.max_temp = get_filtered_max_cell_temp();
+    system_data.ams_data.min_temp = get_filtered_min_cell_temp();
+    system_data.ams_data.average_temp = get_filtered_average_cell_temp();
+    system_data.ams_data.max_temp = get_filtered_max_cell_temp();
 
-    system_data.ams_ok = heartbeat_check && check_voltage();
+    system_data.ams_data.ams_ok = heartbeat_check && check_voltage();
 }
 
 
@@ -58,7 +58,7 @@ float AMSSystem::get_filtered_max_cell_temp() {
             bms_high_temp = num;
         }
     }
-    _filtered_max_cell_temp = _filtered_max_cell_temp * _cell_temp_alpha + (1.0 - _cell_temp_alpha) * bms_high_temp;
+    _filtered_max_cell_temp = _filtered_max_cell_temp * _cell_temp_alpha + (1.0f - _cell_temp_alpha) * bms_high_temp;
     return _filtered_max_cell_temp;
 }
 
@@ -69,7 +69,7 @@ float AMSSystem::get_filtered_min_cell_voltage() {
             bms_low_voltage = num;
         }
     }
-    _filtered_min_cell_voltage = _filtered_min_cell_voltage * _cell_voltage_alpha + (1.0 - _cell_voltage_alpha) * bms_low_voltage;
+    _filtered_min_cell_voltage = _filtered_min_cell_voltage * _cell_voltage_alpha + (1.0f - _cell_voltage_alpha) * bms_low_voltage;
     return _filtered_min_cell_voltage;
 }
 
@@ -80,8 +80,8 @@ float AMSSystem::get_filtered_average_cell_voltage() {
     for (float num : bms_container.voltages) {
         sum += num;
     }
-    float avg = sum / 126;
-    _filtered_average_cell_voltage = _filtered_average_cell_voltage * _cell_voltage_alpha + (1.0 - _cell_voltage_alpha) * avg;
+    float avg = sum / 126; // 126 cells in pack //NOLINT
+    _filtered_average_cell_voltage = _filtered_average_cell_voltage * _cell_voltage_alpha + (1.0f - _cell_voltage_alpha) * avg;
     return _filtered_average_cell_voltage;
 }
 
@@ -91,8 +91,8 @@ float AMSSystem::get_filtered_average_cell_temp() {
     for (float num : bms_container.temperatures) {
         sum += num;
     }
-    float avg = sum / 12;
-    _filtered_average_cell_temp = _filtered_average_cell_temp * _cell_temp_alpha + (1.0 - _cell_temp_alpha) * avg;
+    float avg = sum / 12; // only 12 temps? //NOLINT
+    _filtered_average_cell_temp = _filtered_average_cell_temp * _cell_temp_alpha + (1.0f - _cell_temp_alpha) * avg;
     return _filtered_average_cell_temp;
 }
 
@@ -103,7 +103,7 @@ float AMSSystem::get_filtered_min_cell_temp() {
             min = num;
         }
     }
-    _filtered_min_cell_temp = _filtered_min_cell_temp * _cell_temp_alpha + (1.0 - _cell_temp_alpha) * min;
+    _filtered_min_cell_temp = _filtered_min_cell_temp * _cell_temp_alpha + (1.0f - _cell_temp_alpha) * min;
     return _filtered_min_cell_temp;
 }
 
@@ -114,7 +114,7 @@ float AMSSystem::get_filtered_max_cell_voltage() {
             max = num;
         }
     }
-    _filtered_max_cell_voltage = _filtered_max_cell_voltage * _cell_voltage_alpha + (1.0 - _cell_voltage_alpha) * max;
+    _filtered_max_cell_voltage = _filtered_max_cell_voltage * _cell_voltage_alpha + (1.0f - _cell_voltage_alpha) * max;
     return _filtered_max_cell_voltage;
 }
 

@@ -1,5 +1,5 @@
-#ifndef __AMSSYSTEM_H__
-#define __AMSSYSTEM_H__
+#ifndef AMS_SYSTEM_H
+#define AMS_SYSTEM_H
 
 #include <stdint.h>
 #include <SharedFirmwareTypes.h>
@@ -13,11 +13,11 @@ const unsigned long PACK_CHARGE_CRIT_TOTAL_THRESHOLD_VOLTS = 420;
 /* The lowest pcc threshold is the lowest allowable single cell voltage (in 100 microvolts)*/
 const unsigned long PACK_CHARGE_CRIT_LOWEST_CELL_THRESHOLD = 35000;   // Equivalent to 3.5V
 
-const float DEFAULT_INIT_TEMP       = 40.0;                           // Celsius
-const float DEFAULT_INIT_VOLTAGE    = 3.5;                            // Volts
-const float DEFAULT_TEMP_ALPHA      = 0.8;                            // IIR filter alpha
-const float DEFAULT_VOLTAGE_ALPHA   = 0.8;                            // IIR filter alpha
-const uint16_t MAX_PACK_CHARGE      = 48600;                          // Coulombs
+const float DEFAULT_INIT_TEMP       = 40.0f;                           // Celsius
+const float DEFAULT_INIT_VOLTAGE    = 3.5f;                            // Volts
+const float DEFAULT_TEMP_ALPHA      = 0.8f;                            // IIR filter alpha
+const float DEFAULT_VOLTAGE_ALPHA   = 0.8f;                            // IIR filter alpha
+const uint16_t MAX_PACK_CHARGE      = 48600;                           // Coulombs
 
 
 /**
@@ -53,7 +53,7 @@ public:
      */
     void init(unsigned long curr_micros);
 
-    AMSSystemData_s update_ams_system(unsigned long curr_millis, BMSData_s &bms_data);
+    void update_ams_system(unsigned long curr_millis, BMSData_s &bms_data, VCRSystemData_s &system_data);
 
 private:
 
@@ -119,4 +119,4 @@ private:
 
 };
 
-#endif /* __AMSSYSTEM_H__ */
+#endif /* AMS_SYSTEM_H */
