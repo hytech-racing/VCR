@@ -32,7 +32,12 @@
 /* From shared_firmware_types library */
 #include "SharedFirmwareTypes.h"
 
-
+/* Local includes */
+#include "WatchdogSystem.h"
+#include "VCR_Constants.h"
+#include "VehicleStateMachine.h"
+#include "VCR_Globals.h"
+#include "Buzzer.h"
 
 /**
  * The "tick state machine" task will simply call the state machine's tick function with the current
@@ -75,5 +80,13 @@ extern HT_TASK::Task read_adc1_task;
  */
 bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 extern HT_TASK::Task update_buzzer_controller_task;
+
+
+
+/**
+ * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin
+ */
+bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+extern HT_TASK::Task kick_watchdog_task;
 
 #endif /* VCR_TASKS */

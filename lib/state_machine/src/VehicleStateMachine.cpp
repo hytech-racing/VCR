@@ -117,7 +117,7 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
             break;
         }
 
-        if (_safetysystem.get_software_is_ok() && !system_data.pedals_system_data.implausibility_has_exceeded_max_duration)
+        if (/* _ams_system.ams_ok() && */ !system_data.pedals_system_data.implausibility_has_exceeded_max_duration)
         {
             // TODO: Fix with all references to singleton classes
             // TODO: need to also handle request to mode switch via drivetrain init (?)

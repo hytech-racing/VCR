@@ -2,7 +2,6 @@
 #define SCHEDULER_TEST
 
 #include "ht_sched.hpp"
-#include "VCR_Tasks.h"
 #include "Logger.h"
 #include <chrono>
 
