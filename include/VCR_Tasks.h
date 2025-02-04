@@ -25,7 +25,6 @@
 
 #ifndef VCR_TASKS
 #define VCR_TASKS
-// NOLINTBEGIN // Allow tasks to be non-constant to avoid updating the HT_SCHED library.
 
 /* From HT_SCHED library */
 #include "ht_sched.hpp"
@@ -33,14 +32,12 @@
 /* From shared_firmware_types library */
 #include "SharedFirmwareTypes.h"
 
-/**
- * This "Test" function is purely for validation of the HT_SCHED dependency. This is intended to be removed when
- * further development occurs.
- */
-bool init_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-bool run_test_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern HT_TASK::Task test_task;
-
+/* Local includes */
+#include "WatchdogSystem.h"
+#include "VCR_Constants.h"
+#include "VehicleStateMachine.h"
+#include "VCR_Globals.h"
+#include "Buzzer.h"
 
 /**
  * The "tick state machine" task will simply call the state machine's tick function with the current
@@ -51,11 +48,11 @@ bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::
 extern HT_TASK::Task tick_state_machine_task;
 
 
-
+    
 /**
  * The read_adc0 task will command adc0 to sample all eight channels, convert the outputs, and
  * store them in structs defined in shared_firmware_types. This function relies on adc_0 being
- * defined in ADC_interface.h.
+ * defined in VCRGlobals.h.
  */
 bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
@@ -67,9 +64,9 @@ extern HT_TASK::Task read_adc0_task;
  * NOTE: These channels are UNUSED BY DEFAULT and exist ONLY FOR TESTING. You may edit this
  * manually to add sensors.
  * 
- * The read_adc1 task will command adc0 to sample all eight channels, convert the outputs, and
+ * The read_adc1 task will command adc1 to sample all eight channels, convert the outputs, and
  * store them in a struct defined in shared_firmware_types. This function relies on adc_1 being
- * defined in ADC_interface.h.
+ * defined in VCRGlobals.h.
  */
 bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
@@ -83,5 +80,13 @@ extern HT_TASK::Task read_adc1_task;
  */
 bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 extern HT_TASK::Task update_buzzer_controller_task;
+
+
+
+/**
+ * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin
+ */
+bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+extern HT_TASK::Task kick_watchdog_task;
 
 #endif /* VCR_TASKS */
