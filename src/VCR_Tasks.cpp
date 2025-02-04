@@ -26,7 +26,7 @@ bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     adc_0.setChannelScaleAndOffset(RL_SUS_POT_CHANNEL, RL_SUS_POT_SCALE, RL_SUS_POT_OFFSET);
     adc_0.setChannelScaleAndOffset(RR_SUS_POT_CHANNEL, RR_SUS_POT_SCALE, RR_SUS_POT_OFFSET);
 
-    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros);
+    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros); // NOLINT
 
     return true;
 }
@@ -52,7 +52,7 @@ HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_
 
 bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000, system_data); // tick function requires millis //NOLINT
+    // VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000, system_data); // tick function requires millis //NOLINT
     return true;
 }
 
@@ -72,7 +72,7 @@ bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     adc_1.setChannelScaleAndOffset(7, 1, 0);
     /* NOLINTEND */
 
-    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros);
+    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros); // NOLINT
 
     return true;
 }

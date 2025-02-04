@@ -20,11 +20,11 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
     case CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE:
     {
         // if TS is above HV threshold, move to Tractive System Active
-        _drivetrain.disable_no_pins();
-        if (_drivetrain.hv_over_threshold_on_drivetrain())
-        {
-            set_state_(CAR_STATE::TRACTIVE_SYSTEM_ACTIVE, current_millis);
-        }
+        // _drivetrain.disable_no_pins();
+        // if (_drivetrain.hv_over_threshold_on_drivetrain())
+        // {
+        //     set_state_(CAR_STATE::TRACTIVE_SYSTEM_ACTIVE, current_millis);
+        // }
         break;
     }
 
@@ -35,13 +35,13 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
             _buzzer.deactivate();
         }
 
-        _drivetrain.disable_no_pins();
+        // _drivetrain.disable_no_pins();
 
-        if (!_drivetrain.hv_over_threshold_on_drivetrain())
-        {
-            set_state_(CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
-            break;
-        }
+        // if (!_drivetrain.hv_over_threshold_on_drivetrain())
+        // {
+        //     set_state_(CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
+        //     break;
+        // }
 
         if (system_data.dash_input_state.start_btn_is_pressed && system_data.pedals_system_data.brake_is_pressed)
         {
@@ -54,24 +54,25 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
     case CAR_STATE::ENABLING_INVERTERS:
     {
 
+        // TODO: replace old drivetrain function handling with new interaction paradigm
         // If HV is not active, go to TRACTIVE_SYSTEM_NOT_ACTIVE
-        if (_drivetrain.hv_over_threshold_on_drivetrain())
-        {
-            set_state_(CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
-            break;
-        }
+        // if (_drivetrain.hv_over_threshold_on_drivetrain())
+        // {
+        //     set_state_(CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
+        //     break;
+        // }
 
         // If motor controllers have error, but HV still active
-        if (_drivetrain.drivetrain_error_occured())
-        {
-            set_state_(CAR_STATE::TRACTIVE_SYSTEM_ACTIVE, current_millis);
-        }
+        // if (_drivetrain.drivetrain_error_occured())
+        // {
+        //     set_state_(CAR_STATE::TRACTIVE_SYSTEM_ACTIVE, current_millis);
+        // }
 
-        if (_drivetrain.handle_inverter_startup(current_millis))
-        {
-            set_state_(CAR_STATE::WAITING_READY_TO_DRIVE_SOUND, current_millis);
-            break;
-        }
+        // if (_drivetrain.handle_inverter_startup(current_millis))
+        // {
+        //     set_state_(CAR_STATE::WAITING_READY_TO_DRIVE_SOUND, current_millis);
+        //     break;
+        // }
         break;
     }
 
@@ -79,13 +80,13 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
     {
 
         // If HV is no longer active, return to TRACTIVE_SYSTEM_NOT_ACTIVE
-        if (_drivetrain.hv_over_threshold_on_drivetrain())
-        {
-            set_state_(CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
-            break;
-        }
+        // if (_drivetrain.hv_over_threshold_on_drivetrain())
+        // {
+        //     set_state_(CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
+        //     break;
+        // }
 
-        _drivetrain.command_drivetrain_no_torque(); // While waiting for RTD sound to complete, always command 0 torque
+        // _drivetrain.command_drivetrain_no_torque(); // While waiting for RTD sound to complete, always command 0 torque
 
         // If the ready-to-drive sound is done playing, move to ready to drive mode
         if (!_buzzer.buzzer_is_active(current_millis))
@@ -98,16 +99,18 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
 
     case CAR_STATE::READY_TO_DRIVE:
     {
-
+        
         // If HV is no longer active, return to TRACTIVE_SYSTEM_NOT_ACTIVE
-        if (!_drivetrain.hv_over_threshold_on_drivetrain())
+        
+        // TODO make this real: check to see if the state
+        if(_drivetrain.get_state() == DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT)
         {
-            hal_println("Drivetrain not over threshold while in READY_TO_DRIVE");
             set_state_(CAR_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
             break;
         }
-
-        if (_drivetrain.drivetrain_error_occured())
+        
+        bool drivetrain_in_driveable_mode = ((_drivetrain.get_state() == DrivetrainState_e::ENABLED_SPEED_MODE) || (_drivetrain.get_state() == DrivetrainState_e::ENABLED_TORQUE_MODE)); 
+        if (!drivetrain_in_driveable_mode)
         {
             hal_println("Drivetrain error occurred while in READY_TO_DRIVE");
             set_state_(CAR_STATE::TRACTIVE_SYSTEM_ACTIVE, current_millis);
@@ -117,12 +120,20 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
         if (/* _ams_system.ams_ok() && */ !system_data.pedals_system_data.implausibility_has_exceeded_max_duration)
         {
             // TODO: Fix with all references to singleton classes
-            // drivetrain.command_drivetrain(controller_mux_->getDrivetrainCommand(dashboard_->getDialMode(), dashboard_->getTorqueLimitMode(), current_car_state));
+            // TODO: need to also handle request to mode switch via drivetrain init (?)
+            // _drivetrain.command_drivetrain(controller_mux_->getDrivetrainCommand(dashboard_->getDialMode(), dashboard_->getTorqueLimitMode(), current_car_state));
+            DrivetrainTorqueCommand_s example_cmd = {}; // will need to do a variant check from the controller mux to see what type it is (torque / speed)
+            
+            (void)_drivetrain.evaluate_drivetrain(example_cmd);
+
         }
         else
         {
             // If software is not OK or some implausibility has exceeded max duration, command 0 torque (but stay in RTD mode)
-            _drivetrain.command_drivetrain_no_torque();
+            
+            // TODO: make this check to see exactly what drive mode the drivetrain is in and send its associated empty command.
+            DrivetrainTorqueCommand_s example_cmd = {}; // will need to do a variant check from the controller mux to see what type it is (torque / speed)
+            (void)_drivetrain.evaluate_drivetrain(example_cmd);
         }
 
         break;
