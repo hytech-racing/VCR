@@ -6,14 +6,29 @@ hytech_msgs_VCRSystemData_s VCREthernetInterface::make_vcrsystemdata_msg(const V
 {
 	hytech_msgs_VCRSystemData_s out;
 
-    //RearLoadCellsFiltered_s
-    out.rear_loadcells_filtered.RL_loadcell_filtered_pounds;
-    out.rear_loadcells_filtered.RR_loadcell_filtered_pounds;
-    out.rear_loadcells_filtered.rear_loadcell_FIR_is_saturated;
+    //PedalsSystemData_s
 
-    out.rear_loadcells_filtered = {shared_state.rear_loadcells_filtered.RL_loadcell_filtered_pounds,
-                                   shared_state.rear_loadcells_filtered.RR_loadcell_filtered_pounds,
-                                   shared_state.rear_loadcells_filtered.rear_loadcell_FIR_is_saturated};
+    out.pedals_system_data.accel_is_implausible;
+    out.pedals_system_data.brake_is_implausible;
+    out.pedals_system_data.brake_is_pressed;
+    out.pedals_system_data.accel_is_pressed;
+    out.pedals_system_data.mech_brake_is_active;
+    out.pedals_system_data.brake_and_accel_pressed_implausibility_high;
+    out.pedals_system_data.implausibility_has_exceeded_max_duration;
+    out.pedals_system_accel_percent;
+    out.pedals_system_data.brake_percent;
+    out.pedals_system_data.regen_percent;
+
+    out.rear_loadcells_filtered = {shared_state.pedals_system_data.accel_is_implausible,
+                                   shared_state.pedals_system_data.brake_is_implausible,
+                                   shared_state.pedals_system_data.brake_is_pressed,
+                                   shared_state.pedals_system_data.accel_is_pressed,
+                                   shared_state.pedals_system_data.mech_brake_is_active,
+                                   shared_state.pedals_system_data.brake_and_accel_pressed_implausibility_high,
+                                   shared_state.pedals_system_data.implausibility_has_exceeded_max_duration,
+                                   shared_state.pedals_system_accel_percent,
+                                   shared_state.pedals_system_data.brake_percent,
+                                   shared_state.pedals_system_data.regen_percent};
 
     
     //FrontLoadCellsFiltered_s
