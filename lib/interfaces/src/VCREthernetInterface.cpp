@@ -19,52 +19,86 @@ hytech_msgs_VCRSystemData_s VCREthernetInterface::make_vcrsystemdata_msg(const V
     out.pedals_system_data.brake_percent;
     out.pedals_system_data.regen_percent;
 
-    out.rear_loadcells_filtered = {shared_state.pedals_system_data.accel_is_implausible,
+    out.pedals_system_data = {shared_state.pedals_system_data.accel_is_implausible,
                                    shared_state.pedals_system_data.brake_is_implausible,
                                    shared_state.pedals_system_data.brake_is_pressed,
                                    shared_state.pedals_system_data.accel_is_pressed,
                                    shared_state.pedals_system_data.mech_brake_is_active,
                                    shared_state.pedals_system_data.brake_and_accel_pressed_implausibility_high,
                                    shared_state.pedals_system_data.implausibility_has_exceeded_max_duration,
-                                   shared_state.pedals_system_accel_percent,
+                                   shared_state.pedals_system_data.accel_percent,
                                    shared_state.pedals_system_data.brake_percent,
                                    shared_state.pedals_system_data.regen_percent};
 
     
-    //FrontLoadCellsFiltered_s
-    out.front_loadcells_filtered.FL_loadcell_filtered_pounds;
-    out.front_loadcells_filtered.FR_loadcell_filtered_pounds;
-    out.front_loadcells_filtered.front_loadcell_FIR_is_saturated;
+    //DashInputState_s
 
-    out.front_loadcells_filtered = {shared_state.front_loadcells_filtered.FL_loadcell_filtered_pounds,
-                                    shared_state.front_loadcells_filtered.FR_loadcell_filtered_pounds,
-                                    shared_state.front_loadcells_filtered.front_loadcell_FIR_is_saturated};
+    out.dash_input_state.dim_btn_is_pressed;
+    out.dash_input_state.preset_btn_is_pressed;
+    out.dash_input_state.mc_reset_btn_is_pressed;
+    out.dash_input_state.mode_btn_is_pressed;
+    out.dash_input_state.start_btn_is_pressed;
+    out.dash_input_state.data_btn_is_pressed;
+    out.dash_input_state.left_paddle_is_pressed;
+    out.dash_input_state.right_paddle_is_pressed;
+    out.dash_input_state.dial_state;
+    
+    
+
+    out.dash_input_state = {shared_state.dash_input_state.dim_btn_is_pressed,
+                                    shared_state.dash_input_state.preset_btn_is_pressed,
+                                    shared_state.dash_input_state.mc_reset_btn_is_pressed,
+                                    shared_state.dash_input_state.mode_btn_is_pressed,
+                                    shared_state.dash_input_state.start_btn_is_pressed,
+                                    shared_state.dash_input_state.data_btn_is_pressed,
+                                    shared_state.dash_input_state.left_paddle_is_pressed,
+                                    shared_state.dash_input_state.right_paddle_is_pressed,
+                                    shared_state.dash_input_state.dial_state};
 
     
 
-    //FrontSusPotsFiltered_s
-    out.front_suspots_filtered.FL_sus_pot_filtered_analog;
-    out.front_suspots_filtered.FR_sus_pot_filtered_analog;
-    out.front_suspots_filtered.front_loadcell_FIR_is_saturated;
-
-    out.front_suspots_filtered = {shared_state.front_suspots_filtered.FL_sus_pot_filtered_analog,
-                                  shared_state.front_suspots_filtered.FR_sus_pot_filtered_analog,
-                                  shared_state.front_suspots_filtered.front_loadcell_FIR_is_saturated};
+    //DrivetrainDynamicReport_s
 
 
-    //SteeringFiltered_s
-    out.steering_filtered.steering_filtered_degrees;
-    out.steering_filtered.steering_FIR_is_saturated;
 
-    out.steering_filtered = {shared_state.steering_filtered.steering_filtered_degrees,
-                             shared_state.steering_filtered.steering_FIR_is_saturated};
+    out.drivetrain_data.measuredInverterFLPackVoltage;
+    out.drivetrain_data.measuredSpeeds[4];
+    out.drivetrain_data.measuredTorques[4];
+    out.drivetrain_data.measuredTorqueCurrents[4];
+    out.drivetrain_data.measuredMagnetizingCurrents[4];
+    
+
+    out.drivetrain_data = {shared_state.drivetrain_data.measuredInverterFLPackVoltage,
+                                  shared_state.drivetrain_data.measuredSpeeds[4],
+                                  shared_state.drivetrain_data.measuredTorques[4],
+                                  shared_state.drivetrain_data.measuredTorqueCurrents[4],
+                                  shared_state.drivetrain_data.measuredMagnetizingCurrents[4]};
+
+
+    //AMSSystemData_s
+    out.ams_data.min_cell_voltage;
+    out.ams_data.average_cell_voltage;
+    out.ams_data.max_cell_voltage;
+    out.ams_data.min_temp;
+    out.ams_data.average_temp;
+    out.ams_data.max_temp;
+
+    out.ams_data = {shared_state.ams_data.min_cell_voltage,
+                    shared_state.ams_data.average_cell_voltage,
+                    shared_state.ams_data.max_cell_voltage,
+                    shared_state.ams_data.min_temp,
+                    shared_state.ams_data.average_temp,
+                    shared_state.ams_data.max_temp};
  
     
     //DashDisplayState_s
-    out.dash_display.dash_data;
-    out.dash_display = {shared_state.dash_display.dash_data};
+    out.buzzer_is_active = shared_state.buzzer_is_active;
+    
 
     return out;
+
+    /* EXAMPLE UPDATED 02/04/2025 */
+    /* WILL NOT UPDATE FUNCTIONS PAST THIS POINT */
 
 }
 
