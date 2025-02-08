@@ -18,7 +18,7 @@
  *                                enough time has passed, we enter the next state.
  * READY_TO_DRIVE               - While in this state, pedal inputs command the drivetrain.
  */
-enum class CAR_STATE
+enum class CarState_e
 {
     STARTUP = 0,
     TRACTIVE_SYSTEM_NOT_ACTIVE = 1,
@@ -39,7 +39,7 @@ class VehicleStateMachine
 {
 public:
     VehicleStateMachine(DrivetrainSystem & drivetrain_system) :
-        _current_state(CAR_STATE::STARTUP),
+        _current_state(CarState_e::STARTUP),
         _drivetrain(drivetrain_system),
         _buzzer(BuzzerController::getInstance()) {};
 
@@ -54,25 +54,25 @@ public:
      */
     void tick_state_machine(unsigned long current_millis, const VCRSystemData_s &system_data);
 
-    CAR_STATE get_state() { return _current_state; }
+    CarState_e get_state() { return _current_state; }
 
 private:
 
-    void set_state_(CAR_STATE new_state, unsigned long curr_time);
+    void set_state_(CarState_e new_state, unsigned long curr_time);
 
     /**
      * The function run upon the entry of the car into a new state.
      * @param new_state The state in which we are entering.
      */
-    void handle_entry_logic_(CAR_STATE new_state, unsigned long curr_millis);
+    void handle_entry_logic_(CarState_e new_state, unsigned long curr_millis);
 
     /**
      * The function run upon the exit of a state.
      * @param prev_state the state in which we are leaving.
      */
-    void handle_exit_logic_(CAR_STATE prev_state, unsigned long curr_millis);
+    void handle_exit_logic_(CarState_e prev_state, unsigned long curr_millis);
 
-    CAR_STATE _current_state;
+    CarState_e _current_state;
 
     /* System references to show dependence on systems library */
     DrivetrainSystem &_drivetrain; //TODO: Make this InverterInterface instead of uint32_t

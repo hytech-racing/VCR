@@ -135,14 +135,14 @@ The VCR is connected over CAN and Ethernet to the VCF. We will use the CAN commu
 ### CAN interface
 
 VCF Outputs:
-- pedal data CAN packet:
+- pedal data CAN packet (`0xC0`):
     - status bits: (8 bits)
         - `bool accel_implausible`
             - accel pedal value is out of range
         - `bool brake_implausible`
             - brake pedal value is out of range
-        - `bool brake_pressed`
-        - `bool accel_pressed`
+        - `bool brake_pedal_active`
+        - `bool accel_pedal_active`
         - `bool mech_brake_active`
             - brake pedal has reached zone in which the mechanical brake (the physical calipers) have started engaging
         - `bool brake_and_accel_pressed_implausibility`
