@@ -1,8 +1,6 @@
 ## Inverter Interface
 
-
 ### GPIO connections
-
 
 ### CAN parameter / message descriptions
 
@@ -129,3 +127,59 @@ message 2346 'Converter temperature error' after the warning time1) (ID32943) ha
     - `uint16_t speed_control_kd`
         - inverter's internal value of (TD) kd
         - AKA SERCOS parameter ID102
+
+## VCF Interfaces
+
+The VCR is connected over CAN and Ethernet to the VCF. We will use the CAN communication for latency-sensitive communication such as the driver input and controller input sensor signals. The Ethernet link will be used for the non-timing-sensitive data.
+
+### CAN interface
+
+VCF Outputs:
+- pedal data CAN packet:
+    - status bits: (8 bits)
+        - `bool accel_implausible`
+            - accel pedal value is out of range
+        - `bool brake_implausible`
+            - brake pedal value is out of range
+        - `bool brake_pressed`
+        - `bool accel_pressed`
+        - `bool mech_brake_active`
+            - brake pedal has reached zone in which the mechanical brake (the physical calipers) have started engaging
+        - `bool brake_and_accel_pressed_implausibility`
+        - `bool implausibility_exceeded_duration`
+            - an implausibility been present for longer than allowed (>200ms by rules)
+                - __note__: we should guard this to be over 180ms or some threshold below 200ms to allow for transmission delay to stay within rules as this is now being reacted to by the VCR
+    - data (32 bits):
+        - `brake` (16 bit unsigned) -> mapped between 0 and 1 (65,535)
+        - `accel` (16 bit unsigned) -> mapped between 0 and 1 (65,535)
+
+    - __note__: the regen percentage that was present on MCU should instead be calculated by the controllers themselves instead of by the pedals system to centralize regen calculation at higher levels to allow for tuning / safe modification more easily
+
+- __note__: the following data is all the raw, non-filtered data
+    - steering data CAN packet:
+        - `uint16_t analog_steering`
+        - `float digital_steering` (32 bit) 
+
+    - suspension data CAN packet:
+        - `uint16_t fl_load_cell`
+        - `uint16_t fr_load_cell`
+        - `uint16_t fl_shock_pot`
+        - `uint16_t fr_shock_pot`
+
+### Ethernet Interface
+
+`VCFOutputData`
+VCF Outputs:
+- user inputs
+    - requested drive mode (0 through 5)
+    - requesting drivebrain / VCR in control mode
+    - requested torque limit mode
+    - requesting drivetrain error reset
+- statuses:
+    - buzzer status
+- info:
+    - firmware version info
+        - `bool dirty`
+            - means that the firmware was flashed while there was changes made that had not been commited
+        - `char git_short_hash[8]`
+            - the git hash of the commit that was flashed to the 
