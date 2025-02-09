@@ -1,6 +1,5 @@
 #include "TorqueControllerMux.hpp"
 #include "PhysicalParameters.h"
-#include "BaseController.h"
 
 // #include <iostream>
 template <std::size_t num_controllers>
@@ -9,7 +8,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
                                                                                const VCRSystemData_s &input_state)
 {
 
-    DrivetrainCommand_s empty_command = BaseControllerParams::TC_COMMAND_NO_TORQUE;
+    DrivetrainCommand_s empty_command = { .speeds_rpm = {0.0, 0.0, 0.0, 0.0}, .inverter_torque_limit = {0.0, 0.0, 0.0, 0.0}};
 
     TorqueControllerOutput_s current_output = {
         .command = empty_command,
