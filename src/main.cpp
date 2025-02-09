@@ -37,9 +37,10 @@ qindesign::network::EthernetUDP protobuf_recv_socket;
 
 
 void setup() {
+    const uint32_t CAN_baudrate = 500000;
     // from CANInterfaceon_can2_receive
-    handle_CAN_setup(INV_CAN, 500000, on_can2_receive);
-    handle_CAN_setup(TELEM_CAN, 500000, on_can3_receive);
+    handle_CAN_setup(INV_CAN, CAN_baudrate, on_can2_receive);
+    handle_CAN_setup(TELEM_CAN, CAN_baudrate, on_can3_receive);
 
     scheduler.setTimingFunction(micros);
 

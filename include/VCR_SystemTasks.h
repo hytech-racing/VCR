@@ -1,5 +1,5 @@
-#ifndef __VCR_SYSTEMTASKS_H__
-#define __VCR_SYSTEMTASKS_H__
+#ifndef VCR_SYSTEMTASKS_H
+#define VCR_SYSTEMTASKS_H
 
 #include <tuple>
 #include <utility>
@@ -29,7 +29,7 @@ struct VCRSystems
 
 struct InterfaceData_s
 {
-    PedalsData_s current_pedals_data;
+    PedalsSystemData_s current_pedals_data;
 };
 
 struct SystemData_s

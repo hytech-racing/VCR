@@ -46,7 +46,7 @@ struct CANInterfaces
 {
     explicit CANInterfaces(VCFInterface& vcf_int): vcf_interface(vcf_int) {}
 
-    VCFInterface& vcf_interface; 
+    VCFInterface& vcf_interface;
 };
 
 namespace VCRCANInterfaceImpl

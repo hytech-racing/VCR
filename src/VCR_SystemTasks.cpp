@@ -19,7 +19,7 @@ InterfaceData_s sample_interfaces(unsigned long curr_millis, VCRInterfaces & int
     process_ring_buffer(CAN3_rxBuffer, interface_ref_container.can_interfaces, curr_millis, recv_call);
 
     auto current_vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
-    InterfaceData_s interf_data = {.current_pedals_data = current_vcf_data.pedals_data};
+    InterfaceData_s interf_data = {.current_pedals_data = current_vcf_data.pedals_data.recvd_data };
     
     return interf_data;
 }
@@ -29,10 +29,7 @@ InterfaceData_s sample_interfaces(unsigned long curr_millis, VCRInterfaces & int
 VCRSystemData_s evaluate_systems(unsigned long curr_millis, const InterfaceData_s &interface_data, VCRSystems &systems)
 {   
     VCRSystemData_s sys_data;
-    sys_data.pedals_system_data.implausibility_has_exceeded_max_duration = interface_data.current_pedals_data.implausibility_exceeded_duration;
-    sys_data.pedals_system_data.accel_percent = interface_data.current_pedals_data.accel;
-    sys_data.pedals_system_data.brake_percent = interface_data.current_pedals_data.brake;
-
+    
 
     return sys_data;
 }

@@ -4,14 +4,14 @@
 #include "FlexCAN_T4.h"
 
 #include "shared_types.h"
-
+#include "SharedFirmwareTypes.h"
 // this struct just contains the data we need from pedals 
 // within VCR. the implaus check is done in the state machine.
-struct PedalsData_s : TimestampedData_s
+struct PedalsStampedData_s : TimestampedData_s
 {
-    bool implausibility_exceeded_duration;
-    float brake; // float between 0 and 1
-    float accel; // float between 0 and 1
+    // float brake; // float between 0 and 1
+    // float accel; // float between 0 and 1
+    PedalsSystemData_s recvd_data;
 };
 
 struct LoadCellData_s : TimestampedData_s
@@ -19,8 +19,8 @@ struct LoadCellData_s : TimestampedData_s
     
 };
 
-struct VCFInterfaceData_s {
-    PedalsData_s pedals_data;
+struct VCFCANInterfaceData_s {
+    PedalsStampedData_s pedals_data;
 };
 
 class VCFInterface {
@@ -29,11 +29,11 @@ public:
 
     void receive_pedals_message(const CAN_message_t& msg, unsigned long curr_millis);
     
-    VCFInterfaceData_s get_latest_data();
+    VCFCANInterfaceData_s get_latest_data();
 
 private:
 
-    VCFInterfaceData_s _curr_data;
+    VCFCANInterfaceData_s _curr_data;
     
 };
 #endif // __VCFINTERFACE_H__
