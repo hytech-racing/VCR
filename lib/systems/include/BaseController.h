@@ -21,7 +21,7 @@ public:
     /// @ref TorqueControllerMux.cpp to see that in every tick of the system, the active controller must be ticked through this method
     /// @param state with all sensor information to properly define torque set points
     /// @return TorqueControllerOutput_s This is a Drivetrain command passed along with a state boolean to ensure car controllers are working properly
-    virtual TorqueControllerOutput_s evaluate(const VCRSystemData_s &state) = 0;
+    virtual TorqueControllerOutput_s evaluate(const VCRData_s &state) = 0;
 };
 
 #endif

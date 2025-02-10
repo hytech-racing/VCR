@@ -4,7 +4,7 @@
 /* Local includes */
 #include "VehicleStateMachine.h"
 
-void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const VCRSystemData_s &system_data)
+void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const VCRData_s &shared_data)
 {
 
     switch (_current_state)
@@ -43,7 +43,7 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
         //     break;
         // }
 
-        if (system_data.dash_input_state.start_btn_is_pressed && system_data.pedals_system_data.brake_is_pressed)
+        if (shared_data.dash_input_state.start_btn_is_pressed && shared_data.pedals_system_data.brake_is_pressed)
         {
             set_state_(CAR_STATE::ENABLING_INVERTERS, current_millis);
             break;
@@ -117,7 +117,7 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
             break;
         }
 
-        if (/* _ams_system.ams_ok() && */ !system_data.pedals_system_data.implausibility_has_exceeded_max_duration)
+        if (/* _ams_system.ams_ok() && */ !shared_data.pedals_system_data.implausibility_has_exceeded_max_duration)
         {
             // TODO: Fix with all references to singleton classes
             // TODO: need to also handle request to mode switch via drivetrain init (?)

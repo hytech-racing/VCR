@@ -6,7 +6,7 @@
 template <std::size_t num_controllers>
 DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command(ControllerMode_e requested_controller_type,
                                                                                TorqueLimit_e requested_torque_limit,
-                                                                               const VCRSystemData_s &input_state)
+                                                                               const VCRData_s &input_state)
 {
 
     DrivetrainCommand_s empty_command = BaseControllerParams::TC_COMMAND_NO_TORQUE;

@@ -8,8 +8,7 @@
 #include "SharedFirmwareTypes.h"
 
 /* Interface and system data structs */
-VCRInterfaceData_s interface_data;
-VCRSystemData_s system_data;
+VCRData_s shared_data;
 
 /* ADC setup */
 MCP_ADC<channels_within_mcp_adc> adc_0 = MCP_ADC<8>(ADC0_CS); // MCP3208. ADC0 in VCR schematic. Used for valuable telem data.

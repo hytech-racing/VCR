@@ -2,296 +2,161 @@
 #include "SharedFirmwareTypes.h"
 #include <Arduino.h>
 
-hytech_msgs_VCRSystemData_s VCREthernetInterface::make_vcrsystemdata_msg(const VCRSystemData_s &shared_state)
+hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(VCRData_s &shared_state)
 {
-	hytech_msgs_VCRSystemData_s out;
+	hytech_msgs_VCRData_s out;
 
-    //PedalsSystemData_s
+    //RearLoadCellData_s
+    out.rear_loadcell_data.RL_loadcell_analog = shared_state.rear_loadcell_data.RL_loadcell_analog;
+    out.rear_loadcell_data.RR_loadcell_analog = shared_state.rear_loadcell_data.RR_loadcell_analog;
 
-    out.pedals_system_data.accel_is_implausible;
-    out.pedals_system_data.brake_is_implausible;
-    out.pedals_system_data.brake_is_pressed;
-    out.pedals_system_data.accel_is_pressed;
-    out.pedals_system_data.mech_brake_is_active;
-    out.pedals_system_data.brake_and_accel_pressed_implausibility_high;
-    out.pedals_system_data.implausibility_has_exceeded_max_duration;
-    out.pedals_system_accel_percent;
-    out.pedals_system_data.brake_percent;
-    out.pedals_system_data.regen_percent;
+    //RearSusPotData_s
+    out.rear_suspot_data.RL_sus_pot_analog = shared_state.rear_suspot_data.RL_sus_pot_analog;
+    out.rear_suspot_data.RR_sus_pot_analog = shared_state.rear_suspot_data.RR_sus_pot_analog;
 
-    out.rear_loadcells_filtered = {shared_state.pedals_system_data.accel_is_implausible,
-                                   shared_state.pedals_system_data.brake_is_implausible,
-                                   shared_state.pedals_system_data.brake_is_pressed,
-                                   shared_state.pedals_system_data.accel_is_pressed,
-                                   shared_state.pedals_system_data.mech_brake_is_active,
-                                   shared_state.pedals_system_data.brake_and_accel_pressed_implausibility_high,
-                                   shared_state.pedals_system_data.implausibility_has_exceeded_max_duration,
-                                   shared_state.pedals_system_accel_percent,
-                                   shared_state.pedals_system_data.brake_percent,
-                                   shared_state.pedals_system_data.regen_percent};
+    //ShutdownSensingData_s
+    out.shutdown_sensing_data.i_shutdown_in = shared_state.shutdown_sensing_data.i_shutdown_in;
+    out.shutdown_sensing_data.j_bspd_relay = shared_state.shutdown_sensing_data.j_bspd_relay;
+    out.shutdown_sensing_data.k_watchdog_relay = shared_state.shutdown_sensing_data.k_watchdog_relay;
+    out.shutdown_sensing_data.l_bms_relay = shared_state.shutdown_sensing_data.l_bms_relay;
+    out.shutdown_sensing_data.m_imd_relay = shared_state.shutdown_sensing_data.m_imd_relay;
+    out.shutdown_sensing_data.bspd_is_ok = shared_state.shutdown_sensing_data.bspd_is_ok;
+    out.shutdown_sensing_data.watchdog_is_ok = shared_state.shutdown_sensing_data.watchdog_is_ok;
+    out.shutdown_sensing_data.bms_is_ok = shared_state.shutdown_sensing_data.bms_is_ok;
+    out.shutdown_sensing_data.imd_is_ok = shared_state.shutdown_sensing_data.imd_is_ok;
 
-    
-    //FrontLoadCellsFiltered_s
-    out.front_loadcells_filtered.FL_loadcell_filtered_pounds;
-    out.front_loadcells_filtered.FR_loadcell_filtered_pounds;
-    out.front_loadcells_filtered.front_loadcell_FIR_is_saturated;
+    //VCREthernetLinkData_s
+    out.ethernet_is_linked.acu_link = shared_state.ethernet_is_linked.acu_link;
+    out.ethernet_is_linked.debug_link = shared_state.ethernet_is_linked.debug_link;
+    out.ethernet_is_linked.drivebrain_link = shared_state.ethernet_is_linked.drivebrain_link;
+    out.ethernet_is_linked.teensy_link = shared_state.ethernet_is_linked.teensy_link;
+    out.ethernet_is_linked.ubiquiti_link = shared_state.ethernet_is_linked.ubiquiti_link;
+    out.ethernet_is_linked.vcf_link = shared_state.ethernet_is_linked.vcf_link;
 
-    out.front_loadcells_filtered = {shared_state.front_loadcells_filtered.FL_loadcell_filtered_pounds,
-                                    shared_state.front_loadcells_filtered.FR_loadcell_filtered_pounds,
-                                    shared_state.front_loadcells_filtered.front_loadcell_FIR_is_saturated};
-
-    
-
-    //FrontSusPotsFiltered_s
-    out.front_suspots_filtered.FL_sus_pot_filtered_analog;
-    out.front_suspots_filtered.FR_sus_pot_filtered_analog;
-    out.front_suspots_filtered.front_loadcell_FIR_is_saturated;
-
-    out.front_suspots_filtered = {shared_state.front_suspots_filtered.FL_sus_pot_filtered_analog,
-                                  shared_state.front_suspots_filtered.FR_sus_pot_filtered_analog,
-                                  shared_state.front_suspots_filtered.front_loadcell_FIR_is_saturated};
-
-
-    //SteeringFiltered_s
-    out.steering_filtered.steering_filtered_degrees;
-    out.steering_filtered.steering_FIR_is_saturated;
-
-    out.steering_filtered = {shared_state.steering_filtered.steering_filtered_degrees,
-                             shared_state.steering_filtered.steering_FIR_is_saturated};
- 
-    
-    //DashDisplayState_s
-    out.dash_display.dash_data;
-    out.dash_display = {shared_state.dash_display.dash_data};
-
-    return out;
-
-}
-
-hytech_msgs_VCRInterfaceData_s VCREthernetInterface::make_vcrinterfacedata_msg(const VCRInterfaceData_s &shared_state)
-{
-    hytech_msgs_VCRInterfaceData_s out;
-
-    //RearLoadCellsUnfiltered_s
-    out.rear_loadcells_unfiltered.RL_loadcell_unfiltered_pounds;
-    out.rear_loadcells_unfiltered.RR_loadcell_unfiltered_pounds;
-
-    out.rear_loadcells_unfiltered = {shared_state.rear_loadcells_unfiltered.RL_loadcell_unfiltered_pounds,
-                                   shared_state.rear_loadcells_unfiltered.RR_loadcell_unfiltered_pounds};
-
-    
-    //RearSusPotsUnfiltered_s
-    out.rear_suspots_unfiltered.RL_sus_pot_unfiltered_analog;
-    out.rear_suspots_unfiltered.RR_sus_pot_unfiltered_analog;
-    //out.front_loadcells_filtered.front_loadcell_FIR_is_saturated;
-
-    out.front_loadcells_filtered = {shared_state.rear_suspots_unfiltered.RL_sus_pot_unfiltered_analog,
-                                    shared_state.rear_suspots_unfiltered.RR_sus_pot_unfiltered_analog};
-
-    
-
-    //VectorNavData_s
-    out.vectornav_data.velocity_x;
-    out.vectornav_data.velocity_y;
-    out.vectornav_data.velocity_z;
-    out.vectornav_data.linear_accel_x;
-    out.vectornav_data.linear_accel_y;
-    out.vectornav_data.linear_accel_z;
-    out.vectornav_data.uncompLinear_accel[3]; //idk if this format works
-    out.vectornav_data.yaw;
-    out.vectornav_data.pitch;
-    out.vectornav_data.roll;
-    out.vectornav_data.latitude;
-    out.vectornav_data.longitude;
-    out.vectornav_data.ecef_coords[3]; //same with this
-    out.vectornav_data.gps_time;
-    out.vectornav_data.vn_status;
-    out.vectornav_data.angular_rates;
-
-    out.vectornav_data = {shared_state.vectornav_data.velocity_x,
-                          shared_state.vectornav_data.velocity_y,
-                          shared_state.vectornav_data.velocity_z,
-                          shared_state.vectornav_data.linear_accel_x,
-                          shared_state.vectornav_data.linear_accel_y,
-                          shared_state.vectornav_data.linear_accel_z,
-                          shared_state.vectornav_data.uncompLinear_accel[3], //idk if this format works
-                          shared_state.vectornav_data.yaw,
-                          shared_state.vectornav_data.pitch,
-                          shared_state.vectornav_data.roll,
-                          shared_state.vectornav_data.latitude,
-                          shared_state.vectornav_data.longitude,
-                          shared_state.vectornav_data.ecef_coords[3], //same with this
-                          shared_state.vectornav_data.gps_time,
-                          shared_state.vectornav_data.vn_status,
-                          shared_state.vectornav_data.angular_rates};
-    
-
+    //veh_vec<InverterData>
+    copy_inverter_data(shared_state.inverter_data.FL, out.inverter_data.FL);
+    copy_inverter_data(shared_state.inverter_data.FR, out.inverter_data.FR);
+    copy_inverter_data(shared_state.inverter_data.RL, out.inverter_data.RL);
+    copy_inverter_data(shared_state.inverter_data.RR, out.inverter_data.RR);
 
     //CurrentSensorData_s
-    out.current_sensor_data.twentyfour_volt_sensor;
-    out.current_sensor_data.current_sensor_unfiltered;
-    out.current_sensor_data.current_refererence_unfiltered;
+    out.current_sensor_data.twentyfour_volt_sensor = shared_state.current_sensor_data.twentyfour_volt_sensor;
+    out.current_sensor_data.current_sensor_unfiltered = shared_state.current_sensor_data.current_sensor_unfiltered;
+    out.current_sensor_data.current_refererence_unfiltered = shared_state.current_sensor_data.current_refererence_unfiltered;
 
-    out.current_sensor_data = {shared_state.current_sensor_data.twentyfour_volt_sensor,
-                               shared_state.current_sensor_data.current_sensor_unfiltered,
-                               shared_state.current_sensor_data.current_refererence_unfiltered};
+    //DrivetrainDynamicReport_s
+    out.drivetrain_data.measuredInverterFLPackVoltage = shared_state.drivetrain_data.measuredInverterFLPackVoltage;
+    out.drivetrain_data.measuredSpeeds.FL = shared_state.drivetrain_data.measuredSpeeds[0];
+    out.drivetrain_data.measuredSpeeds.FR = shared_state.drivetrain_data.measuredSpeeds[1];
+    out.drivetrain_data.measuredSpeeds.RL = shared_state.drivetrain_data.measuredSpeeds[2];
+    out.drivetrain_data.measuredSpeeds.RR = shared_state.drivetrain_data.measuredSpeeds[3];
+    out.drivetrain_data.measuredTorques.FL = shared_state.drivetrain_data.measuredTorques[0];
+    out.drivetrain_data.measuredTorques.FR = shared_state.drivetrain_data.measuredTorques[1];
+    out.drivetrain_data.measuredTorques.RL = shared_state.drivetrain_data.measuredTorques[2];
+    out.drivetrain_data.measuredTorques.RR = shared_state.drivetrain_data.measuredTorques[3];
+    out.drivetrain_data.measuredTorqueCurrents.FL = shared_state.drivetrain_data.measuredTorqueCurrents.FL;
+    out.drivetrain_data.measuredTorqueCurrents.FR = shared_state.drivetrain_data.measuredTorqueCurrents.FR;
+    out.drivetrain_data.measuredTorqueCurrents.RL = shared_state.drivetrain_data.measuredTorqueCurrents.RL;
+    out.drivetrain_data.measuredTorqueCurrents.RR = shared_state.drivetrain_data.measuredTorqueCurrents.RR;
+    out.drivetrain_data.measuredMagnetizingCurrents.FL = shared_state.drivetrain_data.measuredMagnetizingCurrents.FL;
+    out.drivetrain_data.measuredMagnetizingCurrents.FR = shared_state.drivetrain_data.measuredMagnetizingCurrents.FR;
+    out.drivetrain_data.measuredMagnetizingCurrents.RL = shared_state.drivetrain_data.measuredMagnetizingCurrents.RL;
+    out.drivetrain_data.measuredMagnetizingCurrents.RR = shared_state.drivetrain_data.measuredMagnetizingCurrents.RR;
 
-    
-    //ShutdownSensingData_s
-    out.shutdown_sensing_data.i_shutdown_in;
-    out.shutdown_sensing_data.j_bspd_relay;
-    out.shutdown_sensing_data.k_watchdog_relay;
-    out.shutdown_sensing_data.l_bms_relay;
-    out.shutdown_sensing_data.m_imd_relay;
+    //AMSSystemData_s
+    out.ams_data.min_cell_voltage = shared_state.ams_data.min_cell_voltage;
+    out.ams_data.average_cell_voltage = shared_state.ams_data.average_cell_voltage;
+    out.ams_data.max_cell_voltage = shared_state.ams_data.max_cell_voltage;
+    out.ams_data.min_temp_celsius = shared_state.ams_data.min_temp_celsius;
+    out.ams_data.average_temp_celsius = shared_state.ams_data.average_temp_celsius;
+    out.ams_data.max_temp_celsius = shared_state.ams_data.max_temp_celsius;
+    out.ams_data.total_pack_voltage = shared_state.ams_data.total_pack_voltage;
+    out.ams_data.ams_ok = out.ams_data.ams_ok;
 
-    out.shutdown_sensing_data.bspd_is_ok;
-    out.shutdown_sensing_data.watchdog_is_ok;
-    out.shutdown_sensing_data.bms_is_ok;
-    out.shutdown_sensing_data.imd_is_ok;
-
-
-    out.dash_display = {shared_state.shutdown_sensing_data.i_shutdown_in,
-                        shared_state.shutdown_sensing_data.j_bspd_relay,
-                        shared_state.shutdown_sensing_data.k_watchdog_relay,
-                        shared_state.shutdown_sensing_data.l_bms_relay,
-                        shared_state.shutdown_sensing_data.m_imd_relay,
-
-                        shared_state.shutdown_sensing_data.bspd_is_ok,
-                        shared_state.shutdown_sensing_data.watchdog_is_ok,
-                        shared_state.shutdown_sensing_data.bms_is_ok,
-                        shared_state.shutdown_sensing_data.imd_is_ok};
-
-    //EthernetLinkData_s
-    out.ethernet_is_linked.acu_link;
-    out.ethernet_is_linked.drivebrain_link;
-    out.ethernet_is_linked.vcf_link;
-    out.ethernet_is_linked.teensy_link;
-    out.ethernet_is_linked.debug_link;
-    out.ethernet_is_linked.ubiquiti_link;
-
-    out.ethernet_is_linked = {shared_state.ethernet_is_linked.acu_link,
-                              shared_state.ethernet_is_linked.drivebrain_link,
-                              shared_state.ethernet_is_linked.vcf_link,
-                              shared_state.ethernet_is_linked.teensy_link,
-                              shared_state.ethernet_is_linked.debug_link,
-                              shared_state.ethernet_is_linked.ubiquiti_link};
-
-
-    //veh_vec_inverter
-    
-    out.inverter_data.system_ready;
-    out.inverter_data.error;
-    out.inverter_data.warning;
-    out.inverter_data.quit_dc_on;
-    out.inverter_data.dc_on;
-    out.inverter_data.quit_inverter_on;
-    out.inverter_data.inverter_on;
-    out.inverter_data.derating_on;
-    out.inverter_data.speed_rpm;
-    out.inverter_data.actual_motor_torque;
-    out.inverter_data.commanded_torque;
-    out.inverter_data.motor_temp;
-    out.inverter_data.inverter_temp;
-    out.inverter_data.diagnostic_number;
-    out.inverter_data.igbt_temp;
-    out.inverter_data.dc_bus_voltage;
-    out.inverter_data.actual_power;
-    out.inverter_data.feedback_torque;
-
-    out.inverter_data = {shared_state.inverter_data.system_ready,
-                         shared_state.inverter_data.error,
-                         shared_state.inverter_data.warning,
-                         shared_state.inverter_data.quit_dc_on,
-                         shared_state.inverter_data.dc_on,
-                         shared_state.inverter_data.quit_inverter_on,
-                         shared_state.inverter_data.inverter_on,
-                         shared_state.inverter_data.derating_on,
-                         shared_state.inverter_data.speed_rpm,
-                         shared_state.inverter_data.actual_motor_torque,
-                         shared_state.inverter_data.commanded_torque,
-                         shared_state.inverter_data.motor_temp,
-                         shared_state.inverter_data.inverter_temp,
-                         shared_state.inverter_data.diagnostic_number,
-                         shared_state.inverter_data.igbt_temp,
-                         shared_state.inverter_data.dc_bus_voltage,
-                         shared_state.inverter_data.actual_power,
-                         shared_state.inverter_data.feedback_torque};
+    // Buzzer
+    out.buzzer_is_active = shared_state.buzzer_is_active;
 
     return out;
 
-
 }
 
-//
-void VCREthernetInterface::receive_pb_msg_acu(const hytech_msgs_BMSData &msg_in)
+void VCREthernetInterface::receive_pb_msg_acu_all_data(const hytech_msgs_ACUAllData_s &msg_in, VCRData_s &shared_state)
 {
-    
-    _latest_acu_data.voltages = msg_in.voltages;
-    _latest_acu_data.cell_temperatures = msg_in.cell_temperatures
-    _latest_acu_data.humidity = msg_in.humidity;
-    _latest_acu_data.board_temperatures = msg_in.board_temperatures;
+    for (uint32_t i = 0; i < msg_in.voltages_count; ++i)
+    {
+        shared_state.acu_all_data.voltages[i] = msg_in.voltages[i];
+    }
 
+    for (uint32_t i = 0; i < msg_in.cell_temperatures_count; ++i)
+    {
+        shared_state.acu_all_data.cell_temperatures[i] = msg_in.cell_temperatures[i];
+    }
 
-
-    _latest_acu_data.min_voltage = msg_in.min_voltage;
-    _latest_acu_data.max_voltage = msg_in.max_voltage;
-    _latest_acu_data.min_voltage_cell_id = msg_in.min_voltage_cell_id;
-    _latest_acu_data.max_voltage_cell_id = msg_in.max_voltage_cell_id;
-    _latest_acu_data.max_board_temperature_segment_id = msg_in.max_board_temperature_segment_id;
-    _latest_acu_data.max_humidity_segment_id = msg_in.max_humidity_segment_id;
-    _latest_acu_data.max_cell_temperature_cell_id = msg_in.max_cell_temperature_cell_id;
-    _latest_acu_data.total_voltage = msg_in.total_voltage;
-    _latest_acu_data.average_cell_temperature = msg_in.average_cell_temperature;
-    
-
+    for (uint32_t i = 0; i < msg_in.board_humidities_count; ++i)
+    {
+        shared_state.acu_all_data.board_humidities[i] = msg_in.board_humidities[i];
+    }
 }
 
-void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in)
+void VCREthernetInterface::receive_pb_msg_acu_core_data(const hytech_msgs_ACUCoreData_s &msg_in, VCRData_s &shared_state)
 {
-    veh_vec<float> speed_desired_rpms(msg_in.desired_rpms.FL, msg_in.desired_rpms.FR, msg_in.desired_rpms.RL, msg_in.desired_rpms.RR);
-    veh_vec<float> torque_lim_nm(msg_in.torque_limit_nm.FL, msg_in.torque_limit_nm.FR, msg_in.torque_limit_nm.RL, msg_in.torque_limit_nm.RR);
-
-    _latest_db_data.desired_rpms = speed_desired_rpms; 
-    _latest_db_data.torque_limit_nm = torque_lim_nm; 
-
-    _latest_db_data.prev_MCU_recv_millis = msg_in.prev_MCU_recv_millis; 
+    shared_state.acu_core_data.avg_cell_voltage = msg_in.avg_cell_voltage;
+    shared_state.acu_core_data.max_cell_temp = msg_in.max_cell_temp;
+    shared_state.acu_core_data.min_cell_voltage = msg_in.min_cell_voltage;
+    shared_state.acu_core_data.pack_voltage = msg_in.pack_voltage;
 }
 
-void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFSystemData_s &msg_in)
+void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in, VCRData_s &shared_state)
 {
-     //deep
-     //PedalsSystemData_s
-    _latest_vcf_data.pedals_system_data.accel_is_implausible = msg_in.pedals_system_data.accel_is_implausible; // --> through regen_percent
-    _latest_vcf_data.pedals_system_data.brake_is_implausible = msg_in.pedals_system_data.brake_is_implausible;
-    _latest_vcf_data.pedals_system_data.brake_is_pressed = msg_in.pedals_system_data.brake_is_pressed;
-    _latest_vcf_data.pedals_system_data.accel_is_pressed = msg_in.pedals_system_data.accel_is_pressed
-    _latest_vcf_data.pedals_system_data.mech_brake_is_active = msg_in.pedals_system_data.mech_brake_is_active;
-    _latest_vcf_data.pedals_system_data.brake_and_accel_pressed_implausibility_high = msg_in.pedals_system_data.brake_and_accel_pressed_implausibility_high
-    _latest_vcf_data.pedals_system_data.implausibility_has_exceeded_max_duration = msg_in.pedals_system_data.implausibility_has_exceeded_max_duration;
-    _latest_vcf_data.pedals_system_data.accel_percent = msg_in.pedals_system_data.accel_percent;
-    _latest_vcf_data.pedals_system_data.brake_percent = msg_in.pedals_system_data.brake_percent;
-    _latest_vcf_data.pedals_system_data.regen_percent = msg_in.pedals_system_data.regen_percent;
+    //TODO: Finish this function. This function could parse the message and put it into shared_state, but depending
+    //      on where things are defined, it might be cleaner for this function to simply return the new data. I do
+    //      not know yet. Definitely worth asking Ben.
+}
 
-    //struct FrontLoadCellsFiltered_s
+void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state)
+{
+    //PedalsSystemData_s
+    shared_state.pedals_system_data.accel_is_implausible = msg_in.pedals_system_data.accel_is_implausible;
+    shared_state.pedals_system_data.brake_is_implausible = msg_in.pedals_system_data.brake_is_implausible;
+    shared_state.pedals_system_data.brake_is_pressed = msg_in.pedals_system_data.brake_is_pressed;
+    shared_state.pedals_system_data.accel_is_pressed = msg_in.pedals_system_data.accel_is_pressed;
+    shared_state.pedals_system_data.mech_brake_is_active = msg_in.pedals_system_data.mech_brake_is_active;
+    shared_state.pedals_system_data.brake_and_accel_pressed_implausibility_high = msg_in.pedals_system_data.brake_and_accel_pressed_implausibility_high;
+    shared_state.pedals_system_data.implausibility_has_exceeded_max_duration = msg_in.pedals_system_data.implausibility_has_exceeded_max_duration;
+    shared_state.pedals_system_data.accel_percent = msg_in.pedals_system_data.accel_percent;
+    shared_state.pedals_system_data.brake_percent = msg_in.pedals_system_data.brake_percent;
+    shared_state.pedals_system_data.regen_percent = msg_in.pedals_system_data.regen_percent;
 
-   _latest_vcf_data.front_loadcells_filtered.FL_loadcell_filtered_pounds = msg_in.front_loadcells_filtered.FL_loadcell_filtered_pounds;
-   _latest_vcf_data.front_loadcells_filtered.FR_loadcell_filtered_pounds = msg_in.front_loadcells_filtered.FR_loadcell_filtered_pounds;
-   _latest_vcf_data.front_loadcells_filtered.front_loadcell_FIR_is_saturated = msg_in.front_loadcells_filtered.front_loadcell_FIR_is_saturated;
-
-   //FrontSusPotsFiltered_s
-   _latest_vcf_data.front_suspots_filtered.FL_sus_pot_filtered_analog = msg_in.front_suspots_filtered.FL_sus_pot_filtered_analog;
-   _latest_vcf_data.front_suspots_filtered.FR_sus_pot_filtered_analog = msg_in.front_suspots_filtered.FR_sus_pot_filtered_analog;
-   _latest_vcf_data.front_suspots_filtered.front_loadcell_FIR_is_saturated = msg_in.front_suspots_filtered.front_loadcell_FIR_is_saturated;
-
-   //SteeringFiltered_s steering_filtered
-
-   _latest_vcf_data.steering_filtered.steering_filtered_degrees = msg_in.steering_filtered.steering_filtered_degrees;
-   _latest_vcf_data.steering_filtered.steering_FIR_is_saturated = msg_in.steering_filtered.steering_FIR_is_saturated;
-
-   //DashDisplayState_s dash_display
-   _latest_vcf_data.dash_display.dash_data = msg_in.dash_display.dash_data;
+    //DashInputState_s
+    shared_state.dash_input_state.data_btn_is_pressed = msg_in.dash_input_state.data_btn_is_pressed;
+    shared_state.dash_input_state.dial_state = (ControllerMode_e) msg_in.dash_input_state.dial_state;
+    shared_state.dash_input_state.dim_btn_is_pressed = msg_in.dash_input_state.dim_btn_is_pressed;
+    shared_state.dash_input_state.left_paddle_is_pressed = msg_in.dash_input_state.left_paddle_is_pressed;
+    shared_state.dash_input_state.right_paddle_is_pressed = msg_in.dash_input_state.right_paddle_is_pressed;
+    shared_state.dash_input_state.mc_reset_btn_is_pressed = msg_in.dash_input_state.mc_reset_btn_is_pressed;
+    shared_state.dash_input_state.mode_btn_is_pressed = msg_in.dash_input_state.mode_btn_is_pressed;
+    shared_state.dash_input_state.preset_btn_is_pressed = msg_in.dash_input_state.preset_btn_is_pressed;
+    shared_state.dash_input_state.start_btn_is_pressed = msg_in.dash_input_state.start_btn_is_pressed;
 }
 	
-
-
-
+void VCREthernetInterface::copy_inverter_data(InverterData_s &original, hytech_msgs_InverterData_s &destination)
+{
+    destination.actual_motor_torque = original.actual_motor_torque;
+    destination.actual_power = original.actual_power;
+    destination.commanded_torque = original.commanded_torque;
+    destination.dc_bus_voltage = original.dc_bus_voltage;
+    destination.dc_on = original.dc_on;
+    destination.derating_on = original.derating_on;
+    destination.diagnostic_number = original.diagnostic_number;
+    destination.error = original.error;
+    destination.feedback_torque = original.feedback_torque;
+    destination.igbt_temp = original.igbt_temp;
+    destination.inverter_on = original.inverter_on;
+    destination.inverter_temp = original.inverter_temp;
+    destination.motor_temp = original.motor_temp;
+    destination.quit_dc_on = original.quit_dc_on;
+    destination.quit_inverter_on = original.quit_inverter_on;
+    destination.speed_rpm = original.speed_rpm;
+    destination.system_ready = original.system_ready;
+    destination.warning = original.warning;
+}
