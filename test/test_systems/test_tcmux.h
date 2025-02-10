@@ -24,7 +24,7 @@ void set_outputs(cmd_type &cmd, float mps, float torque)
 
 TEST(TorqueControllerMuxTesting, test_construction)
 {
-    auto test_func = [](const VCRSystemData_s& state) -> TorqueControllerOutput_s {
+    auto test_func = [](const VCRData_s& state) -> TorqueControllerOutput_s {
         return {};
     };
     TorqueControllerMux<2> test({test_func, test_func}, {false, false});
@@ -33,7 +33,7 @@ TEST(TorqueControllerMuxTesting, test_construction)
 TEST(TorqueControllerMuxTesting, test_invalid_controller_request_error)
 {
     
-    auto test_func = [](const VCRSystemData_s& state) -> TorqueControllerOutput_s {
+    auto test_func = [](const VCRData_s& state) -> TorqueControllerOutput_s {
         return {};
     };
     TorqueControllerMux<2> test({test_func, nullptr}, {false, false});
@@ -67,15 +67,15 @@ TEST(TorqueControllerMuxTesting, test_controller_output_swap_logic)
     set_outputs(out1.command, 0, 1);
     TorqueControllerOutput_s out2;
     set_outputs(out2.command, 6, 1);
-    auto test_func_1 = [&out1](const VCRSystemData_s& state) -> TorqueControllerOutput_s {
+    auto test_func_1 = [&out1](const VCRData_s& state) -> TorqueControllerOutput_s {
         return out1;
     };
-    auto test_func_2 = [&out2](const VCRSystemData_s& state) -> TorqueControllerOutput_s {
+    auto test_func_2 = [&out2](const VCRData_s& state) -> TorqueControllerOutput_s {
         return out2;
     };
 
     TorqueControllerMux<2> test({test_func_1, test_func_2}, {false, false});
-    VCRSystemData_s state;
+    VCRData_s state;
     set_four_outputs(state.drivetrain_data.measuredSpeeds, 10000.0);
 
     auto res1 = test.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
@@ -98,16 +98,16 @@ TEST(TorqueControllerMuxTesting, test_controller_output_swap_logic)
 TEST(TorqueControllerMuxTesting, test_torque_diff_swap_limit)
 {
     TorqueControllerOutput_s inst1, inst2;
-    auto test_func_1 = [&inst1](const VCRSystemData_s& state) -> TorqueControllerOutput_s {
+    auto test_func_1 = [&inst1](const VCRData_s& state) -> TorqueControllerOutput_s {
         return inst1;
     };
-    auto test_func_2 = [&inst2](const VCRSystemData_s& state) -> TorqueControllerOutput_s {
+    auto test_func_2 = [&inst2](const VCRData_s& state) -> TorqueControllerOutput_s {
         return inst2;
     };
     set_outputs(inst1.command, 0.1, 1);
     set_outputs(inst2.command, 3, 10);
     TorqueControllerMux<2> test({test_func_1, test_func_2}, {false, false});
-    VCRSystemData_s state;
+    VCRData_s state;
 
     state.drivetrain_data = {};
 
@@ -239,7 +239,7 @@ TEST(TorqueControllerMuxTesting, test_torque_limit)
 
     // TestControllerType inst1;
     TorqueControllerOutput_s inst1;
-    auto test_func_1 = [&inst1](const VCRSystemData_s& state) -> TorqueControllerOutput_s {
+    auto test_func_1 = [&inst1](const VCRData_s& state) -> TorqueControllerOutput_s {
         return inst1;
     };
     set_outputs(inst1.command, 500, 10.0);
@@ -252,7 +252,7 @@ TEST(TorqueControllerMuxTesting, test_torque_limit)
         drivetrain_data.measuredSpeeds[i] = 500.0f;
     }
 
-    VCRSystemData_s mode_0_input_state;
+    VCRData_s mode_0_input_state;
     mode_0_input_state.drivetrain_data = drivetrain_data;
     mode_0_input_state.pedals_system_data.accel_percent = 0.5f;
     mode_0_input_state.pedals_system_data.brake_percent = 0.0f;
@@ -283,7 +283,7 @@ TEST(TorqueControllerMuxTesting, test_torque_limit)
 TEST(TorqueControllerMuxTesting, test_null_pointer_error_state)
 {
     TorqueControllerMux<1> test({nullptr}, {true});
-    VCRSystemData_s state;
+    VCRData_s state;
     auto res = test.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_LOW_TORQUE, state);
     for (int i = 0; i < 4; i++)
     {
