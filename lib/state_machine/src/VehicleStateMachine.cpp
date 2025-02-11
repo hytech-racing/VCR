@@ -4,7 +4,7 @@
 /* Local includes */
 #include "VehicleStateMachine.h"
 
-void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const VCRSystemData_s &system_data)
+void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const VCRData_s &system_data)
 {
 
     switch (_current_state)
