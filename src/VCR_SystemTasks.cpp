@@ -12,26 +12,27 @@
 
 auto recv_call = etl::delegate<void(CANInterfaces& , const CAN_message_t& , unsigned long )>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 
-InterfaceData_s sample_interfaces(unsigned long millis, VCRInterfaces & interface_ref_container)
+VCRInterfaceData_s sample_interfaces(unsigned long millis, VCRInterfaces & interface_ref_container, const VCRInterfaceData_s & vcr_int_data)
 {
+    VCRInterfaceData_s ret = vcr_int_data;
     // process ring buffer is from CANInterface. TODO put into namespace
     process_ring_buffer(inverter_can_rx_buffer, interface_ref_container.can_interfaces, millis, recv_call);
     process_ring_buffer(telem_can_rx_buffer, interface_ref_container.can_interfaces, millis, recv_call);
 
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
-    InterfaceData_s interf_data = {.pedals_data = vcf_data.pedals_data.recvd_data };
+    ret.pedals_stamped = vcf_data.pedals_data.recvd_data;
     
-    return interf_data;
+    return ret;
 }
 
 
-// used for systems that dont need to interact with the state machine
-VCRData_s evaluate_systems(unsigned long millis, const InterfaceData_s &interface_data, VCRSystems &systems)
+// used for systems that dont need to interact with the state machine. i dont think that we need to pass in the previous s
+VCRSystemData_s evaluate_systems(unsigned long millis, const VCRInterfaceData_s &interface_data, VCRSystems &systems)
 {   
-    VCRData_s sys_data;
-    sys_data.pedals_system_data.implausibility_has_exceeded_max_duration = interface_data.pedals_data.implausibility_has_exceeded_max_duration;
-    sys_data.pedals_system_data.accel_percent = interface_data.pedals_data.accel_percent;
-    sys_data.pedals_system_data.brake_percent = interface_data.pedals_data.brake_percent;
+    VCRSystemData_s sys_data;
+    sys_data.pedals_system_data.implausibility_has_exceeded_max_duration = interface_data.pedals_stamped.implausibility_has_exceeded_max_duration;
+    sys_data.pedals_system_data.accel_percent = interface_data.pedals_stamped.accel_percent;
+    sys_data.pedals_system_data.brake_percent = interface_data.pedals_stamped.brake_percent;
 
 
     return sys_data;

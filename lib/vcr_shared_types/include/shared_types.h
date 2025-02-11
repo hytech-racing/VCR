@@ -65,14 +65,4 @@ struct InverterFeedbackData_s
     InverterControlParams_s control_params;
 };
 
-struct TimestampedData_s
-{
-    unsigned long last_recv_millis;
-};
-
-
-
-
-
-
 #endif // __SHARED_TYPES_H__
