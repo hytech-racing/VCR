@@ -9,6 +9,7 @@
 // within VCR. the implaus check is done in the state machine.
 struct PedalsStampedData_s : TimestampedData_s
 {
+
     // float brake; // float between 0 and 1
     // float accel; // float between 0 and 1
     PedalsSystemData_s recvd_data;

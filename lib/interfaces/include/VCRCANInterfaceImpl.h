@@ -27,19 +27,19 @@ using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_messa
 
 /* RX buffers for CAN extern declarations*/
 extern CANRXBufferType CAN1_rxBuffer;
-extern CANRXBufferType CAN2_rxBuffer;
-extern CANRXBufferType CAN3_rxBuffer;
+extern CANRXBufferType inverter_can_rx_buffer;
+extern CANRXBufferType telem_can_rx_buffer;
 
 /* TX buffer for CAN1 */
 extern CANTXBufferType CAN1_txBuffer;
 /* TX buffer for CAN2 */
-extern CANTXBufferType CAN2_txBuffer;
+extern CANTXBufferType inverter_can_tx_buffer;
 /* TX buffer for CAN3 */
-extern CANTXBufferType CAN3_txBuffer;
+extern CANTXBufferType telem_can_tx_buffer;
 
 void on_can1_receive(const CAN_message_t &msg);
-void on_can2_receive(const CAN_message_t &msg);
-void on_can3_receive(const CAN_message_t &msg);
+void on_inverter_can_receive(const CAN_message_t &msg);
+void on_telem_can_receive(const CAN_message_t &msg);
 
 
 struct CANInterfaces

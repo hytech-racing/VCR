@@ -4,12 +4,12 @@
 #include <cstdint>
 // // global forwards
 CANRXBufferType CAN1_rxBuffer;
-CANRXBufferType CAN2_rxBuffer;
-CANRXBufferType CAN3_rxBuffer;
+CANRXBufferType inverter_can_rx_buffer;
+CANRXBufferType telem_can_rx_buffer;
 
 CANTXBufferType CAN1_txBuffer;
-CANTXBufferType CAN2_txBuffer;
-CANTXBufferType CAN3_txBuffer;
+CANTXBufferType inverter_can_tx_buffer;
+CANTXBufferType telem_can_tx_buffer;
 
 void on_can1_receive(const CAN_message_t &msg)
 {
@@ -18,18 +18,18 @@ void on_can1_receive(const CAN_message_t &msg)
     CAN1_rxBuffer.push_back(buf, sizeof(CAN_message_t));
 }
 
-void on_can2_receive(const CAN_message_t &msg)
+void on_inverter_can_receive(const CAN_message_t &msg)
 {
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
-    CAN2_rxBuffer.push_back(buf, sizeof(CAN_message_t));
+    inverter_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
-void on_can3_receive(const CAN_message_t &msg)
+void on_telem_can_receive(const CAN_message_t &msg)
 {
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
-    CAN3_rxBuffer.push_back(buf, sizeof(CAN_message_t));
+    telem_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
 namespace VCRCANInterfaceImpl
@@ -39,7 +39,7 @@ void vcr_CAN_recv(CANInterfaces& interfaces, const CAN_message_t& msg, unsigned 
 {
     switch(msg.id)
     {
-        case VCR_PEDALS_CANID:
+        case PEDALS_SYSTEM_DATA_CANID:
         {
             interfaces.vcf_interface.receive_pedals_message(msg, millis);   
             break;
