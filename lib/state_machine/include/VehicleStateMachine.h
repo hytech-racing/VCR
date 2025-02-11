@@ -43,7 +43,7 @@ public:
         _drivetrain(drivetrain_system),
         _buzzer(BuzzerController::getInstance()) {};
 
-
+    VehicleStateMachine& operator & (VehicleStateMachine& ) = delete;
     /**
      * This tick() function handles all the update logic for traversing states, and calls the functions
      * of other classes as necessary.
@@ -75,7 +75,7 @@ private:
     CarState_e _current_state;
 
     /* System references to show dependence on systems library */
-    DrivetrainSystem &_drivetrain; //TODO: Make this InverterInterface instead of uint32_t
+    DrivetrainSystem &_drivetrain;
     BuzzerController &_buzzer;
     // AMSSystem &_ams_system;
 };
