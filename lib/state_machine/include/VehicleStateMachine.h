@@ -33,16 +33,16 @@ enum class CAR_STATE
  * wait for the start button to be pressed, and enter ready-to-drive mode. Aside from getters, this
  * class only has one public function, tick_state_machine(). In order to run its update logic, the
  * VehicleStateMachine uses instance data directly from other singleton classes (Buzzer, Pedals, etc)
- * and from the global structs (VCRInterfaceData_s, VCRSystemData_s, etc.).
+ * and from the global structs (VCRInterfaceData_s, VCRData_s, etc.).
  */
 class VehicleStateMachine
 {
 public:
-    static VehicleStateMachine& getInstance()
-    {
-        static VehicleStateMachine instance;
-        return instance;
-    }
+    VehicleStateMachine(DrivetrainSystem & drivetrain_system) :
+        _current_state(CAR_STATE::STARTUP),
+        _drivetrain(drivetrain_system),
+        _buzzer(BuzzerController::getInstance()) {};
+
 
     /**
      * This tick() function handles all the update logic for traversing states, and calls the functions
@@ -50,17 +50,13 @@ public:
      * @pre Other systems are updated properly
      * @pre All relevant data exists in the data structs (VCRInterfaceData, VCRSystemData, etc.)
      * @param current_millis The system time, in millis. Passed in by the scheduler.
-     * @param system_data A reference to the global system data struct.
+     * @param shared_data A reference to the global shared data struct.
      */
-    void tick_state_machine(unsigned long current_millis, const VCRSystemData_s &system_data);
+    void tick_state_machine(unsigned long current_millis, const VCRData_s &shared_data);
 
     CAR_STATE get_state() { return _current_state; }
 
 private:
-    VehicleStateMachine() :
-        _current_state(CAR_STATE::STARTUP),
-        _drivetrain(DrivetrainSystem<uint32_t>::getInstance()),
-        _buzzer(BuzzerController::getInstance()) {};
 
     void set_state_(CAR_STATE new_state, unsigned long curr_time);
 
@@ -79,7 +75,7 @@ private:
     CAR_STATE _current_state;
 
     /* System references to show dependence on systems library */
-    DrivetrainSystem<uint32_t> &_drivetrain; //TODO: Make this InverterInterface instead of uint32_t
+    DrivetrainSystem &_drivetrain; //TODO: Make this InverterInterface instead of uint32_t
     BuzzerController &_buzzer;
     // AMSSystem &_ams_system;
 };

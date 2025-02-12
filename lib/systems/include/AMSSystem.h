@@ -49,11 +49,18 @@ public:
     AMSSystem& operator=(const AMSSystem&) = delete;
 
     /**
-     * Initialize the heartbeat timer.
+     * Initializes the heartbeat timer.
+     * 
+     * @return The initial AMSSystemData_s state (before receiving any data). This will be the same every time this is called.
      */
-    void init(unsigned long curr_micros);
+    AMSSystemData_s init(unsigned long curr_millis);
 
-    void update_ams_system(unsigned long curr_millis, BMSData_s &bms_data, VCRSystemData_s &system_data);
+    /**
+     * Primary function to recalculate the shutdown conditions.
+     * @param curr_millis The current timestmap, in milliseconds.
+     * @param interface_data All current interface data, including ACUCoreData_s and ACUAllData_s.
+     */
+    AMSSystemData_s update_ams_system(unsigned long curr_millis, VCRData_s &interface_data);
 
 private:
 
@@ -61,61 +68,19 @@ private:
      * Constructor for the AMS Interface
      */
     AMSSystem() :
-        _last_heartbeat_time(0),
-        _filtered_max_cell_temp(DEFAULT_INIT_TEMP),
-        _filtered_min_cell_voltage(DEFAULT_INIT_VOLTAGE),
+        _last_heartbeat_time_ms(0),
         _cell_temp_alpha(DEFAULT_TEMP_ALPHA),
         _cell_voltage_alpha(DEFAULT_VOLTAGE_ALPHA)
     {};
 
     /* AMS last heartbeat time */
-    unsigned long _last_heartbeat_time;
-    
-    float _filtered_max_cell_temp;
-    float _filtered_min_cell_voltage;
-
-    /* extra filtered information */
-    float _filtered_average_cell_voltage;
-    float _filtered_max_cell_voltage;
-    float _filtered_average_cell_temp;
-    float _filtered_min_cell_temp;
+    unsigned long _last_heartbeat_time_ms;
 
     /* IIR alpha values */
     float _cell_temp_alpha;
     float _cell_voltage_alpha;
 
-    /*Storage of BMS Struct*/
-    BMSData_s bms_container;
-
-
-    /* Check if lowest cell temperature is below threshold */
-    bool is_below_pack_charge_critical_low_thresh();
-
-    /* Check if total pack charge is above threshold */
-    bool is_below_pack_charge_critical_total_thresh();
-
-    /* IIR filter and return filtered max cell temperature */
-    float get_filtered_max_cell_temp();
-    /* IIR filter and return filtered min cell voltage */
-    float get_filtered_min_cell_voltage();    
-
-
-    /* IIR filter and return filtered average cell voltage */
-    float get_filtered_average_cell_voltage();
-    /* IIR filter and return filtered max cell voltage */
-    float get_filtered_max_cell_voltage();
-    /* IIR filter and return filtered average cell temp */
-    float get_filtered_average_cell_temp();
-    /* IIR filter and return filtered min cell temp */
-    float get_filtered_min_cell_temp();
-
-
-    //Checkers (return true if everything is good)
-    /* Checks if "Total pack voltage is below critical threshold" */
-    bool check_voltage();
-
-    /* Check if heartbeat received is within interval allowance */
-    bool check_heartbeat(unsigned long curr_micros);
+    bool _check_heartbeat(unsigned long curr_micros);
 
 };
 

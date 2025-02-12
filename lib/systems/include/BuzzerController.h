@@ -16,8 +16,6 @@ public:
         static BuzzerController instance;
         return instance;
     }
-
-    BuzzerController(BuzzerController&&) = default;
     
     /**
      * Calling this command will activate the buzzer for BUZZER_PERIOD_MS milliseconds.
@@ -34,7 +32,6 @@ public:
     {
         _last_activation_time_ms = 0;
     }
-    ~BuzzerController() = default;
 
     /**
      * Returns whether or not the buzzer should currently be active, according to the system.
@@ -43,16 +40,6 @@ public:
     {
         return (millis - _last_activation_time_ms) < BUZZER_PERIOD_MS;
     }
-
-    /**
-     * Mandatory for singleton classes to delete the copy constructor.
-     */
-    BuzzerController(const BuzzerController&) = delete;
-
-    /**
-     * Mandatory for singleton classes to prevent copying through the assignment operator.
-     */
-    BuzzerController& operator=(const BuzzerController&) = delete;
 
 private:
 

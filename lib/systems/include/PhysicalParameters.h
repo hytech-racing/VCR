@@ -8,6 +8,7 @@ namespace PhysicalParameters
     const float MAX_REGEN_TORQUE = 10.0f;
 
 }
+
 constexpr const float GEARBOX_RATIO               = 11.83f;
 constexpr const float WHEEL_DIAMETER              = 0.4064f; // meters
 constexpr const float RPM_TO_METERS_PER_SECOND    = WHEEL_DIAMETER * 3.1415f / GEARBOX_RATIO / 60.0f;

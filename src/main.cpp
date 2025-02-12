@@ -18,6 +18,7 @@
 #include "VCR_Constants.h"
 #include "VCR_Tasks.h"
 #include "TorqueControllerMux.hpp"
+#include "VCREthernetInterface.h"
 
 
 
@@ -35,7 +36,6 @@ qindesign::network::EthernetUDP protobuf_recv_socket;
 void setup() {
     scheduler.setTimingFunction(micros);
 
-    scheduler.schedule(tick_state_machine_task);
     scheduler.schedule(read_adc0_task);
     scheduler.schedule(read_adc1_task);
     scheduler.schedule(update_buzzer_controller_task);
