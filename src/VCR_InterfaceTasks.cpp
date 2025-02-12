@@ -14,6 +14,7 @@
 #include "BuzzerController.h"
 #include "VCR_Globals.h"
 #include "VehicleStateMachine.h"
+#include "AMSSystem.h"
 
 bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -49,14 +50,6 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
 }
 
 HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_task, 10, 1000UL); // 1000us is 1kHz //NOLINT
-
-// bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-// {
-//     // VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000, system_data); // tick function requires millis //NOLINT
-//     return true;
-// }
-
-// HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_tick_state_machine_task, 2); // Idle (constant-update) task //NOLINT
 
 bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -98,17 +91,32 @@ bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_
 
 HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz //NOLINT
 
-
-bool create_watchdog(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
+bool init_kick_watchdog_task(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
 {
     WatchdogInstance::create(default_system_params::KICK_INTERVAL_MS); // this has issues for some reason with clang-tidy // NOLINT
     return true;
 }
 
-bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+bool run_kick_watchdog_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sysMicros / 1000));
     return true;
 }
 
-HT_TASK::Task kick_watchdog_task = HT_TASK::Task(create_watchdog, run_kick_watchdog, 3, 2000UL); // 2000us is 500hz // NOLINT
+HT_TASK::Task kick_watchdog_task = HT_TASK::Task(init_kick_watchdog_task, run_kick_watchdog_task, 3, 2000UL); // 2000us is 500Hz // NOLINT
+
+
+
+bool init_ams_system_task(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
+{
+    AMSSystemInstance::create(DEFAULT_VOLTAGE_ALPHA, DEFAULT_TEMP_ALPHA);
+    return true;
+}
+
+bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    AMSSystemInstance::instance().update_ams_system(sysMicros / 1000, vcr_data);
+    return true;
+}
+
+HT_TASK::Task update_ams_system_task = HT_TASK::Task(init_kick_watchdog_task, run_kick_watchdog_task, 3, 100000); // 100000UL is 10Hz // NOLINT
