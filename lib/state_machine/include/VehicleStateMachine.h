@@ -57,7 +57,6 @@ public:
     CAR_STATE get_state() { return _current_state; }
 
 private:
-
     void set_state_(CAR_STATE new_state, unsigned long curr_time);
 
     /**
