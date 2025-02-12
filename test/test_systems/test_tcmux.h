@@ -79,7 +79,7 @@ TEST(TorqueControllerMuxTesting, test_controller_output_swap_logic)
 
     TorqueControllerMux<2> test({test_func_1, test_func_2}, {false, false});
     VCRData_s state;
-    set_four_outputs(state.drivetrain_data.measuredSpeeds, 10000.0);
+    set_four_outputs(state.system_data.drivetrain_data.measuredSpeeds, 10000.0);
 
 
     auto res1 = test.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
@@ -91,7 +91,7 @@ TEST(TorqueControllerMuxTesting, test_controller_output_swap_logic)
 
     set_outputs(out1, 0, 1);
     set_outputs(out2, 0, 1);
-    set_four_outputs(state.drivetrain_data.measuredSpeeds, 0);
+    set_four_outputs(state.system_data.drivetrain_data.measuredSpeeds, 0);
 
     res1 = test.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
 
@@ -113,7 +113,7 @@ TEST(TorqueControllerMuxTesting, test_torque_diff_swap_limit)
     TorqueControllerMux<2> test({test_func_1, test_func_2}, {false, false});
     VCRData_s state;
 
-    state.drivetrain_data = {};
+    state.system_data.drivetrain_data = {};
 
     auto out1 = test.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
     out1 = test.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
@@ -191,8 +191,8 @@ TEST(TorqueControllerMuxTesting, test_mode0_evaluation)
 
 
     VCRData_s mode_0_input_state;
-    mode_0_input_state.pedals_system_data.accel_percent = 0.5f;
-    mode_0_input_state.pedals_system_data.brake_percent = 0.0f;
+    mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.accel_percent = 0.5f;
+    mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.brake_percent = 0.0f;
 
     DrivetrainCommand_s out = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, mode_0_input_state);
     ASSERT_NEAR(out.torque_limits.FL, (max_torque / 2), 0.01);
@@ -261,10 +261,10 @@ TEST(TorqueControllerMuxTesting, test_torque_limit)
     
 
     VCRData_s mode_0_input_state;
-    mode_0_input_state.drivetrain_data = drivetrain_data;
-    mode_0_input_state.pedals_system_data.accel_percent = 0.5f;
-    mode_0_input_state.pedals_system_data.brake_percent = 0.0f;
-    mode_0_input_state.pedals_system_data.regen_percent = 0.0f;
+    mode_0_input_state.system_data.drivetrain_data = drivetrain_data;
+    mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.accel_percent = 0.5f;
+    mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.brake_percent = 0.0f;
+    mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.regen_percent = 0.0f;
     auto drive_command = test.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_LOW_TORQUE, mode_0_input_state);
 
     ASSERT_EQ(drive_command.torque_limits.FL, 5.0f);
