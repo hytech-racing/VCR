@@ -27,7 +27,9 @@
 #define VCR_TASKS
 
 /* From HT_SCHED library */
-#include "ht_sched.hpp"
+// #include "ht_sched.hpp"
+
+
 
 /* From shared_firmware_types library */
 #include "SharedFirmwareTypes.h"
@@ -45,7 +47,7 @@
  * singleton classes to minimize the need for passing instances around.
  */
 bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern HT_TASK::Task tick_state_machine_task;
+// extern HT_TASK::Task tick_state_machine_task;
 
 
     
@@ -56,9 +58,7 @@ extern HT_TASK::Task tick_state_machine_task;
  */
 bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern HT_TASK::Task read_adc0_task;
-
-
+// extern HT_TASK::Task read_adc0_task;
 
 /**
  * NOTE: These channels are UNUSED BY DEFAULT and exist ONLY FOR TESTING. You may edit this
@@ -70,7 +70,7 @@ extern HT_TASK::Task read_adc0_task;
  */
 bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern HT_TASK::Task read_adc1_task;
+// extern HT_TASK::Task read_adc1_task;
 
 
 
@@ -79,7 +79,7 @@ extern HT_TASK::Task read_adc1_task;
  * update function of the buzzer controller.
  */
 bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern HT_TASK::Task update_buzzer_controller_task;
+// extern HT_TASK::Task update_buzzer_controller_task;
 
 
 
@@ -87,6 +87,6 @@ extern HT_TASK::Task update_buzzer_controller_task;
  * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin
  */
 bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern HT_TASK::Task kick_watchdog_task;
+// extern HT_TASK::Task kick_watchdog_task;
 
 #endif /* VCR_TASKS */

@@ -48,7 +48,7 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     return true;
 }
 
-HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_task, 10, 1000UL); // 1000us is 1kHz //NOLINT
+// HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_task, 10, 1000UL); // 1000us is 1kHz //NOLINT
 
 // bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 // {
@@ -86,7 +86,7 @@ bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     return true;
 }
 
-HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_task, 10, 40000UL); // 20000us is 25Hz //NOLINT
+// HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_task, 10, 40000UL); // 20000us is 25Hz //NOLINT
 
 bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -96,7 +96,7 @@ bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_
     return true;
 }
 
-HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz //NOLINT
+// HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz //NOLINT
 
 
 bool create_watchdog(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
@@ -111,4 +111,4 @@ bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& 
     return true;
 }
 
-HT_TASK::Task kick_watchdog_task = HT_TASK::Task(create_watchdog, run_kick_watchdog, 3, 2000UL); // 2000us is 500hz // NOLINT
+// HT_TASK::Task kick_watchdog_task = HT_TASK::Task(create_watchdog, run_kick_watchdog, 3, 2000UL); // 2000us is 500hz // NOLINT
