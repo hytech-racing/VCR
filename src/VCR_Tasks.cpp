@@ -14,6 +14,7 @@
 #include "BuzzerController.h"
 #include "VCR_Globals.h"
 #include "VehicleStateMachine.h"
+#include "AMSSystem.h"
 
 bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -90,7 +91,6 @@ bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_
 
 HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz //NOLINT
 
-
 bool init_kick_watchdog_task(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
 {
     WatchdogInstance::create(default_system_params::KICK_INTERVAL_MS); // this has issues for some reason with clang-tidy // NOLINT
@@ -103,4 +103,20 @@ bool run_kick_watchdog_task(const unsigned long& sysMicros, const HT_TASK::TaskI
     return true;
 }
 
-HT_TASK::Task kick_watchdog_task = HT_TASK::Task(init_kick_watchdog_task, run_kick_watchdog_task, 3, 2000UL); // 2000us is 500hz // NOLINT
+HT_TASK::Task kick_watchdog_task = HT_TASK::Task(init_kick_watchdog_task, run_kick_watchdog_task, 3, 2000UL); // 2000us is 500Hz // NOLINT
+
+
+
+bool init_ams_system_task(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
+{
+    AMSSystemInstance::create();
+    return true;
+}
+
+bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    AMSSystemInstance::instance().update_ams_system(sysMicros / 1000, shared_data);
+    return true;
+}
+
+HT_TASK::Task update_ams_system_task = HT_TASK::Task(init_kick_watchdog_task, run_kick_watchdog_task, 3, 100000); // 100000UL is 10Hz // NOLINT

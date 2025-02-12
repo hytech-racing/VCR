@@ -77,7 +77,6 @@ private:
     /* System references to show dependence on systems library */
     DrivetrainSystem &_drivetrain; //TODO: Make this InverterInterface instead of uint32_t
     BuzzerController &_buzzer;
-    // AMSSystem &_ams_system;
 };
 
 #endif /* VEHICLE_STATE_MACHINE */

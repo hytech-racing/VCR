@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
 #include "AMSSystem.h"
 
-AMSSystem &ams = AMSSystem::getInstance();
 unsigned long init_millis = 10000; // arbitrary number
 
 void ASSERT_AMS_SYSTEM_DATA_EQ(AMSSystemData_s expected, AMSSystemData_s actual)
@@ -17,6 +16,7 @@ void ASSERT_AMS_SYSTEM_DATA_EQ(AMSSystemData_s expected, AMSSystemData_s actual)
 }
 
 TEST (AMSSystemTest, initialization_test) {
+    AMSSystem &ams = AMSSystemInstance::instance();
     // Create expected result of AMS data
     AMSSystemData_s expected_init_data = {
         .min_cell_voltage = 3.5f,
@@ -35,6 +35,7 @@ TEST (AMSSystemTest, initialization_test) {
 }
 
 TEST (AMSSystemTest, tick_once) {
+    AMSSystem &ams = AMSSystemInstance::instance();
     // Declare VCRData_s struct to pass into update function
     VCRData_s state = {};
     state.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = 3.0f;
@@ -60,6 +61,7 @@ TEST (AMSSystemTest, tick_once) {
 }
 
 TEST (AMSSystemTest, test_cell_undervoltage_shutdown) {
+    AMSSystem &ams = AMSSystemInstance::instance();
     // Declare VCRData_s struct to pass into update function
     VCRData_s state = {};
     state.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = 3.0f;
@@ -119,6 +121,7 @@ TEST (AMSSystemTest, test_cell_undervoltage_shutdown) {
 }
 
 TEST (AMSSystemTest, test_pack_undervoltage_shutdown) {
+    AMSSystem &ams = AMSSystemInstance::instance();
     // Declare VCRData_s struct to pass into update function
     VCRData_s state = {};
     state.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = 3.0f;
@@ -172,6 +175,7 @@ TEST (AMSSystemTest, test_pack_undervoltage_shutdown) {
 }
 
 TEST (AMSSystemTest, test_heartbeat_overrun_shutdown) {
+    AMSSystem &ams = AMSSystemInstance::instance();
     // Declare VCRData_s struct to pass into update function
     VCRData_s state = {};
     state.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = 3.0f;

@@ -1,8 +1,14 @@
 #ifndef AMS_SYSTEM_H
 #define AMS_SYSTEM_H
 
+/* Standard int library */
 #include <stdint.h>
+
+/* From shared-firmware-types library */
 #include <SharedFirmwareTypes.h>
+
+/* From ETL library */
+#include "etl/singleton.h"
 
 /* Heartbeat Interval is the allowable amount of milliseconds between BMS status messages before car delatches */
 const unsigned long HEARTBEAT_INTERVAL_MS                  = 2000;    // milliseconds
@@ -33,19 +39,13 @@ class AMSSystem
 public:
 
     /**
-     * Retrieves the singular instance of the AMSSystem
+     * Constructor for the AMS Interface
      */
-    static AMSSystem& getInstance()
-    {
-        static AMSSystem instance;
-        return instance;
-    }
-
-    /**
-     * Delete copy constructor and assignment operator to prevent duplication.
-     */
-    AMSSystem(const AMSSystem&) = delete;
-    AMSSystem& operator=(const AMSSystem&) = delete;
+    AMSSystem() :
+        _last_heartbeat_time_ms(0),
+        _cell_temp_alpha(DEFAULT_TEMP_ALPHA),
+        _cell_voltage_alpha(DEFAULT_VOLTAGE_ALPHA)
+    {};
 
     /**
      * Initializes the heartbeat timer.
@@ -63,15 +63,6 @@ public:
 
 private:
 
-    /**
-     * Constructor for the AMS Interface
-     */
-    AMSSystem() :
-        _last_heartbeat_time_ms(0),
-        _cell_temp_alpha(DEFAULT_TEMP_ALPHA),
-        _cell_voltage_alpha(DEFAULT_VOLTAGE_ALPHA)
-    {};
-
     /* AMS last heartbeat time */
     unsigned long _last_heartbeat_time_ms;
 
@@ -86,5 +77,7 @@ private:
     bool _check_heartbeat_ok(unsigned long curr_millis);
 
 };
+
+using AMSSystemInstance = etl::singleton<AMSSystem>;
 
 #endif /* AMS_SYSTEM_H */

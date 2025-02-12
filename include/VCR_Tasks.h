@@ -76,9 +76,18 @@ extern HT_TASK::Task update_buzzer_controller_task;
 
 
 /**
- * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin
+ * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin.
  */
 bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 extern HT_TASK::Task kick_watchdog_task;
+
+
+
+/**
+ * This task will tick the AMS system and will update the software shutdown if necessary.
+ */
+bool init_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+extern HT_TASK::Task update_ams_system_task;
 
 #endif /* VCR_TASKS */

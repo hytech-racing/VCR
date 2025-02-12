@@ -40,6 +40,7 @@ void setup() {
     scheduler.schedule(read_adc1_task);
     scheduler.schedule(update_buzzer_controller_task);
     scheduler.schedule(kick_watchdog_task);
+    scheduler.schedule(update_ams_system_task);
 }
 
 void loop() {
