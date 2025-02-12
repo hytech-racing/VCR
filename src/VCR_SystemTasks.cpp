@@ -12,7 +12,7 @@
 
 auto recv_call = etl::delegate<void(CANInterfaces& , const CAN_message_t& , unsigned long )>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 
-VCRInterfaceData_s sample_interfaces(unsigned long millis, VCRInterfaces & interface_ref_container, const VCRInterfaceData_s & cur_vcr_int_data)
+VCRInterfaceData_s sample_async_data(unsigned long millis, VCRInterfaces & interface_ref_container, const VCRInterfaceData_s & cur_vcr_int_data)
 {
     VCRInterfaceData_s ret = cur_vcr_int_data;
     // process ring buffer is from CANInterface. TODO put into namespace
@@ -42,7 +42,7 @@ CarState_e evaluate_state_machine(unsigned long millis, const VCRData_s& system_
 
 void big_task(unsigned long millis, VCRInterfaces & interface_ref_container, VCRSystems &systems, VehicleStateMachine& state_machine)
 {
-    auto interface_data = sample_interfaces(millis, interface_ref_container);
+    auto interface_data = sample_async_data(millis, interface_ref_container);
 
     auto sys_data = evaluate_systems(millis, interface_data, systems);
 

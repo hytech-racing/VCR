@@ -40,7 +40,7 @@ struct SystemData_s
 // outlining the main process that that is for handling the main systems 
 // that need interface data and produce outputs that need to get sent
 
-InterfaceData_s sample_interfaces(unsigned long millis, VCRInterfaces& interface_ref_container);
+InterfaceData_s sample_async_data(unsigned long millis, VCRInterfaces& interface_ref_container);
 VCRData_s evaluate_systems(unsigned long curr_millis, const InterfaceData_s &interface_data, VCRSystems &systems_ref_container);
 CarState_e evaluate_state_machine(unsigned long millis, const VCRData_s& system_data, const InterfaceData_s& interface_data, VehicleStateMachine& state_machine);
 void update_interfaces(const VCRData_s& system_data, const InterfaceData_s& interface_data);
