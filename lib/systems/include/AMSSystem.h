@@ -41,10 +41,10 @@ public:
     /**
      * Constructor for the AMS Interface
      */
-    AMSSystem() :
+    AMSSystem(float cell_voltage_alpha, float cell_temp_alpha) :
         _last_heartbeat_time_ms(0),
-        _cell_temp_alpha(DEFAULT_TEMP_ALPHA),
-        _cell_voltage_alpha(DEFAULT_VOLTAGE_ALPHA)
+        _cell_temp_alpha(cell_temp_alpha),
+        _cell_voltage_alpha(cell_voltage_alpha)
     {};
 
     /**

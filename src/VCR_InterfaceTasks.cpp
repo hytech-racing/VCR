@@ -109,7 +109,7 @@ HT_TASK::Task kick_watchdog_task = HT_TASK::Task(init_kick_watchdog_task, run_ki
 
 bool init_ams_system_task(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
 {
-    AMSSystemInstance::create();
+    AMSSystemInstance::create(DEFAULT_VOLTAGE_ALPHA, DEFAULT_TEMP_ALPHA);
     return true;
 }
 

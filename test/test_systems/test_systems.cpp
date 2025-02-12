@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 {
     testing::InitGoogleMock(&argc, argv);
 
-    AMSSystemInstance::create();
+    AMSSystemInstance::create(DEFAULT_VOLTAGE_ALPHA, DEFAULT_TEMP_ALPHA);
 
 	if(RUN_ALL_TESTS()) {
         // Do nothing (always return 0 and allow PlatformIO to parse result)
