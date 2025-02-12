@@ -2,6 +2,7 @@
 #include <gmock/gmock.h>
 #include "test_scheduler.h"
 #include "test_tcmux.h"
+#include "test_drivetrain.h"
 
 int main(int argc, char **argv)
 {
