@@ -18,6 +18,7 @@
 #include "VCR_Constants.h"
 #include "VCR_Tasks.h"
 #include "TorqueControllerMux.hpp"
+#include "VCREthernetInterface.h"
 
 
 
