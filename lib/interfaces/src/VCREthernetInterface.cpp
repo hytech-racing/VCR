@@ -100,10 +100,10 @@ void VCREthernetInterface::receive_pb_msg_acu_all_data(const hytech_msgs_ACUAllD
 
 void VCREthernetInterface::receive_pb_msg_acu_core_data(const hytech_msgs_ACUCoreData_s &msg_in, VCRData_s &shared_state)
 {
-    shared_state.interface_data.acu_core_data.avg_cell_voltage = msg_in.avg_cell_voltage;
-    shared_state.interface_data.acu_core_data.max_cell_temp = msg_in.max_cell_temp;
-    shared_state.interface_data.acu_core_data.min_cell_voltage = msg_in.min_cell_voltage;
-    shared_state.interface_data.acu_core_data.pack_voltage = msg_in.pack_voltage;
+    shared_state.interface_data.stamped_acu_core_data.acu_data.avg_cell_voltage = msg_in.avg_cell_voltage;
+    shared_state.interface_data.stamped_acu_core_data.acu_data.max_cell_temp = msg_in.max_cell_temp;
+    shared_state.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = msg_in.min_cell_voltage;
+    shared_state.interface_data.stamped_acu_core_data.acu_data.pack_voltage = msg_in.pack_voltage;
 }
 
 void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in, VCRData_s &shared_state)

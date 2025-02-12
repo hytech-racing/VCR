@@ -7,18 +7,17 @@
 /* Heartbeat Interval is the allowable amount of milliseconds between BMS status messages before car delatches */
 const unsigned long HEARTBEAT_INTERVAL_MS                  = 2000;    // milliseconds
 
-/* The total PCC threshold is the lowest allowable voltage of the entire pack (in Volts)*/
+/* The total PCC threshold is the lowest allowable voltage of the entire pack (in Volts) */
 const unsigned long PACK_CHARGE_CRIT_TOTAL_THRESHOLD_VOLTS = 420;
 
-/* The lowest pcc threshold is the lowest allowable single cell voltage (in 100 microvolts)*/
-const unsigned long PACK_CHARGE_CRIT_LOWEST_CELL_THRESHOLD = 35000;   // Equivalent to 3.5V
+/* The lowest pcc threshold is the lowest allowable single cell voltage */
+constexpr float PACK_CHARGE_CRIT_LOWEST_CELL_THRESHOLD = 3.2f;             // Volts
 
-const float DEFAULT_INIT_TEMP       = 40.0f;                           // Celsius
-const float DEFAULT_INIT_VOLTAGE    = 3.5f;                            // Volts
-const float DEFAULT_TEMP_ALPHA      = 0.8f;                            // IIR filter alpha
-const float DEFAULT_VOLTAGE_ALPHA   = 0.8f;                            // IIR filter alpha
-const uint16_t MAX_PACK_CHARGE      = 48600;                           // Coulombs
-
+constexpr float DEFAULT_INIT_TEMP       = 40.0f;                           // Celsius
+constexpr float DEFAULT_INIT_VOLTAGE    = 3.5f;                            // Volts
+constexpr float DEFAULT_TEMP_ALPHA      = 0.75f;                           // IIR filter alpha
+constexpr float DEFAULT_VOLTAGE_ALPHA   = 0.8f;                            // IIR filter alpha
+constexpr uint16_t MAX_PACK_CHARGE      = 48600;                           // Coulombs
 
 /**
  * Singleton class for communicating with the BMS. If one of the shutdown conditions is met, this class will return a
@@ -80,7 +79,11 @@ private:
     float _cell_temp_alpha;
     float _cell_voltage_alpha;
 
-    bool _check_heartbeat(unsigned long curr_micros);
+    /**
+     * Returns true if heartbeat is OK, false otherwise. Also resets
+     * the _last_heartbeat_time_ms to be curr_millis.
+     */
+    bool _check_heartbeat_ok(unsigned long curr_millis);
 
 };
 

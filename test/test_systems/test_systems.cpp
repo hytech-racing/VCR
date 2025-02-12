@@ -4,6 +4,7 @@
 #include "test_tcmux.h"
 #include "test_buzzer.h"
 #include "test_watchdog.h"
+#include "test_ams_system.h"
 
 int main(int argc, char **argv)
 {
