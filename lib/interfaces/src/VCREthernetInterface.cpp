@@ -46,14 +46,14 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(VCRData_s &shared_
 
     //DrivetrainDynamicReport_s
     out.drivetrain_data.measuredInverterFLPackVoltage = shared_state.drivetrain_data.measuredInverterFLPackVoltage;
-    out.drivetrain_data.measuredSpeeds.FL = shared_state.drivetrain_data.measuredSpeeds[0];
-    out.drivetrain_data.measuredSpeeds.FR = shared_state.drivetrain_data.measuredSpeeds[1];
-    out.drivetrain_data.measuredSpeeds.RL = shared_state.drivetrain_data.measuredSpeeds[2];
-    out.drivetrain_data.measuredSpeeds.RR = shared_state.drivetrain_data.measuredSpeeds[3];
-    out.drivetrain_data.measuredTorques.FL = shared_state.drivetrain_data.measuredTorques[0];
-    out.drivetrain_data.measuredTorques.FR = shared_state.drivetrain_data.measuredTorques[1];
-    out.drivetrain_data.measuredTorques.RL = shared_state.drivetrain_data.measuredTorques[2];
-    out.drivetrain_data.measuredTorques.RR = shared_state.drivetrain_data.measuredTorques[3];
+    out.drivetrain_data.measuredSpeeds.FL = shared_state.drivetrain_data.measuredSpeeds.FL;
+    out.drivetrain_data.measuredSpeeds.FR = shared_state.drivetrain_data.measuredSpeeds.FR;
+    out.drivetrain_data.measuredSpeeds.RL = shared_state.drivetrain_data.measuredSpeeds.RL;
+    out.drivetrain_data.measuredSpeeds.RR = shared_state.drivetrain_data.measuredSpeeds.RR;
+    out.drivetrain_data.measuredTorques.FL = shared_state.drivetrain_data.measuredTorques.FL;
+    out.drivetrain_data.measuredTorques.FR = shared_state.drivetrain_data.measuredTorques.FR;
+    out.drivetrain_data.measuredTorques.RL = shared_state.drivetrain_data.measuredTorques.RL;
+    out.drivetrain_data.measuredTorques.RR = shared_state.drivetrain_data.measuredTorques.RR;
     out.drivetrain_data.measuredTorqueCurrents.FL = shared_state.drivetrain_data.measuredTorqueCurrents.FL;
     out.drivetrain_data.measuredTorqueCurrents.FR = shared_state.drivetrain_data.measuredTorqueCurrents.FR;
     out.drivetrain_data.measuredTorqueCurrents.RL = shared_state.drivetrain_data.measuredTorqueCurrents.RL;
