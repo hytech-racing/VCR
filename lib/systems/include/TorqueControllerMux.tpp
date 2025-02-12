@@ -36,7 +36,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
     if (requesting_controller_change)
     {
         DrivetrainCommand_s proposed_output = _controller_evals[req_controller_mode_index](input_state);
-        TorqueControllerMuxError_e error_state = can_switch_controller(input_state.drivetrain_data, current_output, proposed_output);
+        TorqueControllerMuxError_e error_state = can_switch_controller(input_state.interface_data.drivetrain_data, current_output, proposed_output);
         if (error_state == TorqueControllerMuxError_e::NO_ERROR)
         {
             _active_status.active_controller_mode = requested_controller_type;
@@ -48,7 +48,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
     if (!_mux_bypass_limits[active_controller_mode_index])
     {
         _active_status.active_torque_limit_enum = requested_torque_limit;
-        current_output = apply_regen_limit(current_output, input_state.drivetrain_data);
+        current_output = apply_regen_limit(current_output, input_state.interface_data.drivetrain_data);
         // std::cout << "output torques before " << current_output.inverter_torque_limit[0] << " " << current_output.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
 
         current_output = apply_torque_limit(current_output, _torque_limit_map[requested_torque_limit]);
@@ -56,7 +56,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
         _active_status.active_torque_limit_value = _torque_limit_map[requested_torque_limit];
         // std::cout << "output torques before pw " << current_output.inverter_torque_limit[0] << " " << current_output.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
 
-        current_output = apply_power_limit(current_output, input_state.drivetrain_data, _max_power_limit, _torque_limit_map[requested_torque_limit]);
+        current_output = apply_power_limit(current_output, input_state.interface_data.drivetrain_data, _max_power_limit, _torque_limit_map[requested_torque_limit]);
         // std::cout << "output torques after pw " << current_output.inverter_torque_limit[0] << " " << current_output.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
         current_output = apply_positive_speed_limit(current_output);
         _active_status.output_is_bypassing_limits = false;

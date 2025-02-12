@@ -6,7 +6,7 @@ DrivetrainCommand_s TorqueControllerSimple::evaluate(const VCRData_s &state)
     // accelRequest goes between 1.0 and -1.0
     DrivetrainCommand_s out;
     
-    float accelRequest = state.pedals_system_data.accel_percent - state.pedals_system_data.brake_percent;
+    float accelRequest = state.interface_data.recvd_pedals_data.pedals_data.accel_percent - state.interface_data.recvd_pedals_data.pedals_data.brake_percent;
     float torqueRequest = 0.0f;
 
     constexpr float balance = 2.0;

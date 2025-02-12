@@ -7,13 +7,6 @@
 #include "SharedFirmwareTypes.h"
 // this struct just contains the data we need from pedals 
 // within VCR. the implaus check is done in the state machine.
-struct PedalsStampedData_s : TimestampedData_s
-{
-
-    // float brake; // float between 0 and 1
-    // float accel; // float between 0 and 1
-    PedalsSystemData_s recvd_data;
-};
 
 struct LoadCellData_s : TimestampedData_s
 {
@@ -21,7 +14,7 @@ struct LoadCellData_s : TimestampedData_s
 };
 
 struct VCFCANInterfaceData_s {
-    PedalsStampedData_s pedals_data;
+    StampedPedalsSystemData_s stamped_pedals;
 };
 
 class VCFInterface {
