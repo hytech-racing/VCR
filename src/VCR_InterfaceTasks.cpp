@@ -91,7 +91,7 @@ HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_
 bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
-    vcr_data.interface_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sysMicros / 1000); //NOLINT
+    vcr_data.system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sysMicros / 1000); //NOLINT
 
     return true;
 }
