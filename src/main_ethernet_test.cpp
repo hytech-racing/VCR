@@ -46,8 +46,8 @@ void init_ethernet_device()
 void test_send()
 {
     //send VCRData_s
-    make_vcr_data_msg(vcr_state);
-    if (handle_ethernet_socket_send_pb<hytech_msgs_VCRData_s, 4096>(receive_ip, 5555, socket, &msg, hytech_msgs_VCRData_s_msg)   {
+    VCREthernetInterface::make_vcr_data_msg(vcr_state);
+    if (handle_ethernet_socket_send_pb<hytech_msgs_VCRData_s, 4096>(receive_ip, 5555, &socket, &msg, hytech_msgs_VCRData_s_msg)   {
         Serial.println("Sent");
     } else {
         Serial.println("Failed");

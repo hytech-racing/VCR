@@ -79,7 +79,7 @@ public:
     /// @param max_power_limit the max power limit defaults to TC_MUX_DEFAULT_PARAMS::MAX_POWER_LIMIT
     /// @param num_motors the number of motors. defaults to 4.
     /// @note TC Mux must be created with at least 1 controller.
-    explicit TorqueControllerMux(std::array<std::function<TorqueControllerOutput_s(const VCRData_s &state)>, num_controllers> controller_evals,
+    explicit TorqueControllerMux(std::array<std::function<DrivetrainCommand_s(const VCRData_s &state)>, num_controllers> controller_evals,
         std::array<bool, num_controllers> mux_bypass_limits,
         float max_change_speed = TC_MUX_DEFAULT_PARAMS::MAX_SPEED_FOR_MODE_CHANGE,
         float max_torque_pos_change_delta = TC_MUX_DEFAULT_PARAMS::MAX_TORQUE_DELTA_FOR_MODE_CHANGE,
@@ -106,7 +106,7 @@ public:
 
 private:
 
-    std::array<std::function<TorqueControllerOutput_s(const VCRData_s &state)>, num_controllers> _controller_evals;
+    std::array<std::function<DrivetrainCommand_s(const VCRData_s &state)>, num_controllers> _controller_evals;
 
     std::array<bool, num_controllers> _mux_bypass_limits;
 
@@ -151,6 +151,10 @@ private:
 
 const int number_of_controllers = 5;
 using TCMuxType = TorqueControllerMux<number_of_controllers>;
+
+const int number_of_controllers_min_viable = 1;
+using TCMuxTypeMinViable = TorqueControllerMux<number_of_controllers_min_viable>;
+
 
 #include "TorqueControllerMux.tpp"
 #endif // __TorqueControllerMux_H__

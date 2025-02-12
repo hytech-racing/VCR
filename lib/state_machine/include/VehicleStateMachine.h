@@ -33,7 +33,7 @@ enum class CAR_STATE
  * wait for the start button to be pressed, and enter ready-to-drive mode. Aside from getters, this
  * class only has one public function, tick_state_machine(). In order to run its update logic, the
  * VehicleStateMachine uses instance data directly from other singleton classes (Buzzer, Pedals, etc)
- * and from the global structs (VCRInterfaceData_s, VCRSystemData_s, etc.).
+ * and from the global structs (VCRInterfaceData_s, VCRData_s, etc.).
  */
 class VehicleStateMachine
 {
