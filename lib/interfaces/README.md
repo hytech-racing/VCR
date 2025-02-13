@@ -128,7 +128,7 @@ message 2346 'Converter temperature error' after the warning time1) (ID32943) ha
         - inverter's internal value of (TD) kd
         - AKA SERCOS parameter ID102
 
-## VCF Interfaces
+## VCF Interface
 
 The VCR is connected over CAN and Ethernet to the VCF. We will use the CAN communication for latency-sensitive communication such as the driver input and controller input sensor signals. The Ethernet link will be used for the non-timing-sensitive data.
 
@@ -183,3 +183,43 @@ VCF Outputs:
             - means that the firmware was flashed while there was changes made that had not been commited
         - `char git_short_hash[8]`
             - the git hash of the commit that was flashed to the 
+
+## Drivebrain Interface
+
+### CAN interface
+
+#### preface
+__NOTE__: the following messages that are on the bus are listened to by the drivebrain and are output from other boards (not VCR)
+- pedal data CAN packet (VCF)
+- inverter data (FL, FR, RL, RR inverters) -> these will be forwarded messages being forwarded by VCR onto the telem CAN line
+
+VCR Outputs:
+
+- VCR suspension data CAN packet:
+    - `uint16_t rl_load_cell`
+    - `uint16_t rr_load_cell`
+    - `uint16_t rl_shock_pot`
+    - `uint16_t rr_shock_pot`
+
+- VCR status CAN packet:
+    - vehicle state (oneof: RTD, tractive system enabled, etc.)
+    - control mode
+    - VCR 
+    - VCR error state word 
+        - drivebrain timeout, VCF timeout, VCR firmware error, etc.
+
+VCR inputs (sent by drivebrain):
+- desired RPMs
+    - `int16_t fl_rpm`
+    - `int16_t fr_rpm`
+    - `int16_t rl_rpm`
+    - `int16_t rr_rpm`
+
+- torque limits
+    - __note__: in units of .01nm: 2100 = 21nm, 2150 = 21.5nm
+    - `int16_t fl_torque_lim` 
+    - `int16_t fr_torque_lim`
+    - `int16_t rl_torque_lim`
+    - `int16_t rl_torque_lim`
+
+

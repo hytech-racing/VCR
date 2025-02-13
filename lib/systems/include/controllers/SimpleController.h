@@ -31,11 +31,11 @@ class TorqueControllerSimple
 {
 public:
     /// @brief simple TC with tunable F/R torque balance. Accel torque balance can be tuned independently of regen torque balance
-    TorqueControllerSimple(TorqueControllerSimpleParams_s params)
+    TorqueControllerSimple(TorqueControllerSimpleParams_s params = TorqueControllerSimpleParams_s())
         : _params(params)
     { }
     /// @brief calculates torque output based off max torque and simple torque scaling
-    DrivetrainCommand_s evaluate(const VCRData_s &state);
+    DrivetrainCommand_s evaluate(const VCRData_s &state, unsigned long eval_millis);
 
 private:
     TorqueControllerSimpleParams_s _params;
