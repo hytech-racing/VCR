@@ -36,11 +36,8 @@ enum class DrivetrainState_e
     INVERTERS_READY = 3,
     INVERTERS_HV_ENABLED = 4,
     INVERTERS_ENABLED = 5,
-    ENABLING_INVERTERS_SPEED_MODE = 6,
-    ENABLING_INVERTERS_TORQUE_MODE = 7,
-    ENABLED_SPEED_MODE = 8,
-    ENABLED_TORQUE_MODE = 9,
-    ERROR = 10
+    ENABLED_DRIVE_MODE = 6,
+    ERROR = 7
 };
 
 enum class DrivetrainCmdResponse_e
@@ -59,18 +56,6 @@ struct DrivetrainSpeedCommand_s
 struct DrivetrainTorqueCommand_s
 {
     veh_vec<float> desired_torque_nm;
-};
-
-enum class DrivetrainModeRequest_e
-{
-    UNINITIALIZED = 0,
-    INIT_SPEED_MODE = 1,
-    INIT_TORQUE_MODE =2
-};
-
-struct DrivetrainInit_s
-{
-    DrivetrainModeRequest_e init_drivetrain;
 };
 
 struct DrivetrainStatus_s

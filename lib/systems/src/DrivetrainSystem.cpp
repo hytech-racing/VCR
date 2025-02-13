@@ -204,47 +204,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             break;
         }
 
-        case DrivetrainState_e::ENABLING_INVERTERS_SPEED_MODE:
-        {    
-            bool inverter_error_present = false;
-            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
-            bool inverters_in_speed_mode = false;
-            inverters_in_speed_mode = (!_get_gpio_state().torque_mode_enabled_pin_state);
-            
-            if(inverter_error_present)
-            {
-                _set_drivetrain_disabled();
-                _set_state(DrivetrainState_e::ERROR);
-            } else if(inverters_in_speed_mode)
-            {
-                _set_enable_drivetrain();
-                _set_state(DrivetrainState_e::ENABLED_SPEED_MODE);
-            }
-            break;
-        }
-
-        case DrivetrainState_e::ENABLING_INVERTERS_TORQUE_MODE:
-        {
-
-            bool inverter_error_present = false;
-            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
-            bool inverters_in_torque_mode = false;
-            inverters_in_torque_mode = _get_gpio_state().torque_mode_enabled_pin_state;
-            
-            if(inverter_error_present)
-            {
-                _set_drivetrain_disabled();
-                _set_state(DrivetrainState_e::ERROR);
-            } else if(inverters_in_torque_mode)
-            {
-                _set_enable_drivetrain();
-                _set_state(DrivetrainState_e::ENABLED_TORQUE_MODE);
-            }
-
-            break;
-        }
-
-        case DrivetrainState_e::ENABLED_SPEED_MODE:
+        case DrivetrainState_e::ENABLED_DRIVE_MODE:
         {
             if(!(_check_inverter_flags(_check_inverter_hv_present_flag)))
             {
@@ -255,7 +215,6 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             // TODO may need to verify that the gpio state is correct while in this state (GPIO torque mode low)
             bool inverter_error_present = false;
             inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
-            // now finally in this mode and the ENABLED_TORQUE_MODE can we command the drivetrain
             bool user_requesting_speed_command = false;
             user_requesting_speed_command = etl::holds_alternative<DrivetrainSpeedCommand_s>(cmd);
             bool user_requesting_torque_mode = false;
@@ -272,30 +231,6 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
                 _set_drivetrain_speed_command(etl::get<DrivetrainSpeedCommand_s>(cmd));
                 
             } else if(user_requesting_torque_mode && !_drivetrain_active(_active_rpm_level))
-            {
-                _set_drivetrain_keepalive_idle();
-                _set_state(DrivetrainState_e::ENABLING_INVERTERS_TORQUE_MODE);
-            }
-            break;
-        }
-        case DrivetrainState_e::ENABLED_TORQUE_MODE:
-        {
-            // TODO may need to verify that the gpio state is correct while in this state (GPIO torque mode high)
-            bool inverter_error_present = false;
-            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
-            
-            bool user_requesting_torque_command = etl::holds_alternative<DrivetrainTorqueCommand_s>(cmd);
-            bool user_requesting_speed_mode = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain == DrivetrainModeRequest_e::INIT_SPEED_MODE);
-            
-            if(inverter_error_present)
-            {
-                _set_drivetrain_disabled();
-                _set_state(DrivetrainState_e::ERROR);
-            }
-            else if(user_requesting_torque_command)
-            {
-                _set_drivetrain_torque_command(etl::get<DrivetrainTorqueCommand_s>(cmd));
-            } else if(user_requesting_speed_mode && !_drivetrain_active(_active_rpm_level))
             {
                 _set_drivetrain_keepalive_idle();
                 _set_state(DrivetrainState_e::ENABLING_INVERTERS_TORQUE_MODE);
