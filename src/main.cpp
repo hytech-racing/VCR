@@ -2,15 +2,9 @@
 #include <Arduino.h>
 #endif
 
-/* From C++ standard library */
-#include <chrono>
-#include <stdint.h>
 
 /* From shared_firmware_types libdep */
 #include "SharedFirmwareTypes.h"
-
-/* From shared-systems-lib libdep */
-#include "SysClock.h"
 
 /* From HT_SCHED libdep */
 #include "ht_sched.hpp"
@@ -29,7 +23,9 @@
 
 #include <hytech.h>
 
-#include <hytech.h>
+/* Scheduler setup */
+HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
+
 
 // /* Scheduler setup */
 // HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
@@ -49,53 +45,11 @@
 //     scheduler.schedule(update_buzzer_controller_task);
 // }
 
-// void loop() {
-//     scheduler.run();
-// }
-
-FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> TEST_CAN1;
-FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> TEST_CAN2; // Inverter CAN (now both are on same line)
-FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> TEST_CAN3; // Inverter CAN (now both are on same line)
-
-CAN_message_t msg;
-
-using CircularBufferType = CANBufferType;
-using InverterInterfaceType = InverterInterface;
-
-InverterInterfaceType fl_inv = InverterInterfaceType(&CAN3_txBuffer, MC1_SETPOINTS_COMMAND_CANID, MC1_TORQUE_COMMAND_CANID);
-InverterInterfaceType fr_inv = InverterInterfaceType(&CAN3_txBuffer, MC2_SETPOINTS_COMMAND_CANID, MC2_TORQUE_COMMAND_CANID);
-InverterInterfaceType rl_inv = InverterInterfaceType(&CAN3_txBuffer, MC3_SETPOINTS_COMMAND_CANID, MC3_TORQUE_COMMAND_CANID);
-InverterInterfaceType rr_inv = InverterInterfaceType(&CAN3_txBuffer, MC4_SETPOINTS_COMMAND_CANID, MC4_TORQUE_COMMAND_CANID);
-
-CANInterfaces CAN_interfaces = {fl_inv, fr_inv, rl_inv, rr_inv};
-
-void init_can_interface()
-{
-    TEST_CAN2.begin();
-    TEST_CAN2.setBaudRate(500000);
-    TEST_CAN2.setMaxMB(16);
-    TEST_CAN2.enableFIFO();
-    TEST_CAN2.enableFIFOInterrupt();
-    TEST_CAN2.onReceive(on_can2_recieve);
-    TEST_CAN2.mailboxStatus();
-
-    TEST_CAN1.begin();
-    TEST_CAN1.setBaudRate(500000);
-    TEST_CAN1.setMaxMB(16);
-    TEST_CAN1.enableFIFO();
-    TEST_CAN1.enableFIFOInterrupt();
-    TEST_CAN1.enableMBInterrupts();
-    TEST_CAN1.onReceive(on_can1_recieve);
-    TEST_CAN1.mailboxStatus();
-
-    TEST_CAN3.begin();
-    TEST_CAN3.setBaudRate(500000);
-    TEST_CAN3.setMaxMB(16);
-    TEST_CAN3.enableFIFO();
-    TEST_CAN3.enableFIFOInterrupt();
-    TEST_CAN3.enableMBInterrupts();
-    TEST_CAN3.onReceive(on_can3_recieve);
-    TEST_CAN3.mailboxStatus();
+    scheduler.schedule(tick_state_machine_task);
+    scheduler.schedule(read_adc0_task);
+    scheduler.schedule(read_adc1_task);
+    scheduler.schedule(update_buzzer_controller_task);
+    scheduler.schedule(kick_watchdog_task);
 }
 
 void setup(void)
