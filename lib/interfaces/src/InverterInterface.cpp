@@ -30,34 +30,6 @@ InverterControlParams_s InverterInterface::get_control_params() {
     return _feedback_data.control_params;
 }
 
-/** 
- * Request change of state
- */
-
-void InverterInterface::set_inverter_setpoints(
-    bool inverter_enable,
-    bool hv_enable,
-    bool driver_enable,
-    bool remove_error,
-    int16_t speed_rpm_setpoint,
-    int16_t positive_torque_limit,
-    int16_t negative_torque_limit
-) 
-{
-    _inverter_setpoints.inverter_enable = inverter_enable;
-    _inverter_setpoints.hv_enable = hv_enable;
-    _inverter_setpoints.driver_enable = driver_enable;
-    _inverter_setpoints.remove_error = remove_error;
-    _inverter_setpoints.speed_rpm_setpoint = speed_rpm_setpoint;
-    _inverter_setpoints.positive_torque_limit = positive_torque_limit;
-    _inverter_setpoints.negative_torque_limit = negative_torque_limit;
-}
-
-void InverterInterface::set_torque_command(uint16_t torque_command) 
-{
-    _inverter_torque_command.torque_command = torque_command;
-}
-
 
 /**
  * Recieving CAN messages
@@ -83,6 +55,8 @@ void InverterInterface::recieve_MCI_STATUS(CAN_message_t &can_msg)
 
 void InverterInterface::recieve_MCI_TEMPS(CAN_message_t &can_msg)
 {
+
+    Serial.println("Recieved temps data!");
 
     // Unpack the message
     MCI1_TEMPS_t unpacked_msg;
@@ -157,10 +131,6 @@ void InverterInterface::send_MC_SETPOINT_COMMAND()
 {
     MC1_SETPOINTS_COMMAND_t msg_out;
 
-    msg_out.inverter_enable = _inverter_setpoints.inverter_enable;
-    msg_out.hv_enable = _inverter_setpoints.hv_enable;
-    msg_out.driver_enable = _inverter_setpoints.driver_enable;
-    msg_out.remove_error = _inverter_setpoints.remove_error;
     msg_out.speed_setpoint_rpm = _inverter_setpoints.speed_rpm_setpoint;
     msg_out.positive_torque_limit_ro = _inverter_setpoints.positive_torque_limit;
     msg_out.negative_torque_limit_ro = _inverter_setpoints.negative_torque_limit;
@@ -168,12 +138,45 @@ void InverterInterface::send_MC_SETPOINT_COMMAND()
     enqueue_new_CAN<MC1_SETPOINTS_COMMAND_t>(&msg_out, &Pack_MC1_SETPOINTS_COMMAND_hytech, inverter_ids.mc_setpoint_commands_id);
 }
 
-void InverterInterface::send_MC_TORQUE_COMMAND() 
+void InverterInterface::send_MC_CONTROL_WORD() 
 {
-    MC1_TORQUE_COMMAND_t msg_out;
-
-    msg_out.torque_command_ro = HYTECH_torque_command_ro_toS(_inverter_torque_command.torque_command);
-
-    enqueue_new_CAN<MC1_TORQUE_COMMAND_t>(&msg_out, &Pack_MC1_TORQUE_COMMAND_hytech, inverter_ids.mc_torque_command_id);
+    // TODO edit PCAN project to finish this
 }
 
+/**
+ * Methods for use as inverter functs
+ */
+
+void InverterInterface::set_speed(float desired_rpm, float torque_limit_nm) 
+{
+    _inverter_setpoints.speed_rpm_setpoint = desired_rpm;
+    _inverter_setpoints.positive_torque_limit = torque_limit_nm;
+    _inverter_setpoints.negative_torque_limit = -torque_limit_nm;
+}
+
+void InverterInterface::set_torque(float torque_nm) 
+{
+    // TODO set desired rpm to max? 
+    _inverter_setpoints.positive_torque_limit = torque_nm;
+    _inverter_setpoints.negative_torque_limit = -torque_nm;
+}
+
+void InverterInterface::set_idle() 
+{
+    _inverter_setpoints.negative_torque_limit = 0; 
+    _inverter_setpoints.positive_torque_limit = 0;
+    _inverter_setpoints.speed_rpm_setpoint = 0;
+}
+
+void InverterInterface::set_inverter_control_word(InverterControlWord_s control_word) 
+{
+    _inverter_control_word.driver_enable = control_word.driver_enable;
+    _inverter_control_word.hv_enable = control_word.hv_enable;
+    _inverter_control_word.inverter_enable = control_word.inverter_enable;
+    _inverter_control_word.remove_error = control_word.remove_error;
+}
+
+InverterStatus_s InverterInterface::get_inverter_status() 
+{
+    return _feedback_data.status;
+}

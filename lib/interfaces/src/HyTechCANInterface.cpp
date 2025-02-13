@@ -1,4 +1,5 @@
 #include <HyTechCANInterface.h>
+#include <Arduino.h>
 
 /* Recieve Buffers */
 CANBufferType CAN1_rxBuffer;

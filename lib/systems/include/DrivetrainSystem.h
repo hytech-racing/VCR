@@ -9,6 +9,7 @@
 
 #include "SharedFirmwareTypes.h"
 #include "SysClock.h"
+#include "InverterInterface.h"
 
 
 // requirements:
@@ -72,24 +73,6 @@ struct DrivetrainInit_s
     DrivetrainModeRequest_e init_drivetrain;
 };
 
-struct InverterStatus_s
-{
-    float dc_bus_voltage;
-    float torque_nm;
-    float speed_rpm;
-    float mech_power_w;
-    float inverter_temp_c; 
-    float motor_temp_c;
-    float igbt_temp_c;
-    uint16_t error_status_id;
-    bool inverter_ready : 1;
-    bool quit_dc : 1;
-    bool quit_inverter : 1;
-    bool error_present : 1;
-    bool connected : 1;
-    bool hv_present : 1;
-};
-
 struct DrivetrainStatus_s
 {
     bool all_inverters_connected;
@@ -112,14 +95,6 @@ struct DrivetrainOutputPins_s
 struct DrivetrainInputPins_s
 {
     bool torque_mode_enabled_pin_state : 1;
-};
-
-struct InverterControlWord_s
-{
-    bool inverter_enable;
-    bool hv_enable;
-    bool driver_enable;
-    bool remove_error;
 };
 
 class DrivetrainSystem

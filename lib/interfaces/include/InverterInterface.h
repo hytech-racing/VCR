@@ -6,6 +6,7 @@
 #include "MessageQueueDefine.h"
 
 #include <hytech.h>
+#include "DrivetrainSystem.h"
 
 namespace HTUnits
 {
@@ -32,18 +33,17 @@ struct InverterIds_s
  */
 struct InverterSetpoints_s 
 {
-    bool inverter_enable : 1;
-    bool hv_enable : 1;
-    bool driver_enable : 1;
-    bool remove_error : 1;
     int16_t speed_rpm_setpoint;
     int16_t positive_torque_limit; 
     int16_t negative_torque_limit;
 };
 
-struct InverterTorqueCommand_s
+struct InverterControlWord_s 
 {
-    uint16_t torque_command;
+    bool inverter_enable : 1;
+    bool hv_enable : 1;
+    bool driver_enable : 1;
+    bool remove_error : 1;
 };
 
 /** 
@@ -122,21 +122,6 @@ class InverterInterface
             inverter_ids.mc_torque_command_id = mc_torque_command_id;
         }
 
-        /* Request change of state */
-        void set_inverter_setpoints(
-            bool inverter_enable,
-            bool hv_enable,
-            bool driver_enable,
-            bool remove_error,
-            int16_t speed_rpm_setpoint,
-            int16_t positive_torque_limit,
-            int16_t negative_torque_limit
-        );
-
-        void set_torque_command(
-            uint16_t torque_command
-        );
-
         // TODO un-public these (they are public for testing)
 
         /* Recieving callbacks */
@@ -150,18 +135,30 @@ class InverterInterface
 
         void recieve_MCI_FEEDBACK(CAN_message_t &can_msg);
 
+        /* Sending */
+        template <typename U>
+        void enqueue_new_CAN(U *structure, uint32_t (*pack_function)(U *, uint8_t *, uint8_t *, uint8_t *), uint32_t id);
+
+        void send_MC_SETPOINT_COMMAND();
+
+        void send_MC_CONTROL_WORD();
+
+        /* Inverter Functs */
+        void set_speed(float desired_rpm, float torque_limit_nm); 
+
+        void set_torque(float torque_nm); 
+
+        void set_idle();
+
+        void set_inverter_control_word(InverterControlWord_s control_word);
+
+        InverterStatus_s get_inverter_status();
 
     private: 
 
         InverterIds_s inverter_ids;
-
         InverterSetpoints_s _inverter_setpoints;
-        InverterTorqueCommand_s _inverter_torque_command;
-
-        // InverterStatus_s _inverter_status;
-        // InverterTemps_s _inverter_temps;
-        // InverterPower_s _inverter_power;
-        // InverterControlParams_s _control_params;
+        InverterControlWord_s _inverter_control_word;
         InverterFeedbackData_s _feedback_data;
 
         /* Getters */
@@ -170,14 +167,6 @@ class InverterInterface
         InverterPower_s get_power();
         MotorMechanics_s get_motor_mechanics();
         InverterControlParams_s get_control_params();
-
-        /* Sending */
-        template <typename U>
-        void enqueue_new_CAN(U *structure, uint32_t (*pack_function)(U *, uint8_t *, uint8_t *, uint8_t *), uint32_t id);
-
-        void send_MC_SETPOINT_COMMAND();
-
-        void send_MC_TORQUE_COMMAND();
 
         CANBufferType *msg_queue_;
 };

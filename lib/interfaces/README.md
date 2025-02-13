@@ -22,7 +22,6 @@ below is the description of the control messages that will be configured within 
 
 - Control Input Message (will be attempted to be sent every 5ms, monitored by the inverter to be expected at least every 20ms)
     - `int16_t speed_setpoint` 
-        - __NOTE: active only when in speed control mode__
         - AKA (`AMK_TargetVelocity`) / Special Signal index 6 / AKA 16-bit version of SERCOS parameter ID36 (unknown why this is 16 bit vs the 32 bit SERCOS parameter in manual)
         - the RPM setpoint for the inverter in units of RPM.
     - `int16_t positive_torque_limit` 
@@ -33,10 +32,6 @@ below is the description of the control messages that will be configured within 
     - `int16_t negative_torque_limit`
         - AKA (`AMK_TorqueLimitNegativ`) / SERCOS parameter ID83 / Special Signal index 14
         - `positive_torque_limit` with a negative sign.
-    - `int16_t torque_setpoint` 
-        - __NOTE: active only when in torque control mode.__
-        - AKA SERCOS parameter ID80 / Special Signal index 17
-        - the torque setpoint for the inverter in units of percentage as described in the `positive_torque_limit` message member above
 
 - Control parameter message (will be sent intermitently, not monitored by the inverter to be expected at any regular period)
     - `uint16_t speed_control_kp`
