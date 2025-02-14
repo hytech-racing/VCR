@@ -112,3 +112,20 @@ bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& 
 }
 
 HT_TASK::Task kick_watchdog_task = HT_TASK::Task(create_watchdog, run_kick_watchdog, 3, 2000UL); // 2000us is 500hz // NOLINT
+
+
+bool init_I2C(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo){
+    mcp.init();
+    mcp.portMode(MCP23017Port::A, 0b11111111);
+    mcp.portMode(MCP23017Port::B, 0b11111111);
+}
+
+bool run_I2C(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo){
+    int a, b;
+    a = mcp.readPort(MCP23017Port::A);
+    b = mcp.readPort(MCP23017Port::B);
+    return true;
+}
+
+
+HT_TASK::Task read_adc1_task = HT_TASK::Task(init_I2C, run_I2C, 5, 40000UL);
