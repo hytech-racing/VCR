@@ -6,7 +6,7 @@ DrivetrainSystem::DrivetrainSystem(
     veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces)
     : _inverter_interfaces(inverter_interfaces), _state(DrivetrainState_e::NOT_CONNECTED), 
     _check_inverter_ready_flag([](const InverterStatus_s & status) -> bool {return status.system_ready;}),
-    _check_inverter_connected_flag([](const InverterStatus_s & status) -> bool {return status.connected;}), // TODO fix this
+    _check_inverter_connected_flag([](const InverterStatus_s & status) -> bool {return status.connected;}),
     _check_inverter_quit_dc_flag([](const InverterStatus_s & status) -> bool {return status.quit_dc_on;}),
     _check_inverter_error_flag([](const InverterStatus_s & status) -> bool {return status.error;}),
     _check_inverter_hv_present_flag([](const InverterStatus_s & status) -> bool {return status.dc_on;}),
@@ -63,7 +63,6 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             {
                 _set_state(DrivetrainState_e::NOT_ENABLED_HV_PRESENT);
             }
-            
             _set_drivetrain_disabled(); // TODO dont know if this should be sent here, but it shouldn't hurt
             break;
         }
@@ -151,10 +150,10 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
                 _set_drivetrain_disabled();
                 _set_state(DrivetrainState_e::ERROR);
             }
-            else if(requesting_init && hv_enabled && inverters_ready && hv_enabled && !inverters_enabled)
+            else if(requesting_init && hv_enabled && inverters_ready && !inverters_enabled)
             {
                 _set_enable_drivetrain(); // should be done on entry of this state
-            } else if(hv_enabled && inverters_ready && hv_enabled && inverters_enabled)
+            } else if(hv_enabled && inverters_ready && inverters_enabled)
             {
                 _set_enable_drivetrain();
                 _set_state(DrivetrainState_e::INVERTERS_ENABLED);
@@ -244,9 +243,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
 void DrivetrainSystem::_set_state(DrivetrainState_e new_state)
 {
-    _handle_exit_logic(_state);
     _state = new_state;
-    _handle_entry_logic(new_state);
 }
 
 // returns false if any of the inverters fail the flag check.
@@ -329,10 +326,10 @@ void DrivetrainSystem::_set_drivetrain_error_reset()
 }
 void DrivetrainSystem::_set_drivetrain_command(DrivetrainCommand_s cmd)
 {
-    _inverter_interfaces.FL.set_speed(cmd.speeds_rpm[0], cmd.inverter_torque_limit[0]);
-    _inverter_interfaces.FR.set_speed(cmd.speeds_rpm[1], cmd.inverter_torque_limit[1]);
-    _inverter_interfaces.RL.set_speed(cmd.speeds_rpm[2], cmd.inverter_torque_limit[2]);
-    _inverter_interfaces.RR.set_speed(cmd.speeds_rpm[3], cmd.inverter_torque_limit[3]);
+    _inverter_interfaces.FL.set_speed(cmd.desired_speeds.FL, cmd.torque_limits.FL);
+    _inverter_interfaces.FR.set_speed(cmd.desired_speeds.FR, cmd.torque_limits.FR);
+    _inverter_interfaces.RL.set_speed(cmd.desired_speeds.RL, cmd.torque_limits.RL);
+    _inverter_interfaces.RR.set_speed(cmd.desired_speeds.RR, cmd.torque_limits.RR);
 }
 
 bool DrivetrainSystem::_drivetrain_active(float max_active_rpm)

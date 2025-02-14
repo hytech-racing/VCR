@@ -62,18 +62,6 @@ struct DrivetrainResetError_s
     bool reset_errors; // true: reset the errors present on inverters, false: dont
 };
 
-// output pin of micro, read by inverters
-struct DrivetrainOutputPins_s
-{
-    bool torque_mode_pin_state : 1;
-};
-
-// the pin set by the inverters themselves ("input": pin being read by micro)
-struct DrivetrainInputPins_s
-{
-    bool torque_mode_enabled_pin_state : 1;
-};
-
 enum DrivetrainModeRequest_e 
 {
     UNINITIALIZED = 0,
@@ -97,7 +85,6 @@ public:
 
     struct InverterFuncts {
         std::function<void(float desired_rpm, float torque_limit_nm)> set_speed;
-        std::function<void(float torque_nm)> set_torque;
         std::function<void()> set_idle;
         std::function<void(InverterControlWord_s control_word)> set_inverter_control_word;
         std::function<InverterStatus_s()> get_status;
@@ -110,8 +97,6 @@ private:
     bool _drivetrain_active(float max_active_rpm);
 
     void _set_state(DrivetrainState_e state);
-    void _handle_exit_logic(DrivetrainState_e prev_state);
-    void _handle_entry_logic(DrivetrainState_e new_state);
     
     void _set_drivetrain_disabled();
     void _set_drivetrain_keepalive_idle();
@@ -132,11 +117,7 @@ private:
     std::function<bool(const InverterStatus_s &)> _check_inverter_error_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_present_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_not_present_flag;
-    std::function<bool(const InverterStatus_s &)> _check_inverter_enabled;
-    
-    std::function<void(const DrivetrainOutputPins_s &)> _set_gpio_state;
-    std::function<DrivetrainInputPins_s()> _get_gpio_state;
-    
+    std::function<bool(const InverterStatus_s &)> _check_inverter_enabled;    
 };
 
 #endif /* DRIVETRAINSYSTEM */
