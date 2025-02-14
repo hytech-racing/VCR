@@ -128,9 +128,38 @@ bool init_I2C(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 }
 
 bool run_I2C(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo){
-    int a, b;
-    a = mcp.readPort(MCP23017Port::A);
-    b = mcp.readPort(MCP23017Port::B);
+    int temp;
+    temp = mcp.readPort(MCP23017Port::A);
+    vcr_data.shutdown_sensing_data.bspd_is_ok = temp&1;
+    temp>>1;
+    vcr_data.shutdown_sensing_data.k_watchdog_relay = temp&1;
+    temp>>1;
+    vcr_data.shutdown_sensing_data.watchdog_is_ok = temp&1;
+    temp >>1;
+    vcr_data.shutdown_sensing_data.l_bms_relay = temp&1;
+    temp>>1;
+    vcr_data.shutdown_sensing_data.bms_is_ok = temp&1;
+    temp>>1;
+    vcr_data.shutdown_sensing_data.m_imd_relay = temp&1; //Coresponds to SHDN_OUT_SNS???
+    temp>>1;
+    vcr_data.shutdown_sensing_data.imd_is_ok = temp&1;
+    temp>>1;
+    vcr_data.shutdown_sensing_data.i_shutdown_in = temp&1;
+    temp = mcp.readPort(MCP23017Port::B);
+    vcr_data.ethernet_is_linked.acu_link = temp&1;
+    temp>>1;
+    vcr_data.ethernet_is_linked.drivebrain_link = temp&1;
+    temp>>1;
+    vcr_data.ethernet_is_linked.vcf_link = temp&1;
+    temp>>1;
+    vcr_data.ethernet_is_linked.teensy_link = temp&1;
+    temp>>1;
+    vcr_data.ethernet_is_linked.debug_link = temp&1;
+    temp>>1;
+    vcr_data.ethernet_is_linked.ubiquiti_link = temp&1;
+    temp>>1;
+    temp>>1;
+    vcr_data.shutdown_sensing_data.j_bspd_relay = temp&1;
     return true;
 }
 
