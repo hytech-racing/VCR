@@ -156,15 +156,10 @@ VCF Outputs:
     - __note__: the regen percentage that was present on MCU should instead be calculated by the controllers themselves instead of by the pedals system to centralize regen calculation at higher levels to allow for tuning / safe modification more easily
 
 - __note__: the following data is all the raw, non-filtered data
-    - steering data CAN packet:
-        - `uint16_t analog_steering`
-        - `float digital_steering` (32 bit) 
+    - `STEERING_DATA` (`0x41f`) steering data CAN packet:
+        - `uint16_t steering_analog_raw`
+        - `float steering_digital_raw` (32 bit) 
 
-    - suspension data CAN packet:
-        - `uint16_t fl_load_cell`
-        - `uint16_t fr_load_cell`
-        - `uint16_t fl_shock_pot`
-        - `uint16_t fr_shock_pot`
 
 ### Ethernet Interface
 
@@ -184,9 +179,9 @@ VCF Outputs:
         - `char git_short_hash[8]`
             - the git hash of the commit that was flashed to the 
 
-## Drivebrain Interface
+## Drivebrain Interface requirements
 
-### CAN interface
+### CAN interface requirements
 
 #### preface
 __NOTE__: the following messages that are on the bus are listened to by the drivebrain and are output from other boards (not VCR)
@@ -195,31 +190,34 @@ __NOTE__: the following messages that are on the bus are listened to by the driv
 
 VCR Outputs:
 
-- VCR suspension data CAN packet:
+- `REAR_SUSPENSION` (`0E4`) VCR suspension data CAN packet: (200hz)
     - `uint16_t rl_load_cell`
     - `uint16_t rr_load_cell`
     - `uint16_t rl_shock_pot`
     - `uint16_t rr_shock_pot`
 
-- VCR status CAN packet:
-    - vehicle state (oneof: RTD, tractive system enabled, etc.)
-    - control mode
-    - VCR 
-    - VCR error state word 
-        - drivebrain timeout, VCF timeout, VCR firmware error, etc.
+- VCR status CAN packet: (5hz)
+    - `uint8_t vehicle_state_index`: vehicle state enum index (oneof: RTD, tractive system enabled, etc.)
+    - `uint8_t control_mode_index` control mode index (MODE0 through MODE5)
+    - `uint16_t vcr_error_state_word` VCR error state word 
+        - bit 1: drivebrain timeout present
+        - bit 2: VCR firmware error
+        - bit 3: drivetrain error present
+        - bits 4 through 16: (reserved)
 
-VCR inputs (sent by drivebrain):
-- desired RPMs
-    - `int16_t fl_rpm`
-    - `int16_t fr_rpm`
-    - `int16_t rl_rpm`
-    - `int16_t rr_rpm`
+VCR inputs (sent by drivebrain and VCF):
+- `DRIVEBRAIN_SPEED_SET_INPUT`: (`0xF2`) desired RPMs
+    - `uint16_t drivebrain_set_rpm_fl`
+    - `uint16_t drivebrain_set_rpm_fr`
+    - `uint16_t drivebrain_set_rpm_rl`
+    - `uint16_t drivebrain_set_rpm_rr`
 
-- torque limits
+- `DRIVEBRAIN_TORQUE_LIM_INPUT`: (`0xF1`) torque limits (de-facto torque setpoint in certain conditions)
     - __note__: in units of .01nm: 2100 = 21nm, 2150 = 21.5nm
-    - `int16_t fl_torque_lim` 
-    - `int16_t fr_torque_lim`
-    - `int16_t rl_torque_lim`
-    - `int16_t rl_torque_lim`
+    - `int16_t drivebrain_torque_fl_torque` 
+    - `int16_t drivebrain_torque_fr_torque`
+    - `int16_t drivebrain_torque_rl_torque`
+    - `int16_t drivebrain_torque_rl_torque`
+
 
 
