@@ -94,12 +94,15 @@ HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCT
 bool init_kick_watchdog_task(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
 {
     WatchdogInstance::create(default_system_params::KICK_INTERVAL_MS); // this has issues for some reason with clang-tidy // NOLINT
+    pinMode(WATCHDOG_PIN, OUTPUT);
+    pinMode(SOFTWARE_OK_PIN, OUTPUT);
     return true;
 }
 
 bool run_kick_watchdog_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sysMicros / 1000));
+    digitalWrite(SOFTWARE_OK_PIN, vcr_data.system_data.ams_data.ams_ok);
     return true;
 }
 
@@ -109,7 +112,7 @@ HT_TASK::Task kick_watchdog_task = HT_TASK::Task(init_kick_watchdog_task, run_ki
 
 bool init_ams_system_task(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
 {
-    AMSSystemInstance::create(DEFAULT_VOLTAGE_ALPHA, DEFAULT_TEMP_ALPHA);
+    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS, PACK_CHARGE_CRITICAL_THRESHOLD_VOLTS, CELL_CHARGE_CRITICAL_THRESHOLD_VOLTS);
     return true;
 }
 
