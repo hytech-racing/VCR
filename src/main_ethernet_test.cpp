@@ -21,8 +21,8 @@ const IPAddress receive_ip(192, 168, 1, 31); // receiver
 const IPAddress default_dns(192, 168, 1, 1);
 const IPAddress default_gateway(192, 168, 1, 1);
 const IPAddress car_subnet(255, 255, 255, 0);
-uint16_t port1 = 4444;
-uint16_t port2 = 5555;
+const uint16_t PORT1 = 4444;
+const uint16_t PORT2 = 5555;
 //hytech_msgs_VCRData_s msg = hytech_msgs_VCRData_s_init_zero;
 VCRData_s vcr_state;
 //hytech_msgs_VCRData_s msg = {};
@@ -40,7 +40,7 @@ void init_ethernet_device()
 void test_send()
 {
     hytech_msgs_VCRData_s msg = VCREthernetInterface::make_vcr_data_msg(vcr_state);
-    if (handle_ethernet_socket_send_pb<hytech_msgs_VCRData_s, hytech_msgs_VCRData_s_size>(receive_ip, port1, &socket, msg, &hytech_msgs_VCRData_s_msg)) {
+    if (handle_ethernet_socket_send_pb<hytech_msgs_VCRData_s, hytech_msgs_VCRData_s_size>(receive_ip, PORT1, &socket, msg, &hytech_msgs_VCRData_s_msg)) {
         Serial.println("Sent");
     } else {
         Serial.println("Failed");
