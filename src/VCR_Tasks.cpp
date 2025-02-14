@@ -118,6 +118,13 @@ bool init_I2C(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
     mcp.init();
     mcp.portMode(MCP23017Port::A, 0b11111111);
     mcp.portMode(MCP23017Port::B, 0b11111111);
+
+    mcp.writeRegister(MCP23017Register::GPIO_A, 0x00);  //Reset port A 
+    mcp.writeRegister(MCP23017Register::GPIO_B, 0x00);  //Reset port B
+
+    // GPIO_B reflects the same logic as the input pins state
+    mcp.writeRegister(MCP23017Register::IPOL_A, 0x00);
+    mcp.writeRegister(MCP23017Register::IPOL_B, 0x00);
 }
 
 bool run_I2C(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo){
@@ -128,4 +135,4 @@ bool run_I2C(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo){
 }
 
 
-HT_TASK::Task read_adc1_task = HT_TASK::Task(init_I2C, run_I2C, 5, 40000UL);
+HT_TASK::Task read_I2C_Task = HT_TASK::Task(init_I2C, run_I2C, 5, 40000UL);
