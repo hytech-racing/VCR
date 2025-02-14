@@ -45,22 +45,10 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(VCRData_s &shared_
 
     //DrivetrainDynamicReport_s
     out.drivetrain_data.measuredInverterFLPackVoltage = shared_state.system_data.drivetrain_data.measuredInverterFLPackVoltage;
-    out.drivetrain_data.measuredSpeeds.FL = shared_state.system_data.drivetrain_data.measuredSpeeds.FL;
-    out.drivetrain_data.measuredSpeeds.FR = shared_state.system_data.drivetrain_data.measuredSpeeds.FR;
-    out.drivetrain_data.measuredSpeeds.RL = shared_state.system_data.drivetrain_data.measuredSpeeds.RL;
-    out.drivetrain_data.measuredSpeeds.RR = shared_state.system_data.drivetrain_data.measuredSpeeds.RR;
-    out.drivetrain_data.measuredTorques.FL = shared_state.system_data.drivetrain_data.measuredTorques.FL;
-    out.drivetrain_data.measuredTorques.FR = shared_state.system_data.drivetrain_data.measuredTorques.FR;
-    out.drivetrain_data.measuredTorques.RL = shared_state.system_data.drivetrain_data.measuredTorques.RL;
-    out.drivetrain_data.measuredTorques.RR = shared_state.system_data.drivetrain_data.measuredTorques.RR;
-    out.drivetrain_data.measuredTorqueCurrents.FL = shared_state.system_data.drivetrain_data.measuredTorqueCurrents.FL;
-    out.drivetrain_data.measuredTorqueCurrents.FR = shared_state.system_data.drivetrain_data.measuredTorqueCurrents.FR;
-    out.drivetrain_data.measuredTorqueCurrents.RL = shared_state.system_data.drivetrain_data.measuredTorqueCurrents.RL;
-    out.drivetrain_data.measuredTorqueCurrents.RR = shared_state.system_data.drivetrain_data.measuredTorqueCurrents.RR;
-    out.drivetrain_data.measuredMagnetizingCurrents.FL = shared_state.system_data.drivetrain_data.measuredMagnetizingCurrents.FL;
-    out.drivetrain_data.measuredMagnetizingCurrents.FR = shared_state.system_data.drivetrain_data.measuredMagnetizingCurrents.FR;
-    out.drivetrain_data.measuredMagnetizingCurrents.RL = shared_state.system_data.drivetrain_data.measuredMagnetizingCurrents.RL;
-    out.drivetrain_data.measuredMagnetizingCurrents.RR = shared_state.system_data.drivetrain_data.measuredMagnetizingCurrents.RR;
+    copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredSpeeds, out.drivetrain_data.measured_speeds);
+    copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredTorques, out.drivetrain_data.measuredTorques);
+    copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredTorqueCurrents, out.drivetrain_data.measuredTorqueCurrents);
+    copy_veh_vec_members(shared_state.system_Data.drivetrain_data.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
 
     //AMSSystemData_s
     out.ams_data.min_cell_voltage = shared_state.system_data.ams_data.min_cell_voltage;
@@ -97,22 +85,23 @@ void VCREthernetInterface::receive_pb_msg_acu_all_data(const hytech_msgs_ACUAllD
     }
 }
 
-void VCREthernetInterface::receive_pb_msg_acu_core_data(const hytech_msgs_ACUCoreData_s &msg_in, VCRData_s &shared_state)
+void VCREthernetInterface::receive_pb_msg_acu_core_data(const hytech_msgs_ACUCoreData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
 {
     shared_state.interface_data.stamped_acu_core_data.acu_data.avg_cell_voltage = msg_in.avg_cell_voltage;
     shared_state.interface_data.stamped_acu_core_data.acu_data.max_cell_temp = msg_in.max_cell_temp;
     shared_state.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = msg_in.min_cell_voltage;
     shared_state.interface_data.stamped_acu_core_data.acu_data.pack_voltage = msg_in.pack_voltage;
+    shared_state.interface_data.stamped_acu_core_data.last_recv_millis = curr_millis;
 }
 
-void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in, VCRData_s &shared_state)
+void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
 {
     //TODO: Finish this function. This function could parse the message and put it into shared_state, but depending
     //      on where things are defined, it might be cleaner for this function to simply return the new data. I do
-    //      not know yet. Definitely worth asking Ben.
+    //      not know yet. Definitely worth asking Ben.    
 }
 
-void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state)
+void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
 {
     //PedalsSystemData_s
     shared_state.interface_data.recvd_pedals_data.pedals_data.accel_is_implausible = msg_in.pedals_system_data.accel_is_implausible;
@@ -125,6 +114,7 @@ void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_i
     shared_state.interface_data.recvd_pedals_data.pedals_data.accel_percent = msg_in.pedals_system_data.accel_percent;
     shared_state.interface_data.recvd_pedals_data.pedals_data.brake_percent = msg_in.pedals_system_data.brake_percent;
     shared_state.interface_data.recvd_pedals_data.pedals_data.regen_percent = msg_in.pedals_system_data.regen_percent;
+    shared_state.interface_data.recvd_pedals_data.last_recv_millis = curr_millis;
 
     //DashInputState_s
     shared_state.interface_data.dash_input_state.data_btn_is_pressed = msg_in.dash_input_state.data_btn_is_pressed;
