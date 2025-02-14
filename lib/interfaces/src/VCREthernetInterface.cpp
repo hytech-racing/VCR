@@ -45,10 +45,10 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(VCRData_s &shared_
 
     //DrivetrainDynamicReport_s
     out.drivetrain_data.measuredInverterFLPackVoltage = shared_state.system_data.drivetrain_data.measuredInverterFLPackVoltage;
-    copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredSpeeds, out.drivetrain_data.measured_speeds);
+    copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredSpeeds, out.drivetrain_data.measuredSpeeds);
     copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredTorques, out.drivetrain_data.measuredTorques);
     copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredTorqueCurrents, out.drivetrain_data.measuredTorqueCurrents);
-    copy_veh_vec_members(shared_state.system_Data.drivetrain_data.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
+    copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
 
     //AMSSystemData_s
     out.ams_data.min_cell_voltage = shared_state.system_data.ams_data.min_cell_voltage;
