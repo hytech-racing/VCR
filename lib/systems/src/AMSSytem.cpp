@@ -3,7 +3,7 @@
 AMSSystemData_s AMSSystem::update_ams_system(unsigned long curr_millis, VCRData_s &vcr_data)
 {
     // Declare struct to return
-    AMSSystemData_s ret;
+    AMSSystemData_s ret = {};
 
     ret.ams_ok = true;
 
@@ -25,7 +25,7 @@ AMSSystemData_s AMSSystem::update_ams_system(unsigned long curr_millis, VCRData_
     ret.max_temp_celsius = vcr_data.interface_data.stamped_acu_core_data.acu_data.max_cell_temp;
 
     // Check for three shutdown conditions
-    bool heartbeat_ok = curr_millis - vcr_data.interface_data.stamped_acu_core_data.last_recv_millis < heartbeat_ok;
+    bool heartbeat_ok = curr_millis - vcr_data.interface_data.stamped_acu_core_data.last_recv_millis < _heartbeat_interval_ms;
     bool lowest_cell_below_threshold = ret.min_cell_voltage < _cell_charge_critical_threshold_volts;
     bool pack_below_threshold = ret.total_pack_voltage < _pack_charge_critical_threshold_volts;
 
