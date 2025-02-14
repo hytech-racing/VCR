@@ -50,9 +50,9 @@ public:
      * @pre Other systems are updated properly
      * @pre All relevant data exists in the data structs (VCRInterfaceData, VCRSystemData, etc.)
      * @param current_millis The system time, in millis. Passed in by the scheduler.
-     * @param system_data A reference to the global system data struct.
+     * @param shared_data A reference to the global shared data struct.
      */
-    void tick_state_machine(unsigned long current_millis, const VCRData_s &system_data);
+    void tick_state_machine(unsigned long current_millis, const VCRData_s &shared_data);
 
     CarState_e get_state() { return _current_state; }
 
@@ -77,7 +77,6 @@ private:
     /* System references to show dependence on systems library */
     DrivetrainSystem &_drivetrain;
     BuzzerController &_buzzer;
-    // AMSSystem &_ams_system;
 };
 
 #endif /* VEHICLE_STATE_MACHINE */

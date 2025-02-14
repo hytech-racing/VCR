@@ -37,15 +37,7 @@
 #include "VCR_Constants.h"
 #include "VehicleStateMachine.h"
 #include "VCR_Globals.h"
-#include "Buzzer.h"
-
-/**
- * The "tick state machine" task will simply call the state machine's tick function with the current
- * timestamp in micros. No init function is necessary. The tick function makes use of the other systems'
- * singleton classes to minimize the need for passing instances around.
- */
-bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-extern HT_TASK::Task tick_state_machine_task;
+#include "BuzzerController.h"
 
 
     
@@ -84,9 +76,18 @@ extern HT_TASK::Task update_buzzer_controller_task;
 
 
 /**
- * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin
+ * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin.
  */
 bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 extern HT_TASK::Task kick_watchdog_task;
+
+
+
+/**
+ * This task will tick the AMS system and will update the software shutdown if necessary.
+ */
+bool init_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+extern HT_TASK::Task update_ams_system_task;
 
 #endif /* VCR_TASKS */

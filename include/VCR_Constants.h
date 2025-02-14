@@ -56,6 +56,7 @@ constexpr float RR_SUS_POT_SCALE = 1;
 constexpr int RR_SUS_POT_OFFSET = 1;
 
 constexpr int WATCHDOG_PIN = 36;
+constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
 
 namespace default_system_params
 {
