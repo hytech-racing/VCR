@@ -18,6 +18,11 @@ namespace HTUnits
     using volts = float;
 };
 
+struct InverterParams_s
+{   
+    float MINIMUM_HV_VOLTAGE; 
+};
+
 /**
  * Struct containing id info for this specific inverter interface
  */
@@ -52,6 +57,7 @@ struct InverterControlWord_s
 **/
 struct InverterStatus_s
 {
+    bool hv_present : 1;
     bool connected : 1;
     bool new_data : 1;
     bool system_ready : 1;
@@ -117,7 +123,8 @@ class InverterInterface
         InverterInterface(
             CANBufferType *msg_output_queue, 
             uint32_t mc_setpoint_commands_id,
-            uint32_t mc_torque_command_id) : msg_queue_(msg_output_queue) 
+            uint32_t mc_torque_command_id,
+            InverterParams_s inverter_params) : msg_queue_(msg_output_queue), _inverter_params(inverter_params)
         { 
             inverter_ids.mc_setpoint_commands_id = mc_setpoint_commands_id;
             inverter_ids.mc_torque_command_id = mc_torque_command_id;
@@ -161,6 +168,7 @@ class InverterInterface
         InverterSetpoints_s _inverter_setpoints;
         InverterControlWord_s _inverter_control_word;
         InverterFeedbackData_s _feedback_data;
+        InverterParams_s _inverter_params;
 
         /* Getters */
         InverterStatus_s get_status(); 

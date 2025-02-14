@@ -25,11 +25,6 @@
 // - [ ] be able to reset drivetrain
     // - [ ] 
 
-
-namespace constants {
-    float MINIMUM_HV_VOLTAGE = 400.0;
-}
-
 // TODO move these into the shared types after finishing the system 
 enum class DrivetrainState_e
 {

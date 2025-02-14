@@ -4,13 +4,13 @@
 
 DrivetrainSystem::DrivetrainSystem(
     veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces)
-    : _inverter_interfaces(inverter_interfaces), _state(DrivetrainState_e::NOT_CONNECTED), 
+    : _inverter_interfaces(inverter_interfaces), _state(DrivetrainState_e::NOT_CONNECTED),
     _check_inverter_ready_flag([](const InverterStatus_s & status) -> bool {return status.system_ready;}),
     _check_inverter_connected_flag([](const InverterStatus_s & status) -> bool {return status.connected;}),
     _check_inverter_quit_dc_flag([](const InverterStatus_s & status) -> bool {return status.quit_dc_on;}),
     _check_inverter_error_flag([](const InverterStatus_s & status) -> bool {return status.error;}),
     _check_inverter_hv_present_flag([](const InverterStatus_s & status) -> bool {return status.dc_on;}),
-    _check_inverter_hv_not_present_flag([](const InverterStatus_s & status) -> bool {return status.dc_bus_voltage > constants::MINIMUM_HV_VOLTAGE;}), // TODO fix this
+    _check_inverter_hv_not_present_flag([](const InverterStatus_s & status) -> bool {return status.hv_present;}), // TODO fix this
     _check_inverter_enabled([](const InverterStatus_s & status) -> bool {return !status.quit_inverter_on;}) { };
 
 

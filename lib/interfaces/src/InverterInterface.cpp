@@ -52,6 +52,7 @@ void InverterInterface::recieve_MCI_STATUS(CAN_message_t &can_msg)
     _feedback_data.status.derating_on = unpacked_msg.derating_on;
     _feedback_data.status.dc_bus_voltage = unpacked_msg.dc_bus_voltage;
     _feedback_data.status.diagnostic_number = unpacked_msg.diagnostic_number;
+    _feedback_data.status.hv_present = _feedback_data.status.dc_bus_voltage > _inverter_params.MINIMUM_HV_VOLTAGE;
 }
 
 void InverterInterface::recieve_MCI_TEMPS(CAN_message_t &can_msg)
