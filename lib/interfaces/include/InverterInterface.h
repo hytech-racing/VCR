@@ -7,6 +7,7 @@
 
 #include <hytech.h>
 #include "DrivetrainSystem.h"
+#include <CANInterface.h>
 
 namespace HTUnits
 {
@@ -132,29 +133,24 @@ class InverterInterface
 
         // TODO un-public these (they are public for testing)
 
-        /* Recieving callbacks */
-        void recieve_MCI_STATUS(CAN_message_t &can_msg);
+        /* receiving callbacks */
+        void receive_MCI_STATUS(CAN_message_t &can_msg);
 
-        void recieve_MCI_TEMPS(CAN_message_t &can_msg);
+        void receive_MCI_TEMPS(CAN_message_t &can_msg);
 
-        void recieve_MCI_DYNAMICS(CAN_message_t &can_msg);
+        void receive_MCI_DYNAMICS(CAN_message_t &can_msg);
 
-        void recieve_MCI_POWER(CAN_message_t &can_msg);
+        void receive_MCI_POWER(CAN_message_t &can_msg);
 
-        void recieve_MCI_FEEDBACK(CAN_message_t &can_msg);
+        void receive_MCI_FEEDBACK(CAN_message_t &can_msg);
 
         /* Sending */
-        template <typename U>
-        void enqueue_new_CAN(U *structure, uint32_t (*pack_function)(U *, uint8_t *, uint8_t *, uint8_t *), uint32_t id);
-
         void send_MC_SETPOINT_COMMAND();
 
         void send_MC_CONTROL_WORD();
 
         /* Inverter Functs */
         void set_speed(float desired_rpm, float torque_limit_nm); 
-
-        void set_torque(float torque_nm); 
 
         void set_idle();
 

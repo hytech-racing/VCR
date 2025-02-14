@@ -32,21 +32,21 @@ InverterControlParams_s InverterInterface::get_control_params() {
 
 
 /**
- * Recieving CAN messages
+ * receiving CAN messages
  */
 
-void InverterInterface::recieve_MCI_STATUS(CAN_message_t &can_msg)
+void InverterInterface::receive_MCI_STATUS(CAN_message_t &can_msg)
 {
     // Unpack the message
     MCI1_STATUS_t unpacked_msg;
     Unpack_MCI1_STATUS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
     
     // Update inverter interface with new data
-    _feedback_data.status.connected = true; // Will set to true once first CAN message has been recieved
+    _feedback_data.status.connected = true; // Will set to true once first CAN message has been received
     _feedback_data.status.system_ready = unpacked_msg.system_ready;
     _feedback_data.status.error = unpacked_msg.error;
     _feedback_data.status.warning = unpacked_msg.warning;
-    _feedback_data. status.quit_dc_on = unpacked_msg.quit_dc_on;
+    _feedback_data.status.quit_dc_on = unpacked_msg.quit_dc_on;
     _feedback_data.status.dc_on = unpacked_msg.dc_on;
     _feedback_data.status.quit_inverter_on = unpacked_msg.quit_inverter_on;
     _feedback_data.status.derating_on = unpacked_msg.derating_on;
@@ -55,10 +55,8 @@ void InverterInterface::recieve_MCI_STATUS(CAN_message_t &can_msg)
     _feedback_data.status.hv_present = _feedback_data.status.dc_bus_voltage > _inverter_params.MINIMUM_HV_VOLTAGE;
 }
 
-void InverterInterface::recieve_MCI_TEMPS(CAN_message_t &can_msg)
+void InverterInterface::receive_MCI_TEMPS(CAN_message_t &can_msg)
 {
-
-    Serial.println("Recieved temps data!");
 
     // Unpack the message
     MCI1_TEMPS_t unpacked_msg;
@@ -72,7 +70,7 @@ void InverterInterface::recieve_MCI_TEMPS(CAN_message_t &can_msg)
 
 }
 
-void InverterInterface::recieve_MCI_DYNAMICS(CAN_message_t &can_msg) 
+void InverterInterface::receive_MCI_DYNAMICS(CAN_message_t &can_msg) 
 {
 
     // Unpack the message
@@ -87,7 +85,7 @@ void InverterInterface::recieve_MCI_DYNAMICS(CAN_message_t &can_msg)
 
 }
 
-void InverterInterface::recieve_MCI_POWER(CAN_message_t &can_msg) 
+void InverterInterface::receive_MCI_POWER(CAN_message_t &can_msg) 
 {
     // Unpack the message
     MCI1_POWER_t unpacked_msg;
@@ -100,7 +98,7 @@ void InverterInterface::recieve_MCI_POWER(CAN_message_t &can_msg)
 
 }
 
-void InverterInterface::recieve_MCI_FEEDBACK(CAN_message_t &can_msg) 
+void InverterInterface::receive_MCI_FEEDBACK(CAN_message_t &can_msg) 
 {
     // Unpack the message
     MCI1_FEEDBACK_t unpacked_msg;
@@ -118,17 +116,6 @@ void InverterInterface::recieve_MCI_FEEDBACK(CAN_message_t &can_msg)
  * Sending CAN messages
  */
 
-template <typename U>
-void InverterInterface::enqueue_new_CAN(U *structure, uint32_t (*pack_function)(U *, uint8_t *, uint8_t *, uint8_t *), uint32_t id)
-{
-    CAN_message_t can_msg;
-    pack_function(structure, can_msg.buf, &can_msg.len, (uint8_t *)&can_msg.flags.extended);
-    can_msg.id = id;
-    uint8_t buf[sizeof(CAN_message_t)] = {};
-    memmove(buf, &can_msg, sizeof(CAN_message_t));
-    msg_queue_->push_back(buf, sizeof(CAN_message_t));
-}
-
 void InverterInterface::send_MC_SETPOINT_COMMAND() 
 {
     MC1_SETPOINTS_COMMAND_t msg_out;
@@ -137,7 +124,7 @@ void InverterInterface::send_MC_SETPOINT_COMMAND()
     msg_out.positive_torque_limit_ro = _inverter_setpoints.positive_torque_limit;
     msg_out.negative_torque_limit_ro = _inverter_setpoints.negative_torque_limit;
 
-    enqueue_new_CAN<MC1_SETPOINTS_COMMAND_t>(&msg_out, &Pack_MC1_SETPOINTS_COMMAND_hytech, inverter_ids.mc_setpoint_commands_id);
+    CAN_util::enqueue_msg<MC1_SETPOINTS_COMMAND_t>(&msg_out, &Pack_MC1_SETPOINTS_COMMAND_hytech, inverter_ids.mc_setpoint_commands_id);
 }
 
 void InverterInterface::send_MC_CONTROL_WORD() 
@@ -152,15 +139,11 @@ void InverterInterface::send_MC_CONTROL_WORD()
 void InverterInterface::set_speed(float desired_rpm, float torque_limit_nm) 
 {
     _inverter_setpoints.speed_rpm_setpoint = desired_rpm;
-    _inverter_setpoints.positive_torque_limit = torque_limit_nm;
-    _inverter_setpoints.negative_torque_limit = -torque_limit_nm;
-}
 
-void InverterInterface::set_torque(float torque_nm) 
-{
-    // TODO set desired rpm to max? 
-    _inverter_setpoints.positive_torque_limit = torque_nm;
-    _inverter_setpoints.negative_torque_limit = -torque_nm;
+    float converted_torque = std::abs(torque_limit_nm * (1000/9.8));
+
+    _inverter_setpoints.positive_torque_limit = converted_torque;
+    _inverter_setpoints.negative_torque_limit = -converted_torque;
 }
 
 void InverterInterface::set_idle() 
