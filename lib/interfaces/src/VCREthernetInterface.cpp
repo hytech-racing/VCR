@@ -1,6 +1,5 @@
 #include "VCREthernetInterface.h"
 #include "SharedFirmwareTypes.h"
-#include <Arduino.h>
 
 hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(VCRData_s &shared_state)
 {
