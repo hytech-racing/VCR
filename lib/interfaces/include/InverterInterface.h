@@ -52,6 +52,7 @@ struct InverterControlWord_s
 **/
 struct InverterStatus_s
 {
+    bool connected : 1;
     bool new_data : 1;
     bool system_ready : 1;
     bool error : 1;

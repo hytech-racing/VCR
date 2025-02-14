@@ -42,6 +42,7 @@ void InverterInterface::recieve_MCI_STATUS(CAN_message_t &can_msg)
     Unpack_MCI1_STATUS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
     
     // Update inverter interface with new data
+    _feedback_data.status.connected = true; // Will set to true once first CAN message has been recieved
     _feedback_data.status.system_ready = unpacked_msg.system_ready;
     _feedback_data.status.error = unpacked_msg.error;
     _feedback_data.status.warning = unpacked_msg.warning;

@@ -26,6 +26,9 @@
     // - [ ] 
 
 
+namespace constants {
+    float MINIMUM_HV_VOLTAGE = 400.0;
+}
 
 // TODO move these into the shared types after finishing the system 
 enum class DrivetrainState_e
@@ -45,17 +48,6 @@ enum class DrivetrainCmdResponse_e
     COMMAND_OK = 0,
     CANNOT_INIT_NOT_CONNECTED = 1,
     COMMAND_INVALID = 2
-};
-
-struct DrivetrainSpeedCommand_s
-{
-    veh_vec<float> desired_speed_rpm;
-    veh_vec<float> torque_limit_nm;
-};
-
-struct DrivetrainTorqueCommand_s
-{
-    veh_vec<float> desired_torque_nm;
 };
 
 struct DrivetrainStatus_s
@@ -82,10 +74,21 @@ struct DrivetrainInputPins_s
     bool torque_mode_enabled_pin_state : 1;
 };
 
+enum DrivetrainModeRequest_e 
+{
+    UNINITIALIZED = 0,
+    INIT_DRIVE_MODE = 1
+};
+
+struct DrivetrainInit_s 
+{
+    DrivetrainModeRequest_e init_drivetrain;
+};
+
 class DrivetrainSystem
 {
 public:
-    using CmdVariant = etl::variant<DrivetrainSpeedCommand_s, DrivetrainTorqueCommand_s, DrivetrainInit_s, DrivetrainResetError_s>;
+    using CmdVariant = etl::variant<DrivetrainCommand_s, DrivetrainInit_s, DrivetrainResetError_s>;
     DrivetrainSystem() = delete;
 
     DrivetrainStatus_s evaluate_drivetrain(CmdVariant cmd);
@@ -98,6 +101,7 @@ public:
         std::function<void()> set_idle;
         std::function<void(InverterControlWord_s control_word)> set_inverter_control_word;
         std::function<InverterStatus_s()> get_status;
+        std::function<MotorMechanics_s()> get_motor_mechanics; 
     };
     
     DrivetrainSystem(veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces);
@@ -114,9 +118,7 @@ private:
     void _set_enable_drivetrain_hv();
     void _set_enable_drivetrain();
     void _set_drivetrain_error_reset();
-    
-    void _set_drivetrain_speed_command(DrivetrainSpeedCommand_s cmd);
-    void _set_drivetrain_torque_command(DrivetrainTorqueCommand_s cmd);
+    void _set_drivetrain_command(DrivetrainCommand_s cmd);
 
     DrivetrainState_e _evaluate_state_machine(CmdVariant cmd);
 
