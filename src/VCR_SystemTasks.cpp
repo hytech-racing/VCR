@@ -44,8 +44,9 @@ CarState_e evaluate_state_machine(const VCRData_s &system_data,
     return {};
 }
 
-void big_task(etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call, VCRInterfaces &interface_ref_container, VCRSystems &systems,
-              VehicleStateMachine &state_machine, const VCRInterfaceData_s & cur_vcr_int_data) {
+void big_task(etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call,
+              VCRInterfaces &interface_ref_container, VCRSystems &systems,
+              VehicleStateMachine &state_machine, const VCRInterfaceData_s &cur_vcr_int_data) {
     auto interface_data = sample_async_data(recv_call, interface_ref_container, cur_vcr_int_data);
 
     auto sys_data = evaluate_systems(interface_data, systems);
