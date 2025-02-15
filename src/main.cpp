@@ -27,14 +27,20 @@
 #include "VCRCANInterfaceImpl.h"
 #include "FlexCAN_T4.h"
 
+#include "etl/singleton.h"
 
-FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> INV_CAN;
-FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> TELEM_CAN;
+#include "DrivebrainInterface.h"
+
+// class DrivebrainInterface;
+
+
+FlexCAN_Type<CAN2> INV_CAN;
+FlexCAN_Type<CAN3> TELEM_CAN;
 
 /* Scheduler setup */
 TsScheduler task_scheduler;
 
-constexpr unsigned long adc_sample_period_us = 250; 
+constexpr unsigned long adc_sample_period_us = 250;
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use 
 TsTask adc_0_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc0_task, &task_scheduler, false, &init_read_adc0_task);
 TsTask adc_1_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc1_task, &task_scheduler, false, &init_read_adc1_task);
@@ -44,7 +50,10 @@ qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
 
 
+
 void setup() {
+    // TODO 
+    DrivebrainInterfaceInstance::create(vcr_data); 
     SPI.begin(); // TODO this should be elsewhere maybe
     const uint32_t CAN_baudrate = 500000;
     // from CANInterfaceon_inverter_can_receive

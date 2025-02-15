@@ -22,8 +22,9 @@ VCRInterfaceData_s sample_async_data(VCRInterfaces & interface_ref_container, co
     process_ring_buffer(telem_can_rx_buffer, interface_ref_container.can_interfaces, sys_time::hal_millis(),recv_call);
     
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
+    auto drivebrain_data = interface_ref_container.can_interfaces.db_interface.get_latest_data();
     ret.recvd_pedals_data = vcf_data.stamped_pedals;
-    
+    ret.latest_drivebrain_command = drivebrain_data;
     return ret;
 }
 
@@ -31,6 +32,7 @@ VCRInterfaceData_s sample_async_data(VCRInterfaces & interface_ref_container, co
 VCRSystemData_s evaluate_systems(const VCRInterfaceData_s &interface_data, VCRSystems &systems)
 {   
     VCRSystemData_s sys_data;
+    // systems
     return sys_data;
 }
 

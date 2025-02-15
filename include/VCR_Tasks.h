@@ -1,9 +1,6 @@
 #ifndef VCR_TASKS
 #define VCR_TASKS
 
-
-
-
 /* From shared_firmware_types library */
 #include "SharedFirmwareTypes.h"
 
@@ -52,5 +49,7 @@ void run_update_buzzer_controller_task();
  * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin
  */
 void run_kick_watchdog();
+
+void handle_send_suspension_CAN_data();
 
 #endif /* VCR_TASKS */

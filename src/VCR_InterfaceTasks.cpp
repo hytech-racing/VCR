@@ -1,3 +1,4 @@
+#include "CANInterface.h"
 #include "SystemTimeInterface.h"
 #include "VCR_Tasks.h"
 
@@ -12,7 +13,10 @@
 #include "VCR_Constants.h"
 #include "BuzzerController.h"
 #include "VCR_Globals.h"
-#include "VehicleStateMachine.h"
+
+// #include "VehicleStateMachine.h"
+
+#include "DrivebrainInterface.h"
 
 bool init_read_adc0_task()
 {
@@ -87,4 +91,12 @@ void create_watchdog()
 void run_kick_watchdog()
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
+}
+
+// CAN send tasks
+
+// adds rear suspension and vcr status CAN messages to the sent on next mega loop run 
+void handle_send_suspension_CAN_data()
+{
+    DrivebrainInterfaceInstance::instance().send_suspension_CAN_data();
 }

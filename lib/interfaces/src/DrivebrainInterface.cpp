@@ -1,5 +1,15 @@
 #include "DrivebrainInterface.h"
+
+#include "FlexCAN_T4.h"
+
+#include "CANInterface.h"
+#include "VCRCANInterfaceImpl.h"
 #include "hytech.h"
+
+DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cell_data,
+                                         const RearSusPotData_s &rear_suspot_data)
+    : _suspension_data{.rear_load_cell_data = rear_load_cell_data,
+                       .rear_suspot_data = rear_suspot_data} {}
 
 StampedDrivetrainCommand_s DrivebrainInterface::get_latest_data() {
     return _latest_drivebrain_command;
@@ -39,4 +49,14 @@ void DrivebrainInterface::receive_drivebrain_torque_lim_command(const CAN_messag
             HYTECH_drivebrain_torque_rl_ro_fromS(drivebrain_msg.drivebrain_torque_rl_ro)),
         static_cast<float>(
             HYTECH_drivebrain_torque_rr_ro_fromS(drivebrain_msg.drivebrain_torque_rr_ro))};
+}
+
+void DrivebrainInterface::send_suspension_CAN_data() {
+    REAR_SUSPENSION_t rear_sus_msg;
+    rear_sus_msg.rl_load_cell = _suspension_data.rear_load_cell_data.RL_loadcell_analog;
+    rear_sus_msg.rr_load_cell = _suspension_data.rear_load_cell_data.RR_loadcell_analog;
+    rear_sus_msg.rl_shock_pot = _suspension_data.rear_suspot_data.RL_sus_pot_analog;
+    rear_sus_msg.rr_shock_pot = _suspension_data.rear_suspot_data.RR_sus_pot_analog;
+
+    CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_hytech, telem_can_tx_buffer);
 }
