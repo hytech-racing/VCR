@@ -3,14 +3,10 @@
 #include <Arduino.h>
 #endif
 
- // NOLINT for TaskScheduler
-
-
+// NOLINT for TaskScheduler
 
 /* From shared_firmware_types libdep */
 #include "SharedFirmwareTypes.h"
-
-
 
 /* Arduino specific upstream Libraries */
 #include "QNEthernet.h"
@@ -18,21 +14,20 @@
 #include <TScheduler.hpp>
 
 /* Local includes */
-#include "VCR_Globals.h"
-#include "VCR_Constants.h"
-#include "VCR_Tasks.h"
 #include "TorqueControllerMux.hpp"
 #include "VCFInterface.h"
+#include "VCR_Constants.h"
+#include "VCR_Globals.h"
+#include "VCR_Tasks.h"
 
-#include "VCRCANInterfaceImpl.h"
 #include "FlexCAN_T4.h"
+#include "VCRCANInterfaceImpl.h"
 
 #include "etl/singleton.h"
 
 #include "DrivebrainInterface.h"
 
 // class DrivebrainInterface;
-
 
 FlexCAN_Type<CAN2> INV_CAN;
 FlexCAN_Type<CAN3> TELEM_CAN;
@@ -41,19 +36,20 @@ FlexCAN_Type<CAN3> TELEM_CAN;
 TsScheduler task_scheduler;
 
 constexpr unsigned long adc_sample_period_us = 250;
-// from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use 
-TsTask adc_0_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc0_task, &task_scheduler, false, &init_read_adc0_task);
-TsTask adc_1_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc1_task, &task_scheduler, false, &init_read_adc1_task);
+// from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
+TsTask adc_0_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc0_task, &task_scheduler,
+                         false, &init_read_adc0_task);
+TsTask adc_1_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc1_task, &task_scheduler,
+                         false, &init_read_adc1_task);
 
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
 
-
-
 void setup() {
-    // TODO 
-    DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_load_cell_data, vcr_data.interface_data.rear_suspot_data); 
+    // TODO
+    DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
+                                        vcr_data.interface_data.rear_suspot_data);
     SPI.begin(); // TODO this should be elsewhere maybe
     const uint32_t CAN_baudrate = 500000;
     // from CANInterfaceon_inverter_can_receive
@@ -64,6 +60,4 @@ void setup() {
     adc_1_sample_task.enable();
 }
 
-void loop() {
-    task_scheduler.execute();
-}
+void loop() { task_scheduler.execute(); }
