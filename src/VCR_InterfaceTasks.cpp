@@ -1,7 +1,6 @@
+#include "SystemTimeInterface.h"
 #include "VCR_Tasks.h"
 
-/* From HT_SCHED library */
-#include "ht_sched.hpp"
 
 /* From shared-systems-lib */
 #include "Logger.h"
@@ -15,9 +14,9 @@
 #include "VCR_Globals.h"
 #include "VehicleStateMachine.h"
 
-bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+bool init_read_adc0_task()
 {
-
+    adc_0.init();
     adc_0.setChannelScaleAndOffset(GLV_SENSE_CHANNEL, GLV_SENSE_SCALE, GLV_SENSE_OFFSET);
     adc_0.setChannelScaleAndOffset(CURRENT_SENSE_CHANNEL, CURRENT_SENSE_SCALE, CURRENT_SENSE_OFFSET);
     adc_0.setChannelScaleAndOffset(REFERENCE_SENSE_CHANNEL, REFERENCE_SENSE_SCALE, REFERENCE_SENSE_OFFSET);
@@ -25,13 +24,12 @@ bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     adc_0.setChannelScaleAndOffset(RR_LOADCELL_CHANNEL, RL_LOADCELL_SCALE, RL_LOADCELL_OFFSET);
     adc_0.setChannelScaleAndOffset(RL_SUS_POT_CHANNEL, RL_SUS_POT_SCALE, RL_SUS_POT_OFFSET);
     adc_0.setChannelScaleAndOffset(RR_SUS_POT_CHANNEL, RR_SUS_POT_SCALE, RR_SUS_POT_OFFSET);
-
-    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros); // NOLINT
-
+    
+    hal_printf("Initialized ADC0 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
     return true;
 }
 
-bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+void run_read_adc0_task()
 {
 
     adc_0.sample(); // Samples all eight channels.
@@ -44,24 +42,15 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = adc_0.data.conversions[RR_LOADCELL_CHANNEL].conversion;
     vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = adc_0.data.conversions[RL_SUS_POT_CHANNEL].raw; // Just use raw for suspots
     vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = adc_0.data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
-
-    return true;
+    // Serial.println("yo");
+    hal_printf("ADC0 reading 0 %d\n", adc_0.data.conversions[0].raw); // NOLINT
 }
 
-HT_TASK::Task read_adc0_task = HT_TASK::Task(init_read_adc0_task, run_read_adc0_task, 10, 1000UL); // 1000us is 1kHz //NOLINT
-
-// bool run_tick_state_machine_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-// {
-//     // VehicleStateMachine::getInstance().tick_state_machine(sysMicros / 1000, system_data); // tick function requires millis //NOLINT
-//     return true;
-// }
-
-// HT_TASK::Task tick_state_machine_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_tick_state_machine_task, 2); // Idle (constant-update) task //NOLINT
-
-bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+bool init_read_adc1_task()
 {
     /* NOLINTBEGIN */ // Thermistor channels are for testing purposes only, the pin numbers 0-7 are acceptable "magic numbers".
     // Initialize all eight channels to scale = 1, offset = 0
+    adc_0.init();
     adc_1.setChannelScaleAndOffset(0, 1, 0);
     adc_1.setChannelScaleAndOffset(1, 1, 0);
     adc_1.setChannelScaleAndOffset(2, 1, 0);
@@ -72,43 +61,30 @@ bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     adc_1.setChannelScaleAndOffset(7, 1, 0);
     /* NOLINTEND */
 
-    hal_printf("Initialized ADC0 at %d (micros)\n", sysMicros); // NOLINT
-
+    hal_printf("Initialized ADC1 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
     return true;
 }
 
-bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+void run_read_adc1_task()
 {
 
     adc_1.sample(); // Samples all eight channels.
     adc_1.convert(); // Converts all eight channels.
-
-    return true;
+    hal_printf("ADC1 reading 0 %d\n", adc_1.data.conversions[0].raw); // NOLINT
 }
 
-HT_TASK::Task read_adc1_task = HT_TASK::Task(init_read_adc1_task, run_read_adc1_task, 10, 40000UL); // 20000us is 25Hz //NOLINT
-
-bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+void run_update_buzzer_controller_task()
 {
+    vcr_data.system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sys_time::hal_millis()); //NOLINT
 
-    vcr_data.system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sysMicros / 1000); //NOLINT
-
-    return true;
 }
 
-HT_TASK::Task update_buzzer_controller_task = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 10, 20000UL); // 20000us is 50hz //NOLINT
-
-
-bool create_watchdog(const unsigned long & sysMicros, const HT_TASK::TaskInfo &task_info)
+void create_watchdog()
 {
     WatchdogInstance::create(default_system_params::KICK_INTERVAL_MS); // this has issues for some reason with clang-tidy // NOLINT
-    return true;
 }
 
-bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+void run_kick_watchdog()
 {
-    digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sysMicros / 1000));
-    return true;
+    digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
 }
-
-HT_TASK::Task kick_watchdog_task = HT_TASK::Task(create_watchdog, run_kick_watchdog, 3, 2000UL); // 2000us is 500hz // NOLINT
