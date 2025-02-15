@@ -53,7 +53,7 @@ qindesign::network::EthernetUDP protobuf_recv_socket;
 
 void setup() {
     // TODO 
-    DrivebrainInterfaceInstance::create(vcr_data); 
+    DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_load_cell_data, vcr_data.interface_data.rear_suspot_data); 
     SPI.begin(); // TODO this should be elsewhere maybe
     const uint32_t CAN_baudrate = 500000;
     // from CANInterfaceon_inverter_can_receive
