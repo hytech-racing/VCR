@@ -14,7 +14,7 @@
 
 /* Arduino specific upstream Libraries */
 #include "QNEthernet.h"
-#define _TASK_MICRO_RES
+#define _TASK_MICRO_RES // NOLINT
 #include <TScheduler.hpp>
 
 /* Local includes */

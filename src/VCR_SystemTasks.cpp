@@ -10,7 +10,7 @@
 #include "VCRCANInterfaceImpl.h"
 #include "VehicleStateMachine.h"
 
-#include "LLSysInterface.h"
+#include "SystemTimeInterface.h"
 
 auto recv_call = etl::delegate<void(CANInterfaces& , const CAN_message_t& , unsigned long )>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 
@@ -18,8 +18,8 @@ VCRInterfaceData_s sample_async_data(VCRInterfaces & interface_ref_container, co
 {
     VCRInterfaceData_s ret = cur_vcr_int_data;
     // process ring buffer is from CANInterface. TODO put into namespace
-    process_ring_buffer(inverter_can_rx_buffer, interface_ref_container.can_interfaces, ll_sys::ll_millis(), recv_call);
-    process_ring_buffer(telem_can_rx_buffer, interface_ref_container.can_interfaces, ll_sys::ll_millis(),recv_call);
+    process_ring_buffer(inverter_can_rx_buffer, interface_ref_container.can_interfaces, sys_time::hal_millis(), recv_call);
+    process_ring_buffer(telem_can_rx_buffer, interface_ref_container.can_interfaces, sys_time::hal_millis(),recv_call);
 
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
     ret.recvd_pedals_data = vcf_data.stamped_pedals;
@@ -37,7 +37,7 @@ VCRSystemData_s evaluate_systems(const VCRInterfaceData_s &interface_data, VCRSy
 CarState_e evaluate_state_machine(const VCRData_s& system_data, const InterfaceData_s& interface_data, VehicleStateMachine& state_machine)
 {
     // TODO make tick stat machine function return the state
-    state_machine.tick_state_machine(ll_sys::ll_millis(), system_data);
+    state_machine.tick_state_machine(sys_time::hal_millis(), system_data);
     return {};
 }
 

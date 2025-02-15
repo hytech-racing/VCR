@@ -1,4 +1,4 @@
-#include "LLSysInterface.h"
+#include "SystemTimeInterface.h"
 #include "VCR_Tasks.h"
 
 
@@ -25,7 +25,7 @@ bool init_read_adc0_task()
     adc_0.setChannelScaleAndOffset(RL_SUS_POT_CHANNEL, RL_SUS_POT_SCALE, RL_SUS_POT_OFFSET);
     adc_0.setChannelScaleAndOffset(RR_SUS_POT_CHANNEL, RR_SUS_POT_SCALE, RR_SUS_POT_OFFSET);
     
-    hal_printf("Initialized ADC0 at %d (millis)\n", ll_sys::ll_millis()); // NOLINT
+    hal_printf("Initialized ADC0 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
     return true;
 }
 
@@ -61,7 +61,7 @@ bool init_read_adc1_task()
     adc_1.setChannelScaleAndOffset(7, 1, 0);
     /* NOLINTEND */
 
-    hal_printf("Initialized ADC1 at %d (millis)\n", ll_sys::ll_millis()); // NOLINT
+    hal_printf("Initialized ADC1 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
     return true;
 }
 
@@ -75,7 +75,7 @@ void run_read_adc1_task()
 
 void run_update_buzzer_controller_task()
 {
-    vcr_data.system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(ll_sys::ll_millis()); //NOLINT
+    vcr_data.system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sys_time::hal_millis()); //NOLINT
 
 }
 
@@ -86,5 +86,5 @@ void create_watchdog()
 
 void run_kick_watchdog()
 {
-    digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(ll_sys::ll_millis()));
+    digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
 }
