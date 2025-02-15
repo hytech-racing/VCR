@@ -27,7 +27,7 @@ void set_outputs(cmd_type &cmd, float mps, float torque)
 
 TEST(TorqueControllerMuxTesting, test_construction)
 {
-    auto test_func = [](const VCRData_s& state) -> DrivetrainCommand_s {
+    auto test_func = [](const VCRData_s& state, unsigned long m) -> DrivetrainCommand_s {
         return {};
     };
     TorqueControllerMux<2> test({test_func, test_func}, {false, false});
@@ -36,7 +36,7 @@ TEST(TorqueControllerMuxTesting, test_construction)
 TEST(TorqueControllerMuxTesting, test_invalid_controller_request_error)
 {
     
-    auto test_func = [](const VCRData_s& state) -> DrivetrainCommand_s {
+    auto test_func = [](const VCRData_s& state, unsigned long m) -> DrivetrainCommand_s {
         return {};
     };
     TorqueControllerMux<2> test({test_func, nullptr}, {false, false});
@@ -70,10 +70,10 @@ TEST(TorqueControllerMuxTesting, test_controller_output_swap_logic)
     set_outputs(out1, 0, 1);
     DrivetrainCommand_s out2;
     set_outputs(out2, 6, 1);
-    auto test_func_1 = [&out1](const VCRData_s& state) -> DrivetrainCommand_s {
+    auto test_func_1 = [&out1](const VCRData_s& state, unsigned long m) -> DrivetrainCommand_s {
         return out1;
     };
-    auto test_func_2 = [&out2](const VCRData_s& state) -> DrivetrainCommand_s {
+    auto test_func_2 = [&out2](const VCRData_s& state, unsigned long m) -> DrivetrainCommand_s {
         return out2;
     };
 
@@ -102,10 +102,10 @@ TEST(TorqueControllerMuxTesting, test_controller_output_swap_logic)
 TEST(TorqueControllerMuxTesting, test_torque_diff_swap_limit)
 {
     DrivetrainCommand_s inst1, inst2;
-    auto test_func_1 = [&inst1](const VCRData_s& state) -> DrivetrainCommand_s {
+    auto test_func_1 = [&inst1](const VCRData_s& state, unsigned long m) -> DrivetrainCommand_s {
         return inst1;
     };
-    auto test_func_2 = [&inst2](const VCRData_s& state) -> DrivetrainCommand_s {
+    auto test_func_2 = [&inst2](const VCRData_s& state, unsigned long m) -> DrivetrainCommand_s {
         return inst2;
     };
     set_outputs(inst1, 0.1, 1);
@@ -249,7 +249,7 @@ TEST(TorqueControllerMuxTesting, test_torque_limit)
 
     // TestControllerType inst1;
     DrivetrainCommand_s inst1;
-    auto test_func_1 = [&inst1](const VCRData_s& state) -> DrivetrainCommand_s {
+    auto test_func_1 = [&inst1](const VCRData_s& state, unsigned long m) -> DrivetrainCommand_s {
         return inst1;
     };
     set_outputs(inst1, 500, 10.0);

@@ -20,7 +20,7 @@ VCRInterfaceData_s sample_async_data(VCRInterfaces & interface_ref_container, co
     // process ring buffer is from CANInterface. TODO put into namespace
     process_ring_buffer(inverter_can_rx_buffer, interface_ref_container.can_interfaces, sys_time::hal_millis(), recv_call);
     process_ring_buffer(telem_can_rx_buffer, interface_ref_container.can_interfaces, sys_time::hal_millis(),recv_call);
-
+    
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
     ret.recvd_pedals_data = vcf_data.stamped_pedals;
     

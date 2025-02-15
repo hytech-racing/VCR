@@ -21,6 +21,7 @@
 #include "hytech.h" // generated CAN library
 
 #include "VCFInterface.h"
+#include "DrivebrainInterface.h"
 
 using CANRXBufferType = Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)>;
 using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_message_t)>;
@@ -44,9 +45,10 @@ void on_telem_can_receive(const CAN_message_t &msg);
 
 struct CANInterfaces
 {
-    explicit CANInterfaces(VCFInterface& vcf_int): vcf_interface(vcf_int) {}
+    explicit CANInterfaces(VCFInterface& vcf_int, DrivebrainInterface& db_int): vcf_interface(vcf_int), db_interface(db_int) {}
 
     VCFInterface& vcf_interface;
+    DrivebrainInterface &db_interface;
 };
 
 namespace VCRCANInterfaceImpl
