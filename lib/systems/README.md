@@ -80,3 +80,26 @@ stateDiagram-v2
     err --> clear_err: on user request of error reset 
     clear_err --> not_en_hv: on successful reset of errors (either internally to the drivetrain system or of the inverters themselves)
 ```
+
+```
+---
+title: Vehicle State Machine
+---
+stateDiagram-v2
+
+    tsna : TRACTIVE_SYSTEM_NOT_ACTIVE
+    tsa : TRACTIVE_SYSTEM_ACTIVE
+    wrtd : WANTING_READY_TO_DRIVE
+    rtd : READY_TO_DRIVE
+
+    tsna --> tsa : If hv is over threshold
+
+    tsa --> tsna : If hv is under threshold
+    tsa --> wrtd : If the brake and start button are pressed
+
+    wrtd --> tsna : If hv is under threshold
+    wrtd --> rtd : If the drivetrain system is in the ready state
+
+    rtd --> tsna : If hv is under threshold
+    rtd --> tsa : If a drivetrain error occurs
+```
