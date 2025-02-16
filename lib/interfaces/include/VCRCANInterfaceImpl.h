@@ -21,6 +21,7 @@
 #include "hytech.h" // generated CAN library
 
 #include "VCFInterface.h"
+#include "DrivebrainInterface.h"
 
 using CANRXBufferType = Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)>;
 using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_message_t)>;
@@ -37,16 +38,22 @@ extern CANTXBufferType inverter_can_tx_buffer;
 /* TX buffer for CAN3 */
 extern CANTXBufferType telem_can_tx_buffer;
 
+template <CAN_DEV_TABLE CAN_DEV>
+using FlexCAN_Type = FlexCAN_T4<CAN_DEV, RX_SIZE_256, TX_SIZE_16>;
+
+// this is being done to send immediately from the inverter CAN line to the TELEM CAN every inverter 
+extern FlexCAN_Type<CAN3> TELEM_CAN; // gets defined in main as of right now
+
 void on_can1_receive(const CAN_message_t &msg);
 void on_inverter_can_receive(const CAN_message_t &msg);
 void on_telem_can_receive(const CAN_message_t &msg);
 
-
 struct CANInterfaces
 {
-    explicit CANInterfaces(VCFInterface& vcf_int): vcf_interface(vcf_int) {}
+    explicit CANInterfaces(VCFInterface& vcf_int, DrivebrainInterface& db_int): vcf_interface(vcf_int), db_interface(db_int) {}
 
     VCFInterface& vcf_interface;
+    DrivebrainInterface &db_interface;
 };
 
 namespace VCRCANInterfaceImpl

@@ -3,6 +3,8 @@
 #include "PhysicalParameters.h"
 #include <cmath>
 
+#include "SystemTimeInterface.h"
+
 template <std::size_t num_controllers>
 DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command(ControllerMode_e requested_controller_type,
                                                                                TorqueLimit_e requested_torque_limit,
@@ -28,14 +30,14 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
         return empty_command;
     }
 
-    current_output = _controller_evals[active_controller_mode_index](input_state);
+    current_output = _controller_evals[active_controller_mode_index](input_state, sys_time::hal_millis());
 
     // std::cout << "output torques " << current_output.inverter_torque_limit[0] << " " << current_output.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
     bool requesting_controller_change = requested_controller_type != _active_status.active_controller_mode;
 
     if (requesting_controller_change)
     {
-        DrivetrainCommand_s proposed_output = _controller_evals[req_controller_mode_index](input_state);
+        DrivetrainCommand_s proposed_output = _controller_evals[req_controller_mode_index](input_state, sys_time::hal_millis());
         TorqueControllerMuxError_e error_state = can_switch_controller(input_state.system_data.drivetrain_data, current_output, proposed_output);
         if (error_state == TorqueControllerMuxError_e::NO_ERROR)
         {

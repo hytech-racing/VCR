@@ -3,6 +3,7 @@
 #include "test_tcmux.h"
 #include "test_buzzer.h"
 #include "test_watchdog.h"
+#include "test_drivebrain_controller.h"
 
 int main(int argc, char **argv)
 {
