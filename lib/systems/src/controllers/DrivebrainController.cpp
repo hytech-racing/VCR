@@ -2,6 +2,8 @@
 #include "SharedFirmwareTypes.h"
 #include <cstdint>
 
+// #include <iostream>
+
 DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsigned long eval_millis)
 {
 
@@ -12,12 +14,14 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     bool not_all_messages_recvd = ( (!db_input.desired_speeds.recvd) || (!db_input.torque_limits.recvd) );
     
     auto last_speed_setpoint_timestamp = db_input.desired_speeds.last_recv_millis;
-    auto last_torque_lim_timestamp = db_input.desired_speeds.last_recv_millis;
+    auto last_torque_lim_timestamp = db_input.torque_limits.last_recv_millis;
 
     // 2 if the time between the current VCR eval_millis time and the last millis time that we recvd a drivebrain msg is too high
     bool speed_setpoint_msg_too_latent = (::abs((int)(static_cast<int64_t>(eval_millis) - static_cast<int64_t>(last_speed_setpoint_timestamp))) > (int)_params.allowed_latency);
     bool torque_limit_message_too_latent = (::abs((int)(static_cast<int64_t>(eval_millis) - static_cast<int64_t>(last_torque_lim_timestamp))) > (int)_params.allowed_latency);
 
+    // std::cout << "last_speedsp ts " << last_speed_setpoint_timestamp <<std::endl;
+    // std::cout << "ts " << last_torque_lim_timestamp <<std::endl;
     // 3 if the relative latency is too high (time between the message members) -> (allowed latency / 2)
     bool latency_diff_too_high = (::abs((int)(static_cast<int64_t>(last_speed_setpoint_timestamp) - static_cast<int64_t>(last_torque_lim_timestamp))) > ((int)_params.allowed_latency / 2));
     
@@ -38,7 +42,14 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     }
 
     bool timing_failure = (speed_setpoint_msg_too_latent || torque_limit_message_too_latent || not_all_messages_recvd || latency_diff_too_high);
-
+    // if(timing_failure)
+    // {
+    //     std::cout <<"timing failures: "<<std::endl;
+    //     std::cout << speed_setpoint_msg_too_latent<< std::endl;
+    //     std::cout << torque_limit_message_too_latent<< std::endl;
+    //     std::cout << not_all_messages_recvd<< std::endl;
+    //     std::cout << latency_diff_too_high<< std::endl;
+    // }
     // only if this is being evaluated while not the active control mode do we clear fault
     bool is_active_controller = state.system_data.tc_mux_status.active_controller_mode == _params.assigned_controller_mode;
 
@@ -55,6 +66,7 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     }
     else
     {
+        
         _timing_failure = true;
         output = _emergency_control.evaluate(state, eval_millis);
     }
