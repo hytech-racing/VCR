@@ -1,5 +1,6 @@
 #include "SystemTimeInterface.h"
 #include "VCR_Tasks.h"
+#include "MCP23017Interface.h"
 
 
 /* From shared-systems-lib */
@@ -105,29 +106,21 @@ bool init_I2C(){
     return true;
 }
 
-bool get_bit(u_int16_t data, int bit){
-    return (data>>bit)&1;
-}
-
 void run_I2C(){
-    
-    uint16_t temp = mcp.read();
-    //GPA
-    vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = get_bit(temp, 0);
-    vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay = get_bit(temp, 1);
-    vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok = get_bit(temp, 2);
-    vcr_data.interface_data.shutdown_sensing_data.l_bms_relay = get_bit(temp, 3);
-    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = get_bit(temp, 4);
-    vcr_data.interface_data.shutdown_sensing_data.m_imd_relay = get_bit(temp, 5);
-    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = get_bit(temp, 6);
-    // vcr_data.shutdown_sensing_data.i_shutdown_in = get_bit(temp, 7); //GPA7 unusable for input
-
-    //GPB
-    vcr_data.interface_data.ethernet_is_linked.acu_link = get_bit(temp, 8);
-    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = get_bit(temp, 9);
-    vcr_data.interface_data.ethernet_is_linked.vcf_link = get_bit(temp, 10);
-    vcr_data.interface_data.ethernet_is_linked.teensy_link = get_bit(temp, 11);
-    vcr_data.interface_data.ethernet_is_linked.debug_link = get_bit(temp, 12);
-    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = get_bit(temp, 13);
-    // vcr_data.shutdown_sensing_data.j_bspd_relay = get_bit(temp, 15); //GPB7 unusable for input
+    uint16_t data = mcp.read();
+    vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = specifiedBit::getBit(data, 0, 0);
+    vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay = specifiedBit::getBit(data, 0,1);
+    vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok = specifiedBit::getBit(data, 0,2);
+    vcr_data.interface_data.shutdown_sensing_data.l_bms_relay = specifiedBit::getBit(data, 0,3);
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = specifiedBit::getBit(data, 0,4);
+    vcr_data.interface_data.shutdown_sensing_data.m_imd_relay = specifiedBit::getBit(data, 0,5);
+    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = specifiedBit::getBit(data, 0,6);
+    // vcr_data.shutdown_sensing_data.i_shutdown_in = specifiedBit::getBit(data, 0,7); //GPA7 unusable for input
+    vcr_data.interface_data.ethernet_is_linked.acu_link = specifiedBit::getBit(data, 1, 0);
+    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = specifiedBit::getBit(data, 1, 1);
+    vcr_data.interface_data.ethernet_is_linked.vcf_link = specifiedBit::getBit(data, 1, 2);
+    vcr_data.interface_data.ethernet_is_linked.teensy_link = specifiedBit::getBit(data, 1, 3);
+    vcr_data.interface_data.ethernet_is_linked.debug_link = specifiedBit::getBit(data, 1, 4);
+    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = specifiedBit::getBit(data, 1, 5);
+    // vcr_data.shutdown_sensing_data.j_bspd_relay = specifiedBit::getBit(data, 1, 7); //GPB7 unusable for input
 }
