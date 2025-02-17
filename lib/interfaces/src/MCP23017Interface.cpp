@@ -1,9 +1,10 @@
 #include "MCP23017Interface.h"
-#include <sys/types.h>
+
+#include "SharedFirmwareTypes.h"
 
 namespace specifiedBit
 {
-    bool getBit(u_int16_t data, bool port, int bit){
+    bool getBit(uint16_t data, bool port, int bit){
         if(!port){ //0=A
             return (data>>bit)&1;
         }
