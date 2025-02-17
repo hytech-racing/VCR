@@ -54,7 +54,7 @@ bool init_read_adc1_task()
 {
     /* NOLINTBEGIN */ // Thermistor channels are for testing purposes only, the pin numbers 0-7 are acceptable "magic numbers".
     // Initialize all eight channels to scale = 1, offset = 0
-    adc_0.init();
+    adc_1.init();
     adc_1.setChannelScaleAndOffset(0, 1, 0);
     adc_1.setChannelScaleAndOffset(1, 1, 0);
     adc_1.setChannelScaleAndOffset(2, 1, 0);
