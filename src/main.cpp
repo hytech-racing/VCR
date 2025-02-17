@@ -1,17 +1,21 @@
 #ifdef ARDUINO
+
 #include <Arduino.h>
 #endif
+
+ // NOLINT for TaskScheduler
 
 
 
 /* From shared_firmware_types libdep */
 #include "SharedFirmwareTypes.h"
 
-/* From HT_SCHED libdep */
-#include "ht_sched.hpp"
 
-/* From Arduino Libraries */
+
+/* Arduino specific upstream Libraries */
 #include "QNEthernet.h"
+#define _TASK_MICRO_RES // NOLINT
+#include <TScheduler.hpp>
 
 /* Local includes */
 #include "VCR_Globals.h"
@@ -26,10 +30,20 @@
 
 FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> INV_CAN;
 FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> TELEM_CAN;
+
 /* Scheduler setup */
-HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
+TsScheduler task_scheduler;
 
-
+constexpr unsigned long adc_sample_period_us = 250; // 250 us = 4kHz
+constexpr unsigned long update_buzzer_controller_period_us = 100000;  // 100 000 us = 10 Hz
+constexpr unsigned long kick_watchdog_period_us = 10000;  // 10 000 us = 100 Hz
+constexpr unsigned long ams_update_period_us = 10000;  // 10 000 us = 100 Hz
+// from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use 
+TsTask adc_0_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc0_task, &task_scheduler, false, &init_read_adc0_task);
+TsTask adc_1_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc1_task, &task_scheduler, false, &init_read_adc1_task);
+TsTask update_buzzer_controller_task(adc_sample_period_us, TASK_FOREVER, &run_update_buzzer_controller_task, &task_scheduler, false);
+TsTask kick_watchdog_task(kick_watchdog_period_us, TASK_FOREVER, &run_kick_watchdog, &task_scheduler, false, &create_watchdog);
+TsTask ams_system_task(ams_update_period_us, TASK_FOREVER, &init_ams_system_task, &task_scheduler, false, &run_ams_system_task);
 
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
@@ -37,20 +51,18 @@ qindesign::network::EthernetUDP protobuf_recv_socket;
 
 
 void setup() {
+    SPI.begin(); // TODO this should be elsewhere maybe
     const uint32_t CAN_baudrate = 500000;
     // from CANInterfaceon_inverter_can_receive
     handle_CAN_setup(INV_CAN, CAN_baudrate, on_inverter_can_receive);
     handle_CAN_setup(TELEM_CAN, CAN_baudrate, on_telem_can_receive);
 
-    scheduler.setTimingFunction(micros);
-
-    scheduler.schedule(read_adc0_task);
-    scheduler.schedule(read_adc1_task);
-    scheduler.schedule(update_buzzer_controller_task);
-    scheduler.schedule(kick_watchdog_task);
-    scheduler.schedule(update_ams_system_task);
+    adc_0_sample_task.enable(); // will run the init function and allow the task to start running
+    adc_1_sample_task.enable();
+    update_buzzer_controller_task.enable();
+    kick_watchdog_task.enable();
 }
 
 void loop() {
-    scheduler.run();
+    task_scheduler.execute();
 }
