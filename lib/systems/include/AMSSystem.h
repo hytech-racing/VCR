@@ -11,13 +11,13 @@
 #include "etl/singleton.h"
 
 /* Heartbeat Interval is the allowable amount of milliseconds between BMS status messages before car delatches */
-const unsigned long HEARTBEAT_INTERVAL_MS                  = 2000;    // milliseconds
+const unsigned long HEARTBEAT_INTERVAL_MS            = 2000;
 
 /* The total PCC threshold is the lowest allowable voltage of the entire pack (in Volts) */
-constexpr float PACK_CHARGE_CRITICAL_THRESHOLD_VOLTS = 420;
+constexpr float PACK_CHARGE_CRITICAL_THRESHOLD_VOLTS = 420.0f;
 
 /* The lowest pcc threshold is the lowest allowable single cell voltage */
-constexpr float CELL_CHARGE_CRITICAL_THRESHOLD_VOLTS = 3.0f;             // Volts
+constexpr float CELL_CHARGE_CRITICAL_THRESHOLD_VOLTS = 3.0f;
 
 /**
  * Singleton class for communicating with the BMS. If one of the shutdown conditions is met, this class will return a
