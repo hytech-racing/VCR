@@ -1,6 +1,8 @@
 #ifndef __MCP23017INTERFACE_H__
 #define __MCP23017INTERFACE_H__
 
+#include <sys/types.h>
+
 // 
 namespace specifiedBit
 {
