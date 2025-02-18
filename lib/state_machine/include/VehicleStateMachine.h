@@ -1,9 +1,9 @@
-#ifndef __VEHICLE_STATE_MACHINE__
-#define __VEHICLE_STATE_MACHINE__
+#ifndef __VehicleState_e_MACHINE__
+#define __VehicleState_e_MACHINE__
 
 #include <etl/delegate.h>
 
-enum class VEHICLE_STATE {
+enum class VehicleState_e {
     TRACTIVE_SYSTEM_NOT_ACTIVE = 1, 
     TRACTIVE_SYSTEM_ACTIVE = 2, 
     WANTING_READY_TO_DRIVE = 3,
@@ -14,46 +14,54 @@ class VehicleStateMachine
 {
     public: 
         VehicleStateMachine(
-            etl::delegate<bool()> hv_over_threshold, 
-            etl::delegate<bool()> start_button_pressed, 
-            etl::delegate<bool()> brake_pressed, 
-            etl::delegate<bool()> drivetrain_error_ocurred, 
-            etl::delegate<bool()> drivetrain_ready,
+            etl::delegate<bool()> check_hv_over_threshold, 
+            etl::delegate<bool()> is_start_button_pressed, 
+            etl::delegate<bool()> is_brake_pressed, 
+            etl::delegate<bool()> check_drivetrain_error_ocurred, 
+            etl::delegate<bool()> check_drivetrain_ready,
+            etl::delegate<void()> start_buzzer,
+            etl::delegate<bool()> is_buzzer_done, 
+            etl::delegate<void()> end_buzzer, 
             etl::delegate<void()> handle_drivetrain_init, 
             etl::delegate<void()> command_drivetrain
         ) :  
-        _hv_over_threshold(hv_over_threshold),
-        _start_button_pressed(start_button_pressed), 
-        _brake_pressed(brake_pressed),
-        _drivetrain_error_ocurred(drivetrain_error_ocurred),
-        _drivetrain_ready(drivetrain_ready),
+        _check_hv_over_threshold(check_hv_over_threshold),
+        _is_start_button_pressed(is_start_button_pressed), 
+        _is_brake_pressed(is_brake_pressed),
+        _check_drivetrain_error_ocurred(check_drivetrain_error_ocurred),
+        _check_drivetrain_ready(check_drivetrain_ready),
+        _start_buzzer(start_buzzer),
+        _is_buzzer_complete(is_buzzer_done),
+        _end_buzzer(end_buzzer),
         _handle_drivetrain_init(handle_drivetrain_init),
         _command_drivetrain(command_drivetrain)
         {   
-            _current_state = VEHICLE_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE;
-
+            _current_state = VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE;
         }
 
         void tick_state_machine(unsigned long curr_time_millis);
 
-        VEHICLE_STATE get_state() { return _current_state; }
+        VehicleState_e get_state() { return _current_state; }
     
     private: 
 
-        void _set_state(VEHICLE_STATE new_state, unsigned long current_time_millis); 
+        void _set_state(VehicleState_e new_state, unsigned long current_time_millis); 
 
-        void _handle_entry_logic(VEHICLE_STATE prev_state, unsigned long current_time_millis);
+        void _handle_entry_logic(VehicleState_e prev_state, unsigned long current_time_millis);
 
-        void _handle_exit_logic(VEHICLE_STATE new_state, unsigned long current_time_millis);
+        void _handle_exit_logic(VehicleState_e new_state, unsigned long current_time_millis);
 
-        VEHICLE_STATE _current_state;
+        VehicleState_e _current_state;
 
         // Lambdas neccesary for state machine to work
-        etl::delegate<bool()> _hv_over_threshold; 
-        etl::delegate<bool()> _start_button_pressed; 
-        etl::delegate<bool()> _brake_pressed; 
-        etl::delegate<bool()> _drivetrain_error_ocurred; 
-        etl::delegate<bool()> _drivetrain_ready;
+        etl::delegate<bool()> _check_hv_over_threshold; 
+        etl::delegate<bool()> _is_start_button_pressed; 
+        etl::delegate<bool()> _is_brake_pressed; 
+        etl::delegate<bool()> _check_drivetrain_error_ocurred; 
+        etl::delegate<bool()> _check_drivetrain_ready;
+        etl::delegate<void()> _start_buzzer; 
+        etl::delegate<bool()> _is_buzzer_complete;
+        etl::delegate<void()> _end_buzzer;
         etl::delegate<void()> _handle_drivetrain_init;
         etl::delegate<void()> _command_drivetrain; // Shouldn't need to pass anything; logic will be handled in the lambda
 

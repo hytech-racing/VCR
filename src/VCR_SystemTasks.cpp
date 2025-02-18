@@ -34,9 +34,9 @@ VCRSystemData_s evaluate_systems(const VCRInterfaceData_s &interface_data, VCRSy
     return sys_data;
 }
 
-VEHICLE_STATE evaluate_state_machine(const VCRData_s& system_data, const InterfaceData_s& interface_data, VehicleStateMachine& state_machine)
+VehicleState_e evaluate_state_machine(VehicleStateMachine& state_machine)
 {
-    // TODO make tick stat machine function return the state
+    // TODO make tick state machine function return the state
     state_machine.tick_state_machine(sys_time::hal_millis());
     return {};
 }
@@ -47,6 +47,6 @@ void big_task(VCRInterfaces & interface_ref_container, VCRSystems &systems, Vehi
 
     auto sys_data = evaluate_systems(interface_data, systems);
 
-    auto state = evaluate_state_machine(sys_data, interface_data, state_machine);
+    auto state = evaluate_state_machine(state_machine);
 
 }

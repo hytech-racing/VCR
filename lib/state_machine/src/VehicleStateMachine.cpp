@@ -9,59 +9,59 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
 
     switch (_current_state)
     {
-        case VEHICLE_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE:
+        case VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE:
         {
-            if (_hv_over_threshold()) 
+            if (_check_hv_over_threshold()) 
             {
-                _set_state(VEHICLE_STATE::TRACTIVE_SYSTEM_ACTIVE, current_millis);
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
                 break;
             }
             break;
         }
 
-        case VEHICLE_STATE::TRACTIVE_SYSTEM_ACTIVE: 
+        case VehicleState_e::TRACTIVE_SYSTEM_ACTIVE: 
         {
-            if (!_hv_over_threshold()) 
+            if (!_check_hv_over_threshold()) 
             {
-                _set_state(VEHICLE_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
                 break;
             }
 
-            if (_start_button_pressed() && _brake_pressed())
+            if (_is_start_button_pressed() && _is_brake_pressed())
             {
-                _set_state(VEHICLE_STATE::WANTING_READY_TO_DRIVE, current_millis);
+                _set_state(VehicleState_e::WANTING_READY_TO_DRIVE, current_millis);
                 break;
             }
             break;
         }
 
-        case VEHICLE_STATE::WANTING_READY_TO_DRIVE: 
+        case VehicleState_e::WANTING_READY_TO_DRIVE: 
         {
-            if (!_hv_over_threshold)
+            if (!_check_hv_over_threshold())
             {
-                _set_state(VEHICLE_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis); 
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis); 
                 break;
             }
 
-            if (_drivetrain_ready())
+            if (_check_drivetrain_ready() && _is_buzzer_complete())
             {
-                _set_state(VEHICLE_STATE::READY_TO_DRIVE, current_millis);
+                _set_state(VehicleState_e::READY_TO_DRIVE, current_millis);
                 break;
             }
             break;
         }
 
-        case VEHICLE_STATE::READY_TO_DRIVE: 
+        case VehicleState_e::READY_TO_DRIVE: 
         {
-            if (!_hv_over_threshold) 
+            if (!_check_hv_over_threshold()) 
             {
-                _set_state(VEHICLE_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
                 break;
             }
 
-            if (_drivetrain_error_ocurred)
+            if (_check_drivetrain_error_ocurred())
             {
-                _set_state(VEHICLE_STATE::TRACTIVE_SYSTEM_ACTIVE, current_millis);
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
                 break;
             }
 
@@ -77,41 +77,47 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
     }
 }
 
-void VehicleStateMachine::_set_state(VEHICLE_STATE new_state, unsigned long curr_millis)
+void VehicleStateMachine::_set_state(VehicleState_e new_state, unsigned long curr_millis)
 {
     _handle_entry_logic(_current_state, curr_millis);
     _current_state = new_state;
     _handle_exit_logic(new_state, curr_millis);
 }
 
-void VehicleStateMachine::_handle_exit_logic(VEHICLE_STATE prev_state, unsigned long curr_millis)
+void VehicleStateMachine::_handle_exit_logic(VehicleState_e prev_state, unsigned long curr_millis)
 {
     switch (prev_state)
     {
-        case VEHICLE_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE:
+        case VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE:
             break;
-        case VEHICLE_STATE::TRACTIVE_SYSTEM_ACTIVE:
+        case VehicleState_e::TRACTIVE_SYSTEM_ACTIVE:
             break;
-        case VEHICLE_STATE::WANTING_READY_TO_DRIVE:
+        case VehicleState_e::WANTING_READY_TO_DRIVE:
+        {
+            _end_buzzer();
             break;
-        case VEHICLE_STATE::READY_TO_DRIVE:
+        }
+        case VehicleState_e::READY_TO_DRIVE:
             break;
         default:
             break;
         }
 }
 
-void VehicleStateMachine::_handle_entry_logic(VEHICLE_STATE new_state, unsigned long curr_millis)
+void VehicleStateMachine::_handle_entry_logic(VehicleState_e new_state, unsigned long curr_millis)
 {
     switch (new_state)
         {
-        case VEHICLE_STATE::TRACTIVE_SYSTEM_NOT_ACTIVE:
+        case VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE:
             break;
-        case VEHICLE_STATE::TRACTIVE_SYSTEM_ACTIVE:
+        case VehicleState_e::TRACTIVE_SYSTEM_ACTIVE:
             break;
-        case VEHICLE_STATE::WANTING_READY_TO_DRIVE:
+        case VehicleState_e::WANTING_READY_TO_DRIVE:
+        {
+            _start_buzzer();
             break;
-        case VEHICLE_STATE::READY_TO_DRIVE:
+        }
+        case VehicleState_e::READY_TO_DRIVE:
             break;
         default:
             break;
