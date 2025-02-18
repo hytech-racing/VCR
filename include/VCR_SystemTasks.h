@@ -40,7 +40,7 @@ struct SystemData_s
 
 InterfaceData_s sample_async_data(VCRInterfaces& interface_ref_container);
 VCRData_s evaluate_systems(const InterfaceData_s &interface_data, VCRSystems &systems_ref_container);
-CarState_e evaluate_state_machine(const VCRData_s& system_data, const InterfaceData_s& interface_data, VehicleStateMachine& state_machine);
+VEHICLE_STATE evaluate_state_machine(const VCRData_s& system_data, const InterfaceData_s& interface_data, VehicleStateMachine& state_machine);
 void update_interfaces(const VCRData_s& system_data, const InterfaceData_s& interface_data);
 
 // void big_task(unsigned long curr_millis);

@@ -34,10 +34,10 @@ VCRSystemData_s evaluate_systems(const VCRInterfaceData_s &interface_data, VCRSy
     return sys_data;
 }
 
-CarState_e evaluate_state_machine(const VCRData_s& system_data, const InterfaceData_s& interface_data, VehicleStateMachine& state_machine)
+VEHICLE_STATE evaluate_state_machine(const VCRData_s& system_data, const InterfaceData_s& interface_data, VehicleStateMachine& state_machine)
 {
     // TODO make tick stat machine function return the state
-    state_machine.tick_state_machine(sys_time::hal_millis(), system_data);
+    state_machine.tick_state_machine(sys_time::hal_millis());
     return {};
 }
 
