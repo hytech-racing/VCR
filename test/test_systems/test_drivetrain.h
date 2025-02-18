@@ -69,7 +69,8 @@ MockInverterInterface RR(RR_status);
 veh_vec<DrivetrainSystem::InverterFuncts> mock_inverter_functs = {FL.inverter_functs, FR.inverter_functs, RL.inverter_functs, RR.inverter_functs};
 DrivetrainSystem drivetrain = DrivetrainSystem(mock_inverter_functs);
 
-DrivetrainInit_s init = {DrivetrainModeRequest_e::INIT_SPEED_MODE};
+DrivetrainInit_s init = {DrivetrainModeRequest_e::INIT_DRIVE_MODE};
+DrivetrainResetError_s reset = {true};
 DrivetrainSystem::CmdVariant cmd = init;
 
 TEST (DrivetrainTest, initial_state) {
@@ -144,11 +145,29 @@ TEST (DrivetrainTest, inverters_enabled) {
     FL_status.quit_inverter = false;
 }
 
-TEST (DrivetrainTest, enabling_inverters_speed_mode) {
+TEST (DrivetrainTest, enabled_drive_mode) {
     drivetrain.evaluate_drivetrain(cmd);
     ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::INVERTERS_ENABLED);
     drivetrain.evaluate_drivetrain(cmd);
-    ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::ENABLING_INVERTERS_SPEED_MODE);
+    ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::ENABLED_DRIVE_MODE);
+}
+
+TEST (DrivetrainTest, error) {
+    FL_status.error_present = true;
+    drivetrain.evaluate_drivetrain(cmd);
+    ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::ERROR);
+    FL_status.error_present = false;
+    drivetrain.evaluate_drivetrain(cmd);
+    ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::ERROR);
+}
+
+TEST (DrivetrainTest, clearing_errors) {
+    cmd = reset;
+    drivetrain.evaluate_drivetrain(cmd);
+    ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::CLEARING_ERRORS);
+    cmd = init;
+    drivetrain.evaluate_drivetrain(cmd);
+    ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::NOT_ENABLED_HV_PRESENT);
 }
 
 #endif
