@@ -8,16 +8,7 @@
 #include <hytech.h>
 #include "DrivetrainSystem.h"
 #include <CANInterface.h>
-
-namespace HTUnits
-{
-    using celcius = float;
-    using watts = float;
-    using var = float;
-    using torque_nm = float;
-    using speed_rpm = float;
-    using volts = float;
-};
+#include <shared_types.h>
 
 struct InverterParams_s
 {   
@@ -32,93 +23,6 @@ struct InverterIds_s
     uint32_t inv_control_word_id; 
     uint32_t inv_control_input_id; 
     uint32_t inv_control_parameter_id; 
-};
-
-/** 
- * Drivetrain system accessible structs for 
- * requesting change of state
- */
-struct InverterControlWord_s 
-{
-    bool inverter_enable : 1;
-    bool hv_enable : 1;
-    bool driver_enable : 1;
-    bool remove_error : 1;
-};
-
-struct InverterControlInput_s 
-{
-    int16_t speed_rpm_setpoint;
-    int16_t positive_torque_limit; 
-    int16_t negative_torque_limit;
-};
-
-struct InverterControlParams_s
-{
-    uint16_t speed_control_kp; 
-    uint16_t speed_control_ki;
-    uint16_t speed_control_kd;
-};
-
-/** 
- * For the most part these are mirrors of the lower-level CAN struct data, 
- * except with already fully float-ized data
-**/
-struct InverterStatus_s
-{
-    bool hv_present : 1;
-    bool connected : 1;
-    bool new_data : 1;
-    bool system_ready : 1;
-    bool error : 1;
-    bool warning : 1;
-    bool quit_dc_on : 1;
-    bool dc_on : 1;
-    bool quit_inverter_on : 1;
-    bool inverter_on : 1;
-    bool derating_on : 1;
-    HTUnits::volts dc_bus_voltage;
-    uint16_t diagnostic_number;
-};
-
-struct InverterTemps_s
-{
-    bool new_data : 1;
-    HTUnits::celcius motor_temp;
-    HTUnits::celcius inverter_temp;
-    HTUnits::celcius igbt_temp;
-};
-
-struct InverterPower_s
-{
-    bool new_data : 1;
-    HTUnits::watts active_power;
-    HTUnits::var reactive_power;
-};
-
-struct MotorMechanics_s
-{
-    bool new_data : 1;
-    HTUnits::watts actual_power;
-    HTUnits::torque_nm actual_torque;
-    HTUnits::speed_rpm actual_speed;
-};
-
-struct InverterControlFeedback_s
-{
-    bool new_data : 1;
-    uint16_t speed_control_kp;
-    uint16_t speed_control_ki;
-    uint16_t speed_control_kd;
-};
-
-struct InverterFeedbackData_s
-{
-    InverterStatus_s status;
-    InverterTemps_s temps;
-    InverterPower_s power;
-    MotorMechanics_s motor_mechanics;
-    InverterControlFeedback_s control_feedback;
 };
 
 /**
