@@ -28,8 +28,7 @@ bool init_read_adc0_task()
 void run_read_adc0_task()
 {
 
-    ADC0Instance::instance().sample(); // Samples all eight channels.
-    ADC0Instance::instance().convert(); // Converts all eight channels.
+    ADC0Instance::instance().tick();
 
     vcr_data.interface_data.current_sensor_data.twentyfour_volt_sensor = ADC0Instance::instance().data.conversions[GLV_SENSE_CHANNEL].conversion;
     vcr_data.interface_data.current_sensor_data.current_sensor_unfiltered = ADC0Instance::instance().data.conversions[CURRENT_SENSE_CHANNEL].conversion;
@@ -59,8 +58,8 @@ bool init_read_adc1_task()
 void run_read_adc1_task()
 {
 
-    ADC1Instance::instance().sample(); // Samples all eight channels.
-    ADC1Instance::instance().convert(); // Converts all eight channels.
+    ADC1Instance::instance().tick();
+
     hal_printf("ADC1 reading 0 %d\n", ADC1Instance::instance().data.conversions[0].raw); // NOLINT
 }
 
