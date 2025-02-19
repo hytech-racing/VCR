@@ -1,4 +1,5 @@
 #include "CANInterface.h"
+#include "VCRCANInterfaceImpl.h"
 #include "SystemTimeInterface.h"
 #include "VCR_Tasks.h"
 
@@ -99,4 +100,9 @@ void run_kick_watchdog()
 void handle_send_suspension_CAN_data()
 {
     DrivebrainInterfaceInstance::instance().send_suspension_CAN_data();
+}
+
+void handle_send_all_data()
+{
+    VCRCANInterfaceImpl::send_all_CAN_msgs(telem_can_tx_buffer, &TELEM_CAN);
 }

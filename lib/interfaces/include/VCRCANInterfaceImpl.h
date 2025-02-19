@@ -59,6 +59,8 @@ struct CANInterfaces
 namespace VCRCANInterfaceImpl
 {
     void vcr_CAN_recv(CANInterfaces& interfaces, const CAN_message_t& msg, unsigned long millis);
+    
+    void send_all_CAN_msgs(CANTXBufferType &buffer, FlexCAN_T4_Base *can_interface);
 };
 
 

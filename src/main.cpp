@@ -44,7 +44,9 @@ constexpr unsigned long adc_sample_period_us = 250;
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use 
 TsTask adc_0_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc0_task, &task_scheduler, false, &init_read_adc0_task);
 TsTask adc_1_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc1_task, &task_scheduler, false, &init_read_adc1_task);
+TsTask suspension_CAN_send(4000, TASK_FOREVER, &handle_send_suspension_CAN_data, &task_scheduler, false);
 
+TsTask CAN_send(TASK_IMMEDIATE, TASK_FOREVER, &handle_send_all_data, &task_scheduler, false);
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
@@ -53,7 +55,7 @@ qindesign::network::EthernetUDP protobuf_recv_socket;
 
 void setup() {
     // TODO 
-    DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_load_cell_data, vcr_data.interface_data.rear_suspot_data); 
+    DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data, vcr_data.interface_data.rear_suspot_data); 
     SPI.begin(); // TODO this should be elsewhere maybe
     const uint32_t CAN_baudrate = 500000;
     // from CANInterfaceon_inverter_can_receive
@@ -62,6 +64,8 @@ void setup() {
 
     adc_0_sample_task.enable(); // will run the init function and allow the task to start running
     adc_1_sample_task.enable();
+    suspension_CAN_send.enable();
+    CAN_send.enable();
 }
 
 void loop() {

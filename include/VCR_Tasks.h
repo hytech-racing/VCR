@@ -51,5 +51,5 @@ void run_update_buzzer_controller_task();
 void run_kick_watchdog();
 
 void handle_send_suspension_CAN_data();
-
+void handle_send_all_data();
 #endif /* VCR_TASKS */
