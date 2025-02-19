@@ -3,14 +3,10 @@
 #include <Arduino.h>
 #endif
 
- // NOLINT for TaskScheduler
-
-
+// NOLINT for TaskScheduler
 
 /* From shared_firmware_types libdep */
 #include "SharedFirmwareTypes.h"
-
-
 
 /* Arduino specific upstream Libraries */
 #include "QNEthernet.h"
@@ -18,21 +14,20 @@
 #include <TScheduler.hpp>
 
 /* Local includes */
-#include "VCR_Globals.h"
-#include "VCR_Constants.h"
-#include "VCR_Tasks.h"
 #include "TorqueControllerMux.hpp"
 #include "VCFInterface.h"
+#include "VCR_Constants.h"
+#include "VCR_Globals.h"
+#include "VCR_Tasks.h"
 
-#include "VCRCANInterfaceImpl.h"
 #include "FlexCAN_T4.h"
+#include "VCRCANInterfaceImpl.h"
 
 #include "etl/singleton.h"
 
 #include "DrivebrainInterface.h"
 
 // class DrivebrainInterface;
-
 
 FlexCAN_Type<CAN2> INV_CAN;
 FlexCAN_Type<CAN3> TELEM_CAN;
@@ -51,8 +46,6 @@ TsTask CAN_send(TASK_IMMEDIATE, TASK_FOREVER, &handle_send_all_data, &task_sched
 qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
 
-
-
 void setup() {
     // TODO 
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data, vcr_data.interface_data.rear_suspot_data); 
@@ -68,6 +61,4 @@ void setup() {
     CAN_send.enable();
 }
 
-void loop() {
-    task_scheduler.execute();
-}
+void loop() { task_scheduler.execute(); }
