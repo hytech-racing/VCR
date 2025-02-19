@@ -73,7 +73,7 @@ void run_update_buzzer_controller_task()
 
 bool init_ams_system_task()
 {
-    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS, PACK_CHARGE_CRITICAL_THRESHOLD_VOLTS, CELL_CHARGE_CRITICAL_THRESHOLD_VOLTS);
+    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS); // NOLINT 
     pinMode(SOFTWARE_OK_PIN, OUTPUT);
     return true;
 }

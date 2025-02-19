@@ -17,7 +17,7 @@ void ASSERT_AMS_SYSTEM_DATA_EQ(AMSSystemData_s expected, AMSSystemData_s actual)
 
 TEST (AMSSystemTest, initialization_test) {
     AMSSystemInstance::destroy();
-    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS, PACK_CHARGE_CRITICAL_THRESHOLD_VOLTS, CELL_CHARGE_CRITICAL_THRESHOLD_VOLTS);
+    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS);
     AMSSystem &ams = AMSSystemInstance::instance();
 
     VCRData_s vcr_data = {};
@@ -54,7 +54,7 @@ TEST (AMSSystemTest, initialization_test) {
 
 TEST (AMSSystemTest, valid_initialization_test) {
     AMSSystemInstance::destroy();
-    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS, PACK_CHARGE_CRITICAL_THRESHOLD_VOLTS, CELL_CHARGE_CRITICAL_THRESHOLD_VOLTS);
+    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS);
     AMSSystem &ams = AMSSystemInstance::instance();
 
     VCRData_s vcr_data = {};
@@ -84,7 +84,7 @@ TEST (AMSSystemTest, valid_initialization_test) {
 
 TEST (AMSSystemTest, heartbeat_overrun_shutdown) {
     AMSSystemInstance::destroy();
-    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS, PACK_CHARGE_CRITICAL_THRESHOLD_VOLTS, CELL_CHARGE_CRITICAL_THRESHOLD_VOLTS);
+    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS);
     AMSSystem &ams = AMSSystemInstance::instance();
 
     VCRData_s vcr_data = {};
@@ -127,55 +127,4 @@ TEST (AMSSystemTest, heartbeat_overrun_shutdown) {
     expected_data.ams_ok = false;
     ASSERT_AMS_SYSTEM_DATA_EQ(expected_data, actual_data);
 
-}
-
-TEST (AMSSystemTest, cell_under_voltage_shutdown) {
-    AMSSystemInstance::destroy();
-    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS, PACK_CHARGE_CRITICAL_THRESHOLD_VOLTS, CELL_CHARGE_CRITICAL_THRESHOLD_VOLTS);
-    AMSSystem &ams = AMSSystemInstance::instance();
-
-    VCRData_s vcr_data = {};
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = 3.1f;
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.avg_cell_voltage = 3.5f;
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.max_cell_temp = 50.0f;
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.pack_voltage = 460.0f;
-    vcr_data.interface_data.stamped_acu_core_data.last_recv_millis = init_millis;
-
-    AMSSystemData_s actual_data = ams.update_ams_system(init_millis + 10, vcr_data);
-    vcr_data.system_data.ams_data = actual_data;
-    ASSERT_EQ(true, actual_data.ams_ok);
-
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = 3.05f;
-    actual_data = ams.update_ams_system(init_millis + 20, vcr_data);
-    ASSERT_EQ(true, actual_data.ams_ok);
-
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = 2.99f;
-    actual_data = ams.update_ams_system(init_millis + 30, vcr_data);
-    ASSERT_EQ(false, actual_data.ams_ok);
-
-}
-
-TEST (AMSSystemTest, pack_under_voltage_shutdown) {
-    AMSSystemInstance::destroy();
-    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS, PACK_CHARGE_CRITICAL_THRESHOLD_VOLTS, CELL_CHARGE_CRITICAL_THRESHOLD_VOLTS);
-    AMSSystem &ams = AMSSystemInstance::instance();
-
-    VCRData_s vcr_data = {};
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = 3.1f;
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.avg_cell_voltage = 3.5f;
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.max_cell_temp = 50.0f;
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.pack_voltage = 460.0f;
-    vcr_data.interface_data.stamped_acu_core_data.last_recv_millis = init_millis;
-
-    AMSSystemData_s actual_data = ams.update_ams_system(init_millis + 10, vcr_data);
-    vcr_data.system_data.ams_data = actual_data;
-    ASSERT_EQ(true, actual_data.ams_ok);
-
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.pack_voltage = 421;
-    actual_data = ams.update_ams_system(init_millis + 20, vcr_data);
-    ASSERT_EQ(true, actual_data.ams_ok);
-
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.pack_voltage = 419;
-    actual_data = ams.update_ams_system(init_millis + 30, vcr_data);
-    ASSERT_EQ(false, actual_data.ams_ok);
 }

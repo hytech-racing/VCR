@@ -26,10 +26,8 @@ AMSSystemData_s AMSSystem::update_ams_system(unsigned long curr_millis, VCRData_
 
     // Check for three shutdown conditions
     bool heartbeat_ok = curr_millis - vcr_data.interface_data.stamped_acu_core_data.last_recv_millis < _heartbeat_interval_ms;
-    bool lowest_cell_below_threshold = ret.min_cell_voltage < _cell_charge_critical_threshold_volts;
-    bool pack_below_threshold = ret.total_pack_voltage < _pack_charge_critical_threshold_volts;
 
-    ret.ams_ok = heartbeat_ok && !lowest_cell_below_threshold && !pack_below_threshold;
+    ret.ams_ok = heartbeat_ok;
 
     return ret;
 }
