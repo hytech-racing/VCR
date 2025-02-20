@@ -10,7 +10,6 @@
 #include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
 
-#include "SystemTimeInterface.h"
 
 VCRInterfaceData_s sample_async_data(
     etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call,
@@ -47,8 +46,7 @@ VCRSystemData_s evaluate_async_systems(const VCRInterfaceData_s &interface_data)
 VehicleState_e evaluate_state_machine(VehicleStateMachine& state_machine)
 {
     // TODO make tick state machine function return the state
-    state_machine.tick_state_machine(sys_time::hal_millis());
-    return {};
+    return state_machine.tick_state_machine(sys_time::hal_millis());
 }
 
 void big_task(etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call,

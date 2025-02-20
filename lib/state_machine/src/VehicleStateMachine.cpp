@@ -4,7 +4,7 @@
 /* Local includes */
 #include "VehicleStateMachine.h"
 
-void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
+VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_millis)
 {
 
     switch (_current_state)
@@ -73,8 +73,8 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis)
         {
             break;
         }
-
     }
+    return _current_state;
 }
 
 void VehicleStateMachine::_set_state(VehicleState_e new_state, unsigned long curr_millis)

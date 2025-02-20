@@ -10,6 +10,8 @@
 #include "VehicleStateMachine.h"
 #include "etl/delegate.h"
 #include "shared_types.h"
+#include "SystemTimeInterface.h"
+
 
 /**
  * Generally, our main "loop" (not actually a loop) will run as fast as possible and will go through
@@ -58,23 +60,8 @@ VCRSystemData_s evaluate_async_systems(const VCRInterfaceData_s &interface_data)
 /**
  * Ticks the state machine based on the new interface and system data.
  */
-CarState_e evaluate_state_machine(const VCRSystemData_s &system_data,
+VehicleState_e evaluate_state_machine(const VCRSystemData_s &system_data,
                                   const VCRInterfaceData_s &interface_data,
                                   VehicleStateMachine &state_machine);
 
-<<<<<<< HEAD
-};
-
-// outlining the main process that that is for handling the main systems 
-// that need interface data and produce outputs that need to get sent
-
-InterfaceData_s sample_async_data(VCRInterfaces& interface_ref_container);
-VCRData_s evaluate_systems(const InterfaceData_s &interface_data, VCRSystems &systems_ref_container);
-VehicleState_e evaluate_state_machine(VehicleStateMachine& state_machine);
-void update_interfaces(const VCRData_s& system_data, const InterfaceData_s& interface_data);
-
-// void big_task(unsigned long curr_millis);
 #endif // __VCR_SYSTEMTASKS_H__
-=======
-#endif // __VCR_SYSTEMTASKS_H__
->>>>>>> main
