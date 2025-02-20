@@ -38,7 +38,7 @@
 
     config: 
         - maximum allowed latency 
-        - assigned controller mode (currently defaults to MODE4)
+        - assigned controller mode of this controller (currently defaults to MODE4)
     inputs:
         - the current car state from which it gets the latest drivebrain input, current controller mode and the stamped drivebrain 
           message data
@@ -55,15 +55,15 @@ public:
         : _emergency_control()
     {
         _last_worst_latency_timestamp = 0;
-        _sub_message_latencies = {-1, -1};
+        _worst_message_latencies = {-1, -1};
         _params = {allowed_latency, assigned_controller_mode};
     }
 
     /// @brief evaluate function for running the business logic
     /// @param state the current state of the car
-    /// @param eval_millis
+    /// @param curr_millis
     /// @return torque controller output that gets passed through the TC MUX
-    DrivetrainCommand_s evaluate(const VCRData_s &state, unsigned long eval_millis);
+    DrivetrainCommand_s evaluate(const VCRData_s &state, unsigned long curr_millis);
 
     /// @brief getter for the current status of whether or not the controller has had a timing failure during operation
     /// @return bool of status
@@ -80,7 +80,7 @@ private:
     struct {
         int64_t worst_speed_setpoint_latency_so_far;
         int64_t worst_torque_lim_latency_so_far;
-    } _sub_message_latencies;
+    } _worst_message_latencies;
     bool _timing_failure = false;
     TorqueControllerSimple _emergency_control;
 };

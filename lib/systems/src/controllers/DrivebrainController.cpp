@@ -4,7 +4,7 @@
 
 // #include <iostream>
 
-DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsigned long eval_millis)
+DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsigned long curr_millis)
 {
 
     auto db_input = state.interface_data.latest_drivebrain_command;
@@ -16,9 +16,9 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     auto last_speed_setpoint_timestamp = db_input.desired_speeds.last_recv_millis;
     auto last_torque_lim_timestamp = db_input.torque_limits.last_recv_millis;
 
-    // 2 if the time between the current VCR eval_millis time and the last millis time that we recvd a drivebrain msg is too high
-    bool speed_setpoint_msg_too_latent = (::abs((int)(static_cast<int64_t>(eval_millis) - static_cast<int64_t>(last_speed_setpoint_timestamp))) > (int)_params.allowed_latency);
-    bool torque_limit_message_too_latent = (::abs((int)(static_cast<int64_t>(eval_millis) - static_cast<int64_t>(last_torque_lim_timestamp))) > (int)_params.allowed_latency);
+    // 2 if the time between the current VCR curr_millis time and the last millis time that we recvd a drivebrain msg is too high
+    bool speed_setpoint_msg_too_latent = (::abs((int)(static_cast<int64_t>(curr_millis) - static_cast<int64_t>(last_speed_setpoint_timestamp))) > (int)_params.allowed_latency);
+    bool torque_limit_message_too_latent = (::abs((int)(static_cast<int64_t>(curr_millis) - static_cast<int64_t>(last_torque_lim_timestamp))) > (int)_params.allowed_latency);
 
     // std::cout << "last_speedsp ts " << last_speed_setpoint_timestamp <<std::endl;
     // std::cout << "ts " << last_torque_lim_timestamp <<std::endl;
@@ -27,18 +27,18 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     
     constexpr int64_t debug_timestamp_period_ms = 5000;
 
-    if((static_cast<int64_t>(eval_millis) - static_cast<int64_t>(_last_worst_latency_timestamp)) > debug_timestamp_period_ms)
+    if((static_cast<int64_t>(curr_millis) - static_cast<int64_t>(_last_worst_latency_timestamp)) > debug_timestamp_period_ms)
     {    
-        _last_worst_latency_timestamp = eval_millis;
-        _sub_message_latencies = {-1, -1};
+        _last_worst_latency_timestamp = curr_millis;
+        _worst_message_latencies = {-1, -1};
     }
 
-    if( (eval_millis - last_speed_setpoint_timestamp) > _sub_message_latencies.worst_speed_setpoint_latency_so_far)
+    if( (curr_millis - last_speed_setpoint_timestamp) > _worst_message_latencies.worst_speed_setpoint_latency_so_far)
     {
-        _sub_message_latencies.worst_speed_setpoint_latency_so_far = (eval_millis - last_speed_setpoint_timestamp);   
-    } else if((eval_millis - last_torque_lim_timestamp) > _sub_message_latencies.worst_torque_lim_latency_so_far)
+        _worst_message_latencies.worst_speed_setpoint_latency_so_far = (curr_millis - last_speed_setpoint_timestamp);   
+    } else if((curr_millis - last_torque_lim_timestamp) > _worst_message_latencies.worst_torque_lim_latency_so_far)
     {
-        _sub_message_latencies.worst_torque_lim_latency_so_far = (eval_millis - last_torque_lim_timestamp);   
+        _worst_message_latencies.worst_torque_lim_latency_so_far = (curr_millis - last_torque_lim_timestamp);   
     }
 
     bool timing_failure = (speed_setpoint_msg_too_latent || torque_limit_message_too_latent || not_all_messages_recvd || latency_diff_too_high);
@@ -68,7 +68,7 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     {
         
         _timing_failure = true;
-        output = _emergency_control.evaluate(state, eval_millis);
+        output = _emergency_control.evaluate(state, curr_millis);
     }
     return output;
 }

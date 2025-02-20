@@ -35,7 +35,7 @@ public:
         : _params(params)
     { }
     /// @brief calculates torque output based off max torque and simple torque scaling
-    DrivetrainCommand_s evaluate(const VCRData_s &state, unsigned long eval_millis);
+    DrivetrainCommand_s evaluate(const VCRData_s &state, unsigned long curr_millis);
 
 private:
     TorqueControllerSimpleParams_s _params;

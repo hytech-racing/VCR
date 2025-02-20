@@ -8,7 +8,7 @@
 
 auto runTick(DrivebrainController *controller, float last_speed_recv_millis,
              float last_torque_receive_time_millis, ControllerMode_e current_control_mode,
-             unsigned long eval_millis, float brakePercent, float accelPercent) {
+             unsigned long curr_millis, float brakePercent, float accelPercent) {
     StampedDrivetrainCommand_s data;
     data.desired_speeds.last_recv_millis = last_speed_recv_millis;
     data.desired_speeds.recvd = true;
@@ -27,7 +27,7 @@ auto runTick(DrivebrainController *controller, float last_speed_recv_millis,
     state.interface_data.latest_drivebrain_command = data;
     state.interface_data.recvd_pedals_data.pedals_data = pedals_data;
 
-    return controller->evaluate(state, eval_millis);
+    return controller->evaluate(state, curr_millis);
 }
 
 TEST(DrivebrainControllerTesting, signals_sent_within_range) {

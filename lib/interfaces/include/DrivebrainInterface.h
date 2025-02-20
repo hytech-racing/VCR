@@ -14,7 +14,7 @@ class DrivebrainInterface {
     void receive_drivebrain_torque_lim_command(const CAN_message_t &msg,
                                                unsigned long curr_millis);
 
-    void send_suspension_CAN_data();
+    void handle_enqueue_suspension_CAN_data();
     StampedDrivetrainCommand_s get_latest_data();
 
   private:

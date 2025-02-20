@@ -18,7 +18,7 @@
 #include "VCFInterface.h"
 #include "VCR_Constants.h"
 #include "VCR_Globals.h"
-#include "VCR_Tasks.h"
+#include "VCR_InterfaceTasks.h"
 
 #include "FlexCAN_T4.h"
 #include "VCRCANInterfaceImpl.h"
@@ -39,7 +39,7 @@ constexpr unsigned long adc_sample_period_us = 250;
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use 
 TsTask adc_0_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc0_task, &task_scheduler, false, &init_read_adc0_task);
 TsTask adc_1_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc1_task, &task_scheduler, false, &init_read_adc1_task);
-TsTask suspension_CAN_send(4000, TASK_FOREVER, &handle_send_suspension_CAN_data, &task_scheduler, false);
+TsTask suspension_CAN_send(4000, TASK_FOREVER, &handle_enqueue_suspension_CAN_data, &task_scheduler, false);
 
 TsTask CAN_send(TASK_IMMEDIATE, TASK_FOREVER, &handle_send_all_data, &task_scheduler, false);
 /* Ethernet message sockets */ // TODO: Move this into its own interface
@@ -52,8 +52,8 @@ void setup() {
     SPI.begin(); // TODO this should be elsewhere maybe
     const uint32_t CAN_baudrate = 500000;
     // from CANInterfaceon_inverter_can_receive
-    handle_CAN_setup(INV_CAN, CAN_baudrate, on_inverter_can_receive);
-    handle_CAN_setup(TELEM_CAN, CAN_baudrate, on_telem_can_receive);
+    handle_CAN_setup(INV_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_inverter_can_receive);
+    handle_CAN_setup(TELEM_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_telem_can_receive);
 
     adc_0_sample_task.enable(); // will run the init function and allow the task to start running
     adc_1_sample_task.enable();
