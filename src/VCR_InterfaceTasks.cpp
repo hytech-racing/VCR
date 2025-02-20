@@ -1,5 +1,7 @@
+#include "CANInterface.h"
+#include "VCRCANInterfaceImpl.h"
 #include "SystemTimeInterface.h"
-#include "VCR_Tasks.h"
+#include "VCR_InterfaceTasks.h"
 
 
 /* From shared-systems-lib */
@@ -12,8 +14,9 @@
 #include "VCR_Constants.h"
 #include "BuzzerController.h"
 #include "VCR_Globals.h"
-#include "VehicleStateMachine.h"
+
 #include "AMSSystem.h"
+#include "DrivebrainInterface.h"
 
 bool init_read_adc0_task()
 {
@@ -28,8 +31,7 @@ bool init_read_adc0_task()
 void run_read_adc0_task()
 {
 
-    ADC0Instance::instance().tick();
-
+    ADC0Instance::instance().tick(); // why is it that the sample and convert functions are public in the mcp_adc interface? 
     vcr_data.interface_data.current_sensor_data.twentyfour_volt_sensor = ADC0Instance::instance().data.conversions[GLV_SENSE_CHANNEL].conversion;
     vcr_data.interface_data.current_sensor_data.current_sensor_unfiltered = ADC0Instance::instance().data.conversions[CURRENT_SENSE_CHANNEL].conversion;
     vcr_data.interface_data.current_sensor_data.current_refererence_unfiltered = ADC0Instance::instance().data.conversions[REFERENCE_SENSE_CHANNEL].conversion;
@@ -37,7 +39,7 @@ void run_read_adc0_task()
     vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = ADC0Instance::instance().data.conversions[RR_LOADCELL_CHANNEL].conversion;
     vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = ADC0Instance::instance().data.conversions[RL_SUS_POT_CHANNEL].raw; // Just use raw for suspots
     vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = ADC0Instance::instance().data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
-    // Serial.println("yo");
+    
     hal_printf("ADC0 reading 0 %d\n", ADC0Instance::instance().data.conversions[0].raw); // NOLINT
 }
 
@@ -51,7 +53,7 @@ bool init_read_adc1_task()
 
     ADC1Instance::create(ADC1_CS, MCP_ADC_DEFAULT_SPI_SDI, MCP_ADC_DEFAULT_SPI_SDO, MCP_ADC_DEFAULT_SPI_CLK, MCP_ADC_DEFAULT_SPI_SPEED, scales, offsets);
 
-    hal_printf("Initialized ADC1 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
+    hal_printf("Initialized ADC1 at %d (millis)\n", sys_time::hal_millis());
     return true;
 }
 
@@ -59,8 +61,7 @@ void run_read_adc1_task()
 {
 
     ADC1Instance::instance().tick();
-
-    hal_printf("ADC1 reading 0 %d\n", ADC1Instance::instance().data.conversions[0].raw); // NOLINT
+    hal_printf("ADC1 reading 0 %d\n", ADC1Instance::instance().data.conversions[0].raw);
 }
 
 void run_update_buzzer_controller_task()
@@ -77,22 +78,35 @@ bool init_ams_system_task()
     return true;
 }
 
-bool run_ams_system_task()
+void run_ams_system_task()
 {
     AMSSystemInstance::instance().update_ams_system(sys_time::hal_millis(), vcr_data);
     digitalWrite(SOFTWARE_OK_PIN, vcr_data.system_data.ams_data.ams_ok);
-    return true;
 }
 
 
 
-void create_watchdog()
+bool create_watchdog()
 {
     WatchdogInstance::create(default_system_params::KICK_INTERVAL_MS); // this has issues for some reason with clang-tidy // NOLINT
     pinMode(WATCHDOG_PIN, OUTPUT);
+    return true;
 }
 
 void run_kick_watchdog()
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
+}
+
+// CAN send tasks
+
+// adds rear suspension and vcr status CAN messages to the sent on next mega loop run 
+void handle_enqueue_suspension_CAN_data()
+{
+    DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
+}
+
+void handle_send_all_data()
+{
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
 }

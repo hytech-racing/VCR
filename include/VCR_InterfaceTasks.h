@@ -1,8 +1,5 @@
-#ifndef VCR_TASKS
-#define VCR_TASKS
-
-
-
+#ifndef VCR_INTERFACETASKS
+#define VCR_INTERFACETASKS
 
 /* From shared_firmware_types library */
 #include "SharedFirmwareTypes.h"
@@ -46,8 +43,18 @@ void run_update_buzzer_controller_task();
 /**
  * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin.
  */
-void create_watchdog();
+bool create_watchdog();
 void run_kick_watchdog();
+
+/**
+ * handles sending of suspension CAN message data (load cell and shock pot data)
+ */
+void handle_enqueue_suspension_CAN_data();
+
+/**
+ * handles sending of all data on all interfaces
+ */
+void handle_send_all_data();
 
 
 
@@ -55,6 +62,6 @@ void run_kick_watchdog();
  * This task will tick the AMS system and will update the software shutdown if necessary.
  */
 bool init_ams_system_task();
-bool run_ams_system_task();
+void run_ams_system_task();
 
-#endif /* VCR_TASKS */
+#endif /* VCR_INTERFACETASKS */
