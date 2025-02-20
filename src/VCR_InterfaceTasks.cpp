@@ -15,18 +15,16 @@
 #include "BuzzerController.h"
 #include "VCR_Globals.h"
 
-// #include "VehicleStateMachine.h"
-
+#include "AMSSystem.h"
 #include "DrivebrainInterface.h"
 
 bool init_read_adc0_task()
 {
-    float scales[channels_within_mcp_adc] = {GLV_SENSE_SCALE, CURRENT_SENSE_SCALE, REFERENCE_SENSE_SCALE, RL_LOADCELL_SCALE, RR_LOADCELL_SCALE, RL_SUS_POT_SCALE, RR_SUS_POT_SCALE, 1}; 
-    float offsets[channels_within_mcp_adc] = {GLV_SENSE_OFFSET, CURRENT_SENSE_OFFSET, REFERENCE_SENSE_OFFSET, RL_LOADCELL_OFFSET, RR_LOADCELL_OFFSET, RL_SUS_POT_OFFSET, RR_SUS_POT_OFFSET, 0};
-
+    float scales[channels_within_mcp_adc] = {GLV_SENSE_SCALE, CURRENT_SENSE_SCALE, REFERENCE_SENSE_SCALE, RL_LOADCELL_SCALE, RR_LOADCELL_SCALE, RL_SUS_POT_SCALE, RR_SUS_POT_SCALE, 1}; //NOLINT
+    float offsets[channels_within_mcp_adc] = {GLV_SENSE_OFFSET, CURRENT_SENSE_OFFSET, REFERENCE_SENSE_OFFSET, RL_LOADCELL_OFFSET, RR_LOADCELL_OFFSET, RL_SUS_POT_OFFSET, RR_SUS_POT_OFFSET, 0}; //NOLINT
     ADC0Instance::create(ADC0_CS, MCP_ADC_DEFAULT_SPI_SDI, MCP_ADC_DEFAULT_SPI_SDO, MCP_ADC_DEFAULT_SPI_CLK, MCP_ADC_DEFAULT_SPI_SPEED, scales, offsets);
-     
-    hal_printf("Initialized ADC0 at %d (millis)\n", sys_time::hal_millis());
+    
+    hal_printf("Initialized ADC0 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
     return true;
 }
 
@@ -69,12 +67,30 @@ void run_read_adc1_task()
 void run_update_buzzer_controller_task()
 {
     vcr_data.system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sys_time::hal_millis()); //NOLINT
-
 }
 
-void create_watchdog()
+
+
+bool init_ams_system_task()
+{
+    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS); // NOLINT 
+    pinMode(SOFTWARE_OK_PIN, OUTPUT);
+    return true;
+}
+
+void run_ams_system_task()
+{
+    AMSSystemInstance::instance().update_ams_system(sys_time::hal_millis(), vcr_data);
+    digitalWrite(SOFTWARE_OK_PIN, vcr_data.system_data.ams_data.ams_ok);
+}
+
+
+
+bool create_watchdog()
 {
     WatchdogInstance::create(default_system_params::KICK_INTERVAL_MS); // this has issues for some reason with clang-tidy // NOLINT
+    pinMode(WATCHDOG_PIN, OUTPUT);
+    return true;
 }
 
 void run_kick_watchdog()

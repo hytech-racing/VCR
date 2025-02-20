@@ -8,5 +8,4 @@
 #include "SharedFirmwareTypes.h"
 
 /* Interface and system data structs */
-// VCRInterfaceData_s interface_data;
 VCRData_s vcr_data;
