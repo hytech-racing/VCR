@@ -1,8 +1,5 @@
-#ifndef VCR_TASKS
-#define VCR_TASKS
-
-
-
+#ifndef VCR_INTERFACETASKS
+#define VCR_INTERFACETASKS
 
 /* From shared_firmware_types library */
 #include "SharedFirmwareTypes.h"
@@ -12,15 +9,10 @@
 #include "VCR_Constants.h"
 #include "VehicleStateMachine.h"
 #include "VCR_Globals.h"
-#include "Buzzer.h"
+#include "BuzzerController.h"
 
-/**
- * The "tick state machine" task will simply call the state machine's tick function with the current
- * timestamp in micros. No init function is necessary. The tick function makes use of the other systems'
- * singleton classes to minimize the need for passing instances around.
- */
-void run_tick_state_machine_task();
-    
+
+
 /**
  * The read_adc0 task will command adc0 to sample all eight channels, convert the outputs, and
  * store them in structs defined in shared_firmware_types. This function relies on adc_0 being
@@ -49,8 +41,27 @@ void run_update_buzzer_controller_task();
 
 
 /**
- * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin
+ * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin.
  */
+bool create_watchdog();
 void run_kick_watchdog();
 
-#endif /* VCR_TASKS */
+/**
+ * handles sending of suspension CAN message data (load cell and shock pot data)
+ */
+void handle_enqueue_suspension_CAN_data();
+
+/**
+ * handles sending of all data on all interfaces
+ */
+void handle_send_all_data();
+
+
+
+/**
+ * This task will tick the AMS system and will update the software shutdown if necessary.
+ */
+bool init_ams_system_task();
+void run_ams_system_task();
+
+#endif /* VCR_INTERFACETASKS */

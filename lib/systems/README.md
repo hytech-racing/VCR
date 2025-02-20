@@ -80,3 +80,32 @@ stateDiagram-v2
     err --> clear_err: on user request of error reset 
     clear_err --> not_en_hv: on successful reset of errors (either internally to the drivetrain system or of the inverters themselves)
 ```
+
+## drivebrain controller system
+
+Drivebrain Controller for fail-safe pass-through control of the car
+  
+this class is the "controller" that allows for pass-through control as commanded by the drivebrain. It also calculates the latency of the most recent input and checks to see if the most recent input is still valid and has not expired. If the input has expired then it switches over to the fail-safe control mode (MODE0) to allow for safe failing even while the car is driving so that we dont lose hard-braking capabilities.
+
+The controller can clear it's own fault by switching off of this operating mode and then swapping back to this operating mode. The fault clears the first time this controller gets evaluated while switch from the swapped-to mode back to this pass through mode. 
+
+- all controllers get evaluated once when being evaluated as a mode to switch to. during this evaluation is when the fault clears.
+
+### latency measurement:
+- the latency is measured by the difference in times in received messages from drivebrain over CAN. if the difference is too great, we swap to MODE0 control. it is assumed that the transmission delay is negligible
+
+### config and I/O
+config: 
+
+- maximum allowed latency 
+
+- assigned controller mode of the drivebrain control mode (currently defaults to MODE4)
+
+inputs:
+
+- the current car state from which it gets the latest drivebrain input, current controller mode and the stamped drivebrain message data
+outputs:
+
+- drivetrain command either from drivebrain or mode0 depending on if an error is present
+
+- getter for the internal state of the drivebrain controller (error present, etc.)
