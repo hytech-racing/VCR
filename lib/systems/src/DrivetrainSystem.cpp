@@ -152,7 +152,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             }
             else if(requesting_init && hv_enabled && inverters_ready && !inverters_enabled)
             {
-                _set_enable_drivetrain(); // should be done on entry of this state
+                _set_enable_drivetrain();
             } else if(hv_enabled && inverters_ready && inverters_enabled)
             {
                 _set_enable_drivetrain();
