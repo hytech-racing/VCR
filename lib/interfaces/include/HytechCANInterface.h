@@ -8,7 +8,7 @@
 #include <InverterInterface.h>
 #include <MessageQueueDefine.h>
 
-/* Recieve Buffers */
+/* receive Buffers */
 extern CANBufferType CAN1_rxBuffer;
 extern CANBufferType CAN2_rxBuffer;
 extern CANBufferType CAN3_rxBuffer;
@@ -30,12 +30,12 @@ struct CANInterfaces
     InverterInterface back_right_inv;
 };
 
-/** Methods called on can recieve */
-void on_can1_recieve(const CAN_message_t &msg); 
+/** Methods called on can receive */
+void on_can1_receive(const CAN_message_t &msg); 
 
-void on_can2_recieve(const CAN_message_t &msg); 
+void on_can2_receive(const CAN_message_t &msg); 
 
-void on_can3_recieve(const CAN_message_t &msg); 
+void on_can3_receive(const CAN_message_t &msg); 
 
 /**
  * Recieving CAN messages
@@ -52,84 +52,84 @@ void process_ring_buffer(BufferType &rx_buffer, CANInterfaces interfaces) {
         switch (recvd_msg.id)
         {
             // FL Inverter
-            case (MCI1_STATUS_CANID):
-                interfaces.front_left_inv.recieve_MCI_STATUS(recvd_msg);
+            case (INV1_STATUS_CANID):
+                interfaces.front_left_inv.receive_INV_STATUS(recvd_msg);
                 break;
 
-            case (MCI1_TEMPS_CANID):
-                interfaces.front_left_inv.recieve_MCI_TEMPS(recvd_msg);
+            case (INV1_TEMPS_CANID):
+                interfaces.front_left_inv.receive_INV_TEMPS(recvd_msg);
                 break;
 
-            case (MCI1_DYNAMICS_CANID):
-                interfaces.front_left_inv.recieve_MCI_DYNAMICS(recvd_msg);
+            case (INV1_DYNAMICS_CANID):
+                interfaces.front_left_inv.receive_INV_DYNAMICS(recvd_msg);
                 break;
 
-            case (MCI1_POWER_CANID):
-                interfaces.front_left_inv.recieve_MCI_POWER(recvd_msg);
+            case (INV1_POWER_CANID):
+                interfaces.front_left_inv.receive_INV_POWER(recvd_msg);
                 break;
 
-            case (MCI1_FEEDBACK_CANID):
-                interfaces.front_left_inv.recieve_MCI_FEEDBACK(recvd_msg);
+            case (INV1_FEEDBACK_CANID):
+                interfaces.front_left_inv.receive_INV_FEEDBACK(recvd_msg);
 
             // FR inverter
-            case (MCI2_STATUS_CANID):
-                interfaces.front_right_inv.recieve_MCI_STATUS(recvd_msg);
+            case (INV2_STATUS_CANID):
+                interfaces.front_right_inv.receive_INV_STATUS(recvd_msg);
                 break;
 
-            case (MCI2_TEMPS_CANID):
-                interfaces.front_right_inv.recieve_MCI_TEMPS(recvd_msg);
+            case (INV2_TEMPS_CANID):
+                interfaces.front_right_inv.receive_INV_TEMPS(recvd_msg);
                 break;
 
-            case (MCI2_DYNAMICS_CANID):
-                interfaces.front_right_inv.recieve_MCI_DYNAMICS(recvd_msg);
+            case (INV2_DYNAMICS_CANID):
+                interfaces.front_right_inv.receive_INV_DYNAMICS(recvd_msg);
                 break;
 
-            case (MCI2_POWER_CANID):
-                interfaces.front_right_inv.recieve_MCI_POWER(recvd_msg);
+            case (INV2_POWER_CANID):
+                interfaces.front_right_inv.receive_INV_POWER(recvd_msg);
                 break;
                 
-            case (MCI2_FEEDBACK_CANID):
-                interfaces.front_right_inv.recieve_MCI_FEEDBACK(recvd_msg);
+            case (INV2_FEEDBACK_CANID):
+                interfaces.front_right_inv.receive_INV_FEEDBACK(recvd_msg);
 
             // RL Inverter
-            case (MCI3_STATUS_CANID):
-                interfaces.back_left_inv.recieve_MCI_STATUS(recvd_msg);
+            case (INV3_STATUS_CANID):
+                interfaces.back_left_inv.receive_INV_STATUS(recvd_msg);
                 break;
 
-            case (MCI3_TEMPS_CANID):
-                interfaces.back_left_inv.recieve_MCI_TEMPS(recvd_msg);
+            case (INV3_TEMPS_CANID):
+                interfaces.back_left_inv.receive_INV_TEMPS(recvd_msg);
                 break;
 
-            case (MCI3_DYNAMICS_CANID):
-                interfaces.back_left_inv.recieve_MCI_DYNAMICS(recvd_msg);
+            case (INV3_DYNAMICS_CANID):
+                interfaces.back_left_inv.receive_INV_DYNAMICS(recvd_msg);
                 break;
 
-            case (MCI3_POWER_CANID):
-                interfaces.back_left_inv.recieve_MCI_POWER(recvd_msg);
+            case (INV3_POWER_CANID):
+                interfaces.back_left_inv.receive_INV_POWER(recvd_msg);
                 break;
 
-            case (MCI3_FEEDBACK_CANID):
-                interfaces.back_left_inv.recieve_MCI_FEEDBACK(recvd_msg);
+            case (INV3_FEEDBACK_CANID):
+                interfaces.back_left_inv.receive_INV_FEEDBACK(recvd_msg);
 
             // RR Inverter
-            case (MCI4_STATUS_CANID):
-                interfaces.back_right_inv.recieve_MCI_STATUS(recvd_msg);
+            case (INV4_STATUS_CANID):
+                interfaces.back_right_inv.receive_INV_STATUS(recvd_msg);
                 break;
 
-            case (MCI4_TEMPS_CANID):
-                interfaces.back_right_inv.recieve_MCI_TEMPS(recvd_msg);
+            case (INV4_TEMPS_CANID):
+                interfaces.back_right_inv.receive_INV_TEMPS(recvd_msg);
                 break;
 
-            case (MCI4_DYNAMICS_CANID):
-                interfaces.back_right_inv.recieve_MCI_DYNAMICS(recvd_msg);
+            case (INV4_DYNAMICS_CANID):
+                interfaces.back_right_inv.receive_INV_DYNAMICS(recvd_msg);
                 break;
 
-            case (MCI4_POWER_CANID):
-                interfaces.back_right_inv.recieve_MCI_POWER(recvd_msg);
+            case (INV4_POWER_CANID):
+                interfaces.back_right_inv.receive_INV_POWER(recvd_msg);
                 break;
 
-            case (MCI4_FEEDBACK_CANID):
-                interfaces.back_right_inv.recieve_MCI_FEEDBACK(recvd_msg);
+            case (INV4_FEEDBACK_CANID):
+                interfaces.back_right_inv.receive_INV_FEEDBACK(recvd_msg);
 
         }
     
