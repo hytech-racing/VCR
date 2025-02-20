@@ -332,14 +332,14 @@ void DrivetrainSystem::_set_drivetrain_command(DrivetrainCommand_s cmd)
     _inverter_interfaces.RR.set_speed(cmd.desired_speeds.RR, cmd.torque_limits.RR);
 }
 
-bool DrivetrainSystem::_drivetrain_active(float max_active_rpm)
+bool DrivetrainSystem::_drivetrain_active(float min_active_rpm)
 {
     
     auto funcs_arr = _inverter_interfaces.as_array();
     for(const auto & func : funcs_arr)
     {
         auto motor_mechanics = func.get_motor_mechanics();
-        if(motor_mechanics.actual_speed >= max_active_rpm)
+        if(motor_mechanics.actual_speed >= min_active_rpm)
         {
             return true;
         }

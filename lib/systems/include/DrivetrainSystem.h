@@ -88,7 +88,7 @@ public:
     DrivetrainSystem(veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces);
 private:
     bool _check_inverter_flags(std::function<bool(const InverterStatus_s&)> flag_check_func);
-    bool _drivetrain_active(float max_active_rpm);
+    bool _drivetrain_active(float min_active_rpm);
 
     void _set_state(DrivetrainState_e state);
     
