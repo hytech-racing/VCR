@@ -39,10 +39,11 @@ constexpr unsigned long adc_sample_period_us = 250;
 TsTask adc_0_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc0_task, &task_scheduler, false, &init_read_adc0_task);
 TsTask adc_1_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc1_task, &task_scheduler, false, &init_read_adc1_task);
 
-/* Ethernet message sockets */ // TODO: Move this into its own interface
-qindesign::network::EthernetUDP protobuf_send_socket;
-qindesign::network::EthernetUDP protobuf_recv_socket;
+// /* Ethernet message sockets */ // TODO: Move this into its own interface
+// qindesign::network::EthernetUDP protobuf_send_socket;
+// qindesign::network::EthernetUDP protobuf_recv_socket;
 
+// // InverterInterface mci1_interface = InverterInterface(&CAN1_rxBuffer, 1, 2);
 
 void setup() {
     SPI.begin(); // TODO this should be elsewhere maybe
