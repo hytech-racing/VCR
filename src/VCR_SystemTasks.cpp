@@ -29,13 +29,9 @@ VCRInterfaceData_s sample_async_data(
     return ret;
 }
 
-// used for systems that dont need to interact with the state machine. i dont think that we need to
-// pass in the previous s
 VCRSystemData_s evaluate_async_systems(const VCRInterfaceData_s &interface_data) {
     VCRSystemData_s sys_data;
-    
-    // systems that will be handled here include anything that we want to be immediately handled every loop but does not depend on the state 
-    // of the car or that the state machine does not depend upon for determing the state.
+
 
     /*
     this could include: 
