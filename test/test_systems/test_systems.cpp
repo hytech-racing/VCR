@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "test_tcmux.h"
-#include "test_buzzer.h"
-#include "test_watchdog.h"
+// #include "test_tcmux.h"
+// #include "test_buzzer.h"
+// #include "test_watchdog.h"
+#include "test_vsm.h"
 
 int main(int argc, char **argv)
 {

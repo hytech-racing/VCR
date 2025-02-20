@@ -1,0 +1,146 @@
+#include "VehicleStateMachine.h"
+#include <gtest/gtest.h>
+
+bool hv_over_threshold;
+bool start_btn;
+bool brake_pressed;
+bool drivetrain_error;
+bool drivetrain_ready;
+bool drivetrain_commanded;
+bool buzzer_active;
+
+etl::delegate<bool()> mock_hv_over_threshold = etl::delegate<bool()>::create([]() -> bool {
+    return hv_over_threshold;
+});
+
+etl::delegate<bool()> mock_start_btn = etl::delegate<bool()>::create([]() -> bool {
+    return brake_pressed;
+});
+
+etl::delegate<bool()> mock_brake_pressed = etl::delegate<bool()>::create([]() -> bool {
+    return brake_pressed;
+});
+
+etl::delegate<bool()> mock_drivetrain_error = etl::delegate<bool()>::create([]() -> bool {
+    return drivetrain_error;
+});
+
+etl::delegate<bool()> mock_drivetrain_ready = etl::delegate<bool()>::create([]() -> bool {
+    return drivetrain_ready;
+});
+
+etl::delegate<void()> mock_start_buzzer = etl::delegate<void()>::create([]() -> void {
+    buzzer_active = true;
+    return;
+});
+
+etl::delegate<bool()> mock_buzzer_done = etl::delegate<bool()>::create([]() -> bool {
+    return !buzzer_active;
+    return true;
+});
+
+etl::delegate<void()> mock_end_buzzer = etl::delegate<void()>::create([]() -> void {
+    buzzer_active = false;
+    return;
+});
+
+etl::delegate<void()> mock_handle_drivetrain_init = etl::delegate<void()>::create([]() -> void {
+    return;
+});
+
+etl::delegate<void()> mock_command_drivetrain = etl::delegate<void()>::create([]() -> void {
+    drivetrain_commanded = true;
+    return;
+});
+
+VehicleStateMachine state_machine = VehicleStateMachine(
+    mock_hv_over_threshold,
+    mock_start_btn,
+    mock_brake_pressed,
+    mock_drivetrain_error,
+    mock_drivetrain_ready,
+    mock_start_buzzer,
+    mock_buzzer_done,
+    mock_end_buzzer,
+    mock_handle_drivetrain_init,
+    mock_command_drivetrain
+);
+
+TEST (VehicleStateMachine, TractiveSystemNotActive) {
+    hv_over_threshold = false;
+    start_btn = false;
+    brake_pressed = false;
+    drivetrain_error = false;
+    drivetrain_ready = false;
+    drivetrain_commanded = false;
+    buzzer_active = false;
+
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE);
+    state_machine.tick_state_machine(0);
+}
+
+TEST (VehicleStateMachine, TractiveSystemActive) {
+    hv_over_threshold = true;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
+    state_machine.tick_state_machine(0);
+
+    hv_over_threshold = false;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE);
+    state_machine.tick_state_machine(0);
+
+    hv_over_threshold = true;
+}
+
+TEST (VehicleStateMachine, WantingReadyToDrive) {
+    start_btn = true;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
+    state_machine.tick_state_machine(0);
+    brake_pressed = true;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::WANTING_READY_TO_DRIVE);
+    state_machine.tick_state_machine(0);
+
+    hv_over_threshold = false;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE);
+    state_machine.tick_state_machine(0);
+
+    hv_over_threshold = true;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
+    state_machine.tick_state_machine(0);
+    
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::WANTING_READY_TO_DRIVE);
+    ASSERT_EQ(buzzer_active, true);
+    state_machine.tick_state_machine(0);
+}
+
+TEST (VehicleStateMachine, ReadyToDrive) {
+    drivetrain_ready = true;
+    ASSERT_EQ(drivetrain_commanded, false);
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::WANTING_READY_TO_DRIVE);
+
+    buzzer_active = false;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::READY_TO_DRIVE);
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(drivetrain_commanded, true);
+    state_machine.tick_state_machine(0);
+
+    drivetrain_error = true;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
+    state_machine.tick_state_machine(0);
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::READY_TO_DRIVE);
+
+    hv_over_threshold = false;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE);
+}
