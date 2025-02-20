@@ -1,6 +1,6 @@
 #include "controllers/SimpleController.h"
 
-DrivetrainCommand_s TorqueControllerSimple::evaluate(const VCRData_s &state)
+DrivetrainCommand_s TorqueControllerSimple::evaluate(const VCRData_s &state, unsigned long curr_millis)
 {
     // Both pedals are not pressed and no implausibility has been detected
     // accelRequest goes between 1.0 and -1.0

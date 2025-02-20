@@ -39,7 +39,7 @@ class VehicleStateMachine
             _current_state = VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE;
         }
 
-        void tick_state_machine(unsigned long curr_time_millis);
+        VehicleState_e tick_state_machine(unsigned long curr_time_millis);
 
         VehicleState_e get_state() { return _current_state; }
     
