@@ -4,12 +4,22 @@
 
 #include "CANInterface.h"
 #include "VCRCANInterfaceImpl.h"
-#include "hytech.h"
+
+#include "hytech.h" // HT_can
+
+#include "hytech_msgs.pb.h"
+#include <cstdint>
 
 DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cell_data,
-                                         const RearSusPotData_s &rear_suspot_data)
+                                         const RearSusPotData_s &rear_suspot_data,
+                                         IPAddress drivebrain_ip, uint16_t vcr_data_port,
+                                         qindesign::network::EthernetUDP *udp_socket)
     : _suspension_data{.rear_load_cell_data = rear_load_cell_data,
-                       .rear_suspot_data = rear_suspot_data} {}
+                       .rear_suspot_data = rear_suspot_data} {
+    _drivebrain_ip = drivebrain_ip;
+    _vcr_data_port = vcr_data_port;
+    _udp_socket = udp_socket;
+}
 
 StampedDrivetrainCommand_s DrivebrainInterface::get_latest_data() {
     return _latest_drivebrain_command;
@@ -58,5 +68,11 @@ void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
     rear_sus_msg.rl_shock_pot = _suspension_data.rear_suspot_data.RL_sus_pot_analog;
     rear_sus_msg.rr_shock_pot = _suspension_data.rear_suspot_data.RR_sus_pot_analog;
 
-    CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+    CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_hytech,
+                          VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
+void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {
+    handle_ethernet_socket_send_pb<(size_t)1024>(_drivebrain_ip, _vcr_data_port, _udp_socket, data,
+                                   hytech_msgs_VCRData_s_fields);
 }

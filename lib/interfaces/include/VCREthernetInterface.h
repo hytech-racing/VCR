@@ -3,7 +3,6 @@
 
 #include "hytech_msgs.pb.h"
 #include "SharedFirmwareTypes.h"
-
 namespace VCREthernetInterface 
 {
     /**
@@ -12,7 +11,7 @@ namespace VCREthernetInterface
      * @param shared_state The current VCR state, which includes both interface and system data.
      * @return A populated instance of the outgoing protoc struct.
      */
-    hytech_msgs_VCRData_s make_vcr_data_msg(VCRData_s &shared_state);
+    hytech_msgs_VCRData_s make_vcr_data_msg(const VCRData_s &shared_state);
 
     /**
      * Function to take a populated protoc struct from ACU and update the VCR state.
@@ -60,7 +59,7 @@ namespace VCREthernetInterface
      * @param destination The destination protoc struct.
      * @post The destination struct will be populated with the data from original.
      */
-    void copy_inverter_data(InverterData_s &original, hytech_msgs_InverterData_s &destination);
+    void copy_inverter_data(const InverterData_s &original, hytech_msgs_InverterData_s &destination);
 
     /**
      * Helper function to copy veh_vec data.
