@@ -31,6 +31,7 @@
 
 // class DrivebrainInterface;
 
+#include "device_fw_version.h"
 FlexCAN_Type<CAN2> INV_CAN;
 FlexCAN_Type<CAN3> TELEM_CAN;
 
