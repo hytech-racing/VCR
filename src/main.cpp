@@ -32,7 +32,6 @@
 
 #include "EthernetAddressDefs.h"
 
-
 FlexCAN_Type<CAN2> INV_CAN;
 FlexCAN_Type<CAN3> TELEM_CAN;
 
@@ -61,14 +60,18 @@ TsTask ams_system_task(ams_update_period_us, TASK_FOREVER, &run_ams_system_task,
                        false, &init_ams_system_task);
 
 TsTask CAN_send(TASK_IMMEDIATE, TASK_FOREVER, &handle_send_all_data, &task_scheduler, false);
-TsTask ethernet_send(ethernet_update_period, TASK_FOREVER, &handle_send_VCR_ethernet_data, &task_scheduler, false);
+TsTask ethernet_send(ethernet_update_period, TASK_FOREVER, &handle_send_VCR_ethernet_data,
+                     &task_scheduler, false);
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
 
 EthernetIPDefs_s car_network_definition;
 void setup() {
-    // TODO
+    qindesign::network::Ethernet.begin(
+        car_network_definition.vcr_ip, car_network_definition.default_dns,
+        car_network_definition.default_gateway, car_network_definition.car_subnet);
+    protobuf_send_socket.begin(car_network_definition.VCRData_port);
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
                                         vcr_data.interface_data.rear_suspot_data,
                                         car_network_definition.drivebrain_ip,
