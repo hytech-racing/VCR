@@ -61,7 +61,7 @@ TsTask ams_system_task(ams_update_period_us, TASK_FOREVER, &run_ams_system_task,
                        false, &init_ams_system_task);
 
 TsTask CAN_send(TASK_IMMEDIATE, TASK_FOREVER, &handle_send_all_data, &task_scheduler, false);
-TsTask drivebrain_ethernet_send(ethernet_update_period, TASK_FOREVER, &handle_send_VCR_ethernet_data, &task_scheduler, false);
+TsTask ethernet_send(ethernet_update_period, TASK_FOREVER, &handle_send_VCR_ethernet_data, &task_scheduler, false);
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
@@ -85,6 +85,7 @@ void setup() {
     CAN_send.enable();
     update_buzzer_controller_task.enable();
     kick_watchdog_task.enable();
+    ethernet_send.enable();
 }
 
 void loop() { task_scheduler.execute(); }
