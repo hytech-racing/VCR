@@ -13,6 +13,7 @@
 #include "BuzzerController.h"
 #include "VCR_Globals.h"
 #include "VehicleStateMachine.h"
+#include "IOExpander.h"
 
 bool init_read_adc0_task()
 {
@@ -87,4 +88,27 @@ void create_watchdog()
 void run_kick_watchdog()
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
+}
+
+void create_IOExpander(){
+    IOExpanderInstance::create();
+}
+
+void read_IOExpander(){
+    IOExpanderInstance::instance().read();
+
+    vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderInstance::instance().getBit(0, 0);
+    vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay = IOExpanderInstance::instance().getBit(0,1);
+    vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok = IOExpanderInstance::instance().getBit(0,2);
+    vcr_data.interface_data.shutdown_sensing_data.l_bms_relay = IOExpanderInstance::instance().getBit(0,3);
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderInstance::instance().getBit(0,4);
+    vcr_data.interface_data.shutdown_sensing_data.m_imd_relay = IOExpanderInstance::instance().getBit(0,5);
+    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderInstance::instance().getBit(0,6);
+
+    vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderInstance::instance().getBit(1, 0);
+    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderInstance::instance().getBit(1, 1);
+    vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderInstance::instance().getBit(1, 2);
+    vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderInstance::instance().getBit(1, 3);
+    vcr_data.interface_data.ethernet_is_linked.debug_link = IOExpanderInstance::instance().getBit(1, 4);
+    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderInstance::instance().getBit(1, 5);
 }
