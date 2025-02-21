@@ -1,8 +1,8 @@
 #include "VCREthernetInterface.h"
 #include "SharedFirmwareTypes.h"
 
-#include "device_fw_version.h" // from pio-git-hash
 #include <algorithm>
+
 hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &shared_state)
 {
 	hytech_msgs_VCRData_s out;
@@ -65,8 +65,10 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     // Buzzer
     out.buzzer_is_active = shared_state.system_data.buzzer_is_active;
     
-    auto current_firmware_version = convert_version_to_char_arr(AUTO_VERSION);
-    std::copy(current_firmware_version.begin(), current_firmware_version.end(),out.firmware_git_hash);
+    out.firmware_version_info.project_is_dirty = shared_state.fw_version_info.project_is_dirty;
+    out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;
+    std::copy(shared_state.fw_version_info.fw_version_hash.begin(), shared_state.fw_version_info.fw_version_hash.end(), out.firmware_version_info.git_hash);
+    
     return out;
 
 }

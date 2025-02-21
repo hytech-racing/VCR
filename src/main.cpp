@@ -28,7 +28,11 @@
 
 #include "DrivebrainInterface.h"
 
-// class DrivebrainInterface;
+
+// has to be included here as the define is only defined for source files in the implementation
+// not in the library folder (makes sense)
+#include "device_fw_version.h"  // from pio-git-hash
+
 
 #include "EthernetAddressDefs.h"
 
@@ -67,7 +71,12 @@ qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
 
 EthernetIPDefs_s car_network_definition;
+
 void setup() {
+    vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
+    vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
+    vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
+
     qindesign::network::Ethernet.begin(
         car_network_definition.vcr_ip, car_network_definition.default_dns,
         car_network_definition.default_gateway, car_network_definition.car_subnet);
