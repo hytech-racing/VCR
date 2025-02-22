@@ -82,6 +82,7 @@ TEST(TorqueControllerMuxTesting, test_controller_output_swap_logic)
     set_four_outputs(state.system_data.drivetrain_data.measuredSpeeds, 10000.0);
 
 
+
     auto res1 = test.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
 
     res1 = test.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
