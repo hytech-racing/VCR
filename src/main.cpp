@@ -58,6 +58,7 @@ void setup() {
     adc_1_sample_task.enable();
     
     IOExpander_read_task.enable();
+}
 
 void loop() {
     task_scheduler.execute();
