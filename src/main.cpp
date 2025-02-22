@@ -39,8 +39,8 @@ constexpr unsigned long adc_sample_period_us = 250;
 TsTask adc_0_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc0_task, &task_scheduler, false, &init_read_adc0_task);
 TsTask adc_1_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc1_task, &task_scheduler, false, &init_read_adc1_task);
 
-
-TsTask IOExpander_read_task(250, TASK_FOREVER, &read_IOExpander, &task_scheduler, false, &create_IOExpander);
+constexpr unsigned long IOExpander_sample_period_us = 250;
+TsTask IOExpander_read_task(IOExpander_sample_period_us, TASK_FOREVER, &read_IOExpander, &task_scheduler, false, &create_IOExpander);
 
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
@@ -56,7 +56,8 @@ void setup() {
 
     adc_0_sample_task.enable(); // will run the init function and allow the task to start running
     adc_1_sample_task.enable();
-}
+    
+    IOExpander_read_task.enable();
 
 void loop() {
     task_scheduler.execute();
