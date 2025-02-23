@@ -1,7 +1,9 @@
 #include "VCREthernetInterface.h"
 #include "SharedFirmwareTypes.h"
 
-hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(VCRData_s &shared_state)
+#include <algorithm>
+
+hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &shared_state)
 {
 	hytech_msgs_VCRData_s out;
 
@@ -62,7 +64,11 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(VCRData_s &shared_
 
     // Buzzer
     out.buzzer_is_active = shared_state.system_data.buzzer_is_active;
-
+    
+    out.firmware_version_info.project_is_dirty = shared_state.fw_version_info.project_is_dirty;
+    out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;
+    std::copy(shared_state.fw_version_info.fw_version_hash.begin(), shared_state.fw_version_info.fw_version_hash.end(), out.firmware_version_info.git_hash);
+    
     return out;
 
 }
@@ -128,7 +134,7 @@ void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_i
     shared_state.interface_data.dash_input_state.start_btn_is_pressed = msg_in.dash_input_state.start_btn_is_pressed;
 }
 	
-void VCREthernetInterface::copy_inverter_data(InverterData_s &original, hytech_msgs_InverterData_s &destination)
+void VCREthernetInterface::copy_inverter_data(const InverterData_s &original, hytech_msgs_InverterData_s &destination)
 {
     destination.actual_motor_torque = original.actual_motor_torque;
     destination.actual_power = original.actual_power;

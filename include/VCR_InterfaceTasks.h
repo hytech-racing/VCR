@@ -64,4 +64,7 @@ void handle_send_all_data();
 bool init_ams_system_task();
 void run_ams_system_task();
 
+
+// task for sending all ethernet data
+void handle_send_VCR_ethernet_data();
 #endif /* VCR_INTERFACETASKS */
