@@ -47,7 +47,6 @@ struct InverterStatus_s
     unsigned long last_recv_millis = 0; 
     bool hv_present : 1;
     bool connected : 1;
-    bool new_data : 1;
     bool system_ready : 1;
     bool error : 1;
     bool warning : 1;

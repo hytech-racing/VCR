@@ -1,4 +1,6 @@
 #include <InverterInterface.h>
+#include "VCRCANInterfaceImpl.h"
+
 
 /**
  * Getters for the data

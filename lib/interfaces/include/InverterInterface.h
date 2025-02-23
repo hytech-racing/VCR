@@ -8,7 +8,6 @@
 #include "DrivetrainSystem.h"
 #include <CANInterface.h>
 #include <shared_types.h>
-#include "VCRCANInterfaceImpl.h"
 
 struct InverterParams_s
 {   

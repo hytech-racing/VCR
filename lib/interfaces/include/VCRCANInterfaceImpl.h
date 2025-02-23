@@ -12,8 +12,6 @@
 
 #include "CANInterface.h"
 
-#include "InverterInterface.h"
-
 #include "SharedFirmwareTypes.h"
 
 #include "hytech.h" // generated CAN library
@@ -21,6 +19,7 @@
 
 #include "DrivebrainInterface.h"
 #include "VCFInterface.h"
+
 #include "InverterInterface.h"
 
 using CANRXBufferType = Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)>;
@@ -36,10 +35,10 @@ struct CANInterfaces {
     explicit CANInterfaces(
         VCFInterface &vcf_int, 
         DrivebrainInterface &db_int, 
-        InverterInterface fl_inverter_int, 
-        InverterInterface fr_inverter_int, 
-        InverterInterface rl_inverter_int, 
-        InverterInterface rr_inverter_int
+        InverterInterface &fl_inverter_int, 
+        InverterInterface &fr_inverter_int, 
+        InverterInterface &rl_inverter_int, 
+        InverterInterface &rr_inverter_int
 
     )
         : vcf_interface(vcf_int), 
