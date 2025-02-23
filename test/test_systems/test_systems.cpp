@@ -7,6 +7,7 @@
 #include "test_drivebrain_controller.h"
 #include "test_ams_system.h"
 #include "AMSSystem.h"
+#include "test_vsm.h"
 
 int main(int argc, char **argv)
 {
