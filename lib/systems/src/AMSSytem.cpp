@@ -5,7 +5,7 @@ AMSSystemData_s AMSSystem::update_ams_system(unsigned long curr_millis, VCRData_
     // Declare struct to return
     AMSSystemData_s ret = {};
 
-    ret.ams_ok = true;
+    ret.ams_ok = false;
 
     // If no message has been received, return immediately.
     if (!_has_received_one_message && vcr_data.interface_data.stamped_acu_core_data.last_recv_millis == 0)
