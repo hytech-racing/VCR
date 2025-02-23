@@ -31,17 +31,14 @@ etl::delegate<bool()> mock_drivetrain_ready = etl::delegate<bool()>::create([]()
 
 etl::delegate<void()> mock_start_buzzer = etl::delegate<void()>::create([]() -> void {
     buzzer_active = true;
-    return;
 });
 
 etl::delegate<bool()> mock_buzzer_done = etl::delegate<bool()>::create([]() -> bool {
     return !buzzer_active;
-    return true;
 });
 
 etl::delegate<void()> mock_end_buzzer = etl::delegate<void()>::create([]() -> void {
     buzzer_active = false;
-    return;
 });
 
 etl::delegate<void()> mock_handle_drivetrain_init = etl::delegate<void()>::create([]() -> void {
@@ -114,6 +111,7 @@ TEST (VehicleStateMachine, WantingReadyToDrive) {
     ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
     state_machine.tick_state_machine(0);
     
+    brake_pressed = true;
     state_machine.tick_state_machine(0);
     ASSERT_EQ(state_machine.get_state(), VehicleState_e::WANTING_READY_TO_DRIVE);
     ASSERT_EQ(buzzer_active, true);
@@ -137,6 +135,8 @@ TEST (VehicleStateMachine, ReadyToDrive) {
     state_machine.tick_state_machine(0);
     ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
     state_machine.tick_state_machine(0);
+    buzzer_active = false;
+    drivetrain_ready = true;
     state_machine.tick_state_machine(0);
     ASSERT_EQ(state_machine.get_state(), VehicleState_e::READY_TO_DRIVE);
 

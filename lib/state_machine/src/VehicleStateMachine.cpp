@@ -6,7 +6,6 @@
 
 VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_millis)
 {
-
     switch (_current_state)
     {
         case VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE:
@@ -79,9 +78,9 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
 
 void VehicleStateMachine::_set_state(VehicleState_e new_state, unsigned long curr_millis)
 {
-    _handle_entry_logic(_current_state, curr_millis);
+    _handle_exit_logic(_current_state, curr_millis);
     _current_state = new_state;
-    _handle_exit_logic(new_state, curr_millis);
+    _handle_entry_logic(_current_state, curr_millis);
 }
 
 void VehicleStateMachine::_handle_exit_logic(VehicleState_e prev_state, unsigned long curr_millis)
@@ -107,7 +106,7 @@ void VehicleStateMachine::_handle_exit_logic(VehicleState_e prev_state, unsigned
 void VehicleStateMachine::_handle_entry_logic(VehicleState_e new_state, unsigned long curr_millis)
 {
     switch (new_state)
-        {
+    {
         case VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE:
             break;
         case VehicleState_e::TRACTIVE_SYSTEM_ACTIVE:
@@ -121,5 +120,5 @@ void VehicleStateMachine::_handle_entry_logic(VehicleState_e new_state, unsigned
             break;
         default:
             break;
-        }
+    }
 }
