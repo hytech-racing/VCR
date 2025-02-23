@@ -8,9 +8,9 @@ DrivetrainSystem::DrivetrainSystem(
     _check_inverter_ready_flag([](const InverterStatus_s & status) -> bool {return status.system_ready;}),
     _check_inverter_connected_flag([](const InverterStatus_s & status) -> bool {return status.connected;}),
     _check_inverter_quit_dc_flag([](const InverterStatus_s & status) -> bool {return status.quit_dc_on;}),
-    _check_inverter_error_flag([](const InverterStatus_s & status) -> bool {return status.error;}),
-    _check_inverter_hv_present_flag([](const InverterStatus_s & status) -> bool {return status.dc_on;}),
-    _check_inverter_hv_not_present_flag([](const InverterStatus_s & status) -> bool {return status.hv_present;}), // TODO fix this
+    _check_inverter_no_errors_present([](const InverterStatus_s & status) -> bool {return !status.error;}),
+    _check_inverter_hv_present_flag([](const InverterStatus_s & status) -> bool {return status.hv_present;}),
+    _check_inverter_hv_not_present_flag([](const InverterStatus_s & status) -> bool {return !status.hv_present;}), 
     _check_inverter_enabled([](const InverterStatus_s & status) -> bool {return !status.quit_inverter_on;}) { };
 
 
@@ -63,7 +63,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             {
                 _set_state(DrivetrainState_e::NOT_ENABLED_HV_PRESENT);
             }
-            _set_drivetrain_disabled(); // TODO dont know if this should be sent here, but it shouldn't hurt
+            _set_drivetrain_disabled();
             break;
         }
 
@@ -80,7 +80,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         case DrivetrainState_e::NOT_ENABLED_HV_PRESENT:
         {   
             bool inverter_error_present = false;
-            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
             if(inverter_error_present)
             {
                 _set_state(DrivetrainState_e::ERROR);
@@ -97,7 +97,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         case DrivetrainState_e::INVERTERS_READY:
         {
             bool inverter_error_present = false;
-            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
             
             // in this state, we are requesting inverters to enable HV
             bool requesting_init = false;
@@ -110,9 +110,6 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             if(inverter_error_present)
             {
                 _set_state(DrivetrainState_e::ERROR);
-            } else if(requesting_init && inverters_ready && !hv_enabled)
-            {
-                _set_enable_drivetrain_hv();
             } else if(requesting_init && inverters_ready && hv_enabled)
             {
                 _set_enable_drivetrain_hv();
@@ -126,22 +123,19 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
         case DrivetrainState_e::INVERTERS_HV_ENABLED:
         {
-            // in this state, we are requesting the inverter to actually be enabled
-
-            // cases that need to be handled:
-            // - [x] if the user stops requesting init -> go back to inverters ready state
-            // - [x] error present on an inverter -> go to error state
 
             bool inverter_error_present = false;
-            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
             
             bool requesting_init = false;
             requesting_init = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED);
 
             bool hv_enabled = false;
             hv_enabled = _check_inverter_flags(_check_inverter_quit_dc_flag);
+
             bool inverters_ready = false;
             inverters_ready = _check_inverter_flags(_check_inverter_ready_flag);
+
             bool inverters_enabled = false;
             inverters_enabled = _check_inverter_flags(_check_inverter_enabled);
 
@@ -149,19 +143,18 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             {
                 _set_drivetrain_disabled();
                 _set_state(DrivetrainState_e::ERROR);
+                break;
             }
             else if(requesting_init && hv_enabled && inverters_ready && !inverters_enabled)
             {
                 _set_enable_drivetrain();
+                break;
             } else if(hv_enabled && inverters_ready && inverters_enabled)
             {
                 _set_enable_drivetrain();
                 _set_state(DrivetrainState_e::INVERTERS_ENABLED);
-            } else if((!requesting_init) && inverters_ready)
-            {
-                // NOTE if the user only calls the evaluate_drivetrain function once with the initialization request, 
-                // this statement will kick in and lead to the inverter staying disabled. the user must keep calling with the initialization 
-                // request flag / struct type in order to keep this state machine evaluating properly          
+            } else if(!hv_enabled && inverters_ready)
+            {        
                 _set_drivetrain_disabled();  
                 _set_state(DrivetrainState_e::INVERTERS_READY);
             }
@@ -171,19 +164,24 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
         case DrivetrainState_e::INVERTERS_ENABLED:
         {
+            bool inverters_enabled = false;
+            inverters_enabled = _check_inverter_flags(_check_inverter_enabled);
+
             bool inverter_error_present = false; 
-            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
+            inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
             
             bool requesting_drive = false;
             requesting_drive = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain == DrivetrainModeRequest_e::INIT_DRIVE_MODE);
-            
-            // for now i wont worry about checking whether or not the inverters are still enabled.
-            // bool inverters_enabled = _check_inverter_flags(_check_inverter_enabled);
 
             if(inverter_error_present)
             {
                 _set_drivetrain_disabled();
                 _set_state(DrivetrainState_e::ERROR);
+            }
+            else if (!inverters_enabled)
+            {
+                _set_drivetrain_disabled();
+                _set_state(DrivetrainState_e::INVERTERS_HV_ENABLED);
             }
             else if(requesting_drive)
             {
@@ -202,7 +200,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             }
 
             bool inverter_error_present = false;
-            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);  
+            inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);  
 
             bool valid_drivetrain_command = etl::holds_alternative<DrivetrainCommand_s>(cmd);
             
@@ -223,16 +221,32 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         {
             bool user_requesting_error_reset = etl::holds_alternative<DrivetrainResetError_s>(cmd) && (etl::get<DrivetrainResetError_s>(cmd).reset_errors); 
             bool inverter_error_present = false;
-            inverter_error_present = _check_inverter_flags(_check_inverter_error_flag);
             
-            if(user_requesting_error_reset && inverter_error_present)
+            inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
+            
+            if(user_requesting_error_reset)
             {
                 _set_drivetrain_error_reset();
+                _set_state(DrivetrainState_e::CLEARING_ERRORS);
             } else if(user_requesting_error_reset && (!inverter_error_present))
             {
                 _set_state(DrivetrainState_e::NOT_ENABLED_HV_PRESENT);
             }
             break;
+        }
+        case DrivetrainState_e::CLEARING_ERRORS: 
+        {
+
+            bool inverter_error_present = false;
+            inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
+
+            if (!inverter_error_present) 
+            {
+                _set_state(DrivetrainState_e::NOT_ENABLED_HV_PRESENT);
+                break;
+            }
+            break;
+
         }
         default:
             break;

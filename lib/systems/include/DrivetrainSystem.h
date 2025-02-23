@@ -34,7 +34,8 @@ enum class DrivetrainState_e
     INVERTERS_HV_ENABLED = 4,
     INVERTERS_ENABLED = 5,
     ENABLED_DRIVE_MODE = 6,
-    ERROR = 7
+    ERROR = 7, 
+    CLEARING_ERRORS = 8
 };
 
 enum class DrivetrainCmdResponse_e
@@ -108,7 +109,7 @@ private:
     std::function<bool(const InverterStatus_s &)> _check_inverter_ready_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_connected_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_quit_dc_flag;
-    std::function<bool(const InverterStatus_s &)> _check_inverter_error_flag;
+    std::function<bool(const InverterStatus_s &)> _check_inverter_no_errors_present;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_present_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_not_present_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_enabled;    
