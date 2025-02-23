@@ -79,7 +79,7 @@ void InverterInterface::receive_INV_DYNAMICS(CAN_message_t &can_msg)
 
     // Update inverter interface with new data
     _feedback_data.motor_mechanics.actual_power = unpacked_msg.actual_power_w;
-    _feedback_data.motor_mechanics.actual_torque = unpacked_msg.actual_torque_nm;
+    _feedback_data.motor_mechanics.actual_torque = HYTECH_actual_torque_nm_ro_fromS(unpacked_msg.actual_torque_nm_ro);
     _feedback_data.motor_mechanics.actual_speed = unpacked_msg.actual_speed_rpm;
     _feedback_data.motor_mechanics.new_data = true;
 
@@ -121,8 +121,8 @@ void InverterInterface::send_INV_SETPOINT_COMMAND()
     INV1_CONTROL_INPUT_t msg_out;
 
     msg_out.speed_setpoint_rpm = _inverter_control_inputs.speed_rpm_setpoint;
-    msg_out.positive_torque_limit_ro = _inverter_control_inputs.positive_torque_limit;
-    msg_out.negative_torque_limit_ro = _inverter_control_inputs.negative_torque_limit;
+    msg_out.positive_torque_limit_ro = HYTECH_positive_torque_limit_ro_toS(_inverter_control_inputs.positive_torque_limit);
+    msg_out.negative_torque_limit_ro = HYTECH_negative_torque_limit_ro_toS(_inverter_control_inputs.negative_torque_limit);
 
     CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, inverter_ids.inv_control_input_id);
 }

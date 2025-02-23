@@ -46,8 +46,6 @@ class InverterInterface
             inverter_ids.inv_control_input_id = inv_control_input_id;
         }
 
-        // TODO un-public these (they are public for testing)
-
         /* receiving callbacks */
         void receive_INV_STATUS(CAN_message_t &can_msg);
 
