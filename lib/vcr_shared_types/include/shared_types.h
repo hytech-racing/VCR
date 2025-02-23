@@ -43,6 +43,8 @@ struct InverterControlParams_s
 **/
 struct InverterStatus_s
 {
+    bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
     bool hv_present : 1;
     bool connected : 1;
     bool new_data : 1;
@@ -61,6 +63,7 @@ struct InverterStatus_s
 struct InverterTemps_s
 {
     bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
     HTUnits::celcius motor_temp;
     HTUnits::celcius inverter_temp;
     HTUnits::celcius igbt_temp;
@@ -69,6 +72,7 @@ struct InverterTemps_s
 struct InverterPower_s
 {
     bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
     HTUnits::watts active_power;
     HTUnits::var reactive_power;
 };
@@ -76,6 +80,7 @@ struct InverterPower_s
 struct MotorMechanics_s
 {
     bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
     HTUnits::watts actual_power;
     HTUnits::torque_nm actual_torque;
     HTUnits::speed_rpm actual_speed;
@@ -84,6 +89,7 @@ struct MotorMechanics_s
 struct InverterControlFeedback_s
 {
     bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
     uint16_t speed_control_kp;
     uint16_t speed_control_ki;
     uint16_t speed_control_kd;

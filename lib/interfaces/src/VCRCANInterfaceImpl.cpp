@@ -38,6 +38,7 @@ void on_telem_can_receive(const CAN_message_t &msg) {
 
 void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis) {
     switch (msg.id) {
+
     case PEDALS_SYSTEM_DATA_CANID: {
         interfaces.vcf_interface.receive_pedals_message(msg, millis);
         break;
@@ -50,6 +51,91 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
         interfaces.db_interface.receive_drivebrain_speed_command(msg, millis);
         break;
     }
+
+    // Front Left Inverter
+    case INV1_STATUS_CANID: {
+        interfaces.fl_inverter_interface.receive_INV_STATUS(msg, millis); 
+        break;
+    }
+    case INV1_TEMPS_CANID: {
+        interfaces.fl_inverter_interface.receive_INV_TEMPS(msg, millis);
+        break;
+    }
+    case INV1_DYNAMICS_CANID: {
+        interfaces.fl_inverter_interface.receive_INV_DYNAMICS(msg, millis);
+        break;
+    }
+    case INV1_POWER_CANID: {
+        interfaces.fl_inverter_interface.receive_INV_POWER(msg, millis);
+        break;
+    }
+    case INV1_FEEDBACK_CANID: {
+        interfaces.fl_inverter_interface.receive_INV_FEEDBACK(msg, millis);
+    }
+
+    // Front right inverter
+    case INV2_STATUS_CANID: {
+        interfaces.fr_inverter_interface.receive_INV_STATUS(msg, millis); 
+        break;
+    }
+    case INV2_TEMPS_CANID: {
+        interfaces.fr_inverter_interface.receive_INV_TEMPS(msg, millis);
+        break;
+    }
+    case INV2_DYNAMICS_CANID: {
+        interfaces.fr_inverter_interface.receive_INV_DYNAMICS(msg, millis);
+        break;
+    }
+    case INV2_POWER_CANID: {
+        interfaces.fr_inverter_interface.receive_INV_POWER(msg, millis);
+        break;
+    }
+    case INV2_FEEDBACK_CANID: {
+        interfaces.fr_inverter_interface.receive_INV_FEEDBACK(msg, millis);
+    }
+
+    // Rear left inverter
+    case INV3_STATUS_CANID: {
+        interfaces.rl_inverter_interface.receive_INV_STATUS(msg, millis); 
+        break;
+    }
+    case INV3_TEMPS_CANID: {
+        interfaces.rl_inverter_interface.receive_INV_TEMPS(msg, millis);
+        break;
+    }
+    case INV3_DYNAMICS_CANID: {
+        interfaces.rl_inverter_interface.receive_INV_DYNAMICS(msg, millis);
+        break;
+    }
+    case INV3_POWER_CANID: {
+        interfaces.rl_inverter_interface.receive_INV_POWER(msg, millis);
+        break;
+    }
+    case INV3_FEEDBACK_CANID: {
+        interfaces.rl_inverter_interface.receive_INV_FEEDBACK(msg, millis);
+    }
+
+    // Rear right inverter
+    case INV4_STATUS_CANID: {
+        interfaces.rr_inverter_interface.receive_INV_STATUS(msg, millis); 
+        break;
+    }
+    case INV4_TEMPS_CANID: {
+        interfaces.rr_inverter_interface.receive_INV_TEMPS(msg, millis);
+        break;
+    }
+    case INV4_DYNAMICS_CANID: {
+        interfaces.rr_inverter_interface.receive_INV_DYNAMICS(msg, millis);
+        break;
+    }
+    case INV4_POWER_CANID: {
+        interfaces.rr_inverter_interface.receive_INV_POWER(msg, millis);
+        break;
+    }
+    case INV4_FEEDBACK_CANID: {
+        interfaces.rr_inverter_interface.receive_INV_FEEDBACK(msg, millis);
+    }
+    
     default: {
         break;
     }

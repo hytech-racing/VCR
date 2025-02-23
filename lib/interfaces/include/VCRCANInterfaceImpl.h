@@ -21,6 +21,7 @@
 
 #include "DrivebrainInterface.h"
 #include "VCFInterface.h"
+#include "InverterInterface.h"
 
 using CANRXBufferType = Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)>;
 using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_message_t)>;
@@ -32,11 +33,29 @@ template <CAN_DEV_TABLE CAN_DEV> using FlexCAN_Type = FlexCAN_T4<CAN_DEV, RX_SIZ
 // this is being done to send immediately from the inverter CAN line to the TELEM CAN every inverter
 
 struct CANInterfaces {
-    explicit CANInterfaces(VCFInterface &vcf_int, DrivebrainInterface &db_int)
-        : vcf_interface(vcf_int), db_interface(db_int) {}
+    explicit CANInterfaces(
+        VCFInterface &vcf_int, 
+        DrivebrainInterface &db_int, 
+        InverterInterface fl_inverter_int, 
+        InverterInterface fr_inverter_int, 
+        InverterInterface rl_inverter_int, 
+        InverterInterface rr_inverter_int
+
+    )
+        : vcf_interface(vcf_int), 
+          db_interface(db_int),
+          fl_inverter_interface(fl_inverter_int),
+          fr_inverter_interface(fr_inverter_int),
+          rl_inverter_interface(rl_inverter_int),
+          rr_inverter_interface(rr_inverter_int) {}
 
     VCFInterface &vcf_interface;
     DrivebrainInterface &db_interface;
+    InverterInterface &fl_inverter_interface;
+    InverterInterface &fr_inverter_interface;
+    InverterInterface &rl_inverter_interface;
+    InverterInterface &rr_inverter_interface;
+
 };
 
 namespace VCRCANInterfaceImpl {
