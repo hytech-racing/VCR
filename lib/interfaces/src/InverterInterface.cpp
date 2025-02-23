@@ -5,29 +5,34 @@
  */
 
 InverterStatus_s InverterInterface::get_status() {
+    InverterStatus_s status_struct = _feedback_data.status;
     _feedback_data.status.new_data = false;
-    return _feedback_data.status;
+    return status_struct;
 }
 
 InverterTemps_s InverterInterface::get_temps() {
+    InverterTemps_s temps_struct = _feedback_data.temps;
     _feedback_data.temps.new_data = false;
-    return _feedback_data.temps;
+    return temps_struct;
 }
 
 InverterPower_s InverterInterface::get_power() {
+    InverterPower_s power_struct = _feedback_data.power;
     _feedback_data.power.new_data = false;
-    return _feedback_data.power;
+    return power_struct;
 }
 
 MotorMechanics_s InverterInterface::get_motor_mechanics() {
+    MotorMechanics_s mm_struct = _feedback_data.motor_mechanics;
     _feedback_data.motor_mechanics.new_data = false;
-    return _feedback_data.motor_mechanics;
+    return mm_struct;
 }
 
 
 InverterControlFeedback_s InverterInterface::get_control_params() {
+    InverterControlFeedback_s cf_struct = _feedback_data.control_feedback;
     _feedback_data.control_feedback.new_data = false;
-    return _feedback_data.control_feedback;
+    return cf_struct;
 }
 
 
