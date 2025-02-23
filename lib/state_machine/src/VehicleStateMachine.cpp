@@ -100,41 +100,7 @@ void VehicleStateMachine::tick_state_machine(unsigned long current_millis, const
     case CarState_e::READY_TO_DRIVE:
     {
         
-        // If HV is no longer active, return to TRACTIVE_SYSTEM_NOT_ACTIVE
-        
-        // TODO make this real: check to see if the state
-        if(_drivetrain.get_state() == DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT)
-        {
-            set_state_(CarState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
-            break;
-        }
-        
-        bool drivetrain_in_driveable_mode = ((_drivetrain.get_state() == DrivetrainState_e::ENABLED_SPEED_MODE) || (_drivetrain.get_state() == DrivetrainState_e::ENABLED_TORQUE_MODE)); 
-        if (!drivetrain_in_driveable_mode)
-        {
-            hal_println("Drivetrain error occurred while in READY_TO_DRIVE");
-            set_state_(CarState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
-            break;
-        }
-
-        if (/* _ams_system.ams_ok() && */ !shared_data.interface_data.recvd_pedals_data.pedals_data.implausibility_has_exceeded_max_duration)
-        {
-            // TODO: Fix with all references to singleton classes
-            // TODO: need to also handle request to mode switch via drivetrain init (?)
-            // _drivetrain.command_drivetrain(controller_mux_->getDrivetrainCommand(dashboard_->getDialMode(), dashboard_->getTorqueLimitMode(), current_CarState_e));
-            DrivetrainTorqueCommand_s example_cmd = {}; // will need to do a variant check from the controller mux to see what type it is (torque / speed)
-            
-            (void)_drivetrain.evaluate_drivetrain(example_cmd);
-
-        }
-        else
-        {
-            // If software is not OK or some implausibility has exceeded max duration, command 0 torque (but stay in RTD mode)
-            
-            // TODO: make this check to see exactly what drive mode the drivetrain is in and send its associated empty command.
-            DrivetrainTorqueCommand_s example_cmd = {}; // will need to do a variant check from the controller mux to see what type it is (torque / speed)
-            (void)_drivetrain.evaluate_drivetrain(example_cmd);
-        }
+        // Commented this state out bc it'll be fixed in the vehicle statemachine PR (and it's referencing drivetrain system methods that don't exist)
 
         break;
     }
