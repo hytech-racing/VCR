@@ -27,6 +27,8 @@
 #include "etl/singleton.h"
 
 #include "DrivebrainInterface.h"
+#include "InverterInterface.h"
+#include "DrivetrainSystem.h"
 
 
 // has to be included here as the define is only defined for source files in the implementation
@@ -72,6 +74,26 @@ qindesign::network::EthernetUDP protobuf_recv_socket;
 
 EthernetIPDefs_s car_network_definition;
 
+InverterParams_s inverter_params = {
+    .MINIMUM_HV_VOLTAGE = 400.0
+};
+
+InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params);
+
+DrivetrainSystem::InverterFuncts fl_inverter_functs = {
+    .set_speed = [](float desired_rpm, float torque_limit_nm) { fl_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_idle = []() { fl_inverter_int.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s control_word) { fl_inverter_int.set_inverter_control_word(control_word); },
+    .get_status = []() { return fl_inverter_int.get_status(); },
+    .get_motor_mechanics = []() { return fl_inverter_int.get_motor_mechanics(); }
+};
+
+veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fl_inverter_functs, fl_inverter_functs, fl_inverter_functs);
+
+DrivetrainSystem drivetrain_system(inverter_functs);
+
+DrivetrainInit_s init = {DrivetrainModeRequest_e::INIT_DRIVE_MODE};
+
 void setup() {
     vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
     vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
@@ -98,6 +120,10 @@ void setup() {
     update_buzzer_controller_task.enable();
     kick_watchdog_task.enable();
     ethernet_send.enable();
+    
 }
 
-void loop() { task_scheduler.execute(); }
+void loop() { 
+    drivetrain_system.evaluate_drivetrain(init);
+    task_scheduler.execute(); 
+}
