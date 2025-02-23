@@ -17,7 +17,7 @@ struct InverterParams_s
 /**
  * Struct containing id info for this specific inverter interface
  */
-struct InverterIds_s
+struct InverterCANIds_s
 {
     uint32_t inv_control_word_id; 
     uint32_t inv_control_input_id; 
@@ -72,7 +72,7 @@ class InverterInterface
 
     private: 
 
-        InverterIds_s inverter_ids;
+        InverterCANIds_s inverter_ids;
         InverterControlInput_s _inverter_control_inputs;
         InverterControlWord_s _inverter_control_word;
         InverterControlParams_s _inverter_control_params;
