@@ -11,6 +11,7 @@
 #include "SharedFirmwareTypes.h"
 
 /* Local includes */
+#include "VCREthernetInterface.h"
 #include "VCR_Constants.h"
 #include "BuzzerController.h"
 #include "VCR_Globals.h"
@@ -104,6 +105,11 @@ void run_kick_watchdog()
 void handle_enqueue_suspension_CAN_data()
 {
     DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
+}
+
+void handle_send_VCR_ethernet_data()
+{
+    DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(VCREthernetInterface::make_vcr_data_msg(vcr_data));
 }
 
 void handle_send_all_data()
