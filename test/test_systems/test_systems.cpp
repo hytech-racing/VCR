@@ -5,6 +5,7 @@
 #include "test_buzzer.h"
 #include "test_watchdog.h"
 #include "test_drivebrain_controller.h"
+#include "test_scheduler_overflow.h"
 #include "test_ams_system.h"
 #include "AMSSystem.h"
 #include "test_vsm.h"
