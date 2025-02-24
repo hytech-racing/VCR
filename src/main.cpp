@@ -41,11 +41,12 @@
 
 #include "VehicleStateMachine.h"
 
-FlexCAN_Type<CAN2> INV_CAN;
-FlexCAN_Type<CAN3> TELEM_CAN;
 
+FlexCAN_Type<CAN3> TELEM_CAN;
+FlexCAN_Type<CAN2> INVERTER_CAN;
 /* Scheduler setup */
 TsScheduler task_scheduler;
+void handle_big_tasks();
 
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
 
@@ -92,7 +93,11 @@ InverterParams_s inverter_params = {
     .MINIMUM_HV_VOLTAGE = 400.0
 };
 
-InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params);
+InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, false);
+InverterInterface fr_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, true);
+InverterInterface rl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, true);
+InverterInterface rr_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, true);
+
 
 DrivetrainSystem::InverterFuncts fl_inverter_functs = {
     .set_speed = [](float desired_rpm, float torque_limit_nm) { fl_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
@@ -107,25 +112,27 @@ veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fl
 DrivetrainSystem drivetrain_system(inverter_functs);
 
 DrivetrainInit_s init = {DrivetrainModeRequest_e::INIT_DRIVE_MODE};
+DrivetrainCommand_s drive = {DrivetrainCommand_s{
+    .desired_speeds = veh_vec<speed_rpm> {100.0, 100.0, 100.0, 100.0},
+    .torque_limits = veh_vec<torque_nm> {2.0, 2.0, 2.0, 2.0}
+}};
 
 VCFInterface vcf_interface;
 
-CANInterfaces can_receive_interfaces(
-    vcf_interface,
-    DrivebrainInterfaceInstance::instance(), 
-    fl_inverter_int,
-    fl_inverter_int,
-    fl_inverter_int,
-    fl_inverter_int
-);
+// CANInterfaces can_receive_interfaces(
+//     vcf_interface,
+//     DrivebrainInterfaceInstance::instance(), 
+//     fl_inverter_int,
+//     fr_inverter_int,
+//     rl_inverter_int,
+//     rr_inverter_int
+// );
 
-VCRAsynchronousInterfaces vcr_async_interfaces(can_receive_interfaces);
+VCRAsynchronousInterfaces vcr_async_interfaces(CANInterfacesInstance::instance());
 
 etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 
-VCRInterfaceData_s curr_data;
-
-etl::delegate<bool()> check_hv_over_threshold = etl::delegate<bool()>::create([]() { return true; });
+VCRInterfaceData_s int_data;
 
 VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
     etl::delegate<bool()>::create([]() { return true; }), 
@@ -154,10 +161,20 @@ void setup() {
                                         vcr_data.interface_data.rear_suspot_data,
                                         car_network_definition.drivebrain_ip,
                                         car_network_definition.VCRData_port, &protobuf_send_socket);
+
+    CANInterfacesInstance::create(
+        vcf_interface,
+        DrivebrainInterfaceInstance::instance(), 
+        fl_inverter_int,
+        fr_inverter_int,
+        rl_inverter_int,
+        rr_inverter_int
+    );
+        
     SPI.begin(); // TODO this should be elsewhere maybe
     const uint32_t CAN_baudrate = 500000;
     // from CANInterfaceon_inverter_can_receive
-    handle_CAN_setup(INV_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_inverter_can_receive);
+    handle_CAN_setup(INVERTER_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(TELEM_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_telem_can_receive);
 
     adc_0_sample_task.enable(); // will run the init function and allow the task to start running
@@ -167,16 +184,22 @@ void setup() {
     update_buzzer_controller_task.enable();
     kick_watchdog_task.enable();
     ethernet_send.enable();
+    inverter_CAN_send.enable();
     big_task_t.enable();
     
 }
 
 void loop() { 
-    drivetrain_system.evaluate_drivetrain(init);
+    if (drivetrain_system.get_state() == DrivetrainState_e::ENABLED_DRIVE_MODE) {
+        drivetrain_system.evaluate_drivetrain(drive);
+    } else {
+        drivetrain_system.evaluate_drivetrain(init);
+    }
     task_scheduler.execute();
+    Serial.println(static_cast<int>(drivetrain_system.get_state()));
 }
 
 void handle_big_tasks()
 {
-    big_task(main_can_recv, vcr_async_interfaces, vehicle_statemachine, curr_data);
+    big_task(main_can_recv, vcr_async_interfaces, vehicle_statemachine, int_data);
 }

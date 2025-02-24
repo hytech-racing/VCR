@@ -58,6 +58,8 @@ struct CANInterfaces {
 };
 
 using CANInterfacesInstance = etl::singleton<CANInterfaces>;
+extern FlexCAN_Type<CAN2> INVERTER_CAN; // gets defined in main as of right now
+extern FlexCAN_Type<CAN3> TELEM_CAN; // gets defined in main as of right now
 
 namespace VCRCANInterfaceImpl {
 
@@ -71,7 +73,6 @@ extern CANTXBufferType CAN1_txBuffer;
 extern CANTXBufferType inverter_can_tx_buffer;
 /* TX buffer for CAN3 */
 extern CANTXBufferType telem_can_tx_buffer;
-extern FlexCAN_Type<CAN3> TELEM_CAN; // gets defined in main as of right now
 
 void on_can1_receive(const CAN_message_t &msg);
 void on_inverter_can_receive(const CAN_message_t &msg);

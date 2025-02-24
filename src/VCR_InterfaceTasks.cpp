@@ -18,6 +18,7 @@
 
 #include "AMSSystem.h"
 #include "DrivebrainInterface.h"
+#include "Arduino.h"
 
 bool init_read_adc0_task()
 {
@@ -41,7 +42,7 @@ void run_read_adc0_task()
     vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = ADC0Instance::instance().data.conversions[RL_SUS_POT_CHANNEL].raw; // Just use raw for suspots
     vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = ADC0Instance::instance().data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
     
-    hal_printf("ADC0 reading 0 %d\n", ADC0Instance::instance().data.conversions[0].raw); // NOLINT
+    // hal_printf("ADC0 reading 0 %d\n", ADC0Instance::instance().data.conversions[0].raw); // NOLINT
 }
 
 bool init_read_adc1_task()
@@ -62,7 +63,7 @@ void run_read_adc1_task()
 {
 
     ADC1Instance::instance().tick();
-    hal_printf("ADC1 reading 0 %d\n", ADC1Instance::instance().data.conversions[0].raw);
+    // hal_printf("ADC1 reading 0 %d\n", ADC1Instance::instance().data.conversions[0].raw);
 }
 
 void run_update_buzzer_controller_task()
@@ -114,25 +115,30 @@ void handle_send_VCR_ethernet_data()
 
 void handle_send_all_data()
 {
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &INVERTER_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
 }
 
 void handle_inverter_CAN_send()
 {
     // adds inverter messages to be sent into the inverter can tx buffer
-    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_PARAMS();
-    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_PARAMS();
-    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_PARAMS();
-    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_PARAMS();
+    // CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_PARAMS();
+    // CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_PARAMS();
+    // CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_PARAMS();
+    // CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_PARAMS();
 
+    // CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
+    // CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_WORD();
+    // CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_WORD();
+    // CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_WORD();
+
+    // CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();
+    // CANInterfacesInstance::instance().fr_inverter_interface.send_INV_SETPOINT_COMMAND();
+    // CANInterfacesInstance::instance().rl_inverter_interface.send_INV_SETPOINT_COMMAND();
+    // CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    // CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_PARAMS();
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
-    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_WORD();
-    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_WORD();
-    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_WORD();
-
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();
-    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_SETPOINT_COMMAND();
-    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_SETPOINT_COMMAND();
-    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
 
 }

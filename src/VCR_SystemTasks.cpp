@@ -8,7 +8,6 @@
 #include "VCFInterface.h"
 #include "VCRCANInterfaceImpl.h"
 #include "VCR_SystemTasks.h"
-#include "VehicleStateMachine.h"
 
 
 VCRInterfaceData_s sample_async_data(

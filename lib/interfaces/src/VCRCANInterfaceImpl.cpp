@@ -15,7 +15,7 @@ CANTXBufferType CAN1_txBuffer;
 CANTXBufferType inverter_can_tx_buffer;
 CANTXBufferType telem_can_tx_buffer;
 
-FlexCAN_Type<CAN3> TELEM_CAN;
+
 
 void on_can1_receive(const CAN_message_t &msg) {
     uint8_t buf[sizeof(CAN_message_t)];
