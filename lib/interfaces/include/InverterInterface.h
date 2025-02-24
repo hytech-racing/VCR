@@ -84,4 +84,6 @@ class InverterInterface
         InverterFeedbackData_s _feedback_data;
         InverterParams_s _inverter_params;
 };
+
+
 #endif // __INVERTERINTERFACE_H__

@@ -39,6 +39,8 @@
 
 #include "EthernetAddressDefs.h"
 
+#include "VehicleStateMachine.h"
+
 FlexCAN_Type<CAN2> INV_CAN;
 FlexCAN_Type<CAN3> TELEM_CAN;
 
@@ -52,6 +54,8 @@ constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 
 constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 us = 100 Hz
 constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
 constexpr unsigned long ethernet_update_period = 10000;
+constexpr unsigned long inv_send_period = 10000;             // 10 000 us = 100 Hz
+
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
 TsTask suspension_CAN_send(4000, TASK_FOREVER, &handle_enqueue_suspension_CAN_data, &task_scheduler,
                            false);
@@ -67,8 +71,17 @@ TsTask ams_system_task(ams_update_period_us, TASK_FOREVER, &run_ams_system_task,
                        false, &init_ams_system_task);
 
 TsTask CAN_send(TASK_IMMEDIATE, TASK_FOREVER, &handle_send_all_data, &task_scheduler, false);
+
+TsTask inverter_CAN_send(inv_send_period, TASK_FOREVER, &handle_inverter_CAN_send,
+    &task_scheduler, false);
+
 TsTask ethernet_send(ethernet_update_period, TASK_FOREVER, &handle_send_VCR_ethernet_data,
                      &task_scheduler, false);
+
+TsTask big_task_t(TASK_IMMEDIATE, TASK_FOREVER, &handle_big_tasks,
+                     &task_scheduler, false);
+
+                     
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
@@ -110,7 +123,22 @@ VCRAsynchronousInterfaces vcr_async_interfaces(can_receive_interfaces);
 
 etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 
-const VCRInterfaceData_s curr_data;
+VCRInterfaceData_s curr_data;
+
+etl::delegate<bool()> check_hv_over_threshold = etl::delegate<bool()>::create([]() { return true; });
+
+VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
+    etl::delegate<bool()>::create([]() { return true; }), 
+    etl::delegate<bool()>::create([]() { return true; }), 
+    etl::delegate<bool()>::create([]() { return true; }), 
+    etl::delegate<bool()>::create([]() { return true; }), 
+    etl::delegate<bool()>::create([]() { return true; }),
+    etl::delegate<void()>::create([]() { }),
+    etl::delegate<bool()>::create([]() { return true; }), 
+    etl::delegate<void()>::create([]() { }), 
+    etl::delegate<void()>::create([]() { }), 
+    etl::delegate<void()>::create([]() { })
+);
 
 void setup() {
 
@@ -139,12 +167,16 @@ void setup() {
     update_buzzer_controller_task.enable();
     kick_watchdog_task.enable();
     ethernet_send.enable();
-
-
+    big_task_t.enable();
     
 }
 
 void loop() { 
     drivetrain_system.evaluate_drivetrain(init);
-    task_scheduler.execute(); 
+    task_scheduler.execute();
+}
+
+void handle_big_tasks()
+{
+    big_task(main_can_recv, vcr_async_interfaces, vehicle_statemachine, curr_data);
 }

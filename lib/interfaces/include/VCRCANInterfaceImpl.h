@@ -9,6 +9,7 @@
 #include "FlexCAN_T4.h"
 
 #include "etl/delegate.h"
+#include "etl/singleton.h"
 
 #include "CANInterface.h"
 
@@ -55,6 +56,8 @@ struct CANInterfaces {
     InverterInterface &rr_inverter_interface;
 
 };
+
+using CANInterfacesInstance = etl::singleton<CANInterfaces>;
 
 namespace VCRCANInterfaceImpl {
 
