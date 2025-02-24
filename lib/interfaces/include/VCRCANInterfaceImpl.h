@@ -35,16 +35,25 @@ struct CANInterfaces {
     explicit CANInterfaces(
         VCFInterface &vcf_int, 
         DrivebrainInterface &db_int, 
-        veh_vec<InverterInterface> &inv_ints
-
+        InverterInterface &fl_inv_int,
+        InverterInterface &fr_inv_int,
+        InverterInterface &rl_inv_int,
+        InverterInterface &rr_inv_int
     )
         : vcf_interface(vcf_int), 
           db_interface(db_int),
-          inverter_interfaces(inv_ints) {}
+          fl_inverter_interface(fl_inv_int),
+          fr_inverter_interface(fr_inv_int),
+          rl_inverter_interface(rl_inv_int),
+          rr_inverter_interface(rr_inv_int) {}
 
     VCFInterface &vcf_interface;
     DrivebrainInterface &db_interface;
-    veh_vec<InverterInterface> &inverter_interfaces;
+    InverterInterface &fl_inverter_interface;
+    InverterInterface &fr_inverter_interface;
+    InverterInterface &rl_inverter_interface;
+    InverterInterface &rr_inverter_interface;
+
 };
 
 namespace VCRCANInterfaceImpl {

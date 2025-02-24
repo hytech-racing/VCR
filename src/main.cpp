@@ -29,6 +29,7 @@
 #include "DrivebrainInterface.h"
 #include "InverterInterface.h"
 #include "DrivetrainSystem.h"
+#include "VCR_SystemTasks.h"
 
 
 // has to be included here as the define is only defined for source files in the implementation
@@ -94,7 +95,25 @@ DrivetrainSystem drivetrain_system(inverter_functs);
 
 DrivetrainInit_s init = {DrivetrainModeRequest_e::INIT_DRIVE_MODE};
 
+VCFInterface vcf_interface;
+
+CANInterfaces can_receive_interfaces(
+    vcf_interface,
+    DrivebrainInterfaceInstance::instance(), 
+    fl_inverter_int,
+    fl_inverter_int,
+    fl_inverter_int,
+    fl_inverter_int
+);
+
+VCRAsynchronousInterfaces vcr_async_interfaces(can_receive_interfaces);
+
+etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
+
+const VCRInterfaceData_s curr_data;
+
 void setup() {
+
     vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
     vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
     vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
@@ -120,6 +139,8 @@ void setup() {
     update_buzzer_controller_task.enable();
     kick_watchdog_task.enable();
     ethernet_send.enable();
+
+
     
 }
 
