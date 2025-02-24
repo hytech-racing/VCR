@@ -64,4 +64,9 @@ VehicleState_e evaluate_state_machine(const VCRSystemData_s &system_data,
                                   const VCRInterfaceData_s &interface_data,
                                   VehicleStateMachine &state_machine);
 
+
+void big_task(etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call,
+              VCRAsynchronousInterfaces &interface_ref_container,
+              VehicleStateMachine &state_machine, const VCRInterfaceData_s &cur_vcr_int_data);
+
 #endif // __VCR_SYSTEMTASKS_H__

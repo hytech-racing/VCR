@@ -14,6 +14,7 @@
 #include <QNEthernet.h>
 class DrivebrainInterface {
   public:
+
     DrivebrainInterface(const RearLoadCellData_s &rear_load_cell_data,
                         const RearSusPotData_s &rear_suspot_data, IPAddress drivebrain_ip,
                         uint16_t vcr_data_port, qindesign::network::EthernetUDP *udp_socket);

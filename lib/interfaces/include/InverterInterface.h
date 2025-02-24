@@ -36,7 +36,8 @@ class InverterInterface
             uint32_t inv_control_word_id,
             uint32_t inv_control_input_id,
             uint32_t inv_control_params_id,
-            InverterParams_s inverter_params) : _inverter_params(inverter_params)
+            InverterParams_s inverter_params, 
+            boolean is_dummy) : _inverter_params(inverter_params), _is_dummy(is_dummy)
         { 
             inverter_ids.inv_control_word_id = inv_control_word_id;
             inverter_ids.inv_control_parameter_id = inv_control_params_id;
@@ -68,7 +69,12 @@ class InverterInterface
 
         void set_inverter_control_word(InverterControlWord_s control_word);
 
-        InverterStatus_s get_inverter_status();
+        /* Getters */
+        InverterStatus_s get_status(); 
+        InverterTemps_s get_temps();
+        InverterPower_s get_power();
+        MotorMechanics_s get_motor_mechanics();
+        InverterControlFeedback_s get_control_params();
 
     private: 
 
@@ -78,12 +84,8 @@ class InverterInterface
         InverterControlParams_s _inverter_control_params;
         InverterFeedbackData_s _feedback_data;
         InverterParams_s _inverter_params;
-
-        /* Getters */
-        InverterStatus_s get_status(); 
-        InverterTemps_s get_temps();
-        InverterPower_s get_power();
-        MotorMechanics_s get_motor_mechanics();
-        InverterControlFeedback_s get_control_params();
+        boolean _is_dummy;
 };
+
+
 #endif // __INVERTERINTERFACE_H__

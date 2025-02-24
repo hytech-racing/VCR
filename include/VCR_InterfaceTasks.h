@@ -67,4 +67,5 @@ void run_ams_system_task();
 
 // task for sending all ethernet data
 void handle_send_VCR_ethernet_data();
+void handle_inverter_CAN_send();
 #endif /* VCR_INTERFACETASKS */

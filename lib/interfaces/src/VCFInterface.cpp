@@ -26,3 +26,8 @@ void VCFInterface::receive_pedals_message(const CAN_message_t &msg, unsigned lon
     // TODO need to ensure that the pedals data timestamp is within a tollerance
     // within the state machine
 }
+
+VCFCANInterfaceData_s VCFInterface::get_latest_data() {
+    VCFCANInterfaceData_s for_testing;
+    return for_testing;
+}
