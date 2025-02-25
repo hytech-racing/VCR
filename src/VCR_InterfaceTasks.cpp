@@ -15,16 +15,24 @@
 #include "VehicleStateMachine.h"
 #include "AMSSystem.h"
 
-bool init_read_adc0_task()
-{
+
+bool init_bundle(){
     float scales[channels_within_mcp_adc] = {GLV_SENSE_SCALE, CURRENT_SENSE_SCALE, REFERENCE_SENSE_SCALE, RL_LOADCELL_SCALE, RR_LOADCELL_SCALE, RL_SUS_POT_SCALE, RR_SUS_POT_SCALE, 1}; //NOLINT
     float offsets[channels_within_mcp_adc] = {GLV_SENSE_OFFSET, CURRENT_SENSE_OFFSET, REFERENCE_SENSE_OFFSET, RL_LOADCELL_OFFSET, RR_LOADCELL_OFFSET, RL_SUS_POT_OFFSET, RR_SUS_POT_OFFSET, 0}; //NOLINT
-    static MCP_ADC<channels_within_mcp_adc> adc0(ADC0_CS, MCP_ADC_DEFAULT_SPI_SDI, MCP_ADC_DEFAULT_SPI_SDO, MCP_ADC_DEFAULT_SPI_CLK, MCP_ADC_DEFAULT_SPI_SPEED, scales, offsets);
-    static MCP_ADC<channels_within_mcp_adc> adc1(ADC1_CS, MCP_ADC_DEFAULT_SPI_SDI, MCP_ADC_DEFAULT_SPI_SDO, MCP_ADC_DEFAULT_SPI_CLK, MCP_ADC_DEFAULT_SPI_SPEED, scales, offsets);
-    ADCSingletonInstance::create(adc0, adc1);    
+    MCP_ADC<channels_within_mcp_adc> adc0(ADC0_CS, MCP_ADC_DEFAULT_SPI_SDI, MCP_ADC_DEFAULT_SPI_SDO, MCP_ADC_DEFAULT_SPI_CLK, MCP_ADC_DEFAULT_SPI_SPEED, scales, offsets);
+    MCP_ADC<channels_within_mcp_adc> adc1(ADC1_CS, MCP_ADC_DEFAULT_SPI_SDI, MCP_ADC_DEFAULT_SPI_SDO, MCP_ADC_DEFAULT_SPI_CLK, MCP_ADC_DEFAULT_SPI_SPEED, scales, offsets);
+    ADCSingletonInstance::create(adc0, adc1); 
+    hal_printf("Initialized ADC0 at %d (millis)\n", sys_time::hal_millis());
+    hal_printf("Initialized ADC1 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
+    return true;
+}
+/*
+bool init_read_adc0_task()
+{
     hal_printf("Initialized ADC0 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
     return true;
 }
+*/
 
 void run_read_adc0_task()
 {
@@ -56,14 +64,14 @@ void run_read_adc0_task()
     hal_printf("ADC0 reading 0 %d\n", 
         ADCSingletonInstance::instance().adc0.data.conversions[0].raw); // NOLINT
 }
-
+/*
 bool init_read_adc1_task()
 {
-    /* NOLINTBEGIN */ // Thermistor channels are for testing purposes only, the pin numbers 0-7 are acceptable "magic numbers".
+    // NOLINTBEGIN - Thermistor channels are for testing purposes only, the pin numbers 0-7 are acceptable "magic numbers".
     // Initialize all eight channels to scale = 1, offset = 0
     float scales[channels_within_mcp_adc] = {1, 1, 1, 1, 1, 1, 1, 1};
     float offsets[channels_within_mcp_adc] = {0, 0, 0, 0, 0, 0, 0, 0};
-    /* NOLINTEND */
+    //NOLINTEND
     static MCP_ADC<channels_within_mcp_adc> adc0(ADC0_CS, MCP_ADC_DEFAULT_SPI_SDI, MCP_ADC_DEFAULT_SPI_SDO, MCP_ADC_DEFAULT_SPI_CLK, MCP_ADC_DEFAULT_SPI_SPEED, scales, offsets);
     static MCP_ADC<channels_within_mcp_adc> adc1(ADC1_CS, MCP_ADC_DEFAULT_SPI_SDI, MCP_ADC_DEFAULT_SPI_SDO, MCP_ADC_DEFAULT_SPI_CLK, MCP_ADC_DEFAULT_SPI_SPEED, scales, offsets);
 
@@ -72,6 +80,8 @@ bool init_read_adc1_task()
     hal_printf("Initialized ADC1 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
     return true;
 }
+    */
+
 
 void run_read_adc1_task()
 {
