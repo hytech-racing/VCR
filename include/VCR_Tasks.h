@@ -23,7 +23,7 @@
  */
 bool init_read_adc0_task();
 void run_read_adc0_task();
-bool init_bundle();
+void init_bundle();
 
 /**
  * NOTE: These channels are UNUSED BY DEFAULT and exist ONLY FOR TESTING. You may edit this
