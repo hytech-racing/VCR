@@ -53,7 +53,7 @@ void run_update_buzzer_controller_task();
  */
 void run_kick_watchdog();
 
-void create_IOExpander();
-void read_IOExpander();
+void create_ioexpander();
+void read_ioexpander();
 
 #endif /* VCR_TASKS */

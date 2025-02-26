@@ -90,11 +90,11 @@ void run_kick_watchdog()
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
 }
 
-void create_IOExpander(){
+void create_ioexpander(){
     IOExpanderInstance::create();
 }
 
-void read_IOExpander(){
+void read_ioexpander(){
     IOExpanderInstance::instance().read();
 
     vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderInstance::instance().getBit(0, 0);
