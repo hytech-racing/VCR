@@ -70,8 +70,8 @@ void setup() {
     SPI.begin(); // TODO this should be elsewhere maybe
     const uint32_t CAN_baudrate = 500000;
     // from CANInterfaceon_inverter_can_receive
-    handle_CAN_setup(INV_CAN, CAN_baudrate, on_inverter_can_receive);
-    handle_CAN_setup(TELEM_CAN, CAN_baudrate, on_telem_can_receive);
+    handle_CAN_setup(INV_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_inverter_can_receive);
+    handle_CAN_setup(TELEM_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_telem_can_receive);
 
     adc_0_sample_task.enable(); // will run the init function and allow the task to start running
     adc_1_sample_task.enable();
