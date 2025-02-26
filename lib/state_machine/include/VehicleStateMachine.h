@@ -1,83 +1,70 @@
-#ifndef VEHICLE_STATE_MACHINE
-#define VEHICLE_STATE_MACHINE
+#ifndef __VehicleState_e_MACHINE__
+#define __VehicleState_e_MACHINE__
 
-/* From local systems library */
-#include "DrivetrainSystem.h"
-#include "BuzzerController.h"
+#include <etl/delegate.h>
 
-/**
- * Enum representing possible states for the vehicle's state machine.
- * 
- * STARTUP                      - Initial state. Vehicle never stays in STARTUP for more than 1 tick.
- * TRACTIVE_SYSTEM_NOT_ACTIVE   - Car stays here until the Drivetrain reports that the inverters' voltage
- *                                is above the HV threshold.
- * TRACTICE_SYSTEM_ACTIVE       - HV is on, car is waiting for brake + start button (to start car)
- * ENABLING_INVERTERS           - While in this state, the car calls the drivetrain's enable command. If
- *                                successful, (usually nearly-immediate), then car goes into WRTDS.
- * WAITING_READY_TO_DRIVE_SOUND - When entering state, buzzer is activated. After BuzzerController says
- *                                enough time has passed, we enter the next state.
- * READY_TO_DRIVE               - While in this state, pedal inputs command the drivetrain.
- */
-enum class CarState_e
-{
-    STARTUP = 0,
-    TRACTIVE_SYSTEM_NOT_ACTIVE = 1,
-    TRACTIVE_SYSTEM_ACTIVE = 2,
-    ENABLING_INVERTERS = 3,
-    WAITING_READY_TO_DRIVE_SOUND = 4,
-    READY_TO_DRIVE = 5
+enum class VehicleState_e {
+    TRACTIVE_SYSTEM_NOT_ACTIVE = 1, 
+    TRACTIVE_SYSTEM_ACTIVE = 2, 
+    WANTING_READY_TO_DRIVE = 3,
+    READY_TO_DRIVE = 4
 };
 
-/**
- * This singleton class represents the vehicle's state machine as we enable HV, enable the inverters,
- * wait for the start button to be pressed, and enter ready-to-drive mode. Aside from getters, this
- * class only has one public function, tick_state_machine(). In order to run its update logic, the
- * VehicleStateMachine uses instance data directly from other singleton classes (Buzzer, Pedals, etc)
- * and from the global structs (VCRInterfaceData_s, VCRData_s, etc.).
- */
 class VehicleStateMachine
 {
-public:
-    VehicleStateMachine(DrivetrainSystem & drivetrain_system) :
-        _current_state(CarState_e::STARTUP),
-        _drivetrain(drivetrain_system),
-        _buzzer(BuzzerController::getInstance()) {};
+    public: 
+        VehicleStateMachine(
+            etl::delegate<bool()> check_hv_over_threshold, 
+            etl::delegate<bool()> is_start_button_pressed, 
+            etl::delegate<bool()> is_brake_pressed, 
+            etl::delegate<bool()> check_drivetrain_error_ocurred, 
+            etl::delegate<bool()> check_drivetrain_ready,
+            etl::delegate<void()> start_buzzer,
+            etl::delegate<bool()> is_buzzer_done, 
+            etl::delegate<void()> end_buzzer, 
+            etl::delegate<void()> handle_drivetrain_init, 
+            etl::delegate<void()> command_drivetrain
+        ) :  
+        _check_hv_over_threshold(check_hv_over_threshold),
+        _is_start_button_pressed(is_start_button_pressed), 
+        _is_brake_pressed(is_brake_pressed),
+        _check_drivetrain_error_ocurred(check_drivetrain_error_ocurred),
+        _check_drivetrain_ready(check_drivetrain_ready),
+        _start_buzzer(start_buzzer),
+        _is_buzzer_complete(is_buzzer_done),
+        _end_buzzer(end_buzzer),
+        _handle_drivetrain_init(handle_drivetrain_init),
+        _command_drivetrain(command_drivetrain)
+        {   
+            _current_state = VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE;
+        }
 
-    VehicleStateMachine& operator & (VehicleStateMachine& ) = delete;
-    /**
-     * This tick() function handles all the update logic for traversing states, and calls the functions
-     * of other classes as necessary.
-     * @pre Other systems are updated properly
-     * @pre All relevant data exists in the data structs (VCRInterfaceData, VCRSystemData, etc.)
-     * @param current_millis The system time, in millis. Passed in by the scheduler.
-     * @param system_data A reference to the global system data struct.
-     */
-    void tick_state_machine(unsigned long current_millis, const VCRData_s &system_data);
+        VehicleState_e tick_state_machine(unsigned long curr_time_millis);
 
-    CarState_e get_state() { return _current_state; }
+        VehicleState_e get_state() { return _current_state; }
+    
+    private: 
 
-private:
+        void _set_state(VehicleState_e new_state, unsigned long current_time_millis); 
 
-    void set_state_(CarState_e new_state, unsigned long curr_time);
+        void _handle_entry_logic(VehicleState_e prev_state, unsigned long current_time_millis);
 
-    /**
-     * The function run upon the entry of the car into a new state.
-     * @param new_state The state in which we are entering.
-     */
-    void handle_entry_logic_(CarState_e new_state, unsigned long curr_millis);
+        void _handle_exit_logic(VehicleState_e new_state, unsigned long current_time_millis);
 
-    /**
-     * The function run upon the exit of a state.
-     * @param prev_state the state in which we are leaving.
-     */
-    void handle_exit_logic_(CarState_e prev_state, unsigned long curr_millis);
+        VehicleState_e _current_state;
 
-    CarState_e _current_state;
+        // Lambdas neccesary for state machine to work
+        etl::delegate<bool()> _check_hv_over_threshold; 
+        etl::delegate<bool()> _is_start_button_pressed; 
+        etl::delegate<bool()> _is_brake_pressed; 
+        etl::delegate<bool()> _check_drivetrain_error_ocurred; 
+        etl::delegate<bool()> _check_drivetrain_ready;
+        etl::delegate<void()> _start_buzzer; 
+        etl::delegate<bool()> _is_buzzer_complete;
+        etl::delegate<void()> _end_buzzer;
+        etl::delegate<void()> _handle_drivetrain_init;
+        etl::delegate<void()> _command_drivetrain; // Shouldn't need to pass anything; logic will be handled in the lambda
 
-    /* System references to show dependence on systems library */
-    DrivetrainSystem &_drivetrain;
-    BuzzerController &_buzzer;
-    // AMSSystem &_ams_system;
 };
 
-#endif /* VEHICLE_STATE_MACHINE */
+#endif
