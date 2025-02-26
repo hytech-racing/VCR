@@ -20,7 +20,7 @@
 /* Local includes */
 #include "VCR_Globals.h"
 #include "VCR_Constants.h"
-#include "VCR_Tasks.h"
+#include "VCR_InterfaceTasks.h"
 #include "TorqueControllerMux.hpp"
 #include "VCFInterface.h"
 
@@ -41,6 +41,7 @@ constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 
 constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 us = 100 Hz
 constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
 constexpr unsigned long ethernet_update_period = 10000;
+constexpr unsigned long ioexpander_sample_period_us = 250;
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
 TsTask suspension_CAN_send(4000, TASK_FOREVER, &handle_enqueue_suspension_CAN_data, &task_scheduler,
                            false);
@@ -58,8 +59,7 @@ TsTask ams_system_task(ams_update_period_us, TASK_FOREVER, &run_ams_system_task,
 TsTask CAN_send(TASK_IMMEDIATE, TASK_FOREVER, &handle_send_all_data, &task_scheduler, false);
 TsTask ethernet_send(ethernet_update_period, TASK_FOREVER, &handle_send_VCR_ethernet_data,
                      &task_scheduler, false);
-constexpr unsigned long IOExpander_sample_period_us = 250;
-TsTask IOExpander_read_task(IOExpander_sample_period_us, TASK_FOREVER, &read_IOExpander, &task_scheduler, false, &create_IOExpander);
+TsTask IOExpander_read_task(ioexpander_sample_period_us, TASK_FOREVER, &read_ioexpander, &task_scheduler, false, &create_ioexpander);
 
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
