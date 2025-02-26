@@ -2,7 +2,7 @@
 #define IOEXPANDER_H
 
 #include <etl/singleton.h>
-#include "MCP23017.h"
+#include <MCP23017.h>
 
 class IOExpander
 {
