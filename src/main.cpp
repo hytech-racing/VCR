@@ -5,12 +5,8 @@
 
  // NOLINT for TaskScheduler
 
-
-
 /* From shared_firmware_types libdep */
 #include "SharedFirmwareTypes.h"
-
-
 
 /* Arduino specific upstream Libraries */
 #include "QNEthernet.h"
@@ -18,18 +14,30 @@
 #include <TScheduler.hpp>
 
 /* Local includes */
-#include "VCR_Globals.h"
-#include "VCR_Constants.h"
-#include "VCR_InterfaceTasks.h"
 #include "TorqueControllerMux.hpp"
 #include "VCFInterface.h"
+#include "VCREthernetInterface.h"
+#include "VCR_Constants.h"
+#include "VCR_Globals.h"
+#include "VCR_InterfaceTasks.h"
 
-#include "VCRCANInterfaceImpl.h"
 #include "FlexCAN_T4.h"
+#include "VCRCANInterfaceImpl.h"
+
+#include "etl/singleton.h"
+
+#include "DrivebrainInterface.h"
 
 
-FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> INV_CAN;
-FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> TELEM_CAN;
+// has to be included here as the define is only defined for source files in the implementation
+// not in the library folder (makes sense)
+#include "device_fw_version.h"  // from pio-git-hash
+
+
+#include "EthernetAddressDefs.h"
+
+FlexCAN_Type<CAN2> INV_CAN;
+FlexCAN_Type<CAN3> TELEM_CAN;
 
 /* Scheduler setup */
 TsScheduler task_scheduler;
@@ -42,6 +50,7 @@ constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 u
 constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
 constexpr unsigned long ethernet_update_period = 10000;
 constexpr unsigned long ioexpander_sample_period_us = 250;
+
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
 TsTask suspension_CAN_send(4000, TASK_FOREVER, &handle_enqueue_suspension_CAN_data, &task_scheduler,
                            false);
@@ -65,8 +74,21 @@ TsTask IOExpander_read_task(ioexpander_sample_period_us, TASK_FOREVER, &read_ioe
 qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
 
+EthernetIPDefs_s car_network_definition;
 
 void setup() {
+    vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
+    vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
+    vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
+
+    qindesign::network::Ethernet.begin(
+        car_network_definition.vcr_ip, car_network_definition.default_dns,
+        car_network_definition.default_gateway, car_network_definition.car_subnet);
+    protobuf_send_socket.begin(car_network_definition.VCRData_port);
+    DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
+                                        vcr_data.interface_data.rear_suspot_data,
+                                        car_network_definition.drivebrain_ip,
+                                        car_network_definition.VCRData_port, &protobuf_send_socket);
     SPI.begin(); // TODO this should be elsewhere maybe
     const uint32_t CAN_baudrate = 500000;
     // from CANInterfaceon_inverter_can_receive
@@ -84,6 +106,4 @@ void setup() {
     IOExpander_read_task.enable();
 }
 
-void loop() {
-    task_scheduler.execute();
-}
+void loop() { task_scheduler.execute(); }

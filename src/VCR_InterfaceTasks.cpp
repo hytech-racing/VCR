@@ -100,11 +100,31 @@ void run_kick_watchdog()
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
 }
 
-void create_ioexpander(){
+// CAN send tasks
+
+// adds rear suspension and vcr status CAN messages to the sent on next mega loop run 
+void handle_enqueue_suspension_CAN_data()
+{
+    DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
+}
+
+void handle_send_VCR_ethernet_data()
+{
+    DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(VCREthernetInterface::make_vcr_data_msg(vcr_data));
+}
+
+void handle_send_all_data()
+{
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
+}
+
+void create_ioexpander()
+{
     IOExpanderInstance::create();
 }
 
-void read_ioexpander(){
+void read_ioexpander()
+{
     IOExpanderInstance::instance().read();
 
     vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderInstance::instance().getBit(0, 0);
