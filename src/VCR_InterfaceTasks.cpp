@@ -120,7 +120,7 @@ void handle_send_all_data()
 
 void create_ioexpander()
 {
-    IOExpanderInstance::create();
+    IOExpanderInstance::create(0x20);
 }
 
 void read_ioexpander()

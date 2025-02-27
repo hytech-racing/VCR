@@ -49,7 +49,7 @@ constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 
 constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 us = 100 Hz
 constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
 constexpr unsigned long ethernet_update_period = 10000;
-constexpr unsigned long ioexpander_sample_period_us = 250;
+constexpr unsigned long ioexpander_sample_period_us = 50000;
 
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
 TsTask suspension_CAN_send(4000, TASK_FOREVER, &handle_enqueue_suspension_CAN_data, &task_scheduler,

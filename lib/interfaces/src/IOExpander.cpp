@@ -1,8 +1,8 @@
 #include "IOExpander.h"
 #include "SharedFirmwareTypes.h"
 
-/* Returns intended watchdog state */
-IOExpander::IOExpander() : mcp(MCP23017(0x20))
+/* Returns data from IOExpander */
+IOExpander::IOExpander(uint8_t addr) : mcp(MCP23017(addr))
 {
     mcp.init();
     mcp.portMode(MCP23017Port::A, 0b01111111);

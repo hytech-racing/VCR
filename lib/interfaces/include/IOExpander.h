@@ -7,15 +7,20 @@
 class IOExpander
 {
 public:
-    IOExpander();
+    IOExpander(uint8_t addr);
 
 private:
     MCP23017 mcp;
     uint16_t data;
     
 public:
-    /* Get/update watchdog state */
+    /* Get data from IOExpander.
+    * Note this only updates the data read. To update any values to be used, please use getBit()
+    */
     void read();
+    /* Gets data from specified bit from specified port
+    @param port 0=A; 1=B
+    */
     bool getBit(bool port, int bit);
 
 };
