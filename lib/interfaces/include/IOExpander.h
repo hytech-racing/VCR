@@ -14,11 +14,11 @@ private:
     uint16_t data;
     
 public:
-    /* Get data from IOExpander.
-    * Note this only updates the data read. To update any values to be used, please use getBit()
+    /* Gets data from IOExpander.
+    * To retrieve updated values, use getBit()
     */
     void read();
-    /* Gets data from specified bit from specified port
+    /* read() only reads the data! This function is only used to get specified bit from previously read dataframe
     @param port 0=A; 1=B
     */
     bool getBit(bool port, int bit);
