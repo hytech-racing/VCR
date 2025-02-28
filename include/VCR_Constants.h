@@ -6,7 +6,7 @@
 /* -------------------------------------------------- */
 /*                 Teensy 4.1 GPIO pins               */
 /* -------------------------------------------------- */
-const int ADC0_CS = 10; // MCP3208. ADC0 in VCR schematic. Used for valuable telem data.
+const int ADC0_CS = 40; // MCP3208. ADC0 in VCR schematic. Used for valuable telem data.
 const int ADC1_CS = 11; // MCP3208. ADC1 in VCR schematic. Used for extra thermistors or extra sensors while testing.
 
 
