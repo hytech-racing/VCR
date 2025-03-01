@@ -16,14 +16,7 @@ IOExpander::IOExpander(uint8_t addr) : mcp(MCP23017(addr))
     mcp.writeRegister(MCP23017Register::IPOL_B, 0x00);
 }
 
-void IOExpander::read() 
+uint16_t IOExpander::read() 
 {
-    data = mcp.read();
-}
-
-bool IOExpander::getBit(bool port, int bit){
-    if(!port){ //0=A
-        return (data>>bit)&1;
-    }
-    return (data>>(7+bit))&1;
+    return mcp.read();
 }

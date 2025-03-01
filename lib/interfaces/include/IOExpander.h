@@ -11,17 +11,16 @@ public:
 
 private:
     MCP23017 mcp;
-    uint16_t data;
     
 public:
     /* Gets data from IOExpander.
     * To retrieve updated values, use getBit()
     */
-    void read();
+    uint16_t read();
     /* read() only reads the data! This function is only used to get specified bit from previously read dataframe
     @param port 0=A; 1=B
     */
-    bool getBit(bool port, int bit);
+    // bool getBit(bool port, int bit);
 
 };
 
