@@ -3,6 +3,7 @@
 
 /* Standard int library */
 #include <stdint.h>
+#include <stdbool.h>
 
 namespace IOExpanderUtils
 {
