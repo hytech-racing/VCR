@@ -4,11 +4,14 @@
 /* Standard int library */
 #include <stdint.h>
 
-// bool IOExpanderUtils::getBit(uint16_t data, int port, int bit);
-
 namespace IOExpanderUtils
 {
-    bool getBit(uint16_t data, int port, int bit);
+    /*
+    IOExpander's read() only reads.
+    getBit() only get specified bit from previously read dataframe and does not read()
+    @param port 0=A; 1=B
+    */
+    bool getBit(uint16_t data, bool port, int bit);
 }
 
 #endif
