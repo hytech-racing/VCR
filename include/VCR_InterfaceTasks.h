@@ -10,6 +10,7 @@
 #include "VehicleStateMachine.h"
 #include "VCR_Globals.h"
 #include "BuzzerController.h"
+#include <ht_task.hpp>
 
 
 
