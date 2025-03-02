@@ -1,5 +1,4 @@
 #include <DrivetrainSystem.h>
-#include <Arduino.h>
 
 //- [x] TODO handle inverter keepalives with correct settings of inverter flags for their associated states
 
@@ -114,7 +113,6 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             bool hv_present = false;
             hv_present = _check_inverter_flags(_check_inverter_hv_present_flag);
 
-            
             if (inverter_error_present) {
                 _set_state(DrivetrainState_e::ERROR);
             } else if (!hv_present) {

@@ -121,24 +121,16 @@ void handle_send_all_data()
 
 void handle_inverter_CAN_send()
 {
-    // adds inverter messages to be sent into the inverter can tx buffer
-    // CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_PARAMS();
-    // CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_PARAMS();
-    // CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_PARAMS();
-    // CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_PARAMS();
-
-    // CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
-    // CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_WORD();
-    // CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_WORD();
-    // CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_WORD();
-
-    // CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();
-    // CANInterfacesInstance::instance().fr_inverter_interface.send_INV_SETPOINT_COMMAND();
-    // CANInterfacesInstance::instance().rl_inverter_interface.send_INV_SETPOINT_COMMAND();
-    // CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
-
-    // CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_PARAMS();
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
 
 }

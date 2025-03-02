@@ -93,12 +93,13 @@ InverterParams_s inverter_params = {
     .MINIMUM_HV_VOLTAGE = 400.0
 };
 
+// Inverter Interfaces
 InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, false);
-InverterInterface fr_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, true);
-InverterInterface rl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, true);
-InverterInterface rr_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, true);
+InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, inverter_params, true);
+InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, inverter_params, true);
+InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, inverter_params, true);
 
-
+// Inverter Functs
 DrivetrainSystem::InverterFuncts fl_inverter_functs = {
     .set_speed = [](float desired_rpm, float torque_limit_nm) { fl_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
     .set_idle = []() { fl_inverter_int.set_idle(); },
@@ -107,32 +108,48 @@ DrivetrainSystem::InverterFuncts fl_inverter_functs = {
     .get_motor_mechanics = []() { return fl_inverter_int.get_motor_mechanics(); }
 };
 
-veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fl_inverter_functs, fl_inverter_functs, fl_inverter_functs);
+DrivetrainSystem::InverterFuncts fr_inverter_functs = {
+    .set_speed = [](float desired_rpm, float torque_limit_nm) { fr_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_idle = []() { fr_inverter_int.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s control_word) { fr_inverter_int.set_inverter_control_word(control_word); },
+    .get_status = []() { return fr_inverter_int.get_status(); },
+    .get_motor_mechanics = []() { return fr_inverter_int.get_motor_mechanics(); }
+};
 
+DrivetrainSystem::InverterFuncts rl_inverter_functs = {
+    .set_speed = [](float desired_rpm, float torque_limit_nm) { rl_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_idle = []() { rl_inverter_int.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s control_word) { rl_inverter_int.set_inverter_control_word(control_word); },
+    .get_status = []() { return rl_inverter_int.get_status(); },
+    .get_motor_mechanics = []() { return rl_inverter_int.get_motor_mechanics(); }
+};
+
+DrivetrainSystem::InverterFuncts rr_inverter_functs = {
+    .set_speed = [](float desired_rpm, float torque_limit_nm) { rr_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_idle = []() { rr_inverter_int.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s control_word) { rr_inverter_int.set_inverter_control_word(control_word); },
+    .get_status = []() { return rr_inverter_int.get_status(); },
+    .get_motor_mechanics = []() { return rr_inverter_int.get_motor_mechanics(); }
+};
+
+veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr_inverter_functs, rl_inverter_functs, rr_inverter_functs);
+
+// Drivetrain system stuff
 DrivetrainSystem drivetrain_system(inverter_functs);
-
 DrivetrainInit_s init = {DrivetrainModeRequest_e::INIT_DRIVE_MODE};
 DrivetrainCommand_s drive = {DrivetrainCommand_s{
     .desired_speeds = veh_vec<speed_rpm> {100.0, 100.0, 100.0, 100.0},
     .torque_limits = veh_vec<torque_nm> {2.0, 2.0, 2.0, 2.0}
 }};
 
-VCFInterface vcf_interface;
 
-// CANInterfaces can_receive_interfaces(
-//     vcf_interface,
-//     DrivebrainInterfaceInstance::instance(), 
-//     fl_inverter_int,
-//     fr_inverter_int,
-//     rl_inverter_int,
-//     rr_inverter_int
-// );
+VCFInterface vcf_interface;
 
 VCRAsynchronousInterfaces vcr_async_interfaces(CANInterfacesInstance::instance());
 
 etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 
-VCRInterfaceData_s int_data;
+VCRInterfaceData_s int_data; // TODO what were we planning on doing with this
 
 VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
     etl::delegate<bool()>::create([]() { return true; }), 
