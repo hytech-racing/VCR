@@ -66,7 +66,7 @@ HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, 2, ams_
 HT_TASK::Task suspension_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_enqueue_suspension_CAN_data, 4, suspension_can_period_us);
 HT_TASK::Task CAN_send(HT_TASK::DUMMY_FUNCTION, handle_send_all_data, 5);
 HT_TASK::Task ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, 6, ethernet_update_period);
-HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, 5, IOexpander_sample_period_us);
+HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, 100, IOexpander_sample_period_us);
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
