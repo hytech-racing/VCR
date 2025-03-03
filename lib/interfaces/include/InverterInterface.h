@@ -36,8 +36,7 @@ class InverterInterface
             uint32_t inv_control_word_id,
             uint32_t inv_control_input_id,
             uint32_t inv_control_params_id,
-            InverterParams_s inverter_params, 
-            boolean is_dummy) : _inverter_params(inverter_params), _is_dummy(is_dummy)
+            InverterParams_s inverter_params) : _inverter_params(inverter_params)
         { 
             inverter_ids.inv_control_word_id = inv_control_word_id;
             inverter_ids.inv_control_parameter_id = inv_control_params_id;
@@ -84,7 +83,6 @@ class InverterInterface
         InverterControlParams_s _inverter_control_params;
         InverterFeedbackData_s _feedback_data;
         InverterParams_s _inverter_params;
-        boolean _is_dummy;
 };
 
 

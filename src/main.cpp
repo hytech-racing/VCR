@@ -46,7 +46,6 @@ FlexCAN_Type<CAN3> TELEM_CAN;
 FlexCAN_Type<CAN2> INVERTER_CAN;
 /* Scheduler setup */
 TsScheduler task_scheduler;
-void handle_big_tasks();
 
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
 
@@ -55,7 +54,7 @@ constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 
 constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 us = 100 Hz
 constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
 constexpr unsigned long ethernet_update_period = 10000;
-constexpr unsigned long inv_send_period = 10000;             // 10 000 us = 100 Hz
+constexpr unsigned long inv_send_period = 4000;             // 4 000 us = 250 Hz
 
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
 TsTask suspension_CAN_send(4000, TASK_FOREVER, &handle_enqueue_suspension_CAN_data, &task_scheduler,
@@ -94,10 +93,10 @@ InverterParams_s inverter_params = {
 };
 
 // Inverter Interfaces
-InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, false);
-InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, inverter_params, true);
-InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, inverter_params, true);
-InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, inverter_params, true);
+InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params);
+InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, inverter_params);
+InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, inverter_params);
+InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, inverter_params);
 
 // Inverter Functs
 DrivetrainSystem::InverterFuncts fl_inverter_functs = {
@@ -136,12 +135,6 @@ veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr
 
 // Drivetrain system stuff
 DrivetrainSystem drivetrain_system(inverter_functs);
-DrivetrainInit_s init = {DrivetrainModeRequest_e::INIT_DRIVE_MODE};
-DrivetrainCommand_s drive = {DrivetrainCommand_s{
-    .desired_speeds = veh_vec<speed_rpm> {100.0, 100.0, 100.0, 100.0},
-    .torque_limits = veh_vec<torque_nm> {2.0, 2.0, 2.0, 2.0}
-}};
-
 
 VCFInterface vcf_interface;
 
@@ -207,13 +200,7 @@ void setup() {
 }
 
 void loop() { 
-    if (drivetrain_system.get_state() == DrivetrainState_e::ENABLED_DRIVE_MODE) {
-        drivetrain_system.evaluate_drivetrain(drive);
-    } else {
-        drivetrain_system.evaluate_drivetrain(init);
-    }
     task_scheduler.execute();
-    Serial.println(static_cast<int>(drivetrain_system.get_state()));
 }
 
 void handle_big_tasks()
