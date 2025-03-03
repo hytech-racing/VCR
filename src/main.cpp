@@ -56,6 +56,8 @@ constexpr unsigned long ams_update_period_us = 10000;                // 10 000 u
 constexpr unsigned long ethernet_update_period = 10000;
 constexpr unsigned long inv_send_period = 4000;             // 4 000 us = 250 Hz
 
+void handle_big_tasks();
+
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
 TsTask suspension_CAN_send(4000, TASK_FOREVER, &handle_enqueue_suspension_CAN_data, &task_scheduler,
                            false);
