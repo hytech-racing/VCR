@@ -11,6 +11,7 @@
 #include "VCR_Globals.h"
 #include "BuzzerController.h"
 #include <ht_task.hpp>
+#include "IOExpander.h"
 
 
 
@@ -46,6 +47,9 @@ bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_
  */
 bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+
+void create_ioexpander();
+void read_ioexpander();
 
 /**
  * handles sending of suspension CAN message data (load cell and shock pot data)
