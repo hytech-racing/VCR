@@ -48,8 +48,8 @@ bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_
 bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
-void create_ioexpander();
-void read_ioexpander();
+bool init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
 /**
  * handles sending of suspension CAN message data (load cell and shock pot data)

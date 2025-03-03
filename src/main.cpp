@@ -103,7 +103,7 @@ void setup() {
     scheduler.schedule(suspension_CAN_send);
     scheduler.schedule(CAN_send);
     scheduler.schedule(ethernet_send);
-    scheduler.schedule(IOexpander_read_task);
+    scheduler.schedule(IOExpander_read_task);
 }
 
 void loop() { scheduler.run(); }

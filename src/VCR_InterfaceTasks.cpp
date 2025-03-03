@@ -127,12 +127,13 @@ bool handle_send_all_data(const unsigned long& sysMicros, const HT_TASK::TaskInf
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
 }
 
-void create_ioexpander()
+bool init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     IOExpanderInstance::create(0x20);
+    return true;
 }
 
-void read_ioexpander()
+bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     uint16_t data = IOExpanderInstance::instance().read();
 
@@ -150,4 +151,6 @@ void read_ioexpander()
     vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 3);
     vcr_data.interface_data.ethernet_is_linked.debug_link = IOExpanderUtils::getBit(data, 1, 4);
     vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 1, 5);
+
+    return true;
 }
