@@ -10,6 +10,7 @@
 #include "VehicleStateMachine.h"
 #include "VCR_Globals.h"
 #include "BuzzerController.h"
+#include "IOExpander.h"
 
 
 
@@ -45,6 +46,9 @@ void run_update_buzzer_controller_task();
  */
 bool create_watchdog();
 void run_kick_watchdog();
+
+void create_ioexpander();
+void read_ioexpander();
 
 /**
  * handles sending of suspension CAN message data (load cell and shock pot data)
