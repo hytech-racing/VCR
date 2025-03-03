@@ -44,7 +44,7 @@ bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_
 /**
  * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin.
  */
-bool create_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
 /**

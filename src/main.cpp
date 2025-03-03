@@ -48,21 +48,22 @@ HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
 
-constexpr unsigned long adc_sample_period_us = 250;                  // 250 us = 4kHz
+constexpr unsigned long adc0_sample_period_us = 250;                 // 250 us = 4 kHz
+constexpr unsigned long adc1_sample_period_us = 10000;               // 10000 us = 100 Hz
 constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 us = 10 Hz
 constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 us = 100 Hz
 constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
-constexpr unsigned long ethernet_update_period = 10000;
+constexpr unsigned long ethernet_update_period = 10000;              // 10 000 us = 100 Hz
 constexpr unsigned long suspension_can_period_us = 4000;             // 4000 us = 250 Hz
 
 // task declarations
-HT_TASK::Task adc_0_sample_task(init_read_adc0_task, run_read_adc0_task, 1, adc_sample_period_us);
-HT_TASK::Task adc_1_sample_task(init_read_adc1_task, run_read_adc1_task, 1, adc_sample_period_us);
+HT_TASK::Task adc_0_sample_task(init_read_adc0_task, run_read_adc0_task, 5, adc0_sample_period_us);
+HT_TASK::Task adc_1_sample_task(init_read_adc1_task, run_read_adc1_task, 50, adc1_sample_period_us);
 HT_TASK::Task update_buzzer_controller_task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 3, update_buzzer_controller_period_us);
-HT_TASK::Task kick_watchdog_task(create_watchdog, run_kick_watchdog, 0, kick_watchdog_period_us); 
+HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, 0, kick_watchdog_period_us); 
 HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, 2, ams_update_period_us);
 HT_TASK::Task suspension_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_enqueue_suspension_CAN_data, 4, suspension_can_period_us);
-HT_TASK::Task CAN_send(HT_TASK::DUMMY_FUNCTION, handle_send_all_data, 5, 0);
+HT_TASK::Task CAN_send(HT_TASK::DUMMY_FUNCTION, handle_send_all_data, 5);
 HT_TASK::Task ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, 6, ethernet_update_period);
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
