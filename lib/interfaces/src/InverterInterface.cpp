@@ -192,8 +192,3 @@ void InverterInterface::set_inverter_control_word(InverterControlWord_s control_
     _inverter_control_word.inverter_enable = control_word.inverter_enable;
     _inverter_control_word.remove_error = control_word.remove_error;
 }
-
-InverterStatus_s InverterInterface::get_inverter_status() 
-{
-    return _feedback_data.status;
-}

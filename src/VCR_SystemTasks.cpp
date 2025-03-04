@@ -8,7 +8,6 @@
 #include "VCFInterface.h"
 #include "VCRCANInterfaceImpl.h"
 #include "VCR_SystemTasks.h"
-#include "VehicleStateMachine.h"
 
 
 VCRInterfaceData_s sample_async_data(
@@ -61,5 +60,4 @@ void big_task(etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigne
     vcr_data.system_data = sys_data;
     vcr_data.interface_data = interface_data;
     // TODO the car state needs to be part of the vcr data (this is not in interface or system data)
-
 }

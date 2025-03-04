@@ -124,7 +124,26 @@ bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK
 
 bool handle_send_all_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &INVERTER_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
+}
+
+bool handle_inverter_CAN_send(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
+    return true;
 }
 
 bool init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)

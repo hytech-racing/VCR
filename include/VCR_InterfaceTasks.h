@@ -72,4 +72,5 @@ bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
 
 // task for sending all ethernet data
 bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+bool handle_inverter_CAN_send(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 #endif /* VCR_INTERFACETASKS */

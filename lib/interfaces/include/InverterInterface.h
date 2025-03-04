@@ -68,7 +68,12 @@ class InverterInterface
 
         void set_inverter_control_word(InverterControlWord_s control_word);
 
-        InverterStatus_s get_inverter_status();
+        /* Getters */
+        InverterStatus_s get_status(); 
+        InverterTemps_s get_temps();
+        InverterPower_s get_power();
+        MotorMechanics_s get_motor_mechanics();
+        InverterControlFeedback_s get_control_params();
 
     private: 
 
@@ -78,12 +83,7 @@ class InverterInterface
         InverterControlParams_s _inverter_control_params;
         InverterFeedbackData_s _feedback_data;
         InverterParams_s _inverter_params;
-
-        /* Getters */
-        InverterStatus_s get_status(); 
-        InverterTemps_s get_temps();
-        InverterPower_s get_power();
-        MotorMechanics_s get_motor_mechanics();
-        InverterControlFeedback_s get_control_params();
 };
+
+
 #endif // __INVERTERINTERFACE_H__

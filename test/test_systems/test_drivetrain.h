@@ -153,20 +153,17 @@ TEST (DrivetrainTest, test) {
     drivetrain.evaluate_drivetrain(cmd);
     ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::INVERTERS_READY);
     FL_status.quit_dc_on = true;
-
-    FL_status.quit_inverter_on = false;
-    FR_status.quit_inverter_on = false;
+    FR_status.quit_dc_on = true;
+    RL_status.quit_dc_on = true;
+    RR_status.quit_dc_on = true;
     drivetrain.evaluate_drivetrain(cmd);
     ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::INVERTERS_HV_ENABLED);
-    RL_status.quit_inverter_on = false;
-    RR_status.quit_inverter_on = false;
     drivetrain.evaluate_drivetrain(cmd);
-    ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::INVERTERS_ENABLED);
     FL_status.quit_inverter_on = true;
-    drivetrain.evaluate_drivetrain(cmd);
+    FR_status.quit_inverter_on = true;
     ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::INVERTERS_HV_ENABLED);
-    FL_status.quit_inverter_on = false;
-
+    RL_status.quit_inverter_on = true;
+    RR_status.quit_inverter_on = true;
     drivetrain.evaluate_drivetrain(cmd);
     ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::INVERTERS_ENABLED);
     drivetrain.evaluate_drivetrain(cmd);

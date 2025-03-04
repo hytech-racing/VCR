@@ -9,6 +9,7 @@
 #include "FlexCAN_T4.h"
 
 #include "etl/delegate.h"
+#include "etl/singleton.h"
 
 #include "CANInterface.h"
 
@@ -35,17 +36,30 @@ struct CANInterfaces {
     explicit CANInterfaces(
         VCFInterface &vcf_int, 
         DrivebrainInterface &db_int, 
-        veh_vec<InverterInterface> &inv_ints
-
+        InverterInterface &fl_inv_int,
+        InverterInterface &fr_inv_int,
+        InverterInterface &rl_inv_int,
+        InverterInterface &rr_inv_int
     )
         : vcf_interface(vcf_int), 
           db_interface(db_int),
-          inverter_interfaces(inv_ints) {}
+          fl_inverter_interface(fl_inv_int),
+          fr_inverter_interface(fr_inv_int),
+          rl_inverter_interface(rl_inv_int),
+          rr_inverter_interface(rr_inv_int) {}
 
     VCFInterface &vcf_interface;
     DrivebrainInterface &db_interface;
-    veh_vec<InverterInterface> &inverter_interfaces;
+    InverterInterface &fl_inverter_interface;
+    InverterInterface &fr_inverter_interface;
+    InverterInterface &rl_inverter_interface;
+    InverterInterface &rr_inverter_interface;
+
 };
+
+using CANInterfacesInstance = etl::singleton<CANInterfaces>;
+extern FlexCAN_Type<CAN2> INVERTER_CAN; // gets defined in main as of right now
+extern FlexCAN_Type<CAN3> TELEM_CAN; // gets defined in main as of right now
 
 namespace VCRCANInterfaceImpl {
 
@@ -59,7 +73,6 @@ extern CANTXBufferType CAN1_txBuffer;
 extern CANTXBufferType inverter_can_tx_buffer;
 /* TX buffer for CAN3 */
 extern CANTXBufferType telem_can_tx_buffer;
-extern FlexCAN_Type<CAN3> TELEM_CAN; // gets defined in main as of right now
 
 void on_can1_receive(const CAN_message_t &msg);
 void on_inverter_can_receive(const CAN_message_t &msg);
