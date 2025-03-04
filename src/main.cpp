@@ -10,6 +10,9 @@
 
 /* Arduino specific upstream Libraries */
 #include "QNEthernet.h"
+#include "ht_sched.hpp"
+#include "ht_task.hpp"
+
 #define _TASK_MICRO_RES // NOLINT
 #include <TScheduler.hpp>
 
@@ -45,47 +48,37 @@
 FlexCAN_Type<CAN3> TELEM_CAN;
 FlexCAN_Type<CAN2> INVERTER_CAN;
 /* Scheduler setup */
-TsScheduler task_scheduler;
+HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
+
+bool handle_big_tasks(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+
 
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
 
-constexpr unsigned long adc_sample_period_us = 250;                  // 250 us = 4kHz
+constexpr unsigned long adc0_sample_period_us = 250;                 // 250 us = 4 kHz
+constexpr unsigned long adc1_sample_period_us = 10000;               // 10000 us = 100 Hz
 constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 us = 10 Hz
 constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 us = 100 Hz
 constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
-constexpr unsigned long ethernet_update_period = 10000;
+constexpr unsigned long ethernet_update_period = 10000;              // 10 000 us = 100 Hz
+constexpr unsigned long suspension_can_period_us = 4000;             // 4000 us = 250 Hz
 constexpr unsigned long inv_send_period = 4000;             // 4 000 us = 250 Hz
 constexpr unsigned long ioexpander_sample_period_us = 50000;
 
-void handle_big_tasks();
+// task declarations
+HT_TASK::Task adc_0_sample_task(init_read_adc0_task, run_read_adc0_task, 5, adc0_sample_period_us);
+HT_TASK::Task adc_1_sample_task(init_read_adc1_task, run_read_adc1_task, 50, adc1_sample_period_us);
+HT_TASK::Task update_buzzer_controller_task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 3, update_buzzer_controller_period_us);
+HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, 0, kick_watchdog_period_us); 
+HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, 2, ams_update_period_us);
+HT_TASK::Task suspension_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_enqueue_suspension_CAN_data, 4, suspension_can_period_us);
+HT_TASK::Task CAN_send(HT_TASK::DUMMY_FUNCTION, handle_send_all_data, 5);
 
-// from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
-TsTask suspension_CAN_send(4000, TASK_FOREVER, &handle_enqueue_suspension_CAN_data, &task_scheduler,
-                           false);
-TsTask adc_0_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc0_task, &task_scheduler,
-                         false, &init_read_adc0_task);
-TsTask adc_1_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc1_task, &task_scheduler,
-                         false, &init_read_adc1_task);
-TsTask update_buzzer_controller_task(adc_sample_period_us, TASK_FOREVER,
-                                     &run_update_buzzer_controller_task, &task_scheduler, false);
-TsTask kick_watchdog_task(kick_watchdog_period_us, TASK_FOREVER, &run_kick_watchdog,
-                          &task_scheduler, false, &create_watchdog);
-TsTask ams_system_task(ams_update_period_us, TASK_FOREVER, &run_ams_system_task, &task_scheduler,
-                       false, &init_ams_system_task);
+HT_TASK::Task ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, 6);
+HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, 100, ioexpander_sample_period_us);
+HT_TASK::Task inverter_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_inverter_CAN_send, 5, inv_send_period);
+HT_TASK::Task big_task_t(HT_TASK::DUMMY_FUNCTION, handle_big_tasks, 0);
 
-TsTask CAN_send(TASK_IMMEDIATE, TASK_FOREVER, &handle_send_all_data, &task_scheduler, false);
-
-TsTask inverter_CAN_send(inv_send_period, TASK_FOREVER, &handle_inverter_CAN_send,
-    &task_scheduler, false);
-
-TsTask ethernet_send(ethernet_update_period, TASK_FOREVER, &handle_send_VCR_ethernet_data,
-                     &task_scheduler, false);
-
-TsTask big_task_t(TASK_IMMEDIATE, TASK_FOREVER, &handle_big_tasks,
-                     &task_scheduler, false);
-
-                     
-TsTask IOExpander_read_task(ioexpander_sample_period_us, TASK_FOREVER, &read_ioexpander, &task_scheduler, false, &create_ioexpander);
 
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
@@ -168,6 +161,9 @@ void setup() {
     vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
     vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
 
+    // timing function
+    scheduler.setTimingFunction(micros);
+
     qindesign::network::Ethernet.begin(
         car_network_definition.vcr_ip, car_network_definition.default_dns,
         car_network_definition.default_gateway, car_network_definition.car_subnet);
@@ -192,25 +188,24 @@ void setup() {
     handle_CAN_setup(INVERTER_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(TELEM_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_telem_can_receive);
 
-    adc_0_sample_task.enable(); // will run the init function and allow the task to start running
-    adc_1_sample_task.enable();
-    suspension_CAN_send.enable();
-    CAN_send.enable();
-    update_buzzer_controller_task.enable();
-    kick_watchdog_task.enable();
-    ethernet_send.enable();
-    inverter_CAN_send.enable();
-    big_task_t.enable();
-    
-    
-    IOExpander_read_task.enable();
+    scheduler.schedule(adc_0_sample_task);
+    scheduler.schedule(adc_1_sample_task);
+    scheduler.schedule(update_buzzer_controller_task);
+    scheduler.schedule(kick_watchdog_task);
+    scheduler.schedule(suspension_CAN_send);
+    scheduler.schedule(CAN_send);
+    scheduler.schedule(ethernet_send);
+    scheduler.schedule(inverter_CAN_send);
+    scheduler.schedule(big_task_t);
+    scheduler.schedule(IOExpander_read_task);
 }
 
 void loop() { 
-    task_scheduler.execute();
+    scheduler.run(); 
 }
 
-void handle_big_tasks()
+bool handle_big_tasks(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     big_task(main_can_recv, vcr_async_interfaces, vehicle_statemachine, int_data);
+    return true;
 }
