@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #endif
 
-// NOLINT for TaskScheduler
+ // NOLINT for TaskScheduler
 
 /* From shared_firmware_types libdep */
 #include "SharedFirmwareTypes.h"
@@ -55,6 +55,7 @@ constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 u
 constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
 constexpr unsigned long ethernet_update_period = 10000;
 constexpr unsigned long inv_send_period = 4000;             // 4 000 us = 250 Hz
+constexpr unsigned long ioexpander_sample_period_us = 50000;
 
 void handle_big_tasks();
 
@@ -84,6 +85,8 @@ TsTask big_task_t(TASK_IMMEDIATE, TASK_FOREVER, &handle_big_tasks,
                      &task_scheduler, false);
 
                      
+TsTask IOExpander_read_task(ioexpander_sample_period_us, TASK_FOREVER, &read_ioexpander, &task_scheduler, false, &create_ioexpander);
+
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
 qindesign::network::EthernetUDP protobuf_recv_socket;
@@ -199,6 +202,8 @@ void setup() {
     inverter_CAN_send.enable();
     big_task_t.enable();
     
+    
+    IOExpander_read_task.enable();
 }
 
 void loop() { 

@@ -18,7 +18,8 @@
 
 #include "AMSSystem.h"
 #include "DrivebrainInterface.h"
-#include "Arduino.h"
+#include "IOExpander.h"
+#include "IOExpanderUtils.h"
 
 bool init_read_adc0_task()
 {
@@ -133,4 +134,30 @@ void handle_inverter_CAN_send()
     CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
 
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
+}
+
+void create_ioexpander()
+{
+    IOExpanderInstance::create(0x20);
+}
+
+void read_ioexpander()
+{
+    uint16_t data = IOExpanderInstance::instance().read();
+
+    vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 0);
+    vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay = IOExpanderUtils::getBit(data, 0,1);
+    vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok = IOExpanderUtils::getBit(data, 0,2);
+    vcr_data.interface_data.shutdown_sensing_data.l_bms_relay = IOExpanderUtils::getBit(data, 0,3);
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0,4);
+    vcr_data.interface_data.shutdown_sensing_data.m_imd_relay = IOExpanderUtils::getBit(data, 0,5);
+    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 0,6);
+
+    vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 0);
+    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 1, 1);
+    vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 2);
+    vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 3);
+    vcr_data.interface_data.ethernet_is_linked.debug_link = IOExpanderUtils::getBit(data, 1, 4);
+    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 1, 5);
 }

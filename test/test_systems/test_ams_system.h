@@ -35,17 +35,30 @@ TEST (AMSSystemTest, initialization_test) {
         .average_temp_celsius = 0.0f,
         .max_temp_celsius = 0.0f,
         .total_pack_voltage = 0.0f,
-        .ams_ok = true
+        .ams_ok = false
     };
 
     AMSSystemData_s actual_data = ams.update_ams_system(init_millis, vcr_data);
     vcr_data.system_data.ams_data = actual_data;
     ASSERT_AMS_SYSTEM_DATA_EQ(expected_data, vcr_data.system_data.ams_data);
 
+    vcr_data.interface_data.stamped_acu_core_data.last_recv_millis = init_millis; // this should set _has_received_one_message to true
+    expected_data = {
+        .min_cell_voltage = 3.4f,
+        .average_cell_voltage = 3.5f,
+        .max_cell_voltage = -1.0f,
+        .min_temp_celsius = -1.0f,
+        .average_temp_celsius = -1.0f,
+        .max_temp_celsius = 50.0f,
+        .total_pack_voltage = 460.0f,
+        .ams_ok = true
+    };
+
     actual_data = ams.update_ams_system(init_millis + 1000, vcr_data);
     vcr_data.system_data.ams_data = actual_data;
     ASSERT_AMS_SYSTEM_DATA_EQ(expected_data, vcr_data.system_data.ams_data);
 
+    expected_data.ams_ok = false; // more than 2000ms have been exceeded, so not OK anymore
     actual_data = ams.update_ams_system(init_millis + 10000, vcr_data);
     vcr_data.system_data.ams_data = actual_data;
     ASSERT_AMS_SYSTEM_DATA_EQ(expected_data, vcr_data.system_data.ams_data);
