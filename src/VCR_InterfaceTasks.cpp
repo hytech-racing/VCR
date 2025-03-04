@@ -2,6 +2,7 @@
 #include "VCRCANInterfaceImpl.h"
 #include "SystemTimeInterface.h"
 #include "VCR_InterfaceTasks.h"
+#include "ht_task.hpp"
 
 
 /* From shared-systems-lib */
@@ -21,7 +22,7 @@
 #include "IOExpander.h"
 #include "IOExpanderUtils.h"
 
-bool init_read_adc0_task()
+bool init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     float scales[channels_within_mcp_adc] = {GLV_SENSE_SCALE, CURRENT_SENSE_SCALE, REFERENCE_SENSE_SCALE, RL_LOADCELL_SCALE, RR_LOADCELL_SCALE, RL_SUS_POT_SCALE, RR_SUS_POT_SCALE, 1}; //NOLINT
     float offsets[channels_within_mcp_adc] = {GLV_SENSE_OFFSET, CURRENT_SENSE_OFFSET, REFERENCE_SENSE_OFFSET, RL_LOADCELL_OFFSET, RR_LOADCELL_OFFSET, RL_SUS_POT_OFFSET, RR_SUS_POT_OFFSET, 0}; //NOLINT
@@ -31,7 +32,7 @@ bool init_read_adc0_task()
     return true;
 }
 
-void run_read_adc0_task()
+bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
     ADC0Instance::instance().tick(); // why is it that the sample and convert functions are public in the mcp_adc interface? 
@@ -44,9 +45,10 @@ void run_read_adc0_task()
     vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = ADC0Instance::instance().data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
     
     hal_printf("ADC0 reading 0 %d\n", ADC0Instance::instance().data.conversions[0].raw); // NOLINT
+    return true;
 }
 
-bool init_read_adc1_task()
+bool init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     /* NOLINTBEGIN */ // Thermistor channels are for testing purposes only, the pin numbers 0-7 are acceptable "magic numbers".
     // Initialize all eight channels to scale = 1, offset = 0
@@ -60,71 +62,78 @@ bool init_read_adc1_task()
     return true;
 }
 
-void run_read_adc1_task()
+bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
     ADC1Instance::instance().tick();
     hal_printf("ADC1 reading 0 %d\n", ADC1Instance::instance().data.conversions[0].raw);
+    return true;
 }
 
-void run_update_buzzer_controller_task()
+bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     vcr_data.system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sys_time::hal_millis()); //NOLINT
+    return true;
 }
 
 
 
-bool init_ams_system_task()
+bool init_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS); // NOLINT 
     pinMode(SOFTWARE_OK_PIN, OUTPUT);
     return true;
 }
 
-void run_ams_system_task()
+bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     AMSSystemInstance::instance().update_ams_system(sys_time::hal_millis(), vcr_data);
     digitalWrite(SOFTWARE_OK_PIN, vcr_data.system_data.ams_data.ams_ok);
+    return true;
 }
 
 
 
-bool create_watchdog()
+bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     WatchdogInstance::create(default_system_params::KICK_INTERVAL_MS); // this has issues for some reason with clang-tidy // NOLINT
     pinMode(WATCHDOG_PIN, OUTPUT);
     return true;
 }
 
-void run_kick_watchdog()
+bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
+    return true;
 }
 
 // CAN send tasks
 
 // adds rear suspension and vcr status CAN messages to the sent on next mega loop run 
-void handle_enqueue_suspension_CAN_data()
+bool handle_enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
+    return true;
 }
 
-void handle_send_VCR_ethernet_data()
+bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(VCREthernetInterface::make_vcr_data_msg(vcr_data));
+    return true;
 }
 
-void handle_send_all_data()
+bool handle_send_all_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
 }
 
-void create_ioexpander()
+bool init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     IOExpanderInstance::create(0x20);
+    return true;
 }
 
-void read_ioexpander()
+bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     uint16_t data = IOExpanderInstance::instance().read();
 
@@ -142,4 +151,6 @@ void read_ioexpander()
     vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 3);
     vcr_data.interface_data.ethernet_is_linked.debug_link = IOExpanderUtils::getBit(data, 1, 4);
     vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 1, 5);
+
+    return true;
 }
