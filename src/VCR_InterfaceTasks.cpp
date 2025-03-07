@@ -1,6 +1,7 @@
 #include "SystemTimeInterface.h"
 #include "VCR_Tasks.h"
 
+#include <array>
 
 /* From shared-systems-lib */
 #include "Logger.h"
@@ -16,20 +17,53 @@
 #include "AMSSystem.h"
 
 
-void init_bundle(){
-    float scales[channels_within_mcp_adc] = {GLV_SENSE_SCALE, CURRENT_SENSE_SCALE, REFERENCE_SENSE_SCALE, RL_LOADCELL_SCALE, RR_LOADCELL_SCALE, RL_SUS_POT_SCALE, RR_SUS_POT_SCALE, 1}; //NOLINT
-    float offsets[channels_within_mcp_adc] = {GLV_SENSE_OFFSET, CURRENT_SENSE_OFFSET, REFERENCE_SENSE_OFFSET, RL_LOADCELL_OFFSET, RR_LOADCELL_OFFSET, RL_SUS_POT_OFFSET, RR_SUS_POT_OFFSET, 0}; //NOLINT
-    MCP_ADC<channels_within_mcp_adc> adc0(ADC0_CS, MCP_ADC_DEFAULT_SPI_SDI, MCP_ADC_DEFAULT_SPI_SDO, MCP_ADC_DEFAULT_SPI_CLK, MCP_ADC_DEFAULT_SPI_SPEED, scales, offsets);
-    MCP_ADC<channels_within_mcp_adc> adc1(ADC1_CS, MCP_ADC_DEFAULT_SPI_SDI, MCP_ADC_DEFAULT_SPI_SDO, MCP_ADC_DEFAULT_SPI_CLK, MCP_ADC_DEFAULT_SPI_SPEED, scales, offsets);
-    ADCSingletonInstance::create(adc0, adc1); 
+bool init_bundle(){
+
+    std::array<float, channels_within_mcp_adc> adc0_scales, adc0_offsets, adc1_scales, adc1_offsets;
+    adc0_scales[GLV_SENSE_CHANNEL] = GLV_SENSE_SCALE;
+    adc0_offsets[GLV_SENSE_CHANNEL] = GLV_SENSE_OFFSET;
+    adc0_scales[CURRENT_SENSE_CHANNEL] = CURRENT_SENSE_SCALE;
+    adc0_offsets[CURRENT_SENSE_CHANNEL] = CURRENT_SENSE_OFFSET;
+    adc0_scales[REFERENCE_SENSE_CHANNEL] = REFERENCE_SENSE_SCALE;
+    adc0_offsets[REFERENCE_SENSE_CHANNEL] = REFERENCE_SENSE_OFFSET;
+    adc0_scales[RL_LOADCELL_CHANNEL] = RL_LOADCELL_SCALE;
+    adc0_offsets[RL_LOADCELL_CHANNEL] = RL_LOADCELL_OFFSET;
+    adc0_scales[RR_LOADCELL_CHANNEL] = RR_LOADCELL_SCALE;
+    adc0_offsets[RR_LOADCELL_CHANNEL] = RR_LOADCELL_OFFSET;
+    adc0_scales[RL_SUS_POT_CHANNEL] = RL_SUS_POT_SCALE;
+    adc0_offsets[RL_SUS_POT_CHANNEL] = RL_SUS_POT_OFFSET;
+    adc0_scales[RR_SUS_POT_CHANNEL] = RR_SUS_POT_SCALE;
+    adc0_offsets[RR_SUS_POT_CHANNEL] = RR_SUS_POT_OFFSET;
+
+    adc1_scales[THERMISTOR_0] = THERMISTOR_0_SCALE;
+    adc1_offsets[THERMISTOR_0] = THERMISTOR_0_OFFSET;
+    adc1_scales[THERMISTOR_1] = THERMISTOR_1_SCALE;
+    adc1_offsets[THERMISTOR_1] = THERMISTOR_1_OFFSET;
+    adc1_scales[THERMISTOR_2] = THERMISTOR_2_SCALE;
+    adc1_offsets[THERMISTOR_2] = THERMISTOR_2_OFFSET;
+    adc1_scales[THERMISTOR_3] = THERMISTOR_3_SCALE;
+    adc1_offsets[THERMISTOR_3] = THERMISTOR_3_OFFSET;
+    adc1_scales[THERMISTOR_4] = THERMISTOR_4_SCALE;
+    adc1_offsets[THERMISTOR_4] = THERMISTOR_4_OFFSET;
+    adc1_scales[THERMISTOR_5] = THERMISTOR_5_SCALE;
+    adc1_offsets[THERMISTOR_5] = THERMISTOR_5_OFFSET;
+    adc1_scales[THERMISTOR_6] = THERMISTOR_6_SCALE;
+    adc1_offsets[THERMISTOR_6] = THERMISTOR_6_OFFSET;
+    adc1_scales[THERMISTOR_7] = THERMISTOR_7_SCALE;
+    adc1_offsets[THERMISTOR_7] = THERMISTOR_7_OFFSET;
+
+    ADCSingletonInstance::create(adc0_scales, adc0_offsets, adc1_scales, adc1_offsets);
+
+    return true;
 }
+
 
 bool init_read_adc0_task()
 {
-    init_bundle();
+    //init_bundle();
     hal_printf("Initialized ADC0 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
     return true;
-}
+} 
 
 
 void run_read_adc0_task()
@@ -63,12 +97,13 @@ void run_read_adc0_task()
         ADCSingletonInstance::instance().adc0.data.conversions[0].raw); // NOLINT
 }
 
+
 bool init_read_adc1_task()
 {
-    init_bundle();
+   // init_bundle();
     hal_printf("Initialized ADC1 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
     return true;
-}
+} 
 
 
 void run_read_adc1_task()
