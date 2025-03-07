@@ -60,7 +60,7 @@ constexpr unsigned long adc1_sample_period_us = 10000;               // 10000 us
 constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 us = 10 Hz
 constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 us = 100 Hz
 constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
-constexpr unsigned long ethernet_update_period = 10000;              // 10 000 us = 100 Hz
+constexpr unsigned long ethernet_send_period = 10000;              // 10 000 us = 100 Hz
 constexpr unsigned long suspension_can_period_us = 4000;             // 4000 us = 250 Hz
 constexpr unsigned long inv_send_period = 4000;             // 4 000 us = 250 Hz
 constexpr unsigned long ioexpander_sample_period_us = 50000;
@@ -74,17 +74,15 @@ HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, 2, ams_
 HT_TASK::Task suspension_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_enqueue_suspension_CAN_data, 4, suspension_can_period_us);
 HT_TASK::Task CAN_send(HT_TASK::DUMMY_FUNCTION, handle_send_all_data, 5);
 
-HT_TASK::Task ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, 6);
+HT_TASK::Task ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, 6, ethernet_send_period);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, 100, ioexpander_sample_period_us);
 HT_TASK::Task inverter_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_inverter_CAN_send, 5, inv_send_period);
 HT_TASK::Task big_task_t(HT_TASK::DUMMY_FUNCTION, handle_big_tasks, 0);
 
 
 /* Ethernet message sockets */ // TODO: Move this into its own interface
-qindesign::network::EthernetUDP protobuf_send_socket;
-qindesign::network::EthernetUDP protobuf_recv_socket;
-
-EthernetIPDefs_s car_network_definition;
+qindesign::network::EthernetUDP vcr_data_socket;
+qindesign::network::EthernetUDP vcf_data_socket;
 
 InverterParams_s inverter_params = {
     .MINIMUM_HV_VOLTAGE = 400.0
@@ -156,6 +154,7 @@ VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
 );
 
 void setup() {
+    Serial.begin(115200);
 
     vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
     vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
@@ -164,14 +163,18 @@ void setup() {
     // timing function
     scheduler.setTimingFunction(micros);
 
-    qindesign::network::Ethernet.begin(
-        car_network_definition.vcr_ip, car_network_definition.default_dns,
-        car_network_definition.default_gateway, car_network_definition.car_subnet);
-    protobuf_send_socket.begin(car_network_definition.VCRData_port);
+    EthernetIPDefsInstance::create();
+    uint8_t mac[6];
+    qindesign::network::Ethernet.macAddress(mac);
+    qindesign::network::Ethernet.begin(mac, EthernetIPDefsInstance::instance().vcr_ip, EthernetIPDefsInstance::instance().default_dns, EthernetIPDefsInstance::instance().default_gateway, EthernetIPDefsInstance::instance().car_subnet);
+
+    vcr_data_socket.begin(EthernetIPDefsInstance::instance().VCRData_port);
+    vcf_data_socket.begin(EthernetIPDefsInstance::instance().VCFData_port);
+
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
                                         vcr_data.interface_data.rear_suspot_data,
-                                        car_network_definition.drivebrain_ip,
-                                        car_network_definition.VCRData_port, &protobuf_send_socket);
+                                        EthernetIPDefsInstance::instance().drivebrain_ip,
+                                        EthernetIPDefsInstance::instance().VCRData_port, &vcr_data_socket);
 
     CANInterfacesInstance::create(
         vcf_interface,
@@ -201,7 +204,24 @@ void setup() {
 }
 
 void loop() { 
-    scheduler.run(); 
+    scheduler.run();
+    if (millis() % 1000 < 500) {
+        etl::optional<hytech_msgs_VCFData_s> protoc_struct = handle_ethernet_socket_receive<hytech_msgs_VCFData_s_size, hytech_msgs_VCFData_s>(&vcf_data_socket, &hytech_msgs_VCFData_s_msg);
+        if (protoc_struct) {
+            VCREthernetInterface::receive_pb_msg_vcf(protoc_struct.value(), vcr_data, millis());
+            
+            char *string_ptr = (char*) &(protoc_struct.value());
+            uint32_t kk = sizeof(protoc_struct.value());
+            while(kk--)
+                Serial.printf("%02X ", *string_ptr++);
+            Serial.println("");
+
+            Serial.println(protoc_struct.value().pedals_system_data.regen_percent);
+            Serial.println(vcr_data.interface_data.recvd_pedals_data.pedals_data.regen_percent);
+        } else {
+            Serial.printf("Did not receive VCF message!\n");
+        }
+    }
 }
 
 bool handle_big_tasks(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
