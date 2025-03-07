@@ -1,7 +1,6 @@
 #include "SystemTimeInterface.h"
 #include "VCR_Tasks.h"
 
-#include <array>
 
 /* From shared-systems-lib */
 #include "Logger.h"
@@ -19,7 +18,7 @@
 
 bool init_bundle(){
 
-    std::array<float, channels_within_mcp_adc> adc0_scales, adc0_offsets, adc1_scales, adc1_offsets;
+    float adc0_scales[channels_within_mcp_adc], adc0_offsets[channels_within_mcp_adc], adc1_scales[channels_within_mcp_adc], adc1_offsets[channels_within_mcp_adc]; 
     adc0_scales[GLV_SENSE_CHANNEL] = GLV_SENSE_SCALE;
     adc0_offsets[GLV_SENSE_CHANNEL] = GLV_SENSE_OFFSET;
     adc0_scales[CURRENT_SENSE_CHANNEL] = CURRENT_SENSE_SCALE;
