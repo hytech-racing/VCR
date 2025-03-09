@@ -39,8 +39,8 @@ constexpr unsigned long update_buzzer_controller_period_us = 100000;  // 100 000
 constexpr unsigned long kick_watchdog_period_us = 10000;  // 10 000 us = 100 Hz
 constexpr unsigned long ams_update_period_us = 10000;  // 10 000 us = 100 Hz
 // from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use 
-TsTask adc_0_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc0_task, &task_scheduler, false, &init_read_adc0_task);
-TsTask adc_1_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc1_task, &task_scheduler, false, &init_read_adc1_task);
+TsTask adc_0_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc0_task, &task_scheduler, false, &init_bundle);
+TsTask adc_1_sample_task(adc_sample_period_us, TASK_FOREVER, &run_read_adc1_task, &task_scheduler, false, &init_bundle);
 TsTask update_buzzer_controller_task(adc_sample_period_us, TASK_FOREVER, &run_update_buzzer_controller_task, &task_scheduler, false);
 TsTask kick_watchdog_task(kick_watchdog_period_us, TASK_FOREVER, &run_kick_watchdog, &task_scheduler, false, &create_watchdog);
 TsTask ams_system_task(ams_update_period_us, TASK_FOREVER, &init_ams_system_task, &task_scheduler, false, &run_ams_system_task);

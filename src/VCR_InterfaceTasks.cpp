@@ -56,15 +56,6 @@ bool init_bundle(){
     return true;
 }
 
-
-bool init_read_adc0_task()
-{
-    //init_bundle();
-    hal_printf("Initialized ADC0 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
-    return true;
-} 
-
-
 void run_read_adc0_task()
 {
 
@@ -95,14 +86,6 @@ void run_read_adc0_task()
     hal_printf("ADC0 reading 0 %d\n", 
         ADCSingletonInstance::instance().adc0.data.conversions[0].raw); // NOLINT
 }
-
-
-bool init_read_adc1_task()
-{
-   // init_bundle();
-    hal_printf("Initialized ADC1 at %d (millis)\n", sys_time::hal_millis()); // NOLINT
-    return true;
-} 
 
 
 void run_read_adc1_task()

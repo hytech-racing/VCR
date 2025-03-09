@@ -21,12 +21,12 @@ extern VCRData_s vcr_data; // NOLINT
 
 /* ADC setup */
 constexpr unsigned int channels_within_mcp_adc = 8;
-struct ADCBundle
+struct ADCBundle_s
 {
     
     //ADCBundle(MCP_ADC <channels_within_mcp_adc> &adc0_, MCP_ADC <channels_within_mcp_adc> &adc1_) : adc0(adc0_), adc1(adc1_) {};
 
-    ADCBundle(const float (&adc_0_scales)[channels_within_mcp_adc],
+    ADCBundle_s(const float (&adc_0_scales)[channels_within_mcp_adc],
                 const float (&adc_0_offsets)[channels_within_mcp_adc],
                 const float (&adc_1_scales)[channels_within_mcp_adc],
                 const float (&adc_1_offsets)[channels_within_mcp_adc]) :
@@ -37,5 +37,5 @@ struct ADCBundle
     MCP_ADC <channels_within_mcp_adc> adc0;
     MCP_ADC <channels_within_mcp_adc> adc1;
 };
-using ADCSingletonInstance = etl::singleton<ADCBundle>; // Singleton for ADCs. Used to pass ADCs to other systems that need them, such as the TelemetrySystem.
+using ADCSingletonInstance = etl::singleton<ADCBundle_s>; // Singleton for ADCs. Used to pass ADCs to other systems that need them, such as the TelemetrySystem.
 #endif /* VCR_GLOBALS */
