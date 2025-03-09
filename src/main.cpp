@@ -68,8 +68,8 @@ constexpr unsigned long inv_send_period = 4000;             // 4 000 us = 250 Hz
 constexpr unsigned long ioexpander_sample_period_us = 50000;
 
 // task declarations
-HT_TASK::Task adc_0_sample_task([](const unsigned long&, const HT_TASK::TaskInfo&) { return true; }, run_read_adc0_task, 5, adc0_sample_period_us);
-HT_TASK::Task adc_1_sample_task([](const unsigned long&, const HT_TASK::TaskInfo&) { return true; }, run_read_adc1_task, 50, adc1_sample_period_us);
+HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, 5, adc0_sample_period_us);
+HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, 50, adc1_sample_period_us);
 HT_TASK::Task update_buzzer_controller_task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 3, update_buzzer_controller_period_us);
 HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, 0, kick_watchdog_period_us); 
 HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, 2, ams_update_period_us);
