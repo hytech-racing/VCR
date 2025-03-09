@@ -1,5 +1,8 @@
+#include "CANInterface.h"
+#include "VCRCANInterfaceImpl.h"
 #include "SystemTimeInterface.h"
-#include "VCR_Tasks.h"
+#include "VCR_InterfaceTasks.h"
+#include "ht_task.hpp"
 
 
 /* From shared-systems-lib */
@@ -9,11 +12,15 @@
 #include "SharedFirmwareTypes.h"
 
 /* Local includes */
+#include "VCREthernetInterface.h"
 #include "VCR_Constants.h"
 #include "BuzzerController.h"
 #include "VCR_Globals.h"
-#include "VehicleStateMachine.h"
+
 #include "AMSSystem.h"
+#include "DrivebrainInterface.h"
+#include "IOExpander.h"
+#include "IOExpanderUtils.h"
 
 
 bool init_bundle(){
@@ -56,7 +63,7 @@ bool init_bundle(){
     return true;
 }
 
-void run_read_adc0_task()
+bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
     ADCSingletonInstance::instance().adc0.tick();
@@ -88,7 +95,7 @@ void run_read_adc0_task()
 }
 
 
-void run_read_adc1_task()
+bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
     ADCSingletonInstance::instance().adc1.tick();
@@ -96,21 +103,22 @@ void run_read_adc1_task()
     hal_printf("ADC1 reading 0 %d\n", ADCSingletonInstance::instance().adc1.data.conversions[0].raw); // NOLINT
 }
 
-void run_update_buzzer_controller_task()
+bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     vcr_data.system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sys_time::hal_millis()); //NOLINT
+    return true;
 }
 
 
 
-bool init_ams_system_task()
+bool init_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS); // NOLINT 
     pinMode(SOFTWARE_OK_PIN, OUTPUT);
     return true;
 }
 
-bool run_ams_system_task()
+bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     AMSSystemInstance::instance().update_ams_system(sys_time::hal_millis(), vcr_data);
     digitalWrite(SOFTWARE_OK_PIN, vcr_data.system_data.ams_data.ams_ok);
@@ -119,13 +127,82 @@ bool run_ams_system_task()
 
 
 
-void create_watchdog()
+bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     WatchdogInstance::create(default_system_params::KICK_INTERVAL_MS); // this has issues for some reason with clang-tidy // NOLINT
     pinMode(WATCHDOG_PIN, OUTPUT);
+    return true;
 }
 
-void run_kick_watchdog()
+bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
+    return true;
+}
+
+// CAN send tasks
+
+// adds rear suspension and vcr status CAN messages to the sent on next mega loop run 
+bool handle_enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
+    return true;
+}
+
+bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(VCREthernetInterface::make_vcr_data_msg(vcr_data));
+    return true;
+}
+
+bool handle_send_all_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &INVERTER_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
+}
+
+bool handle_inverter_CAN_send(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
+
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
+    return true;
+}
+
+bool init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    IOExpanderInstance::create(0x20);
+    return true;
+}
+
+bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    uint16_t data = IOExpanderInstance::instance().read();
+
+    vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 0);
+    vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay = IOExpanderUtils::getBit(data, 0,1);
+    vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok = IOExpanderUtils::getBit(data, 0,2);
+    vcr_data.interface_data.shutdown_sensing_data.l_bms_relay = IOExpanderUtils::getBit(data, 0,3);
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0,4);
+    vcr_data.interface_data.shutdown_sensing_data.m_imd_relay = IOExpanderUtils::getBit(data, 0,5);
+    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 0,6);
+
+    vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 0);
+    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 1, 1);
+    vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 2);
+    vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 3);
+    vcr_data.interface_data.ethernet_is_linked.debug_link = IOExpanderUtils::getBit(data, 1, 4);
+    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 1, 5);
+
+    return true;
 }

@@ -12,7 +12,7 @@
 
 /* From shared-firmware-types */
 #include "SharedFirmwareTypes.h"
-
+#include "etl/singleton.h"
 /* Local includes */
 #include "VCR_Constants.h"
 

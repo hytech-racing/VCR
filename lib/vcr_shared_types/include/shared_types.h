@@ -11,10 +11,42 @@ namespace HTUnits
     using volts = float;
 };
 
-// for the most part these are mirrors of the lower-level CAN struct data, except with already fully float-ized data
+/** 
+ * Drivetrain system accessible structs for 
+ * requesting change of state
+ */
+struct InverterControlWord_s 
+{
+    bool inverter_enable : 1;
+    bool hv_enable : 1;
+    bool driver_enable : 1;
+    bool remove_error : 1;
+};
 
+struct InverterControlInput_s 
+{
+    int16_t speed_rpm_setpoint;
+    int16_t positive_torque_limit; 
+    int16_t negative_torque_limit;
+};
+
+struct InverterControlParams_s
+{
+    uint16_t speed_control_kp; 
+    uint16_t speed_control_ki;
+    uint16_t speed_control_kd;
+};
+
+/** 
+ * For the most part these are mirrors of the lower-level CAN struct data, 
+ * except with already fully float-ized data
+**/
 struct InverterStatus_s
 {
+    bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
+    bool hv_present : 1;
+    bool connected : 1;
     bool system_ready : 1;
     bool error : 1;
     bool warning : 1;
@@ -23,14 +55,14 @@ struct InverterStatus_s
     bool quit_inverter_on : 1;
     bool inverter_on : 1;
     bool derating_on : 1;
-    bool connected : 1; // if we have received a CAN message from the inverter
     HTUnits::volts dc_bus_voltage;
     uint16_t diagnostic_number;
-    int16_t speed_rpm;
 };
 
 struct InverterTemps_s
 {
+    bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
     HTUnits::celcius motor_temp;
     HTUnits::celcius inverter_temp;
     HTUnits::celcius igbt_temp;
@@ -38,19 +70,25 @@ struct InverterTemps_s
 
 struct InverterPower_s
 {
+    bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
     HTUnits::watts active_power;
     HTUnits::var reactive_power;
 };
 
 struct MotorMechanics_s
 {
+    bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
     HTUnits::watts actual_power;
     HTUnits::torque_nm actual_torque;
     HTUnits::speed_rpm actual_speed;
 };
 
-struct InverterControlParams_s
+struct InverterControlFeedback_s
 {
+    bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
     uint16_t speed_control_kp;
     uint16_t speed_control_ki;
     uint16_t speed_control_kd;
@@ -62,7 +100,8 @@ struct InverterFeedbackData_s
     InverterTemps_s temps;
     InverterPower_s power;
     MotorMechanics_s motor_mechanics;
-    InverterControlParams_s control_params;
+    InverterControlFeedback_s control_feedback;
 };
 
 #endif // __SHARED_TYPES_H__
+
