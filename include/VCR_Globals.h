@@ -24,8 +24,6 @@ constexpr unsigned int channels_within_mcp_adc = 8;
 struct ADCBundle_s
 {
     
-    //ADCBundle(MCP_ADC <channels_within_mcp_adc> &adc0_, MCP_ADC <channels_within_mcp_adc> &adc1_) : adc0(adc0_), adc1(adc1_) {};
-
     ADCBundle_s(const float (&adc_0_scales)[channels_within_mcp_adc],
                 const float (&adc_0_offsets)[channels_within_mcp_adc],
                 const float (&adc_1_scales)[channels_within_mcp_adc],
