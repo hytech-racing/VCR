@@ -55,6 +55,25 @@ constexpr int RL_SUS_POT_OFFSET = 1;
 constexpr float RR_SUS_POT_SCALE = 1;
 constexpr int RR_SUS_POT_OFFSET = 1;
 
+//figure out values
+const float THERMISTOR_0_SCALE = 1;
+const float THERMISTOR_0_OFFSET = 1; 
+const float THERMISTOR_1_SCALE = 1;
+const float THERMISTOR_1_OFFSET = 1; 
+const float THERMISTOR_2_SCALE = 1;
+const float THERMISTOR_2_OFFSET = 1; 
+const float THERMISTOR_3_SCALE = 1;
+const float THERMISTOR_3_OFFSET = 1; 
+const float THERMISTOR_4_SCALE = 1;
+const float THERMISTOR_4_OFFSET = 1; 
+const float THERMISTOR_5_SCALE = 1;
+const float THERMISTOR_5_OFFSET = 1; 
+const float THERMISTOR_6_SCALE = 1;
+const float THERMISTOR_6_OFFSET = 1; 
+const float THERMISTOR_7_SCALE = 1;
+const float THERMISTOR_7_OFFSET = 1; 
+
+
 constexpr int WATCHDOG_PIN = 36;
 constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
 
