@@ -157,8 +157,9 @@ bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK
 
 bool handle_send_all_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &INVERTER_CAN);
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
+    Serial.println(INVERTER_CAN.getBaudRate());
+    // VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &INVERTER_CAN);
+    // VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
 }
 
 bool handle_inverter_CAN_send(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)

@@ -74,7 +74,7 @@ HT_TASK::Task update_buzzer_controller_task(HT_TASK::DUMMY_FUNCTION, run_update_
 HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, 0, kick_watchdog_period_us); 
 HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, 2, ams_update_period_us);
 HT_TASK::Task suspension_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_enqueue_suspension_CAN_data, 4, suspension_can_period_us);
-HT_TASK::Task CAN_send(HT_TASK::DUMMY_FUNCTION, handle_send_all_data, 5);
+HT_TASK::Task CAN_send(HT_TASK::DUMMY_FUNCTION, handle_send_all_data, 5, inv_send_period);
 
 HT_TASK::Task ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, 6);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, 100, ioexpander_sample_period_us);
@@ -191,20 +191,23 @@ void setup() {
     handle_CAN_setup(INVERTER_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(TELEM_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_telem_can_receive);
 
-    scheduler.schedule(adc_0_sample_task);
-    scheduler.schedule(adc_1_sample_task);
-    scheduler.schedule(update_buzzer_controller_task);
-    scheduler.schedule(kick_watchdog_task);
-    scheduler.schedule(suspension_CAN_send);
+    // scheduler.schedule(adc_0_sample_task);
+    // scheduler.schedule(adc_1_sample_task);
+    // scheduler.schedule(update_buzzer_controller_task);
+    // scheduler.schedule(kick_watchdog_task);
+    // scheduler.schedule(suspension_CAN_send);
     scheduler.schedule(CAN_send);
     scheduler.schedule(ethernet_send);
     scheduler.schedule(inverter_CAN_send);
     scheduler.schedule(big_task_t);
-    scheduler.schedule(IOExpander_read_task);
+    // scheduler.schedule(IOExpander_read_task);
 }
 
 void loop() { 
-    scheduler.run(); 
+    Serial.println("From loop");
+    // scheduler.run(); 
+    HT_TASK::TaskInfo info;
+    handle_send_all_data(1, info);
 }
 
 bool handle_big_tasks(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
