@@ -93,21 +93,21 @@ InverterParams_s inverter_params = {
     .MINIMUM_HV_VOLTAGE = 400.0
 };
 
-InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, false);
-InverterInterface fr_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, true);
-InverterInterface rl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, true);
-InverterInterface rr_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, true);
+InverterInterface fl_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, inverter_params, false);
+InverterInterface fr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, inverter_params, true);
+InverterInterface rl_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, inverter_params, true);
+InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, inverter_params, true);
 
 
-DrivetrainSystem::InverterFuncts fl_inverter_functs = {
-    .set_speed = [](float desired_rpm, float torque_limit_nm) { fl_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
-    .set_idle = []() { fl_inverter_int.set_idle(); },
-    .set_inverter_control_word = [](InverterControlWord_s control_word) { fl_inverter_int.set_inverter_control_word(control_word); },
-    .get_status = []() { return fl_inverter_int.get_status(); },
-    .get_motor_mechanics = []() { return fl_inverter_int.get_motor_mechanics(); }
+DrivetrainSystem::InverterFuncts rr_inverter_functs = {
+    .set_speed = [](float desired_rpm, float torque_limit_nm) { rr_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_idle = []() { rr_inverter_int.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s control_word) { rr_inverter_int.set_inverter_control_word(control_word); },
+    .get_status = []() { return rr_inverter_int.get_status(); },
+    .get_motor_mechanics = []() { return rr_inverter_int.get_motor_mechanics(); }
 };
 
-veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fl_inverter_functs, fl_inverter_functs, fl_inverter_functs);
+veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(rr_inverter_functs, rr_inverter_functs, rr_inverter_functs, rr_inverter_functs);
 
 DrivetrainSystem drivetrain_system(inverter_functs);
 
@@ -118,15 +118,6 @@ DrivetrainCommand_s drive = {DrivetrainCommand_s{
 }};
 
 VCFInterface vcf_interface;
-
-// CANInterfaces can_receive_interfaces(
-//     vcf_interface,
-//     DrivebrainInterfaceInstance::instance(), 
-//     fl_inverter_int,
-//     fr_inverter_int,
-//     rl_inverter_int,
-//     rr_inverter_int
-// );
 
 VCRAsynchronousInterfaces vcr_async_interfaces(CANInterfacesInstance::instance());
 

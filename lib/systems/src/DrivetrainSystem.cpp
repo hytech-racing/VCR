@@ -47,7 +47,7 @@ DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVa
 }
 
 DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::CmdVariant cmd)
-{
+{   
     switch(get_state())
     {
         // TODO need to ensure that the inverter outputs CAN messages on idle even not when being sent msgs
