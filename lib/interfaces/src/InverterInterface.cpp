@@ -61,6 +61,18 @@ void InverterInterface::receive_INV_STATUS(const CAN_message_t &can_msg, unsigne
     _feedback_data.status.diagnostic_number = unpacked_msg.diagnostic_number;
     _feedback_data.status.hv_present = _feedback_data.status.dc_bus_voltage > _inverter_params.MINIMUM_HV_VOLTAGE;
 
+    // if (can_msg.len < 8) 
+    // {
+    //     for (int i=0; i<can_msg.len; i++) 
+    //     {
+    //         Serial.print(can_msg.buf[i]);
+    //         Serial.print(" ");
+    //     }
+    //     Serial.println();
+    // }
+    // Serial.print("id: ");
+    // Serial.println(can_msg.id);
+
     _feedback_data.status.new_data = true;
     _feedback_data.status.last_recv_millis = curr_millis;
 }

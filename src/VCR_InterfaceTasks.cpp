@@ -138,7 +138,7 @@ void handle_inverter_CAN_send()
     // CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
 
     // CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_PARAMS();
-    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_WORD();
-    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_SETPOINT_COMMAND();
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_WORD();
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_SETPOINT_COMMAND();
 
 }

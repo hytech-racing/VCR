@@ -47,13 +47,15 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
         interfaces.db_interface.receive_drivebrain_torque_lim_command(msg, millis);
         break;
     }
+    
     case DRIVEBRAIN_SPEED_SET_INPUT_CANID: {
         interfaces.db_interface.receive_drivebrain_speed_command(msg, millis);
         break;
     }
 
     // Front Left Inverter
-    case INV1_STATUS_CANID: {
+    case INV1_STATUS_CANID: 
+    {
         interfaces.fl_inverter_interface.receive_INV_STATUS(msg, millis); 
         break;
     }
@@ -71,10 +73,12 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
     }
     case INV1_FEEDBACK_CANID: {
         interfaces.fl_inverter_interface.receive_INV_FEEDBACK(msg, millis);
+        break;
     }
 
     // Front right inverter
-    case INV2_STATUS_CANID: {
+    case INV2_STATUS_CANID: 
+    {
         interfaces.fr_inverter_interface.receive_INV_STATUS(msg, millis); 
         break;
     }
@@ -92,6 +96,7 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
     }
     case INV2_FEEDBACK_CANID: {
         interfaces.fr_inverter_interface.receive_INV_FEEDBACK(msg, millis);
+        break;
     }
 
     // Rear left inverter
@@ -113,6 +118,7 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
     }
     case INV3_FEEDBACK_CANID: {
         interfaces.rl_inverter_interface.receive_INV_FEEDBACK(msg, millis);
+        break;
     }
 
     // Rear right inverter
@@ -132,8 +138,10 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
         interfaces.rr_inverter_interface.receive_INV_POWER(msg, millis);
         break;
     }
-    case INV4_FEEDBACK_CANID: {
+    case INV4_FEEDBACK_CANID: 
+    {
         interfaces.rr_inverter_interface.receive_INV_FEEDBACK(msg, millis);
+        break;
     }
     
     default: {

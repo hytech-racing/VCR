@@ -48,6 +48,8 @@ DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVa
 
 DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::CmdVariant cmd)
 {   
+    Serial.println(static_cast<int>(get_state()));
+
     switch(get_state())
     {
         // TODO need to ensure that the inverter outputs CAN messages on idle even not when being sent msgs
@@ -60,10 +62,12 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             
             if(connected_no_hv_present)
             {
-                _set_state(DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT);
+                // _set_state(DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT);
+                _set_state(DrivetrainState_e::CLEARING_ERRORS);
             } else if(connected_hv_present)
             {
-                _set_state(DrivetrainState_e::NOT_ENABLED_HV_PRESENT);
+                // _set_state(DrivetrainState_e::NOT_ENABLED_HV_PRESENT);
+                _set_state(DrivetrainState_e::CLEARING_ERRORS);
             }
             _set_drivetrain_disabled();
             break;
@@ -114,7 +118,6 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             bool hv_present = false;
             hv_present = _check_inverter_flags(_check_inverter_hv_present_flag);
 
-            
             if (inverter_error_present) {
                 _set_state(DrivetrainState_e::ERROR);
             } else if (!hv_present) {
