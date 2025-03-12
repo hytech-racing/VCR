@@ -193,7 +193,6 @@ bool init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& ta
 
 bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    unsigned long startTime = micros();  // Get time before calling read()
     uint16_t data = IOExpanderInstance::instance().read();
     vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 0);
     vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay = IOExpanderUtils::getBit(data, 0,1);
@@ -209,11 +208,6 @@ bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& ta
     vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 3);
     vcr_data.interface_data.ethernet_is_linked.debug_link = IOExpanderUtils::getBit(data, 1, 4);
     vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 1, 5);
-    unsigned long endTime = micros();    // Get time after read()
-    
-    Serial.print("IOExpander read() took: ");
-    Serial.print(endTime - startTime);
-    Serial.println(" us");
 
     return true;
 }
