@@ -42,8 +42,8 @@ FlexCAN_Type<CAN3> TELEM_CAN;
 FlexCAN_Type<CAN2> INVERTER_CAN;
 
 /* Ethernet message sockets */ // TODO: Move this into its own interface
-qindesign::network::EthernetUDP vcr_data_socket;
 qindesign::network::EthernetUDP vcf_data_socket;
+qindesign::network::EthernetUDP vcr_data_socket;
 
 VCRData_s vcr_data = {};
 
@@ -55,8 +55,8 @@ void setup() {
     qindesign::network::Ethernet.macAddress(mac);
     qindesign::network::Ethernet.begin(mac, EthernetIPDefsInstance::instance().vcr_ip, EthernetIPDefsInstance::instance().default_dns, EthernetIPDefsInstance::instance().default_gateway, EthernetIPDefsInstance::instance().car_subnet);
 
-    vcr_data_socket.begin(EthernetIPDefsInstance::instance().VCRData_port);
     vcf_data_socket.begin(EthernetIPDefsInstance::instance().VCFData_port);
+    vcr_data_socket.begin(EthernetIPDefsInstance::instance().VCRData_port);
 }
 
 void loop() { 
@@ -72,7 +72,6 @@ void loop() {
                 Serial.printf("%02X ", *string_ptr++);
             Serial.println("");
 
-            Serial.println(protoc_struct.value().pedals_system_data.regen_percent);
             Serial.println(vcr_data.interface_data.recvd_pedals_data.pedals_data.regen_percent);
         } else {
             Serial.printf("Did not receive VCF message!\n");
