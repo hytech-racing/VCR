@@ -77,7 +77,7 @@ HT_TASK::Task CAN_send(HT_TASK::DUMMY_FUNCTION, handle_send_all_data, 5, inv_sen
 
 HT_TASK::Task ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, 6);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, 100, ioexpander_sample_period_us);
-HT_TASK::Task inverter_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_inverter_CAN_send, 5, inv_send_period);
+HT_TASK::Task inverter_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_inverter_CAN_send, 5);
 HT_TASK::Task big_task_t(HT_TASK::DUMMY_FUNCTION, handle_big_tasks, 0);
 
 
