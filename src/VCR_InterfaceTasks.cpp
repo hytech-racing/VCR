@@ -92,6 +92,8 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     // Serial.println("yo");
     hal_printf("ADC0 reading 0 %d\n", 
         ADCSingletonInstance::instance().adc0.data.conversions[0].raw); // NOLINT
+
+    return true;
 }
 
 
@@ -101,6 +103,8 @@ bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     ADCSingletonInstance::instance().adc1.tick();
 
     hal_printf("ADC1 reading 0 %d\n", ADCSingletonInstance::instance().adc1.data.conversions[0].raw); // NOLINT
+
+    return true;
 }
 
 bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
@@ -159,7 +163,9 @@ bool handle_send_all_data(const unsigned long& sysMicros, const HT_TASK::TaskInf
 {
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &INVERTER_CAN);
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
+    return true;
 }
+
 
 bool handle_inverter_CAN_send(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -188,7 +194,6 @@ bool init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& ta
 bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     uint16_t data = IOExpanderInstance::instance().read();
-
     vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 0);
     vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay = IOExpanderUtils::getBit(data, 0,1);
     vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok = IOExpanderUtils::getBit(data, 0,2);
