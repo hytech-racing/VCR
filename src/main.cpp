@@ -14,7 +14,6 @@
 #include "ht_task.hpp"
 
 #define _TASK_MICRO_RES // NOLINT
-#include <TScheduler.hpp>
 
 /* Local includes */
 #include "TorqueControllerMux.hpp"
@@ -174,6 +173,8 @@ void setup() {
                                         vcr_data.interface_data.rear_suspot_data,
                                         car_network_definition.drivebrain_ip,
                                         car_network_definition.VCRData_port, &protobuf_send_socket);
+    
+    IOExpanderInstance::create(0);
 
     CANInterfacesInstance::create(
         vcf_interface,
@@ -191,11 +192,11 @@ void setup() {
     handle_CAN_setup(INVERTER_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(TELEM_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_telem_can_receive);
 
-    // scheduler.schedule(adc_0_sample_task);
-    // scheduler.schedule(adc_1_sample_task);
-    // scheduler.schedule(update_buzzer_controller_task);
-    // scheduler.schedule(kick_watchdog_task);
-    // scheduler.schedule(suspension_CAN_send);
+    scheduler.schedule(adc_0_sample_task);
+    scheduler.schedule(adc_1_sample_task);
+    scheduler.schedule(update_buzzer_controller_task);
+    scheduler.schedule(kick_watchdog_task);
+    scheduler.schedule(suspension_CAN_send);
     scheduler.schedule(CAN_send);
     scheduler.schedule(ethernet_send);
     scheduler.schedule(inverter_CAN_send);
@@ -204,10 +205,7 @@ void setup() {
 }
 
 void loop() { 
-    Serial.println("From loop");
-    // scheduler.run(); 
-    HT_TASK::TaskInfo info;
-    handle_send_all_data(1, info);
+    scheduler.run();
 }
 
 bool handle_big_tasks(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)

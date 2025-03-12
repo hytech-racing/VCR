@@ -14,7 +14,6 @@
 #include "IOExpander.h"
 
 
-
 /**
  * The read_adc0 task will command adc0 to sample all eight channels, convert the outputs, and
  * store them in structs defined in shared_firmware_types. This function relies on adc_0 being
