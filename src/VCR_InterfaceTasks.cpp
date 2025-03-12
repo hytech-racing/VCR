@@ -195,6 +195,20 @@ bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& ta
 {
     unsigned long startTime = micros();  // Get time before calling read()
     uint16_t data = IOExpanderInstance::instance().read();
+    vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 0);
+    vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay = IOExpanderUtils::getBit(data, 0,1);
+    vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok = IOExpanderUtils::getBit(data, 0,2);
+    vcr_data.interface_data.shutdown_sensing_data.l_bms_relay = IOExpanderUtils::getBit(data, 0,3);
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0,4);
+    vcr_data.interface_data.shutdown_sensing_data.m_imd_relay = IOExpanderUtils::getBit(data, 0,5);
+    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 0,6);
+
+    vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 0);
+    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 1, 1);
+    vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 2);
+    vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 3);
+    vcr_data.interface_data.ethernet_is_linked.debug_link = IOExpanderUtils::getBit(data, 1, 4);
+    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 1, 5);
     unsigned long endTime = micros();    // Get time after read()
     
     Serial.print("IOExpander read() took: ");
