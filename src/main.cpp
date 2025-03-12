@@ -73,11 +73,11 @@ HT_TASK::Task update_buzzer_controller_task(HT_TASK::DUMMY_FUNCTION, run_update_
 HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, 0, kick_watchdog_period_us); 
 HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, 2, ams_update_period_us);
 HT_TASK::Task suspension_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_enqueue_suspension_CAN_data, 4, suspension_can_period_us);
-HT_TASK::Task CAN_send(HT_TASK::DUMMY_FUNCTION, handle_send_all_data, 5, inv_send_period);
+HT_TASK::Task CAN_send(HT_TASK::DUMMY_FUNCTION, handle_send_all_data, 5);
 
 HT_TASK::Task ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, 6);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, 100, ioexpander_sample_period_us);
-HT_TASK::Task inverter_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_inverter_CAN_send, 5);
+HT_TASK::Task inverter_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_inverter_CAN_send, 5, inv_send_period);
 HT_TASK::Task big_task_t(HT_TASK::DUMMY_FUNCTION, handle_big_tasks, 0);
 
 
