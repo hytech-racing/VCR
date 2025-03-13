@@ -12,6 +12,11 @@
 #include "shared_types.h"
 #include "SystemTimeInterface.h"
 
+#include <iostream>
+#include <chrono>
+#include "ht_sched.hpp"
+#include "ht_task.hpp"
+
 
 /**
  * Generally, our main "loop" (not actually a loop) will run as fast as possible and will go through
@@ -68,5 +73,48 @@ VehicleState_e evaluate_state_machine(const VCRSystemData_s &system_data,
 void big_task(etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call,
               VCRAsynchronousInterfaces &interface_ref_container,
               VehicleStateMachine &state_machine, const VCRInterfaceData_s &cur_vcr_int_data);
+
+
+HT_TASK::Task schedMon = HT_TASK::Task(
+    std::bind(&HT_SCHED::Scheduler::initSchedMon, std::ref(scheduler), std::placeholders::_1, std::placeholders::_2), 
+    std::bind(&HT_SCHED::Scheduler::schedMon, std::ref(scheduler), std::placeholders::_1, std::placeholders::_2), 
+    100000UL,
+    0
+);
+
+auto start_time = std::chrono::high_resolution_clock::now();
+
+unsigned long stdMicros()
+{
+    auto now = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - start_time).count();
+    return static_cast<unsigned long>(elapsed);
+}
+
+bool task1F(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    std::cout << "task1 exec " << taskInfo.executions << "\n";
+    return true;
+}
+
+HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
+
+HT_TASK::Task task1 = HT_TASK::Task(HT_TASK::DUMMY_FUNCTION, task1F, 2, 20000UL); // 20000us is 50hz
+
+int main(void)
+{
+    scheduler.setTimingFunction(stdMicros);
+    
+    // all tasks
+    scheduler.schedule(task1);
+    scheduler.schedule(schedMon);
+
+    while (std::chrono::high_resolution_clock::now() - start_time < std::chrono::seconds(1))
+    {
+        scheduler.run();
+    }
+
+    return 0;
+}
 
 #endif // __VCR_SYSTEMTASKS_H__
