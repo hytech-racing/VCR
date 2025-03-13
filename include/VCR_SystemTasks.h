@@ -12,6 +12,9 @@
 #include "shared_types.h"
 #include "SystemTimeInterface.h"
 
+#include "ht_sched.hpp"
+#include "ht_task.hpp"
+
 
 /**
  * Generally, our main "loop" (not actually a loop) will run as fast as possible and will go through
@@ -68,5 +71,13 @@ VehicleState_e evaluate_state_machine(const VCRSystemData_s &system_data,
 void big_task(etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call,
               VCRAsynchronousInterfaces &interface_ref_container,
               VehicleStateMachine &state_machine, const VCRInterfaceData_s &cur_vcr_int_data);
+
+
+HT_SCHED::Scheduler scheduler;
+
+void add_task(int taskPriority, int taskLoopRate) {
+    HT_TASK::Task schedMon(HT_SCHED::Scheduler::initSchedMon, HT_SCHED::Scheduler::schedMon, taskPriority, taskLoopRate);
+    scheduler.schedule(schedMon);
+}
 
 #endif // __VCR_SYSTEMTASKS_H__
