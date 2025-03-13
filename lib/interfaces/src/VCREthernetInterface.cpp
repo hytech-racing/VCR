@@ -7,6 +7,17 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
 {
 	hytech_msgs_VCRData_s out;
 
+    //has_data
+    out.has_ams_data = true;
+    out.has_current_sensor_data = true;
+    out.has_drivetrain_data = true;
+    out.has_ethernet_is_linked = true;
+    out.has_firmware_version_info = true;
+    out.has_inverter_data = true;
+    out.has_rear_loadcell_data = true;
+    out.has_rear_suspot_data = true;
+    out.has_shutdown_sensing_data = true;
+
     //RearLoadCellData_s
     out.rear_loadcell_data.RL_loadcell_analog = shared_state.interface_data.rear_loadcell_data.RL_loadcell_analog;
     out.rear_loadcell_data.RR_loadcell_analog = shared_state.interface_data.rear_loadcell_data.RR_loadcell_analog;
