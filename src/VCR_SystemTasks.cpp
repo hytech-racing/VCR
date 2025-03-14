@@ -41,23 +41,3 @@ VCRSystemData_s evaluate_async_systems(const VCRInterfaceData_s &interface_data)
     */ 
     return sys_data;
 }
-
-VehicleState_e evaluate_state_machine(VehicleStateMachine& state_machine)
-{
-    // TODO make tick state machine function return the state
-    return state_machine.tick_state_machine(sys_time::hal_millis());
-}
-
-void big_task(etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call,
-              VCRAsynchronousInterfaces &interface_ref_container,
-              VehicleStateMachine &state_machine, const VCRInterfaceData_s &cur_vcr_int_data) {
-    auto interface_data = sample_async_data(recv_call, interface_ref_container, cur_vcr_int_data);
-
-    auto sys_data = evaluate_async_systems(interface_data);
-
-    auto state = evaluate_state_machine(state_machine);
-
-    vcr_data.system_data = sys_data;
-    vcr_data.interface_data = interface_data;
-    // TODO the car state needs to be part of the vcr data (this is not in interface or system data)
-}

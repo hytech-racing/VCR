@@ -3,17 +3,22 @@
 #include <Arduino.h>
 #endif
 
- // NOLINT for TaskScheduler
-
 /* From shared_firmware_types libdep */
 #include "SharedFirmwareTypes.h"
 
 /* Arduino specific upstream Libraries */
 #include "QNEthernet.h"
+#include "FlexCAN_T4.h"
+
+/* From Embedded Template Library libdep */
+#include "etl/singleton.h"
+
+/* From HT_SCHED libdep*/
 #include "ht_sched.hpp"
 #include "ht_task.hpp"
 
-#define _TASK_MICRO_RES // NOLINT
+/* From shared-firmware-interfaces libdep */
+#include "EthernetAddressDefs.h"
 
 /* Local includes */
 #include "TorqueControllerMux.hpp"
@@ -22,71 +27,28 @@
 #include "VCR_Constants.h"
 #include "VCR_Globals.h"
 #include "VCR_InterfaceTasks.h"
-
-#include "FlexCAN_T4.h"
 #include "VCRCANInterfaceImpl.h"
-
-#include "etl/singleton.h"
-
 #include "DrivebrainInterface.h"
 #include "InverterInterface.h"
 #include "DrivetrainSystem.h"
 #include "VCR_SystemTasks.h"
-
-
-
-// has to be included here as the define is only defined for source files in the implementation
-// not in the library folder (makes sense)
-#include "device_fw_version.h"  // from pio-git-hash
-
-
-#include "EthernetAddressDefs.h"
-
 #include "VehicleStateMachine.h"
 
+/* From pio-git-hash */
+#include "device_fw_version.h"
 
-
+/* CAN setup */
 FlexCAN_Type<CAN3> TELEM_CAN;
 FlexCAN_Type<CAN2> INVERTER_CAN;
-/* Scheduler setup */
-HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
-bool handle_big_tasks(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+/* Ethernet message sockets */
+qindesign::network::EthernetUDP vcr_data_send_socket;
+qindesign::network::EthernetUDP vcf_data_recv_socket;
+qindesign::network::EthernetUDP acu_core_data_recv_socket;
+qindesign::network::EthernetUDP acu_all_data_recv_socket;
+qindesign::network::EthernetUDP db_data_recv_socket;
 
-
-// from https://github.com/arkhipenko/TaskScheduler/wiki/API-Task#task note that we will use
-
-constexpr unsigned long adc0_sample_period_us = 250;                 // 250 us = 4 kHz
-constexpr unsigned long adc1_sample_period_us = 10000;               // 10000 us = 100 Hz
-constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 us = 10 Hz
-constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 us = 100 Hz
-constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
-constexpr unsigned long ethernet_update_period = 10000;              // 10 000 us = 100 Hz
-constexpr unsigned long suspension_can_period_us = 4000;             // 4000 us = 250 Hz
-constexpr unsigned long inv_send_period = 4000;             // 4 000 us = 250 Hz
-constexpr unsigned long ioexpander_sample_period_us = 50000;
-
-// task declarations
-HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, 5, adc0_sample_period_us);
-HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, 50, adc1_sample_period_us);
-HT_TASK::Task update_buzzer_controller_task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 3, update_buzzer_controller_period_us);
-HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, 0, kick_watchdog_period_us); 
-HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, 2, ams_update_period_us);
-HT_TASK::Task suspension_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_enqueue_suspension_CAN_data, 4, suspension_can_period_us);
-HT_TASK::Task CAN_send(HT_TASK::DUMMY_FUNCTION, handle_send_all_data, 5);
-
-HT_TASK::Task ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, 6);
-HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, 100, ioexpander_sample_period_us);
-HT_TASK::Task inverter_CAN_send(HT_TASK::DUMMY_FUNCTION, handle_inverter_CAN_send, 5, inv_send_period);
-HT_TASK::Task big_task_t(HT_TASK::DUMMY_FUNCTION, handle_big_tasks, 0);
-
-
-/* Ethernet message sockets */ // TODO: Move this into its own interface
-qindesign::network::EthernetUDP protobuf_send_socket;
-qindesign::network::EthernetUDP protobuf_recv_socket;
-
-EthernetIPDefs_s car_network_definition;
-
+/* Drivetrain Initialization */
 InverterParams_s inverter_params = {
     .MINIMUM_HV_VOLTAGE = 400.0
 };
@@ -132,16 +94,9 @@ DrivetrainSystem::InverterFuncts rr_inverter_functs = {
 
 veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr_inverter_functs, rl_inverter_functs, rr_inverter_functs);
 
-// Drivetrain system stuff
 DrivetrainSystem drivetrain_system(inverter_functs);
 
-VCFInterface vcf_interface;
-
-VCRAsynchronousInterfaces vcr_async_interfaces(CANInterfacesInstance::instance());
-
 etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
-
-VCRInterfaceData_s int_data; // TODO what were we planning on doing with this
 
 VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
     etl::delegate<bool()>::create([]() { return true; }), 
@@ -156,34 +111,85 @@ VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
     etl::delegate<void()>::create([]() { })
 );
 
+/* Scheduler setup */
+HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
+
+constexpr unsigned long adc0_sample_period_us = 250;                 // 250 us = 4 kHz
+constexpr unsigned long adc1_sample_period_us = 10000;               // 10 000 us = 100 Hz
+constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 us = 10 Hz
+constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 us = 100 Hz
+constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
+constexpr unsigned long ethernet_update_period = 10000;              // 10 000 us = 100 Hz
+constexpr unsigned long suspension_can_period_us = 4000;             // 4 000 us = 250 Hz
+constexpr unsigned long inv_send_period = 4000;                      // 4 000 us = 250 Hz
+constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
+
+bool run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    auto new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data);
+    auto sys_data = evaluate_async_systems(new_interface_data);
+    auto state = vehicle_statemachine.tick_state_machine(sys_time::hal_millis());
+
+    vcr_data.system_data = sys_data;
+    vcr_data.interface_data = new_interface_data;
+
+    return true;
+}
+
+/* Task Declarations */
+HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, 5, adc0_sample_period_us);
+HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, 50, adc1_sample_period_us);
+HT_TASK::Task update_buzzer_controller_task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 3, update_buzzer_controller_period_us);
+HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, 0, kick_watchdog_period_us); 
+HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, 2, ams_update_period_us);
+HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, 4, suspension_can_period_us);
+HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, 5, inv_send_period);
+HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, 3); // Sends all messages from the CAN queue
+HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, 6);
+HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, 100, ioexpander_sample_period_us);
+HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, 0);
+
 void setup() {
 
+    // Save firmware version
     vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
     vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
     vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
 
-    // timing function
-    scheduler.setTimingFunction(micros);
-
-    qindesign::network::Ethernet.begin(
-        car_network_definition.vcr_ip, car_network_definition.default_dns,
-        car_network_definition.default_gateway, car_network_definition.car_subnet);
-    protobuf_send_socket.begin(car_network_definition.VCRData_port);
-    DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
-                                        vcr_data.interface_data.rear_suspot_data,
-                                        car_network_definition.drivebrain_ip,
-                                        car_network_definition.VCRData_port, &protobuf_send_socket);
-    
+    // Create all singletons
     IOExpanderInstance::create(0);
-
+    VCFInterfaceInstance::create();
     CANInterfacesInstance::create(
-        vcf_interface,
+        VCFInterfaceInstance::instance(),
         DrivebrainInterfaceInstance::instance(), 
         fl_inverter_int,
         fr_inverter_int,
         rl_inverter_int,
         rr_inverter_int
     );
+    VCRAsynchronousInterfacesInstance::create(CANInterfacesInstance::instance());
+
+    // Scheduler timing function
+    scheduler.setTimingFunction(micros);
+
+    // Initializes all ethernet
+    EthernetIPDefsInstance::create();
+    uint8_t mac[6];
+    qindesign::network::Ethernet.macAddress(mac);
+    qindesign::network::Ethernet.begin(
+        EthernetIPDefsInstance::instance().vcr_ip, EthernetIPDefsInstance::instance().default_dns,
+        EthernetIPDefsInstance::instance().default_gateway, EthernetIPDefsInstance::instance().car_subnet);
+    vcr_data_send_socket.begin(EthernetIPDefsInstance::instance().VCRData_port);
+    vcf_data_recv_socket.begin(EthernetIPDefsInstance::instance().VCFData_port);
+    acu_core_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUCoreData_port);
+    acu_all_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUAllData_port);
+    db_data_recv_socket.begin(EthernetIPDefsInstance::instance().DBData_port);
+
+    DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
+                                        vcr_data.interface_data.rear_suspot_data,
+                                        EthernetIPDefsInstance::instance().drivebrain_ip,
+                                        EthernetIPDefsInstance::instance().VCRData_port,
+                                        &vcr_data_send_socket);
         
     SPI.begin(); // TODO this should be elsewhere maybe
     init_bundle();
@@ -196,20 +202,14 @@ void setup() {
     scheduler.schedule(adc_1_sample_task);
     scheduler.schedule(update_buzzer_controller_task);
     scheduler.schedule(kick_watchdog_task);
-    scheduler.schedule(suspension_CAN_send);
-    scheduler.schedule(CAN_send);
-    scheduler.schedule(ethernet_send);
-    scheduler.schedule(inverter_CAN_send);
-    scheduler.schedule(big_task_t);
-    // scheduler.schedule(IOExpander_read_task);
+    scheduler.schedule(enqueue_suspension_CAN_task);
+    scheduler.schedule(send_CAN_task);
+    scheduler.schedule(vcr_data_ethernet_send);
+    scheduler.schedule(enqueue_inverter_CAN_task);
+    scheduler.schedule(main_task);
+    // scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
 }
 
 void loop() { 
     scheduler.run();
-}
-
-bool handle_big_tasks(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    big_task(main_can_recv, vcr_async_interfaces, vehicle_statemachine, int_data);
-    return true;
 }

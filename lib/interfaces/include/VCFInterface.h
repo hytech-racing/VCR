@@ -5,13 +5,7 @@
 
 #include "shared_types.h"
 #include "SharedFirmwareTypes.h"
-// this struct just contains the data we need from pedals 
-// within VCR. the implaus check is done in the state machine.
-
-struct LoadCellData_s : TimestampedData_s
-{
-    
-};
+#include "etl/singleton.h"
 
 struct VCFCANInterfaceData_s {
     StampedPedalsSystemData_s stamped_pedals;
@@ -30,4 +24,7 @@ private:
     VCFCANInterfaceData_s _curr_data;
     
 };
+
+using VCFInterfaceInstance = etl::singleton<VCFInterface>;
+
 #endif // __VCFINTERFACE_H__

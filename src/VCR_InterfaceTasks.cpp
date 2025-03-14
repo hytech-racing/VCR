@@ -147,7 +147,7 @@ bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& 
 // CAN send tasks
 
 // adds rear suspension and vcr status CAN messages to the sent on next mega loop run 
-bool handle_enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+bool enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
     return true;
@@ -159,7 +159,7 @@ bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK
     return true;
 }
 
-bool handle_send_all_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+bool handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &INVERTER_CAN);
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
@@ -167,7 +167,7 @@ bool handle_send_all_data(const unsigned long& sysMicros, const HT_TASK::TaskInf
 }
 
 
-bool handle_inverter_CAN_send(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+bool enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();

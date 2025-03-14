@@ -21,7 +21,7 @@
  * asynchronously arrive and be added to a buffer. This ensures that we are processing this data as
  * quickly as possible, instead of simply at the next "tick" at 50/100/1000Hz.
  * 
- * Second, it will evaluate all systems based on this udpated data.
+ * Second, it will evaluate all systems based on this updated data.
  * 
  * Third, it will tick the state machine using this updated data.
  * 
@@ -38,6 +38,8 @@ struct VCRAsynchronousInterfaces {
 
     CANInterfaces &can_interfaces;
 };
+
+using VCRAsynchronousInterfacesInstance = etl::singleton<VCRAsynchronousInterfaces>;
 
 /**
  * Reads all asynchronously-arriving data (CAN and Ethernet) from their respective buffers and updates their
@@ -63,10 +65,5 @@ VCRSystemData_s evaluate_async_systems(const VCRInterfaceData_s &interface_data)
 VehicleState_e evaluate_state_machine(const VCRSystemData_s &system_data,
                                   const VCRInterfaceData_s &interface_data,
                                   VehicleStateMachine &state_machine);
-
-
-void big_task(etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call,
-              VCRAsynchronousInterfaces &interface_ref_container,
-              VehicleStateMachine &state_machine, const VCRInterfaceData_s &cur_vcr_int_data);
 
 #endif // __VCR_SYSTEMTASKS_H__

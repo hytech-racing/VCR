@@ -40,28 +40,33 @@ bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
  */
 bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
-
-
 /**
  * This task will fetch the watchdog state from WatchdogSystem and write it to the watchdog pin.
  */
 bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
+/**
+ * Uses the i2c IOExpander to sense the shutdown line.
+ */
 bool init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
 /**
- * handles sending of suspension CAN message data (load cell and shock pot data)
+ * Handles sending of suspension CAN message data (load cell and shock pot data)
  */
-bool handle_enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+bool enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+
+/**
+ * Enqueues all inverter CAN data. This will add all inverter data to the CAN queue, and then
+ * the send_all_data task will empty the queue.
+ */
+bool enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
 /**
  * handles sending of all data on all interfaces
  */
-bool handle_send_all_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-
-
+bool handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
 /**
  * This task will tick the AMS system and will update the software shutdown if necessary.
@@ -72,5 +77,4 @@ bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
 
 // task for sending all ethernet data
 bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-bool handle_inverter_CAN_send(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 #endif /* VCR_INTERFACETASKS */
