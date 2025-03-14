@@ -11,6 +11,7 @@
 #include "etl/delegate.h"
 #include "shared_types.h"
 #include "SystemTimeInterface.h"
+#include "QNEthernet.h"
 
 
 /**
@@ -42,13 +43,25 @@ struct VCRAsynchronousInterfaces {
 using VCRAsynchronousInterfacesInstance = etl::singleton<VCRAsynchronousInterfaces>;
 
 /**
+ * Wrapper to contain all Protobuf send/recv sockets.
+ */
+struct ProtobufSockets_s {
+    qindesign::network::EthernetUDP &vcr_data_send_socket;
+    qindesign::network::EthernetUDP &vcf_data_recv_socket;
+    qindesign::network::EthernetUDP &acu_core_data_recv_socket;
+    qindesign::network::EthernetUDP &acu_all_data_recv_socket;
+};
+
+/**
  * Reads all asynchronously-arriving data (CAN and Ethernet) from their respective buffers and updates their
  * timestamped values in VCRInterfaceData_s (returns the new struct). Takes in a bundle of all the asynchronous
  * interfaces to be ticked. 
  */
 VCRInterfaceData_s sample_async_data(
     etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call,
-    VCRAsynchronousInterfaces &interface_ref_container, const VCRInterfaceData_s &cur_vcr_int_data);
+    VCRAsynchronousInterfaces &interface_ref_container, const VCRInterfaceData_s &cur_vcr_int_data,
+    ProtobufSockets_s sockets
+);
 
 /** 
  * Ticks all hardware-abstracted systems based on the current VCRInterfaceData passed in. Takes in a bundle

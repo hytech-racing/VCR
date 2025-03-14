@@ -46,7 +46,6 @@ qindesign::network::EthernetUDP vcr_data_send_socket;
 qindesign::network::EthernetUDP vcf_data_recv_socket;
 qindesign::network::EthernetUDP acu_core_data_recv_socket;
 qindesign::network::EthernetUDP acu_all_data_recv_socket;
-qindesign::network::EthernetUDP db_data_recv_socket;
 
 /* Drivetrain Initialization */
 
@@ -113,7 +112,12 @@ HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
 bool run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    auto new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data);
+    auto new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data, {
+        .vcr_data_send_socket = vcr_data_send_socket,
+        .vcf_data_recv_socket = vcf_data_recv_socket,
+        .acu_core_data_recv_socket = acu_core_data_recv_socket,
+        .acu_all_data_recv_socket = acu_all_data_recv_socket
+    });
     auto sys_data = evaluate_async_systems(new_interface_data);
     auto state = vehicle_statemachine.tick_state_machine(sys_time::hal_millis());
 
@@ -174,7 +178,6 @@ void setup() {
     vcf_data_recv_socket.begin(EthernetIPDefsInstance::instance().VCFData_port);
     acu_core_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUCoreData_port);
     acu_all_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUAllData_port);
-    db_data_recv_socket.begin(EthernetIPDefsInstance::instance().DBData_port);
 
     // Initialize CAN
     const uint32_t CAN_baudrate = 500000;
