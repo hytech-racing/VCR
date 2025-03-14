@@ -51,14 +51,14 @@ qindesign::network::EthernetUDP db_data_recv_socket;
 /* Drivetrain Initialization */
 
 InverterParams_s inverter_params = {
-    .MINIMUM_HV_VOLTAGE = 400.0
+    .MINIMUM_HV_VOLTAGE = MINIMUM_HV_VOLTAGE;
 };
 
 // Inverter Interfaces
-InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params);
-InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, inverter_params);
-InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, inverter_params);
-InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, inverter_params);
+InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
+InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
+InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
+InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
 
 // Inverter Functs
 DrivetrainSystem::InverterFuncts fl_inverter_functs = {
@@ -116,14 +116,25 @@ VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
 constexpr unsigned long adc0_sample_period_us = 250;                 // 250 us = 4 kHz
+constexpr unsigned long adc0_priority = 7;
 constexpr unsigned long adc1_sample_period_us = 10000;               // 10 000 us = 100 Hz
+constexpr unsigned long adc1_priority = 50;
 constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 us = 10 Hz
+constexpr unsigned long buzzer_priority = 3;
 constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 us = 100 Hz
+constexpr unsigned long watchdog_priority = 1;
 constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
-constexpr unsigned long ethernet_update_period = 10000;              // 10 000 us = 100 Hz
+constexpr unsigned long ams_priority = 2;
 constexpr unsigned long suspension_can_period_us = 4000;             // 4 000 us = 250 Hz
+constexpr unsigned long suspension_priority = 4;
+constexpr unsigned long ethernet_update_period = 10000;              // 10 000 us = 100 Hz
+constexpr unsigned long ethernet_send_priority = 6;
 constexpr unsigned long inv_send_period = 4000;                      // 4 000 us = 250 Hz
+constexpr unsigned long inverter_send_priority = 5;
 constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
+constexpr unsigned long ioexpander_priority = 100;
+constexpr unsigned long send_can_priority = 10;
+constexpr unsigned long main_task_priority = 0;
 
 bool run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -138,21 +149,19 @@ bool run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& task
 }
 
 /* Task Declarations */
-HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, 5, adc0_sample_period_us);
-HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, 50, adc1_sample_period_us);
-HT_TASK::Task update_buzzer_controller_task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, 3, update_buzzer_controller_period_us);
-HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, 0, kick_watchdog_period_us); 
-HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, 2, ams_update_period_us);
-HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, 4, suspension_can_period_us);
-HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, 5, inv_send_period);
-HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, 3); // Sends all messages from the CAN queue
-HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, 6);
-HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, 100, ioexpander_sample_period_us);
-HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, 0);
+HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
+HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
+HT_TASK::Task update_buzzer_controller_task(HT_TASK::DUMMY_FUNCTION, run_update_buzzer_controller_task, buzzer_priority, update_buzzer_controller_period_us);
+HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, watchdog_priority, kick_watchdog_period_us); 
+HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, ams_priority ams_update_period_us);
+HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, suspension_priority, suspension_can_period_us);
+HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, inverter_send_priority, inv_send_period);
+HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, send_can_priority); // Sends all messages from the CAN queue
+HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority);
+HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
+HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, main_task_priority);
 
 void setup() {
-    int i = 10;
-    int j = i / 1000;
     // Save firmware version
     vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
     vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
@@ -181,8 +190,8 @@ void setup() {
 
     // Initializes all ethernet
     EthernetIPDefsInstance::create();
-    uint8_t mac[6];
-    qindesign::network::Ethernet.macAddress(mac);
+    uint8_t mac[6]; // NOLINT (mac addresses are always 6 bytes)
+    qindesign::network::Ethernet.macAddress(&mac);
     qindesign::network::Ethernet.begin(
         EthernetIPDefsInstance::instance().vcr_ip, EthernetIPDefsInstance::instance().default_dns,
         EthernetIPDefsInstance::instance().default_gateway, EthernetIPDefsInstance::instance().car_subnet);

@@ -55,18 +55,18 @@ bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& ta
 /**
  * Handles sending of suspension CAN message data (load cell and shock pot data)
  */
-bool enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+bool enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 
 /**
  * Enqueues all inverter CAN data. This will add all inverter data to the CAN queue, and then
  * the send_all_data task will empty the queue.
  */
-bool enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+bool enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 
 /**
  * handles sending of all data on all interfaces
  */
-bool handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+bool handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 
 /**
  * This task will tick the AMS system and will update the software shutdown if necessary.
@@ -76,5 +76,5 @@ bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
 
 
 // task for sending all ethernet data
-bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized VCR)
 #endif /* VCR_INTERFACETASKS */

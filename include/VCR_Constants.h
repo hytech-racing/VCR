@@ -72,10 +72,12 @@ const float THERMISTOR_6_OFFSET = 1;
 const float THERMISTOR_7_SCALE = 1;
 const float THERMISTOR_7_OFFSET = 1; 
 
-
+/* Watchdog constants */
 constexpr int WATCHDOG_PIN = 36;
 constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
-
 constexpr unsigned long WATCHDOG_KICK_INTERVAL_MS = 10UL;
+
+/* Inverter constants */
+constexpr int INVERTER_MINIMUM_HV_VOLTAGE = 400;
 
 #endif /* VCR_CONSTANTS */

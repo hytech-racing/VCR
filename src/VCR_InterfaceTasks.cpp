@@ -26,7 +26,7 @@
 bool init_adc_bundle()
 {
 
-    float adc0_scales[channels_within_mcp_adc], adc0_offsets[channels_within_mcp_adc], adc1_scales[channels_within_mcp_adc], adc1_offsets[channels_within_mcp_adc]; 
+    float adc0_scales[channels_within_mcp_adc], adc0_offsets[channels_within_mcp_adc], adc1_scales[channels_within_mcp_adc], adc1_offsets[channels_within_mcp_adc];  // NOLINT (C-style arrays)
     adc0_scales[GLV_SENSE_CHANNEL] = GLV_SENSE_SCALE;
     adc0_offsets[GLV_SENSE_CHANNEL] = GLV_SENSE_OFFSET;
     adc0_scales[CURRENT_SENSE_CHANNEL] = CURRENT_SENSE_SCALE;
@@ -90,10 +90,6 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = 
         ADCSingletonInstance::instance().adc0.data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
 
-    // Serial.println("yo");
-    hal_printf("ADC0 reading 0 %d\n", 
-        ADCSingletonInstance::instance().adc0.data.conversions[0].raw); // NOLINT
-
     return true;
 }
 
@@ -102,8 +98,6 @@ bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
 {
 
     ADCSingletonInstance::instance().adc1.tick();
-
-    hal_printf("ADC1 reading 0 %d\n", ADCSingletonInstance::instance().adc1.data.conversions[0].raw); // NOLINT
 
     return true;
 }
@@ -194,14 +188,16 @@ bool init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& ta
 
 bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    uint16_t data = IOExpanderInstance::instance().read();
+    // NOLINTBEGIN
+    uint16_t data = 0;
+    data = IOExpanderInstance::instance().read();
     vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 0);
-    vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay = IOExpanderUtils::getBit(data, 0,1);
-    vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok = IOExpanderUtils::getBit(data, 0,2);
-    vcr_data.interface_data.shutdown_sensing_data.l_bms_relay = IOExpanderUtils::getBit(data, 0,3);
-    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0,4);
-    vcr_data.interface_data.shutdown_sensing_data.m_imd_relay = IOExpanderUtils::getBit(data, 0,5);
-    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 0,6);
+    vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay = IOExpanderUtils::getBit(data, 0, 1);
+    vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok = IOExpanderUtils::getBit(data, 0, 2);
+    vcr_data.interface_data.shutdown_sensing_data.l_bms_relay = IOExpanderUtils::getBit(data, 0, 3);
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0, 4);
+    vcr_data.interface_data.shutdown_sensing_data.m_imd_relay = IOExpanderUtils::getBit(data, 0, 5);
+    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 0, 6);
 
     vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 0);
     vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 1, 1);
@@ -211,4 +207,5 @@ bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& ta
     vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 1, 5);
 
     return true;
+    // NOLINTEND
 }
