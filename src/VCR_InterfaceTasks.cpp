@@ -23,7 +23,8 @@
 #include "IOExpanderUtils.h"
 
 
-bool init_bundle(){
+bool init_adc_bundle()
+{
 
     float adc0_scales[channels_within_mcp_adc], adc0_offsets[channels_within_mcp_adc], adc1_scales[channels_within_mcp_adc], adc1_offsets[channels_within_mcp_adc]; 
     adc0_scales[GLV_SENSE_CHANNEL] = GLV_SENSE_SCALE;

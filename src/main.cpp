@@ -159,6 +159,11 @@ void setup() {
     // Create all singletons
     IOExpanderInstance::create(0);
     VCFInterfaceInstance::create();
+    DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
+        vcr_data.interface_data.rear_suspot_data,
+        EthernetIPDefsInstance::instance().drivebrain_ip,
+        EthernetIPDefsInstance::instance().VCRData_port,
+        &vcr_data_send_socket);
     CANInterfacesInstance::create(
         VCFInterfaceInstance::instance(),
         DrivebrainInterfaceInstance::instance(), 
@@ -185,16 +190,8 @@ void setup() {
     acu_all_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUAllData_port);
     db_data_recv_socket.begin(EthernetIPDefsInstance::instance().DBData_port);
 
-    DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
-                                        vcr_data.interface_data.rear_suspot_data,
-                                        EthernetIPDefsInstance::instance().drivebrain_ip,
-                                        EthernetIPDefsInstance::instance().VCRData_port,
-                                        &vcr_data_send_socket);
-        
-    SPI.begin(); // TODO this should be elsewhere maybe
-    init_bundle();
+    // Initialize CAN
     const uint32_t CAN_baudrate = 500000;
-    // from CANInterfaceon_inverter_can_receive
     handle_CAN_setup(INVERTER_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(TELEM_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_telem_can_receive);
 
@@ -208,6 +205,9 @@ void setup() {
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(main_task);
     // scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
+
+    SPI.begin();
+    init_adc_bundle();
 }
 
 void loop() { 
