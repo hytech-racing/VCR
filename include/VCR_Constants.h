@@ -2,7 +2,6 @@
 #define VCR_CONSTANTS
 
 
-
 /* -------------------------------------------------- */
 /*                 Teensy 4.1 GPIO pins               */
 /* -------------------------------------------------- */
@@ -77,8 +76,6 @@ const float THERMISTOR_7_OFFSET = 1;
 constexpr int WATCHDOG_PIN = 36;
 constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
 
-namespace default_system_params
-{
-    constexpr unsigned long KICK_INTERVAL_MS = 10UL;
-}
+constexpr unsigned long WATCHDOG_KICK_INTERVAL_MS = 10UL;
+
 #endif /* VCR_CONSTANTS */

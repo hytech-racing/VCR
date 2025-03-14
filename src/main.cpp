@@ -49,6 +49,7 @@ qindesign::network::EthernetUDP acu_all_data_recv_socket;
 qindesign::network::EthernetUDP db_data_recv_socket;
 
 /* Drivetrain Initialization */
+
 InverterParams_s inverter_params = {
     .MINIMUM_HV_VOLTAGE = 400.0
 };
@@ -150,7 +151,8 @@ HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, 100, ioexpa
 HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, 0);
 
 void setup() {
-
+    int i = 10;
+    int j = i / 1000;
     // Save firmware version
     vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
     vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
