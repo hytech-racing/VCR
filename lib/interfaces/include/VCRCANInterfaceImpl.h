@@ -58,28 +58,30 @@ struct CANInterfaces {
 };
 
 using CANInterfacesInstance = etl::singleton<CANInterfaces>;
+
 extern FlexCAN_Type<CAN2> INVERTER_CAN; // gets defined in main as of right now
 extern FlexCAN_Type<CAN3> TELEM_CAN; // gets defined in main as of right now
 
 namespace VCRCANInterfaceImpl {
 
-extern CANRXBufferType CAN1_rxBuffer;
-extern CANRXBufferType inverter_can_rx_buffer;
-extern CANRXBufferType telem_can_rx_buffer;
+    extern CANRXBufferType CAN1_rxBuffer;
+    extern CANRXBufferType inverter_can_rx_buffer;
+    extern CANRXBufferType telem_can_rx_buffer;
 
-/* TX buffer for CAN1 */
-extern CANTXBufferType CAN1_txBuffer;
-/* TX buffer for CAN2 */
-extern CANTXBufferType inverter_can_tx_buffer;
-/* TX buffer for CAN3 */
-extern CANTXBufferType telem_can_tx_buffer;
+    /* TX buffer for CAN1 */
+    extern CANTXBufferType CAN1_txBuffer;
+    /* TX buffer for CAN2 */
+    extern CANTXBufferType inverter_can_tx_buffer;
+    /* TX buffer for CAN3 */
+    extern CANTXBufferType telem_can_tx_buffer;
 
-void on_can1_receive(const CAN_message_t &msg);
-void on_inverter_can_receive(const CAN_message_t &msg);
-void on_telem_can_receive(const CAN_message_t &msg);
-void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis);
+    void on_can1_receive(const CAN_message_t &msg);
+    void on_inverter_can_receive(const CAN_message_t &msg);
+    void on_telem_can_receive(const CAN_message_t &msg);
+    void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis);
 
-void send_all_CAN_msgs(CANTXBufferType &buffer, FlexCAN_T4_Base *can_interface);
+    void send_all_CAN_msgs(CANTXBufferType &buffer, FlexCAN_T4_Base *can_interface);
+    
 }; // namespace VCRCANInterfaceImpl
 
 #endif // __VCRCANINTERFACEIMPL_H__
