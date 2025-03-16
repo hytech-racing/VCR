@@ -23,8 +23,9 @@ void VCFInterface::receive_pedals_message(const CAN_message_t &msg, unsigned lon
         HYTECH_brake_pedal_ro_fromS(static_cast<float>(pedals_msg.brake_pedal_ro));
     _curr_data.stamped_pedals.last_recv_millis = curr_millis;
 
-    // TODO need to ensure that the pedals data timestamp is within a tollerance
-    // within the state machine
+    // Using millis() function, so loop overrun not a concern
+    _curr_data.stamped_pedals.heartbeat_ok = (millis() - _curr_data.stamped_pedals.last_heartbeat_time < _max_heartbeat_interval_ms);
+    _curr_data.stamped_pedals.last_heartbeat_time = millis();
 }
 
 VCFCANInterfaceData_s VCFInterface::get_latest_data() {

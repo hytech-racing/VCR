@@ -148,7 +148,7 @@ void setup() {
 
     // Create all singletons
     IOExpanderInstance::create(0);
-    VCFInterfaceInstance::create();
+    VCFInterfaceInstance::create(millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
         EthernetIPDefsInstance::instance().drivebrain_ip,

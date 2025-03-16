@@ -13,7 +13,14 @@ struct VCFCANInterfaceData_s {
 
 class VCFInterface {
 public:
-    VCFInterface() = default;
+
+    VCFInterface() = delete;
+
+    VCFInterface(unsigned long init_millis, unsigned long max_heartbeat_interval_ms)
+    {
+        _curr_data.stamped_pedals.last_heartbeat_time = init_millis;
+        _max_heartbeat_interval_ms = max_heartbeat_interval_ms;
+    };
 
     void receive_pedals_message(const CAN_message_t& msg, unsigned long curr_millis);
     
@@ -22,6 +29,8 @@ public:
 private:
 
     VCFCANInterfaceData_s _curr_data;
+
+    unsigned long _max_heartbeat_interval_ms;
     
 };
 
