@@ -1,3 +1,4 @@
+#include "SystemTimeInterface.h"
 #ifdef ARDUINO
 
 #include <Arduino.h>
@@ -38,8 +39,8 @@
 #include "device_fw_version.h"
 
 /* CAN setup */
-FlexCAN_Type<CAN3> TELEM_CAN;
-FlexCAN_Type<CAN2> INVERTER_CAN;
+FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> TELEM_CAN;
+FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> INVERTER_CAN;
 
 /* Ethernet message sockets */
 qindesign::network::EthernetUDP vcr_data_send_socket;
@@ -148,7 +149,7 @@ void setup() {
 
     // Create all singletons
     IOExpanderInstance::create(0);
-    VCFInterfaceInstance::create(millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
+    VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
         EthernetIPDefsInstance::instance().drivebrain_ip,
@@ -195,7 +196,7 @@ void setup() {
     scheduler.schedule(main_task);
     // scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
 
-    SPI.begin();
+    
     init_adc_bundle();
 }
 
