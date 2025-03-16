@@ -76,7 +76,7 @@ const float THERMISTOR_7_OFFSET = 1;
 constexpr int WATCHDOG_PIN = 36;
 constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
 constexpr unsigned long WATCHDOG_KICK_INTERVAL_MS = 10UL;
-constexpr unsigned long VCF_PEDALS_MAX_HEARTBEAT_MS = 200UL;         // 500ms
+constexpr unsigned long VCF_PEDALS_MAX_HEARTBEAT_MS = 200UL;         // 20ms at 60mph is about 0.5 meters
 
 /* Inverter constants */
 constexpr int INVERTER_MINIMUM_HV_VOLTAGE = 400;
