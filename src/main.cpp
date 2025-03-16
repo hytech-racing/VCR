@@ -171,7 +171,7 @@ void setup() {
     EthernetIPDefsInstance::create();
     uint8_t mac[6]; // NOLINT (mac addresses are always 6 bytes)
     qindesign::network::Ethernet.macAddress(&mac[0]);
-    qindesign::network::Ethernet.begin(
+    qindesign::network::Ethernet.begin(mac,
         EthernetIPDefsInstance::instance().vcr_ip, EthernetIPDefsInstance::instance().default_dns,
         EthernetIPDefsInstance::instance().default_gateway, EthernetIPDefsInstance::instance().car_subnet);
     vcr_data_send_socket.begin(EthernetIPDefsInstance::instance().VCRData_port);
