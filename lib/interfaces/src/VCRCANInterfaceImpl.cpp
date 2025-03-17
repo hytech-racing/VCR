@@ -31,6 +31,7 @@ void on_inverter_can_receive(const CAN_message_t &msg) {
 }
 
 void on_telem_can_receive(const CAN_message_t &msg) {
+    // Serial.println("recvd");
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
     telem_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
@@ -39,7 +40,9 @@ void on_telem_can_receive(const CAN_message_t &msg) {
 void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis) {
     switch (msg.id) {
 
+    
     case PEDALS_SYSTEM_DATA_CANID: {
+        
         interfaces.vcf_interface.receive_pedals_message(msg, millis);
         break;
     }

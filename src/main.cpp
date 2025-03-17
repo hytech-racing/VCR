@@ -39,8 +39,8 @@
 #include "device_fw_version.h"
 
 /* CAN setup */
-FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> TELEM_CAN;
-FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> INVERTER_CAN;
+FlexCAN_Type<CAN3> TELEM_CAN;
+FlexCAN_Type<CAN2> INVERTER_CAN;
 
 /* Ethernet message sockets */
 qindesign::network::EthernetUDP vcr_data_send_socket;
@@ -93,7 +93,7 @@ veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr
 
 DrivetrainSystem drivetrain_system(inverter_functs);
 
-etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
+
 
 VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
     etl::delegate<bool()>::create([]() { return true; }), 
@@ -111,8 +111,10 @@ VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
+etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 bool run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
+    
     auto new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data, {
         .vcr_data_send_socket = vcr_data_send_socket,
         .vcf_data_recv_socket = vcf_data_recv_socket,
@@ -140,6 +142,20 @@ HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, s
 HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
 HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, main_task_priority);
+
+bool debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    Serial.println("timestamp\t:\taccel\t:\tbrake");
+    Serial.print(vcr_data.interface_data.recvd_pedals_data.last_heartbeat_time);
+    Serial.print("\t:\t");
+    Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
+    Serial.print("\t:\t");
+    Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
+    Serial.println();
+    return true;
+}
+
+HT_TASK::Task debug_state_print_task(HT_TASK::DUMMY_FUNCTION, debug_print, 100, 100000);
 
 void setup() {
     // Save firmware version
@@ -182,24 +198,25 @@ void setup() {
 
     // Initialize CAN
     const uint32_t CAN_baudrate = 500000;
-    handle_CAN_setup(INVERTER_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_inverter_can_receive);
-    handle_CAN_setup(TELEM_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_telem_can_receive);
+    handle_CAN_setup(INVERTER_CAN, CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
+    handle_CAN_setup(TELEM_CAN, CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
 
-    scheduler.schedule(adc_0_sample_task);
-    scheduler.schedule(adc_1_sample_task);
-    scheduler.schedule(update_buzzer_controller_task);
+    // scheduler.schedule(adc_0_sample_task);
+    // scheduler.schedule(adc_1_sample_task);
+    // scheduler.schedule(update_buzzer_controller_task);
     scheduler.schedule(kick_watchdog_task);
     scheduler.schedule(enqueue_suspension_CAN_task);
     scheduler.schedule(send_CAN_task);
-    scheduler.schedule(vcr_data_ethernet_send);
+    // scheduler.schedule(vcr_data_ethernet_send);
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(main_task);
+    scheduler.schedule(debug_state_print_task);
     // scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
 
     
     init_adc_bundle();
 }
 
-void loop() { 
+void loop() {
     scheduler.run();
 }

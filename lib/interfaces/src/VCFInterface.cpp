@@ -29,6 +29,5 @@ void VCFInterface::receive_pedals_message(const CAN_message_t &msg, unsigned lon
 }
 
 VCFCANInterfaceData_s VCFInterface::get_latest_data() {
-    VCFCANInterfaceData_s for_testing;
-    return for_testing;
+    return _curr_data;
 }
