@@ -96,7 +96,7 @@ DrivetrainSystem drivetrain_system(inverter_functs);
 
 
 VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
-    etl::delegate<bool()>::create([]() { return true; }), 
+    etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
     etl::delegate<bool()>::create([]() { return true; }), 
     etl::delegate<bool()>::create([]() { return true; }), 
     etl::delegate<bool()>::create([]() { return true; }), 
@@ -105,6 +105,8 @@ VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
     etl::delegate<bool()>::create([]() { return true; }), 
     etl::delegate<void()>::create([]() { }), 
     etl::delegate<void()>::create([]() { }), 
+    etl::delegate<void()>::create([]() { }),
+    etl::delegate<bool()>::create([](){return true;}),
     etl::delegate<void()>::create([]() { })
 );
 

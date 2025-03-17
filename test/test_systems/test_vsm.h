@@ -8,6 +8,7 @@ bool drivetrain_error;
 bool drivetrain_ready;
 bool drivetrain_commanded;
 bool buzzer_active;
+bool pedals_timeout;
 
 etl::delegate<bool()> mock_hv_over_threshold = etl::delegate<bool()>::create([]() -> bool {
     return hv_over_threshold;
@@ -50,6 +51,15 @@ etl::delegate<void()> mock_command_drivetrain = etl::delegate<void()>::create([]
     return;
 });
 
+etl::delegate<bool()> mock_pedals_timeout = etl::delegate<bool()>::create([]() -> bool {
+    return pedals_timeout;
+});
+
+etl::delegate<void()> mock_pedals_reset = etl::delegate<void()>::create([]() -> void {
+    pedals_timeout = false;
+    return;
+});
+
 VehicleStateMachine state_machine = VehicleStateMachine(
     mock_hv_over_threshold,
     mock_start_btn,
@@ -60,7 +70,9 @@ VehicleStateMachine state_machine = VehicleStateMachine(
     mock_buzzer_done,
     mock_end_buzzer,
     mock_handle_drivetrain_init,
-    mock_command_drivetrain
+    mock_command_drivetrain,
+    mock_pedals_timeout,
+    mock_pedals_reset
 );
 
 TEST (VehicleStateMachine, TractiveSystemNotActive) {
@@ -98,7 +110,7 @@ TEST (VehicleStateMachine, WantingReadyToDrive) {
     state_machine.tick_state_machine(0);
     brake_pressed = true;
     state_machine.tick_state_machine(0);
-    ASSERT_EQ(state_machine.get_state(), VehicleState_e::WANTING_READY_TO_DRIVE);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::READY_TO_DRIVE);
     state_machine.tick_state_machine(0);
 
     hv_over_threshold = false;
@@ -113,17 +125,12 @@ TEST (VehicleStateMachine, WantingReadyToDrive) {
     
     brake_pressed = true;
     state_machine.tick_state_machine(0);
-    ASSERT_EQ(state_machine.get_state(), VehicleState_e::WANTING_READY_TO_DRIVE);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::READY_TO_DRIVE);
     ASSERT_EQ(buzzer_active, true);
     state_machine.tick_state_machine(0);
 }
 
 TEST (VehicleStateMachine, ReadyToDrive) {
-    drivetrain_ready = true;
-    ASSERT_EQ(drivetrain_commanded, false);
-    state_machine.tick_state_machine(0);
-    ASSERT_EQ(state_machine.get_state(), VehicleState_e::WANTING_READY_TO_DRIVE);
-
     buzzer_active = false;
     state_machine.tick_state_machine(0);
     ASSERT_EQ(state_machine.get_state(), VehicleState_e::READY_TO_DRIVE);

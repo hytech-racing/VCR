@@ -76,6 +76,8 @@ public:
 
     DrivetrainStatus_s evaluate_drivetrain(CmdVariant cmd);
     DrivetrainState_e get_state();
+    DrivetrainStatus_s get_status();
+    bool hv_over_threshold();
     // DrivetrainDynamicReport_s get_dynamic_data();
 
     struct InverterFuncts {
@@ -106,6 +108,7 @@ private:
     const float _active_rpm_level = 100;
     veh_vec<InverterFuncts> _inverter_interfaces;
     DrivetrainState_e _state;
+    DrivetrainStatus_s _status;
     std::function<bool(const InverterStatus_s &)> _check_inverter_ready_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_connected_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_quit_dc_flag;

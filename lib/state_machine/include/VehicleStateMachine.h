@@ -6,8 +6,7 @@
 enum class VehicleState_e {
     TRACTIVE_SYSTEM_NOT_ACTIVE = 1, 
     TRACTIVE_SYSTEM_ACTIVE = 2, 
-    WANTING_READY_TO_DRIVE = 3,
-    READY_TO_DRIVE = 4
+    READY_TO_DRIVE = 3
 };
 
 class VehicleStateMachine
@@ -23,7 +22,9 @@ class VehicleStateMachine
             etl::delegate<bool()> is_buzzer_done, 
             etl::delegate<void()> end_buzzer, 
             etl::delegate<void()> handle_drivetrain_init, 
-            etl::delegate<void()> command_drivetrain
+            etl::delegate<void()> command_drivetrain,
+            etl::delegate<bool()> check_pedals_timeout,
+            etl::delegate<void()> reset_pedals_timeout
         ) :  
         _check_hv_over_threshold(check_hv_over_threshold),
         _is_start_button_pressed(is_start_button_pressed), 
@@ -34,7 +35,9 @@ class VehicleStateMachine
         _is_buzzer_complete(is_buzzer_done),
         _end_buzzer(end_buzzer),
         _handle_drivetrain_init(handle_drivetrain_init),
-        _command_drivetrain(command_drivetrain)
+        _command_drivetrain(command_drivetrain),
+        _check_pedals_timeout(check_pedals_timeout),
+        _reset_pedals_timeout(reset_pedals_timeout)
         {   
             _current_state = VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE;
         }
@@ -64,7 +67,8 @@ class VehicleStateMachine
         etl::delegate<void()> _end_buzzer;
         etl::delegate<void()> _handle_drivetrain_init;
         etl::delegate<void()> _command_drivetrain; // Shouldn't need to pass anything; logic will be handled in the lambda
-
+        etl::delegate<bool()> _check_pedals_timeout;
+        etl::delegate<void()> _reset_pedals_timeout;
 };
 
 #endif

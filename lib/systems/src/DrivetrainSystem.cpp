@@ -19,6 +19,15 @@ DrivetrainState_e DrivetrainSystem::get_state()
     return _state;
 }
 
+DrivetrainStatus_s DrivetrainSystem::get_status()
+{
+    return _status; 
+}
+
+bool DrivetrainSystem::hv_over_threshold()
+{
+   return _check_inverter_flags(_check_inverter_hv_present_flag); 
+}
 DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVariant cmd) 
 {
     
@@ -41,7 +50,7 @@ DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVa
     {
         status.cmd_resp = DrivetrainCmdResponse_e::COMMAND_OK;
     }
-
+    _status = status;
     return status; 
 }
 
