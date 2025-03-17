@@ -1,5 +1,6 @@
 #include "VCFInterface.h"
 #include "hytech.h"
+#include "VCRCANInterfaceImpl.h"
 
 void VCFInterface::receive_pedals_message(const CAN_message_t &msg, unsigned long curr_millis) {
     PEDALS_SYSTEM_DATA_t pedals_msg;
@@ -24,10 +25,32 @@ void VCFInterface::receive_pedals_message(const CAN_message_t &msg, unsigned lon
     _curr_data.stamped_pedals.last_recv_millis = curr_millis;
 
     // As long as we're using millis() function, loop overrun not a concern
-    _curr_data.stamped_pedals.heartbeat_ok = (curr_millis - _curr_data.stamped_pedals.last_heartbeat_time < _max_heartbeat_interval_ms);
+    bool first_received_message_heartbeat_init = (!_curr_data.stamped_pedals.heartbeat_ok) && (_curr_data.stamped_pedals.last_heartbeat_time ==0);
+    
+    // only in the situation where the hearbeat has yet to be established or the heartbeat is ok do we re-evaluate the heartbeat.
+    // if hearbeat is is not ok, the only thing that should be able to reset it is the state machine via the reset_pedals_heartbeat function
+
+    if(first_received_message_heartbeat_init || _curr_data.stamped_pedals.heartbeat_ok)
+    {
+    
+        _curr_data.stamped_pedals.heartbeat_ok = (curr_millis - _curr_data.stamped_pedals.last_heartbeat_time < _max_heartbeat_interval_ms);
+    }
+    
     _curr_data.stamped_pedals.last_heartbeat_time = curr_millis;
+}
+
+void VCFInterface::reset_pedals_heartbeat()
+{
+    _curr_data.stamped_pedals.heartbeat_ok = true;
 }
 
 VCFCANInterfaceData_s VCFInterface::get_latest_data() {
     return _curr_data;
+}
+
+void VCFInterface::send_buzzer_start_message()
+{
+    DASHBOARD_BUZZER_CONTROL_t ctrl = {};
+    ctrl.dash_buzzer_flag = true;
+    CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer);
 }

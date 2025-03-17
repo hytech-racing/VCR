@@ -35,6 +35,7 @@
 #include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
 
+#include "controls.h"
 /* From pio-git-hash */
 #include "device_fw_version.h"
 
@@ -93,21 +94,17 @@ veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr
 
 DrivetrainSystem drivetrain_system(inverter_functs);
 
-
-
+VCRControls controls(&drivetrain_system);
 VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
-    etl::delegate<bool()>::create([]() { return true; }), 
-    etl::delegate<bool()>::create([]() { return true; }), 
-    etl::delegate<bool()>::create([]() { return true; }), 
-    etl::delegate<bool()>::create([]() { return true; }),
-    etl::delegate<void()>::create([]() { }),
-    etl::delegate<bool()>::create([]() { return true; }), 
-    etl::delegate<void()>::create([]() { }), 
-    etl::delegate<void()>::create([]() { }), 
-    etl::delegate<void()>::create([]() { }),
-    etl::delegate<bool()>::create([](){return true;}),
-    etl::delegate<void()>::create([]() { })
+    etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_start_button_pressed>(VCFInterfaceInstance::instance()), 
+    etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_brake_pressed>(VCFInterfaceInstance::instance()),
+    etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
+    etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
+    etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
+    etl::delegate<void()>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
+    etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_ok>(VCFInterfaceInstance::instance()),
+    etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance())
 );
 
 /* Scheduler setup */

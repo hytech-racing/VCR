@@ -50,6 +50,7 @@ struct DrivetrainStatus_s
     bool all_inverters_connected;
     veh_vec<InverterStatus_s> inverter_statuses;
     DrivetrainCmdResponse_e cmd_resp;
+    DrivetrainState_e state;
 };
 
 struct DrivetrainResetError_s
@@ -73,11 +74,16 @@ class DrivetrainSystem
 public:
     using CmdVariant = etl::variant<DrivetrainCommand_s, DrivetrainInit_s, DrivetrainResetError_s>;
     DrivetrainSystem() = delete;
+    
+    // these are functions for interaction with the state machine mostly
+    bool hv_over_threshold();
+    bool drivetrain_error_present();
+    bool drivetrain_ready();
 
     DrivetrainStatus_s evaluate_drivetrain(CmdVariant cmd);
     DrivetrainState_e get_state();
     DrivetrainStatus_s get_status();
-    bool hv_over_threshold();
+
     // DrivetrainDynamicReport_s get_dynamic_data();
 
     struct InverterFuncts {

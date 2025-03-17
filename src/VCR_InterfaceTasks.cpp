@@ -175,8 +175,6 @@ bool enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::Ta
 
     CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
-
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
     return true;
 }
 

@@ -28,9 +28,21 @@ bool DrivetrainSystem::hv_over_threshold()
 {
    return _check_inverter_flags(_check_inverter_hv_present_flag); 
 }
+
+bool DrivetrainSystem::drivetrain_error_present()
+{
+    return !_check_inverter_flags(_check_inverter_no_errors_present);
+}
+
+bool DrivetrainSystem::drivetrain_ready()
+{
+    DrivetrainInit_s init_cmd = {.init_drivetrain=DrivetrainModeRequest_e::INIT_DRIVE_MODE};
+    DrivetrainSystem::CmdVariant var = init_cmd;
+    return (evaluate_drivetrain(init_cmd).state == DrivetrainState_e::ENABLED_DRIVE_MODE);
+}
+
 DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVariant cmd) 
 {
-    
     auto state = _evaluate_state_machine(cmd);
 
     DrivetrainStatus_s status;
@@ -51,6 +63,7 @@ DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVa
         status.cmd_resp = DrivetrainCmdResponse_e::COMMAND_OK;
     }
     _status = status;
+    status.state = state;
     return status; 
 }
 
@@ -221,7 +234,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             }
             else if (valid_drivetrain_command) {
                 DrivetrainCommand_s drivetrain_command = etl::get<DrivetrainCommand_s>(cmd);
-                 _set_drivetrain_command(drivetrain_command);
+                _set_drivetrain_command(drivetrain_command);
             }
             break;
         }
