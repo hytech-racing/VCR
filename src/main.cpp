@@ -1,4 +1,6 @@
 #include "SystemTimeInterface.h"
+#include "controllers/SimpleController.h"
+#include <cstdint>
 #ifdef ARDUINO
 
 #include <Arduino.h>
@@ -95,6 +97,7 @@ veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr
 DrivetrainSystem drivetrain_system(inverter_functs);
 
 VCRControls controls(&drivetrain_system);
+
 VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_start_button_pressed>(VCFInterfaceInstance::instance()), 
@@ -110,21 +113,33 @@ VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
+
+uint16_t state_global;
 etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
+
+bool drivetrain_initialized = false;
+TorqueControllerSimple mode0;
+
 bool run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     
-    auto new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data, {
-        .vcr_data_send_socket = vcr_data_send_socket,
-        .vcf_data_recv_socket = vcf_data_recv_socket,
-        .acu_core_data_recv_socket = acu_core_data_recv_socket,
-        .acu_all_data_recv_socket = acu_all_data_recv_socket
-    });
-    auto sys_data = evaluate_async_systems(new_interface_data);
-    auto state = vehicle_statemachine.tick_state_machine(sys_time::hal_millis());
 
-    vcr_data.system_data = sys_data;
-    vcr_data.interface_data = new_interface_data;
+    if(!drivetrain_initialized)
+    {
+        drivetrain_initialized = drivetrain_system.drivetrain_ready();
+        
+    } else {
+        DrivetrainCommand_s cmd;
+        cmd.desired_speeds.FL = 1000;
+        cmd.desired_speeds.FR = 1000;
+        cmd.desired_speeds.RL = 1000;
+        cmd.desired_speeds.RR = 1000; 
+        cmd.torque_limits.FL = 10; 
+        cmd.torque_limits.FR = 10;
+        cmd.torque_limits.RL = 10; 
+        cmd.torque_limits.RR = 10;
+        drivetrain_system.evaluate_drivetrain(cmd);
+    }
 
     return true;
 }
@@ -140,7 +155,7 @@ HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverte
 HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, send_can_priority); // Sends all messages from the CAN queue
 HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
-HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, main_task_priority);
+HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, main_task_priority, 100);
 
 bool debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -151,6 +166,14 @@ bool debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskIn
     Serial.print("\t:\t");
     Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
     Serial.println();
+    Serial.println();
+    Serial.println();
+    Serial.println();
+
+    Serial.println("state machine state");
+
+    Serial.println(state_global);
+    
     return true;
 }
 
@@ -204,12 +227,13 @@ void setup() {
     // scheduler.schedule(adc_1_sample_task);
     // scheduler.schedule(update_buzzer_controller_task);
     scheduler.schedule(kick_watchdog_task);
-    scheduler.schedule(enqueue_suspension_CAN_task);
+    scheduler.schedule(ams_system_task);
+    // scheduler.schedule(enqueue_suspension_CAN_task);
     scheduler.schedule(send_CAN_task);
     // scheduler.schedule(vcr_data_ethernet_send);
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(main_task);
-    scheduler.schedule(debug_state_print_task);
+    // scheduler.schedule(debug_state_print_task);
     // scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
 
     

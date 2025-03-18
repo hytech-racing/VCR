@@ -36,7 +36,7 @@ bool DrivetrainSystem::drivetrain_error_present()
 
 bool DrivetrainSystem::drivetrain_ready()
 {
-    DrivetrainInit_s init_cmd = {.init_drivetrain=DrivetrainModeRequest_e::INIT_DRIVE_MODE};
+    DrivetrainInit_s init_cmd = {.init_drivetrain = DrivetrainModeRequest_e::INIT_DRIVE_MODE};
     DrivetrainSystem::CmdVariant var = init_cmd;
     return (evaluate_drivetrain(init_cmd).state == DrivetrainState_e::ENABLED_DRIVE_MODE);
 }
