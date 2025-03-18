@@ -145,7 +145,7 @@ HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, main_task_priori
 bool debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     Serial.println("timestamp\t:\taccel\t:\tbrake");
-    Serial.print(vcr_data.interface_data.recvd_pedals_data.last_heartbeat_time);
+    Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
     Serial.print("\t:\t");
     Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
     Serial.print("\t:\t");

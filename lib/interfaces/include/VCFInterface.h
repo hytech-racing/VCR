@@ -19,7 +19,7 @@ public:
 
     VCFInterface(unsigned long init_millis, unsigned long max_heartbeat_interval_ms) : _max_heartbeat_interval_ms(max_heartbeat_interval_ms)
     {
-        _curr_data.stamped_pedals.last_heartbeat_time = 0;
+        _curr_data.stamped_pedals.last_recv_millis = 0;
         _curr_data.stamped_pedals.heartbeat_ok = false; // start out false
     };
 
