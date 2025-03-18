@@ -18,7 +18,7 @@ public:
 
     VCFInterface(unsigned long init_millis, unsigned long max_heartbeat_interval_ms)
     {
-        _curr_data.stamped_pedals.last_heartbeat_time = init_millis;
+        _curr_data.stamped_pedals.last_recv_millis = init_millis;
         _max_heartbeat_interval_ms = max_heartbeat_interval_ms;
     };
 

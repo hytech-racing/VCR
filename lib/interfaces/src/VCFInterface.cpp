@@ -24,8 +24,7 @@ void VCFInterface::receive_pedals_message(const CAN_message_t &msg, unsigned lon
     _curr_data.stamped_pedals.last_recv_millis = curr_millis;
 
     // As long as we're using millis() function, loop overrun not a concern
-    _curr_data.stamped_pedals.heartbeat_ok = (curr_millis - _curr_data.stamped_pedals.last_heartbeat_time < _max_heartbeat_interval_ms);
-    _curr_data.stamped_pedals.last_heartbeat_time = curr_millis;
+    _curr_data.stamped_pedals.heartbeat_ok = (curr_millis - _curr_data.stamped_pedals.last_recv_millis < _max_heartbeat_interval_ms);
 }
 
 VCFCANInterfaceData_s VCFInterface::get_latest_data() {
