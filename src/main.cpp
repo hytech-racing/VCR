@@ -94,9 +94,9 @@ InverterParams_s inverter_params = {
 };
 
 InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, inverter_params, false);
-InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, inverter_params, true);
-InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, inverter_params, true);
-InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, inverter_params, true);
+InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, inverter_params, false);
+InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, inverter_params, false);
+InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, inverter_params, false);
 
 
 DrivetrainSystem::InverterFuncts fr_inverter_functs = {
@@ -107,7 +107,32 @@ DrivetrainSystem::InverterFuncts fr_inverter_functs = {
     .get_motor_mechanics = []() { return fr_inverter_int.get_motor_mechanics(); }
 };
 
-veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fr_inverter_functs, fr_inverter_functs, fr_inverter_functs, fr_inverter_functs);
+DrivetrainSystem::InverterFuncts fl_inverter_functs = {
+    .set_speed = [](float desired_rpm, float torque_limit_nm) { fl_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_idle = []() { fl_inverter_int.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s control_word) { fl_inverter_int.set_inverter_control_word(control_word); },
+    .get_status = []() { return fl_inverter_int.get_status(); },
+    .get_motor_mechanics = []() { return fl_inverter_int.get_motor_mechanics(); }
+};
+
+DrivetrainSystem::InverterFuncts rl_inverter_functs = {
+    .set_speed = [](float desired_rpm, float torque_limit_nm) { rl_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_idle = []() { rl_inverter_int.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s control_word) { rl_inverter_int.set_inverter_control_word(control_word); },
+    .get_status = []() { return rl_inverter_int.get_status(); },
+    .get_motor_mechanics = []() { return rl_inverter_int.get_motor_mechanics(); }
+};
+
+DrivetrainSystem::InverterFuncts rr_inverter_functs = {
+    .set_speed = [](float desired_rpm, float torque_limit_nm) { rr_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_idle = []() { rr_inverter_int.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s control_word) { rr_inverter_int.set_inverter_control_word(control_word); },
+    .get_status = []() { return rr_inverter_int.get_status(); },
+    .get_motor_mechanics = []() { return rr_inverter_int.get_motor_mechanics(); }
+};
+
+
+veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fr_inverter_functs, fl_inverter_functs, rl_inverter_functs, rr_inverter_functs);
 
 DrivetrainSystem drivetrain_system(inverter_functs);
 
@@ -164,6 +189,8 @@ void setup() {
     );
         
     SPI.begin(); // TODO this should be elsewhere maybe
+    create_watchdog();
+    init_ams_system_task();
     const uint32_t CAN_baudrate = 500000;
     // from CANInterfaceon_inverter_can_receive
     handle_CAN_setup(INVERTER_CAN, CAN_baudrate, VCRCANInterfaceImpl::on_inverter_can_receive);
@@ -190,10 +217,13 @@ void loop() {
         drivetrain_system.evaluate_drivetrain(init);
     }
     task_scheduler.execute();
+    run_kick_watchdog();
+    run_ams_system_task();
     // Serial.println(static_cast<int>(drivetrain_system.get_state()));
 }
 
 void handle_big_tasks()
 {
+    
     big_task(main_can_recv, vcr_async_interfaces, vehicle_statemachine, int_data);
 }
