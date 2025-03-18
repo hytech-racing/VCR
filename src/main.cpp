@@ -82,6 +82,7 @@ TsTask ethernet_send(ethernet_update_period, TASK_FOREVER, &handle_send_VCR_ethe
 TsTask big_task_t(TASK_IMMEDIATE, TASK_FOREVER, &handle_big_tasks,
                      &task_scheduler, false);
 
+// TsTask debug_task(TASK_IMMEDIATE, TASK_FOREVER, &debug_drivetrain_system, &task_scheduler, false);
                      
 /* Ethernet message sockets */ // TODO: Move this into its own interface
 qindesign::network::EthernetUDP protobuf_send_socket;
@@ -132,13 +133,13 @@ DrivetrainSystem::InverterFuncts rr_inverter_functs = {
 };
 
 
-veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fr_inverter_functs, fl_inverter_functs, rl_inverter_functs, rr_inverter_functs);
+veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr_inverter_functs, rl_inverter_functs, rr_inverter_functs);
 
 DrivetrainSystem drivetrain_system(inverter_functs);
 
 DrivetrainInit_s init = {DrivetrainModeRequest_e::INIT_DRIVE_MODE};
 DrivetrainCommand_s drive = {DrivetrainCommand_s{
-    .desired_speeds = veh_vec<speed_rpm> {100.0, 100.0, 100.0, 100.0},
+    .desired_speeds = veh_vec<speed_rpm> {400.0, 400.0, 400.0, 400.0},
     .torque_limits = veh_vec<torque_nm> {2.0, 2.0, 2.0, 2.0}
 }};
 DrivetrainResetError_s clearing_errors = {.reset_errors=true}; 
@@ -165,7 +166,6 @@ VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
 );
 
 void setup() {
-
     vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
     vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
     vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
@@ -187,7 +187,7 @@ void setup() {
         rl_inverter_int,
         rr_inverter_int
     );
-        
+    
     SPI.begin(); // TODO this should be elsewhere maybe
     create_watchdog();
     init_ams_system_task();
@@ -205,10 +205,10 @@ void setup() {
     ethernet_send.enable();
     inverter_CAN_send.enable();
     big_task_t.enable();
-    
 }
 
 void loop() { 
+    
     if (drivetrain_system.get_state() == DrivetrainState_e::ENABLED_DRIVE_MODE) {
         drivetrain_system.evaluate_drivetrain(drive);
     } else if (drivetrain_system.get_state() == DrivetrainState_e::ERROR) {
@@ -216,10 +216,10 @@ void loop() {
     } else {
         drivetrain_system.evaluate_drivetrain(init);
     }
-    task_scheduler.execute();
+
     run_kick_watchdog();
     run_ams_system_task();
-    // Serial.println(static_cast<int>(drivetrain_system.get_state()));
+    task_scheduler.execute();
 }
 
 void handle_big_tasks()

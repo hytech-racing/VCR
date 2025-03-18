@@ -77,6 +77,7 @@ bool init_ams_system_task()
 {
     AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS); // NOLINT 
     pinMode(SOFTWARE_OK_PIN, OUTPUT);
+    pinMode(INVERTER_EN, OUTPUT);
     return true;
 }
 
@@ -85,6 +86,7 @@ void run_ams_system_task()
     AMSSystemInstance::instance().update_ams_system(sys_time::hal_millis(), vcr_data);
     // digitalWrite(SOFTWARE_OK_PIN, vcr_data.system_data.ams_data.ams_ok);
     digitalWrite(SOFTWARE_OK_PIN, true);
+    digitalWrite(INVERTER_EN, OUTPUT);
 }
 
 
@@ -123,10 +125,10 @@ void handle_send_all_data()
 void handle_inverter_CAN_send()
 {
     // adds inverter messages to be sent into the inverter can tx buffer
-    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_PARAMS();
-    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_PARAMS();
-    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_PARAMS();
-    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_PARAMS();
+    // CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_PARAMS();
+    // CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_PARAMS();
+    // CANInterfacesInstance::instance().rl_inverter_interface.send_INV_CONTROL_PARAMS();
+    // CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_PARAMS();
 
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().fr_inverter_interface.send_INV_CONTROL_WORD();
