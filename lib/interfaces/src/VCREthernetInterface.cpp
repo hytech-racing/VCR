@@ -86,17 +86,17 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
 
 void VCREthernetInterface::receive_pb_msg_acu_all_data(const hytech_msgs_ACUAllData_s &msg_in, VCRData_s &shared_state)
 {
-    for (uint32_t i = 0; i < msg_in.voltages_count; ++i)
+    for (int i = 0; i < msg_in.voltages_count; ++i)
     {
         shared_state.interface_data.acu_all_data.voltages[i] = msg_in.voltages[i];
     }
 
-    for (uint32_t i = 0; i < msg_in.cell_temperatures_count; ++i)
+    for (int i = 0; i < msg_in.cell_temperatures_count; ++i)
     {
         shared_state.interface_data.acu_all_data.cell_temperatures[i] = msg_in.cell_temperatures[i];
     }
 
-    for (uint32_t i = 0; i < msg_in.board_humidities_count; ++i)
+    for (int i = 0; i < msg_in.board_humidities_count; ++i)
     {
         shared_state.interface_data.acu_all_data.board_humidities[i] = msg_in.board_humidities[i];
     }

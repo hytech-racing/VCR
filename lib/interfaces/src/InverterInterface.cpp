@@ -89,7 +89,7 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     Unpack_INV1_DYNAMICS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
 
     // Update inverter interface with new data
-    _feedback_data.motor_mechanics.actual_power = unpacked_msg.actual_power_w;
+    _feedback_data.motor_mechanics.actual_power = unpacked_msg.actual_power_w; // NOLINT (watts)
     _feedback_data.motor_mechanics.actual_torque = HYTECH_actual_torque_nm_ro_fromS(unpacked_msg.actual_torque_nm_ro);
     _feedback_data.motor_mechanics.actual_speed = unpacked_msg.actual_speed_rpm;
 
@@ -104,8 +104,8 @@ void InverterInterface::receive_INV_POWER(const CAN_message_t &can_msg, unsigned
     Unpack_INV1_POWER_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
 
     // Update inverter interface with new data
-    _feedback_data.power.active_power = unpacked_msg.active_power_w;
-    _feedback_data.power.reactive_power = unpacked_msg.reactive_power_var;
+    _feedback_data.power.active_power = unpacked_msg.active_power_w; // NOLINT (watts)
+    _feedback_data.power.reactive_power = unpacked_msg.reactive_power_var; // NOLINT (watts)
 
     _feedback_data.power.new_data = true;
     _feedback_data.power.last_recv_millis = curr_millis;

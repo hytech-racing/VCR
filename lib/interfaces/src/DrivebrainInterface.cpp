@@ -15,11 +15,10 @@ DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cel
                                          IPAddress drivebrain_ip, uint16_t vcr_data_port,
                                          qindesign::network::EthernetUDP *udp_socket)
     : _suspension_data{.rear_load_cell_data = rear_load_cell_data,
-                       .rear_suspot_data = rear_suspot_data} {
-    _drivebrain_ip = drivebrain_ip;
-    _vcr_data_port = vcr_data_port;
-    _udp_socket = udp_socket;
-}
+                       .rear_suspot_data = rear_suspot_data},
+      _drivebrain_ip(drivebrain_ip),
+      _vcr_data_port(vcr_data_port),
+      _udp_socket(udp_socket) {};
 
 StampedDrivetrainCommand_s DrivebrainInterface::get_latest_data() {
     return _latest_drivebrain_command;
@@ -73,6 +72,6 @@ void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
 }
 
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {
-    handle_ethernet_socket_send_pb<(size_t)1024>(_drivebrain_ip, _vcr_data_port, _udp_socket, data,
+    handle_ethernet_socket_send_pb<hytech_msgs_VCRData_s_size>(_drivebrain_ip, _vcr_data_port, _udp_socket, data,
                                    hytech_msgs_VCRData_s_fields);
 }

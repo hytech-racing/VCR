@@ -154,7 +154,7 @@ bool debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskIn
     return true;
 }
 
-HT_TASK::Task debug_state_print_task(HT_TASK::DUMMY_FUNCTION, debug_print, 100, 100000);
+HT_TASK::Task debug_state_print_task(HT_TASK::DUMMY_FUNCTION, debug_print, 100, 100000); //NOLINT (priority and loop rate)
 
 void setup() {
     // Save firmware version
