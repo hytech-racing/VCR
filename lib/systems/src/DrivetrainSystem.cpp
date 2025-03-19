@@ -36,9 +36,11 @@ bool DrivetrainSystem::drivetrain_error_present()
 
 bool DrivetrainSystem::drivetrain_ready()
 {
-    DrivetrainInit_s init_cmd = {.init_drivetrain=DrivetrainModeRequest_e::INIT_DRIVE_MODE};
+    DrivetrainInit_s init_cmd = {.init_drivetrain = DrivetrainModeRequest_e::INIT_DRIVE_MODE};
     DrivetrainSystem::CmdVariant var = init_cmd;
-    return (evaluate_drivetrain(init_cmd).state == DrivetrainState_e::ENABLED_DRIVE_MODE);
+    auto state = evaluate_drivetrain(init_cmd).state;
+
+    return (state == DrivetrainState_e::ENABLED_DRIVE_MODE);
 }
 
 DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVariant cmd) 
@@ -234,6 +236,8 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             }
             else if (valid_drivetrain_command) {
                 DrivetrainCommand_s drivetrain_command = etl::get<DrivetrainCommand_s>(cmd);
+                
+                
                 _set_drivetrain_command(drivetrain_command);
             }
             break;

@@ -31,7 +31,7 @@ class InverterInterface
 {
 
     public: 
-
+        
         InverterInterface(
             uint32_t inv_control_word_id,
             uint32_t inv_control_input_id,

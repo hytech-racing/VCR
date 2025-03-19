@@ -5,7 +5,7 @@
 IOExpander::IOExpander(uint8_t addr) : mcp(MCP23017(addr))
 {
     mcp.init();
-    constexpr seven_bit_mask = 0b01111111;
+    constexpr uint8_t seven_bit_mask = 0b01111111;
     mcp.portMode(MCP23017Port::A, seven_bit_mask);
     mcp.portMode(MCP23017Port::B, seven_bit_mask);
 

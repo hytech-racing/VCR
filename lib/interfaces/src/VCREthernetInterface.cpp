@@ -86,19 +86,20 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
 
 void VCREthernetInterface::receive_pb_msg_acu_all_data(const hytech_msgs_ACUAllData_s &msg_in, VCRData_s &shared_state)
 {
-    for (int i = 0; i < msg_in.voltages_count; ++i)
+    shared_state.interface_data.acu_all_data = {};
+    for (size_t i = 0; i < msg_in.voltages_count; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
     {
-        shared_state.interface_data.acu_all_data.voltages[i] = msg_in.voltages[i];
+        shared_state.interface_data.acu_all_data.voltages[i] = msg_in.voltages[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
     }
 
-    for (int i = 0; i < msg_in.cell_temperatures_count; ++i)
+    for (size_t i = 0; i < msg_in.cell_temperatures_count; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
     {
-        shared_state.interface_data.acu_all_data.cell_temperatures[i] = msg_in.cell_temperatures[i];
+        shared_state.interface_data.acu_all_data.cell_temperatures[i] = msg_in.cell_temperatures[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
     }
 
-    for (int i = 0; i < msg_in.board_humidities_count; ++i)
+    for (size_t i = 0; i < msg_in.board_humidities_count; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
     {
-        shared_state.interface_data.acu_all_data.board_humidities[i] = msg_in.board_humidities[i];
+        shared_state.interface_data.acu_all_data.board_humidities[i] = msg_in.board_humidities[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
     }
 }
 

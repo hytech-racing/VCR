@@ -25,7 +25,7 @@ public:
 
     bool is_start_button_pressed() { return _curr_data.dash_input_state.start_btn_is_pressed; }
     bool is_brake_pressed() {return _curr_data.stamped_pedals.pedals_data.brake_is_pressed; }
-    bool is_pedals_heartbeat_ok() {return _curr_data.stamped_pedals.heartbeat_ok; }
+    bool is_pedals_heartbeat_not_ok() {return !_curr_data.stamped_pedals.heartbeat_ok; }
     void reset_pedals_heartbeat();
     
     void receive_pedals_message(const CAN_message_t& msg, unsigned long curr_millis);
@@ -39,6 +39,7 @@ private:
     VCFCANInterfaceData_s _curr_data;
 
     unsigned long _max_heartbeat_interval_ms;
+    bool _first_received_message_heartbeat_init = false;
     
 };
 

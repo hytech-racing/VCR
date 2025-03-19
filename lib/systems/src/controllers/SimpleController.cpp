@@ -34,6 +34,7 @@ DrivetrainCommand_s TorqueControllerSimple::evaluate(const VCRData_s &state, uns
         out.torque_limits.FR = torqueRequest * (balance - _params.rear_regen_torque_scale);
         out.torque_limits.RL = torqueRequest * _params.rear_regen_torque_scale;
         out.torque_limits.RR = torqueRequest * _params.rear_regen_torque_scale;
+        
     }
 
     return out;

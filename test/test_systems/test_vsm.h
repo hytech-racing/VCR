@@ -15,7 +15,7 @@ etl::delegate<bool()> mock_hv_over_threshold = etl::delegate<bool()>::create([](
 });
 
 etl::delegate<bool()> mock_start_btn = etl::delegate<bool()>::create([]() -> bool {
-    return brake_pressed;
+    return start_btn;
 });
 
 etl::delegate<bool()> mock_brake_pressed = etl::delegate<bool()>::create([]() -> bool {
@@ -67,9 +67,6 @@ VehicleStateMachine state_machine = VehicleStateMachine(
     mock_drivetrain_error,
     mock_drivetrain_ready,
     mock_start_buzzer,
-    mock_buzzer_done,
-    mock_end_buzzer,
-    mock_handle_drivetrain_init,
     mock_command_drivetrain,
     mock_pedals_timeout,
     mock_pedals_reset
@@ -110,7 +107,7 @@ TEST (VehicleStateMachine, WantingReadyToDrive) {
     state_machine.tick_state_machine(0);
     brake_pressed = true;
     state_machine.tick_state_machine(0);
-    ASSERT_EQ(state_machine.get_state(), VehicleState_e::READY_TO_DRIVE);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::WANTING_READY_TO_DRIVE);
     state_machine.tick_state_machine(0);
 
     hv_over_threshold = false;
@@ -125,19 +122,20 @@ TEST (VehicleStateMachine, WantingReadyToDrive) {
     
     brake_pressed = true;
     state_machine.tick_state_machine(0);
-    ASSERT_EQ(state_machine.get_state(), VehicleState_e::READY_TO_DRIVE);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::WANTING_READY_TO_DRIVE);
     ASSERT_EQ(buzzer_active, true);
     state_machine.tick_state_machine(0);
 }
 
 TEST (VehicleStateMachine, ReadyToDrive) {
     buzzer_active = false;
+    drivetrain_ready = true;
     state_machine.tick_state_machine(0);
     ASSERT_EQ(state_machine.get_state(), VehicleState_e::READY_TO_DRIVE);
     state_machine.tick_state_machine(0);
     ASSERT_EQ(drivetrain_commanded, true);
     state_machine.tick_state_machine(0);
-
+    drivetrain_commanded = false;
     drivetrain_error = true;
     state_machine.tick_state_machine(0);
     ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
@@ -150,4 +148,54 @@ TEST (VehicleStateMachine, ReadyToDrive) {
     hv_over_threshold = false;
     state_machine.tick_state_machine(0);
     ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE);
+    drivetrain_commanded = false; // reset
+}
+
+TEST (VehicleStateMachine, PedalsTimeout) {
+    hv_over_threshold = true;
+    drivetrain_error = false;
+    brake_pressed = false; 
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(drivetrain_commanded, false);
+
+    brake_pressed = true;
+    start_btn = true;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::WANTING_READY_TO_DRIVE);
+    start_btn = false;
+    buzzer_active = false;
+    drivetrain_ready = true;
+
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::READY_TO_DRIVE);
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(drivetrain_commanded, true);
+    state_machine.tick_state_machine(0);
+
+    pedals_timeout = true;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
+
+    start_btn = true;
+    brake_pressed = true;
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::WANTING_READY_TO_DRIVE);
+
+    state_machine.tick_state_machine(0);
+    ASSERT_EQ(state_machine.get_state(), VehicleState_e::READY_TO_DRIVE);
+    ASSERT_FALSE(pedals_timeout);
+
+    // pedals_timeout_status = false;
+    // state_machine.tick_state_machine(0);
+    // ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
+    
+    // state_machine.tick_state_machine(0);
+    // ASSERT_EQ(state_machine.get_state(), VehicleState_e::TRACTIVE_SYSTEM_ACTIVE);
+
+    
+     
 }

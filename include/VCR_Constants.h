@@ -76,9 +76,10 @@ const float THERMISTOR_7_OFFSET = 1;
 constexpr int WATCHDOG_PIN = 36;
 constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
 constexpr unsigned long WATCHDOG_KICK_INTERVAL_MS = 10UL;
-constexpr unsigned long VCF_PEDALS_MAX_HEARTBEAT_MS = 20UL;         // 20ms at 60mph is about 0.5 meters
+constexpr unsigned long VCF_PEDALS_MAX_HEARTBEAT_MS = 50UL;         // 20ms at 60mph is about 0.5 meters
 
 /* Inverter constants */
+constexpr int INVERTER_EN_PIN = 2;
 constexpr int INVERTER_MINIMUM_HV_VOLTAGE = 400;
 
 /* Task loop rates & priorities */
@@ -96,11 +97,11 @@ constexpr unsigned long suspension_can_period_us = 4000;             // 4 000 us
 constexpr unsigned long suspension_priority = 4;
 constexpr unsigned long ethernet_update_period = 10000;              // 10 000 us = 100 Hz
 constexpr unsigned long ethernet_send_priority = 6;
-constexpr unsigned long inv_send_period = 4000;                      // 4 000 us = 250 Hz
+constexpr unsigned long inv_send_period = 12000;                      // 4 000 us = 250 Hz
 constexpr unsigned long inverter_send_priority = 5;
 constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
 constexpr unsigned long ioexpander_priority = 100;
 constexpr unsigned long send_can_priority = 10;
 constexpr unsigned long main_task_priority = 0;
-
+constexpr unsigned long main_task_period_us = 100;
 #endif /* VCR_CONSTANTS */

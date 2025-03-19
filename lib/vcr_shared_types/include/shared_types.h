@@ -26,8 +26,8 @@ struct InverterControlWord_s
 struct InverterControlInput_s 
 {
     int16_t speed_rpm_setpoint;
-    int16_t positive_torque_limit; 
-    int16_t negative_torque_limit;
+    float positive_torque_limit; 
+    float negative_torque_limit;
 };
 
 struct InverterControlParams_s
