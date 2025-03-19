@@ -122,6 +122,7 @@ bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     AMSSystemInstance::instance().update_ams_system(sys_time::hal_millis(), vcr_data);
     // digitalWrite(SOFTWARE_OK_PIN, vcr_data.system_data.ams_data.ams_ok);
     digitalWrite(SOFTWARE_OK_PIN, true);
+    digitalWrite(2, true);
     return true;
 }
 
@@ -157,8 +158,8 @@ bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK
 
 bool handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &INVERTER_CAN);
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &VCRCANInterfaceImpl::INVERTER_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
     return true;
 }
 

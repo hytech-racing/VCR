@@ -1,5 +1,6 @@
 #include <DrivetrainSystem.h>
 
+#include <Arduino.h>
 //- [x] TODO handle inverter keepalives with correct settings of inverter flags for their associated states
 
 DrivetrainSystem::DrivetrainSystem(
@@ -38,6 +39,10 @@ bool DrivetrainSystem::drivetrain_ready()
 {
     DrivetrainInit_s init_cmd = {.init_drivetrain = DrivetrainModeRequest_e::INIT_DRIVE_MODE};
     DrivetrainSystem::CmdVariant var = init_cmd;
+    // Serial.println("drivetrain ready?");
+    auto state = evaluate_drivetrain(init_cmd).state;
+    // Serial.println(static_cast<int>(state));
+
     return (evaluate_drivetrain(init_cmd).state == DrivetrainState_e::ENABLED_DRIVE_MODE);
 }
 
@@ -234,6 +239,8 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             }
             else if (valid_drivetrain_command) {
                 DrivetrainCommand_s drivetrain_command = etl::get<DrivetrainCommand_s>(cmd);
+                
+                
                 _set_drivetrain_command(drivetrain_command);
             }
             break;

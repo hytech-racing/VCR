@@ -11,7 +11,7 @@
 struct TorqueControllerSimpleParams_s
 {
 private:
-    static constexpr speed_rpm _amk_max_rpm_default = 1000.0f;
+    static constexpr speed_rpm _amk_max_rpm_default = 2800.0f;
     static constexpr torque_nm _amk_max_torque = 21.0f;
     static constexpr torque_nm _amk_max_regen_torque = 10.0f;
 public:
