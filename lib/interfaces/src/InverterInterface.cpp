@@ -1,7 +1,7 @@
 #include <InverterInterface.h>
 #include "VCRCANInterfaceImpl.h"
 
-
+#include <Arduino.h>
 /**
  * Getters for the data
  */
@@ -89,7 +89,7 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     Unpack_INV1_DYNAMICS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
 
     // Update inverter interface with new data
-    _feedback_data.motor_mechanics.actual_power = unpacked_msg.actual_power_w;
+    _feedback_data.motor_mechanics.actual_power = unpacked_msg.actual_power_w; // NOLINT (watts)
     _feedback_data.motor_mechanics.actual_torque = HYTECH_actual_torque_nm_ro_fromS(unpacked_msg.actual_torque_nm_ro);
     _feedback_data.motor_mechanics.actual_speed = unpacked_msg.actual_speed_rpm;
 
@@ -104,8 +104,8 @@ void InverterInterface::receive_INV_POWER(const CAN_message_t &can_msg, unsigned
     Unpack_INV1_POWER_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
 
     // Update inverter interface with new data
-    _feedback_data.power.active_power = unpacked_msg.active_power_w;
-    _feedback_data.power.reactive_power = unpacked_msg.reactive_power_var;
+    _feedback_data.power.active_power = unpacked_msg.active_power_w; // NOLINT (watts)
+    _feedback_data.power.reactive_power = unpacked_msg.reactive_power_var; // NOLINT (watts)
 
     _feedback_data.power.new_data = true;
     _feedback_data.power.last_recv_millis = curr_millis;
@@ -170,12 +170,13 @@ void InverterInterface::send_INV_CONTROL_PARAMS()
 
 void InverterInterface::set_speed(float desired_rpm, float torque_limit_nm) 
 {
-    _inverter_control_inputs.speed_rpm_setpoint = desired_rpm;
+    _inverter_control_inputs.speed_rpm_setpoint = static_cast<int16_t>(desired_rpm);
 
-    float converted_torque = std::abs(torque_limit_nm * (1000/9.8));
-
-    _inverter_control_inputs.positive_torque_limit = converted_torque;
-    _inverter_control_inputs.negative_torque_limit = -converted_torque;
+    // float converted_torque = std::abs(torque_limit_nm * (1000/9.8));
+    Serial.println("set torq");
+    Serial.println(fabs(torque_limit_nm));
+    _inverter_control_inputs.positive_torque_limit = ::fabs(torque_limit_nm);
+    _inverter_control_inputs.negative_torque_limit = -1.0f * ::fabs(torque_limit_nm);
 }
 
 void InverterInterface::set_idle() 

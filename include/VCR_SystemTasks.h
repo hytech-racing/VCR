@@ -11,6 +11,7 @@
 #include "etl/delegate.h"
 #include "shared_types.h"
 #include "SystemTimeInterface.h"
+#include "QNEthernet.h"
 
 
 /**
@@ -21,7 +22,7 @@
  * asynchronously arrive and be added to a buffer. This ensures that we are processing this data as
  * quickly as possible, instead of simply at the next "tick" at 50/100/1000Hz.
  * 
- * Second, it will evaluate all systems based on this udpated data.
+ * Second, it will evaluate all systems based on this updated data.
  * 
  * Third, it will tick the state machine using this updated data.
  * 
@@ -39,6 +40,18 @@ struct VCRAsynchronousInterfaces {
     CANInterfaces &can_interfaces;
 };
 
+using VCRAsynchronousInterfacesInstance = etl::singleton<VCRAsynchronousInterfaces>;
+
+/**
+ * Wrapper to contain all Protobuf send/recv sockets.
+ */
+struct ProtobufSockets_s {
+    qindesign::network::EthernetUDP &vcr_data_send_socket;
+    qindesign::network::EthernetUDP &vcf_data_recv_socket;
+    qindesign::network::EthernetUDP &acu_core_data_recv_socket;
+    qindesign::network::EthernetUDP &acu_all_data_recv_socket;
+};
+
 /**
  * Reads all asynchronously-arriving data (CAN and Ethernet) from their respective buffers and updates their
  * timestamped values in VCRInterfaceData_s (returns the new struct). Takes in a bundle of all the asynchronous
@@ -46,7 +59,9 @@ struct VCRAsynchronousInterfaces {
  */
 VCRInterfaceData_s sample_async_data(
     etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call,
-    VCRAsynchronousInterfaces &interface_ref_container, const VCRInterfaceData_s &cur_vcr_int_data);
+    VCRAsynchronousInterfaces &interface_ref_container, const VCRInterfaceData_s &cur_vcr_int_data,
+    ProtobufSockets_s sockets
+);
 
 /** 
  * Ticks all hardware-abstracted systems based on the current VCRInterfaceData passed in. Takes in a bundle
@@ -63,10 +78,5 @@ VCRSystemData_s evaluate_async_systems(const VCRInterfaceData_s &interface_data)
 VehicleState_e evaluate_state_machine(const VCRSystemData_s &system_data,
                                   const VCRInterfaceData_s &interface_data,
                                   VehicleStateMachine &state_machine);
-
-
-void big_task(etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> recv_call,
-              VCRAsynchronousInterfaces &interface_ref_container,
-              VehicleStateMachine &state_machine, const VCRInterfaceData_s &cur_vcr_int_data);
 
 #endif // __VCR_SYSTEMTASKS_H__

@@ -2,7 +2,6 @@
 #define VCR_CONSTANTS
 
 
-
 /* -------------------------------------------------- */
 /*                 Teensy 4.1 GPIO pins               */
 /* -------------------------------------------------- */
@@ -73,12 +72,36 @@ const float THERMISTOR_6_OFFSET = 1;
 const float THERMISTOR_7_SCALE = 1;
 const float THERMISTOR_7_OFFSET = 1; 
 
-
+/* Watchdog constants */
 constexpr int WATCHDOG_PIN = 36;
 constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
+constexpr unsigned long WATCHDOG_KICK_INTERVAL_MS = 10UL;
+constexpr unsigned long VCF_PEDALS_MAX_HEARTBEAT_MS = 50UL;         // 20ms at 60mph is about 0.5 meters
 
-namespace default_system_params
-{
-    constexpr unsigned long KICK_INTERVAL_MS = 10UL;
-}
+/* Inverter constants */
+constexpr int INVERTER_EN_PIN = 2;
+constexpr int INVERTER_MINIMUM_HV_VOLTAGE = 400;
+
+/* Task loop rates & priorities */
+constexpr unsigned long adc0_sample_period_us = 250;                 // 250 us = 4 kHz
+constexpr unsigned long adc0_priority = 7;
+constexpr unsigned long adc1_sample_period_us = 10000;               // 10 000 us = 100 Hz
+constexpr unsigned long adc1_priority = 50;
+constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 us = 10 Hz
+constexpr unsigned long buzzer_priority = 3;
+constexpr unsigned long kick_watchdog_period_us = 10000;             // 10 000 us = 100 Hz
+constexpr unsigned long watchdog_priority = 1;
+constexpr unsigned long ams_update_period_us = 10000;                // 10 000 us = 100 Hz
+constexpr unsigned long ams_priority = 2;
+constexpr unsigned long suspension_can_period_us = 4000;             // 4 000 us = 250 Hz
+constexpr unsigned long suspension_priority = 4;
+constexpr unsigned long ethernet_update_period = 10000;              // 10 000 us = 100 Hz
+constexpr unsigned long ethernet_send_priority = 6;
+constexpr unsigned long inv_send_period = 12000;                      // 4 000 us = 250 Hz
+constexpr unsigned long inverter_send_priority = 5;
+constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
+constexpr unsigned long ioexpander_priority = 100;
+constexpr unsigned long send_can_priority = 10;
+constexpr unsigned long main_task_priority = 0;
+constexpr unsigned long main_task_period_us = 100;
 #endif /* VCR_CONSTANTS */

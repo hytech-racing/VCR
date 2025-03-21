@@ -27,7 +27,7 @@ AMSSystemData_s AMSSystem::update_ams_system(unsigned long curr_millis, VCRData_
     ret.max_temp_celsius = vcr_data.interface_data.stamped_acu_core_data.acu_data.max_cell_temp;
 
     // Check for three shutdown conditions
-    bool heartbeat_ok = curr_millis - vcr_data.interface_data.stamped_acu_core_data.last_recv_millis < _heartbeat_interval_ms;
+    bool heartbeat_ok = ((curr_millis - vcr_data.interface_data.stamped_acu_core_data.last_recv_millis) < _heartbeat_interval_ms);
 
     ret.ams_ok = heartbeat_ok;
 

@@ -35,10 +35,10 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
 
     if( (curr_millis - last_speed_setpoint_timestamp) > _worst_message_latencies.worst_speed_setpoint_latency_so_far)
     {
-        _worst_message_latencies.worst_speed_setpoint_latency_so_far = (curr_millis - last_speed_setpoint_timestamp);   
+        _worst_message_latencies.worst_speed_setpoint_latency_so_far = static_cast<int64_t>(curr_millis - last_speed_setpoint_timestamp);   
     } else if((curr_millis - last_torque_lim_timestamp) > _worst_message_latencies.worst_torque_lim_latency_so_far)
     {
-        _worst_message_latencies.worst_torque_lim_latency_so_far = (curr_millis - last_torque_lim_timestamp);   
+        _worst_message_latencies.worst_torque_lim_latency_so_far = static_cast<int64_t>(curr_millis - last_torque_lim_timestamp);   
     }
 
     bool timing_failure = (speed_setpoint_msg_too_latent || torque_limit_message_too_latent || not_all_messages_recvd || latency_diff_too_high);

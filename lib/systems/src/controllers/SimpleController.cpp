@@ -26,7 +26,7 @@ DrivetrainCommand_s TorqueControllerSimple::evaluate(const VCRData_s &state, uns
     else
     {
         // regen torque request
-        torqueRequest = _params.amk_max_regen_torque * accelRequest * -1.0;
+        torqueRequest = _params.amk_max_regen_torque * accelRequest * -1.0; // NOLINT (-1 is magic number)
 
         out.desired_speeds = {0.0f, 0.0f, 0.0f, 0.0f};
         
@@ -34,6 +34,7 @@ DrivetrainCommand_s TorqueControllerSimple::evaluate(const VCRData_s &state, uns
         out.torque_limits.FR = torqueRequest * (balance - _params.rear_regen_torque_scale);
         out.torque_limits.RL = torqueRequest * _params.rear_regen_torque_scale;
         out.torque_limits.RR = torqueRequest * _params.rear_regen_torque_scale;
+        
     }
 
     return out;

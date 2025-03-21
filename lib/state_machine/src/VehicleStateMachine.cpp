@@ -33,7 +33,6 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
             }
             break;
         }
-
         case VehicleState_e::WANTING_READY_TO_DRIVE: 
         {
             if (!_check_hv_over_threshold())
@@ -42,7 +41,7 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 break;
             }
 
-            if (_check_drivetrain_ready() && _is_buzzer_complete())
+            if (_check_drivetrain_ready())
             {
                 _set_state(VehicleState_e::READY_TO_DRIVE, current_millis);
                 break;
@@ -58,7 +57,14 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 break;
             }
 
+            // TODO this shouldnt de-latch us. 
             if (_check_drivetrain_error_ocurred())
+            {
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
+                break;
+            }
+
+            if(_check_pedals_timeout())
             {
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
                 break;
@@ -92,15 +98,12 @@ void VehicleStateMachine::_handle_exit_logic(VehicleState_e prev_state, unsigned
         case VehicleState_e::TRACTIVE_SYSTEM_ACTIVE:
             break;
         case VehicleState_e::WANTING_READY_TO_DRIVE:
-        {
-            _end_buzzer();
             break;
-        }
         case VehicleState_e::READY_TO_DRIVE:
             break;
         default:
             break;
-        }
+    }
 }
 
 void VehicleStateMachine::_handle_entry_logic(VehicleState_e new_state, unsigned long curr_millis)
@@ -114,6 +117,7 @@ void VehicleStateMachine::_handle_entry_logic(VehicleState_e new_state, unsigned
         case VehicleState_e::WANTING_READY_TO_DRIVE:
         {
             _start_buzzer();
+            _reset_pedals_timeout();
             break;
         }
         case VehicleState_e::READY_TO_DRIVE:
