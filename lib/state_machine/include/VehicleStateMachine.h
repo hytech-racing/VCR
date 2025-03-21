@@ -2,6 +2,7 @@
 #define __VehicleState_e_MACHINE__
 
 #include <etl/delegate.h>
+#include <etl/singleton.h>
 
 enum class VehicleState_e {
     TRACTIVE_SYSTEM_NOT_ACTIVE = 1, 
@@ -62,5 +63,7 @@ class VehicleStateMachine
         etl::delegate<bool()> _check_pedals_timeout;
         etl::delegate<void()> _reset_pedals_timeout;
 };
+
+using VehicleStateMachineInstance = etl::singleton<VehicleStateMachine>;
 
 #endif

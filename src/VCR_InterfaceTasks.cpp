@@ -8,9 +8,6 @@
 /* From shared-systems-lib */
 #include "Logger.h"
 
-/* From shared_firmware_types library */
-#include "SharedFirmwareTypes.h"
-
 /* Local includes */
 #include "VCREthernetInterface.h"
 #include "VCR_Constants.h"
@@ -122,7 +119,6 @@ bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     AMSSystemInstance::instance().update_ams_system(sys_time::hal_millis(), vcr_data);
     // digitalWrite(SOFTWARE_OK_PIN, vcr_data.system_data.ams_data.ams_ok);
     digitalWrite(SOFTWARE_OK_PIN, true);
-    digitalWrite(2, true);
     return true;
 }
 
@@ -138,6 +134,9 @@ bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
 bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
+
+    digitalWrite(2, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::WANTING_READY_TO_DRIVE
+                    || VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE); // Enables inverters when in WAITING_RTD or READY_TO_DRIVE mode
     return true;
 }
 

@@ -99,30 +99,6 @@ DrivetrainSystem drivetrain_system(inverter_functs);
 
 VCRControls controls(&drivetrain_system);
 
-// VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
-//     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
-//     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_start_button_pressed>(VCFInterfaceInstance::instance()), 
-//     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_brake_pressed>(VCFInterfaceInstance::instance()),
-//     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
-//     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
-//     etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
-//     etl::delegate<void()>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
-//     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_ok>(VCFInterfaceInstance::instance()),
-//     etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance())
-// );
-
-VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
-    etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
-    etl::delegate<bool()>::create([](){return true;}),
-    etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_brake_pressed>(VCFInterfaceInstance::instance()),
-    etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
-    etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
-    etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
-    etl::delegate<void()>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
-    etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_not_ok>(VCFInterfaceInstance::instance()),
-    etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance())
-);
-
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
@@ -142,7 +118,7 @@ bool run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& task
         .acu_all_data_recv_socket = acu_all_data_recv_socket
     });
     auto sys_data = evaluate_async_systems(new_interface_data);
-    auto state = vehicle_statemachine.tick_state_machine(sys_time::hal_millis());
+    auto state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
     state_global = static_cast<uint16_t>(state);
     vcr_data.system_data = sys_data;
     vcr_data.interface_data = new_interface_data;
@@ -217,6 +193,31 @@ void setup() {
         rr_inverter_int
     );
     VCRAsynchronousInterfacesInstance::create(CANInterfacesInstance::instance());
+
+    // VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
+    //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
+    //     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_start_button_pressed>(VCFInterfaceInstance::instance()), 
+    //     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_brake_pressed>(VCFInterfaceInstance::instance()),
+    //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
+    //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
+    //     etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
+    //     etl::delegate<void()>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
+    //     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_ok>(VCFInterfaceInstance::instance()),
+    //     etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance())
+    // );
+
+    VehicleStateMachineInstance::create(
+        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
+        // etl::delegate<bool()>::create([](){return vcr_data.interface_data.dash_input_state.start_btn_is_pressed;}),
+        etl::delegate<bool()>::create([](){return true;}),
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_brake_pressed>(VCFInterfaceInstance::instance()),
+        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
+        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
+        etl::delegate<void()>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_not_ok>(VCFInterfaceInstance::instance()),
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance())
+    );
 
     // Scheduler timing function
     scheduler.setTimingFunction(micros);
