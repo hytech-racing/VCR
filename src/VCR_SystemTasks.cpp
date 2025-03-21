@@ -26,6 +26,7 @@ VCRInterfaceData_s sample_async_data(
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
     auto drivebrain_data = interface_ref_container.can_interfaces.db_interface.get_latest_data();
     ret.recvd_pedals_data = vcf_data.stamped_pedals;
+    ret.dash_input_state = vcf_data.dash_input_state;
     ret.latest_drivebrain_command = drivebrain_data;
 
     etl::optional<hytech_msgs_VCFData_s> vcf_data_protoc_struct = handle_ethernet_socket_receive<hytech_msgs_VCFData_s_size, hytech_msgs_VCFData_s>(&sockets.vcf_data_recv_socket, &hytech_msgs_VCFData_s_msg);

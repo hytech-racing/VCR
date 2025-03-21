@@ -164,6 +164,9 @@ bool debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskIn
 
     Serial.println("drivetrain system state: ");
     Serial.println(static_cast<int>(drivetrain_system.get_state()));
+
+    Serial.print("Start button pressed: ");
+    Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
     
     return true;
 }
@@ -208,8 +211,7 @@ void setup() {
 
     VehicleStateMachineInstance::create(
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
-        // etl::delegate<bool()>::create([](){return vcr_data.interface_data.dash_input_state.start_btn_is_pressed;}),
-        etl::delegate<bool()>::create([](){return true;}),
+        etl::delegate<bool()>::create([](){return vcr_data.interface_data.dash_input_state.start_btn_is_pressed;}),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_brake_pressed>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),

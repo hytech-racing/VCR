@@ -35,6 +35,22 @@ void VCFInterface::receive_pedals_message(const CAN_message_t &msg, unsigned lon
     _curr_data.stamped_pedals.last_recv_millis = curr_millis;
 }
 
+void VCFInterface::receive_dashboard_message(const CAN_message_t &msg, unsigned long curr_millis)
+{
+    DASH_INPUT_t dash_msg;
+    Unpack_DASH_INPUT_hytech(&dash_msg, &msg.buf[0], msg.len);
+    _curr_data.dash_input_state.dim_btn_is_pressed = dash_msg.led_dimmer_button;
+    _curr_data.dash_input_state.preset_btn_is_pressed = dash_msg.preset_button;
+    _curr_data.dash_input_state.mc_reset_btn_is_pressed = dash_msg.motor_controller_cycle_button;
+    _curr_data.dash_input_state.mode_btn_is_pressed = dash_msg.mode_button;
+    _curr_data.dash_input_state.start_btn_is_pressed = dash_msg.start_button;
+    _curr_data.dash_input_state.data_btn_is_pressed = dash_msg.data_button_is_pressed;
+    _curr_data.dash_input_state.left_paddle_is_pressed = dash_msg.left_shifter_button;
+    _curr_data.dash_input_state.right_paddle_is_pressed = dash_msg.right_shifter_button;
+    _curr_data.dash_input_state.dial_state = (ControllerMode_e) dash_msg.dash_dial_mode;
+}
+
+
 void VCFInterface::reset_pedals_heartbeat()
 {
     _curr_data.stamped_pedals.heartbeat_ok = true;

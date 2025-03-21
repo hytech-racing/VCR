@@ -46,6 +46,11 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
         interfaces.vcf_interface.receive_pedals_message(msg, millis);
         break;
     }
+    case DASH_INPUT_CANID:
+    {
+        interfaces.vcf_interface.receive_dashboard_message(msg, millis);
+        break;
+    }
     case DRIVEBRAIN_TORQUE_LIM_INPUT_CANID: 
     {
         interfaces.db_interface.receive_drivebrain_torque_lim_command(msg, millis);

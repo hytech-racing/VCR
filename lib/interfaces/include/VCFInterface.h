@@ -29,6 +29,7 @@ public:
     void reset_pedals_heartbeat();
     
     void receive_pedals_message(const CAN_message_t& msg, unsigned long curr_millis);
+    void receive_dashboard_message(const CAN_message_t& msg, unsigned long curr_millis);
     
     VCFCANInterfaceData_s get_latest_data();
 
