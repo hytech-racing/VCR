@@ -135,7 +135,7 @@ bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& 
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
 
-    digitalWrite(2, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::WANTING_READY_TO_DRIVE
+    digitalWrite(INVERTER_ENABLE_PIN, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::WANTING_READY_TO_DRIVE
                     || VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE); // Enables inverters when in WAITING_RTD or READY_TO_DRIVE mode
     return true;
 }
