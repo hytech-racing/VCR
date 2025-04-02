@@ -78,6 +78,7 @@ constexpr int WATCHDOG_PIN = 36;
 constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
 constexpr unsigned long WATCHDOG_KICK_INTERVAL_MS = 10UL;
 constexpr unsigned long VCF_PEDALS_MAX_HEARTBEAT_MS = 50UL;         // 20ms at 60mph is about 0.5 meters
+constexpr unsigned long MAX_ALLOWED_DB_LATENCY_MS = 20; // milliseconds
 
 /* Inverter constants */
 constexpr int INVERTER_EN_PIN = 2;

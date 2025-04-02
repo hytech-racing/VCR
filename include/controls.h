@@ -5,6 +5,7 @@
 #include "SharedFirmwareTypes.h"
 #include "TorqueControllerMux.hpp"
 #include "controllers/SimpleController.h"
+#include "controllers/DrivebrainController.h"
 
 /**
  * Class that is responsible for actually commanding the drivetrain. The VehicleStateMachine
@@ -16,13 +17,14 @@ class VCRControls
 {
 
     public:
-        explicit VCRControls(DrivetrainSystem *dt_system);
+        explicit VCRControls(DrivetrainSystem *dt_system, uint32_t max_allowed_db_latency_ms);
         void handle_drivetrain_command();
         DrivetrainCommand_s _debug_dt_command = {};
     private:
         TorqueControllerSimple _mode0; // this needs to be first for tc_mux to have a valid capture
-        TCMuxTypeMinViable _tc_mux;
-        DrivetrainSystem *_dt_system = nullptr; 
+        DrivebrainController _mode4;
+        TCMuxType _tc_mux;
+        DrivetrainSystem *_dt_system = nullptr;
 
 };
 

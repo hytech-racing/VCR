@@ -3,10 +3,19 @@
 #include "VCR_Globals.h"
 #include <Arduino.h>
 
-VCRControls::VCRControls(DrivetrainSystem *dt_system) :
-    _tc_mux({[this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode0.evaluate(state, curr_millis); }}, {true}),
+VCRControls::VCRControls(DrivetrainSystem *dt_system, uint32_t max_allowed_db_latency_ms) :
+    _mode4(max_allowed_db_latency_ms),
+    _tc_mux({[this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode0.evaluate(state, curr_millis); },
+    [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode0.evaluate(state, curr_millis); },
+    [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode0.evaluate(state, curr_millis); },
+    [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode0.evaluate(state, curr_millis); },
+    [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode4.evaluate(state, curr_millis); }},
+    {true, true, true, true, true}),
     _dt_system(dt_system)
-    {}
+{
+
+}
+
 void VCRControls::handle_drivetrain_command()
 {
     if(_dt_system != nullptr)
