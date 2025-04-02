@@ -6,6 +6,8 @@
     #include "etl/singleton.h"
     #include "EthernetAddressDefs.h"
 
+    const int BAUD_RATE = 115200;
+
     using namespace qindesign::network;
 
     class VCREthernetTCPClient {

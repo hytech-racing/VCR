@@ -5,7 +5,7 @@ VCREthernetTCPClient::VCREthernetTCPClient() {
 }
 
 void VCREthernetTCPClient::begin() {
-    Serial.begin(115200);
+    Serial.begin(BAUD_RATE);
     while (!Serial) {}
 
     EthernetIPDefs_s& ipDeps = EthernetIPDefsInstance::instance();
