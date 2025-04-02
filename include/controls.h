@@ -5,6 +5,13 @@
 #include "SharedFirmwareTypes.h"
 #include "TorqueControllerMux.hpp"
 #include "controllers/SimpleController.h"
+
+/**
+ * Class that is responsible for actually commanding the drivetrain. The VehicleStateMachine
+ * must be able to call a no-args, no-return "command drivetrain" function, which is this
+ * class's "handle_drivetrain_command()" function. Then, internally, this class will find
+ * the DrivetrainCommand from the TC MUX and will command the drivetrain with it.
+ */
 class VCRControls
 {
 
@@ -15,8 +22,7 @@ class VCRControls
     private:
         TorqueControllerSimple _mode0; // this needs to be first for tc_mux to have a valid capture
         TCMuxTypeMinViable _tc_mux;
-        DrivetrainSystem *_dt_system = nullptr;
-        
+        DrivetrainSystem *_dt_system = nullptr; 
 
 };
 
