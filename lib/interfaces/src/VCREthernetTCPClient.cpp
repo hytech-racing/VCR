@@ -23,8 +23,8 @@ void VCREthernetTCPClient::sendAndReceive() {
         Serial.print("Connecting to server at ");
         Serial.print(ipDeps.acu_ip);
         Serial.print(":");
-        Serial.println(ipDeps.ACUAllData_port);
-        if (client.connect(ipDeps.acu_ip, ipDeps.ACUAllData_port)) {
+        Serial.println(ipDeps.ACUCoreData_port);
+        if (client.connect(ipDeps.acu_ip, ipDeps.ACUCoreData_port)) {
             Serial.println("Connected to server");
         } else {
             Serial.println("Connection failed");
