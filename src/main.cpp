@@ -97,7 +97,7 @@ veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr
 
 DrivetrainSystem drivetrain_system(inverter_functs);
 
-VCRControls controls(&drivetrain_system);
+VCRControls controls(&drivetrain_system, MAX_ALLOWED_DB_LATENCY_MS);
 
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
