@@ -11,7 +11,6 @@
 /* Local includes */
 #include "VCREthernetInterface.h"
 #include "VCR_Constants.h"
-#include "BuzzerController.h"
 #include "VCR_Globals.h"
 
 #include "AMSSystem.h"
@@ -96,12 +95,6 @@ bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
 
     ADCSingletonInstance::instance().adc1.tick();
 
-    return true;
-}
-
-bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    vcr_data.system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sys_time::hal_millis()); //NOLINT
     return true;
 }
 
