@@ -20,7 +20,11 @@ void VCRControls::handle_drivetrain_command()
 {
     if(_dt_system != nullptr)
     {
-        auto dt_command = _tc_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_MID_TORQUE, vcr_data);
+        // Testing code (mode 0 and mode 4)
+        ControllerMode_e mode = vcr_data.interface_data.dash_input_state.mode_btn_is_pressed ? ControllerMode_e::MODE_4 : ControllerMode_e::MODE_0;
+
+
+        auto dt_command = _tc_mux.get_drivetrain_command(mode, TorqueLimit_e::TCMUX_MID_TORQUE, vcr_data);
         _dt_system->evaluate_drivetrain(dt_command);
         // Serial.println("layer 2");
         // Serial.println(dt_command.torque_limits.FL);
