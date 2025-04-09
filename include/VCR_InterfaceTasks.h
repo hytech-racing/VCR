@@ -73,6 +73,11 @@ bool handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::Tas
 bool init_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
+/**
+ * This task reads the received pedals data and determines whether to turn on the brake light or not.
+ */
+bool init_update_brakelight_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+bool run_update_brakelight_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
 // task for sending all ethernet data
 bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized VCR)

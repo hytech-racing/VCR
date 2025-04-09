@@ -137,6 +137,7 @@ HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, s
 HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
 HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, main_task_priority, main_task_period_us);
+HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
 
 bool debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -178,6 +179,8 @@ void setup() {
     vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
     vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
 
+    pinMode(INVERTER_ENABLE_PIN, OUTPUT);
+    
     // Create all singletons
     IOExpanderInstance::create(0);
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
@@ -242,7 +245,6 @@ void setup() {
 
     // scheduler.schedule(adc_0_sample_task);
     // scheduler.schedule(adc_1_sample_task);
-    // scheduler.schedule(update_buzzer_controller_task);
     scheduler.schedule(kick_watchdog_task);
     scheduler.schedule(ams_system_task);
     // scheduler.schedule(enqueue_suspension_CAN_task);
@@ -251,7 +253,7 @@ void setup() {
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(main_task);
     scheduler.schedule(debug_state_print_task);
-    pinMode(2, OUTPUT);
+    scheduler.schedule(update_brakelight_task);
     
     // scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
 
