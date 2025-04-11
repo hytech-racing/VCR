@@ -20,6 +20,7 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
 
         case VehicleState_e::TRACTIVE_SYSTEM_ACTIVE: 
         {
+            hal_printf("start button : brake_pressed = %d %d\n", _is_start_button_pressed(), _is_brake_pressed());
             if (!_check_hv_over_threshold()) 
             {
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
@@ -91,6 +92,7 @@ void VehicleStateMachine::_set_state(VehicleState_e new_state, unsigned long cur
 
 void VehicleStateMachine::_handle_exit_logic(VehicleState_e prev_state, unsigned long curr_millis)
 {
+    hal_printf("Exiting state %d\n", prev_state);
     switch (prev_state)
     {
         case VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE:
