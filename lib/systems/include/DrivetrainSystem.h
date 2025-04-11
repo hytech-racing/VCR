@@ -79,6 +79,7 @@ public:
     bool hv_over_threshold();
     bool drivetrain_error_present();
     bool drivetrain_ready();
+    void reset_dt_error();
 
     DrivetrainStatus_s evaluate_drivetrain(CmdVariant cmd);
     DrivetrainState_e get_state();

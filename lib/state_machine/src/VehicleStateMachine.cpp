@@ -10,16 +10,26 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
     {
         case VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE:
         {
+            if (_is_inverter_reset_button_pressed() && _check_drivetrain_error_ocurred())
+            {
+                _reset_inverter_error();
+            }
             if (_check_hv_over_threshold()) 
             {
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
                 break;
             }
+            
             break;
         }
 
         case VehicleState_e::TRACTIVE_SYSTEM_ACTIVE: 
         {
+            if (_is_inverter_reset_button_pressed() && _check_drivetrain_error_ocurred())   
+            {
+                _reset_inverter_error();
+            }
+            
             hal_printf("start button : brake_pressed = %d %d\n", _is_start_button_pressed(), _is_brake_pressed());
             if (!_check_hv_over_threshold()) 
             {
@@ -32,6 +42,8 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 _set_state(VehicleState_e::WANTING_READY_TO_DRIVE, current_millis);
                 break;
             }
+
+            
             break;
         }
         case VehicleState_e::WANTING_READY_TO_DRIVE: 
@@ -58,6 +70,7 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 break;
             }
 
+
             // TODO this shouldnt de-latch us. 
             if (_check_drivetrain_error_ocurred())
             {
@@ -71,7 +84,8 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 break;
             }
 
-            _command_drivetrain();
+            
+            
             break;
         }
 

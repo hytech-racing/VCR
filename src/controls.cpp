@@ -23,23 +23,15 @@ void VCRControls::handle_drivetrain_command()
         // Testing code (mode 0 and mode 4)
         ControllerMode_e mode = vcr_data.interface_data.dash_input_state.mode_btn_is_pressed ? ControllerMode_e::MODE_4 : ControllerMode_e::MODE_0;
 
-        if(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed)
-        {
-            DrivetrainResetError_s cmd = {true};
-            _dt_system->evaluate_drivetrain(cmd);
-        } else {
-            auto dt_command = _tc_mux.get_drivetrain_command(mode, TorqueLimit_e::TCMUX_MID_TORQUE, vcr_data);
-            _debug_dt_command = dt_command;
-            _dt_system->evaluate_drivetrain(dt_command);
-        }
+        
+        auto dt_command = _tc_mux.get_drivetrain_command(mode, TorqueLimit_e::TCMUX_MID_TORQUE, vcr_data);
+        _debug_dt_command = dt_command;
+        _dt_system->evaluate_drivetrain(dt_command);
 
         
         
         // TODO if the user is requesting mc error reset, the dt command needs to be the error reset command
-        
-        // Serial.println("layer 2");
-        // Serial.println(dt_command.torque_limits.FL);
-        
+
     }
 }
 

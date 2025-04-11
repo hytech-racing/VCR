@@ -23,7 +23,9 @@ class VehicleStateMachine
             etl::delegate<void()> start_buzzer,
             etl::delegate<void()> command_drivetrain,
             etl::delegate<bool()> check_pedals_timeout,
-            etl::delegate<void()> reset_pedals_timeout
+            etl::delegate<void()> reset_pedals_timeout,
+            etl::delegate<bool()> is_inverter_reset_button_pressed,
+            etl::delegate<void()> reset_inverter_error
         ) :  
         _check_hv_over_threshold(check_hv_over_threshold),
         _is_start_button_pressed(is_start_button_pressed), 
@@ -33,7 +35,9 @@ class VehicleStateMachine
         _start_buzzer(start_buzzer),
         _command_drivetrain(command_drivetrain),
         _check_pedals_timeout(check_pedals_timeout),
-        _reset_pedals_timeout(reset_pedals_timeout)
+        _reset_pedals_timeout(reset_pedals_timeout),
+        _is_inverter_reset_button_pressed(is_inverter_reset_button_pressed),
+        _reset_inverter_error(reset_inverter_error)
         {   
             _current_state = VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE;
         }
@@ -62,6 +66,8 @@ class VehicleStateMachine
         etl::delegate<void()> _command_drivetrain; // Shouldn't need to pass anything; logic will be handled in the lambda
         etl::delegate<bool()> _check_pedals_timeout;
         etl::delegate<void()> _reset_pedals_timeout;
+        etl::delegate<bool()> _is_inverter_reset_button_pressed;
+        etl::delegate<void()> _reset_inverter_error;
 };
 
 using VehicleStateMachineInstance = etl::singleton<VehicleStateMachine>;

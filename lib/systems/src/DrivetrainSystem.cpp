@@ -1,4 +1,5 @@
 #include <DrivetrainSystem.h>
+#include <Arduino.h>
 
 //- [x] TODO handle inverter keepalives with correct settings of inverter flags for their associated states
 
@@ -41,6 +42,13 @@ bool DrivetrainSystem::drivetrain_ready()
     auto state = evaluate_drivetrain(init_cmd).state;
 
     return (state == DrivetrainState_e::ENABLED_DRIVE_MODE);
+}
+
+void DrivetrainSystem::reset_dt_error()
+{
+    DrivetrainResetError_s reset_cmd = {true};
+    DrivetrainSystem::CmdVariant var = reset_cmd;
+    auto state = evaluate_drivetrain(reset_cmd).state;
 }
 
 DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVariant cmd) 
@@ -313,6 +321,7 @@ void DrivetrainSystem::_set_drivetrain_disabled()
         func.set_inverter_control_word(disabled_control_word);
         func.set_idle(); // set speed / torque to zero
     }
+
 }
 
 void DrivetrainSystem::_set_enable_drivetrain_hv()
