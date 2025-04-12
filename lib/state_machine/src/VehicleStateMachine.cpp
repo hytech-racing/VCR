@@ -6,11 +6,12 @@
 
 VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_millis)
 {
+    _command_drivetrain(); // TODO turn this into tick drivetrain system or something OR move into separate tasks
     switch (_current_state)
     {
         case VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE:
         {
-            _command_drivetrain();
+            
             if (_check_hv_over_threshold()) 
             {
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
@@ -21,7 +22,7 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
 
         case VehicleState_e::TRACTIVE_SYSTEM_ACTIVE: 
         {
-            _command_drivetrain();
+
             // hal_printf("start button : brake_pressed = %d %d\n", _is_start_button_pressed(), _is_brake_pressed());
             if (!_check_hv_over_threshold()) 
             {
@@ -39,7 +40,6 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
         case VehicleState_e::WANTING_READY_TO_DRIVE: 
         {
             
-            _command_drivetrain();
             if (!_check_hv_over_threshold())
             {
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis); 
@@ -74,8 +74,6 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
                 break;
             }
-
-            _command_drivetrain();
             break;
         }
 
