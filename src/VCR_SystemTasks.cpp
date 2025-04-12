@@ -29,24 +29,11 @@ VCRInterfaceData_s sample_async_data(
     ret.dash_input_state = vcf_data.dash_input_state;
     ret.latest_drivebrain_command = drivebrain_data;
 
-    etl::optional<hytech_msgs_VCFData_s> vcf_data_protoc_struct = handle_ethernet_socket_receive<hytech_msgs_VCFData_s_size, hytech_msgs_VCFData_s>(&sockets.vcf_data_recv_socket, &hytech_msgs_VCFData_s_msg);
-    if (vcf_data_protoc_struct)
-        VCREthernetInterface::receive_pb_msg_vcf(vcf_data_protoc_struct.value(), vcr_data, millis());
-
-    etl::optional<hytech_msgs_ACUCoreData> acu_core_data_protoc_struct = handle_ethernet_socket_receive<hytech_msgs_ACUCoreData_size, hytech_msgs_ACUCoreData>(&sockets.acu_core_data_recv_socket, &hytech_msgs_ACUCoreData_msg);
-    if (acu_core_data_protoc_struct)
-        VCREthernetInterface::receive_pb_msg_acu_core_data(acu_core_data_protoc_struct.value(), vcr_data, millis());
-    
-    etl::optional<hytech_msgs_ACUAllData> acu_all_data_protoc_struct = handle_ethernet_socket_receive<2048, hytech_msgs_ACUAllData>(&sockets.acu_all_data_recv_socket, &hytech_msgs_ACUAllData_msg); // NOLINT (figure out how to handle repeated values)
-    // etl::optional<hytech_msgs_ACUAllData> acu_all_data_protoc_struct = handle_ethernet_socket_receive<hytech_msgs_ACUAllData_size, hytech_msgs_ACUAllData>(&sockets.acu_all_data_recv_socket, &hytech_msgs_ACUAllData_msg);
-    if (acu_all_data_protoc_struct)
-        VCREthernetInterface::receive_pb_msg_acu_all_data(acu_all_data_protoc_struct.value(), vcr_data);
-
     return ret;
 }
 
 VCRSystemData_s evaluate_async_systems(const VCRInterfaceData_s &interface_data) {
-    VCRSystemData_s sys_data;
+    VCRSystemData_s sys_data = {};
 
 
     /*

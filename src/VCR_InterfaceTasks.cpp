@@ -89,7 +89,6 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     return true;
 }
 
-
 bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
@@ -112,8 +111,6 @@ bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     digitalWrite(SOFTWARE_OK_PIN, true);
     return true;
 }
-
-
 
 bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {

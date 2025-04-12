@@ -105,7 +105,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         }
 
         case DrivetrainState_e::NOT_ENABLED_HV_PRESENT:
-        {   
+        {
             bool inverter_error_present = false;
             inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
             if(inverter_error_present)
