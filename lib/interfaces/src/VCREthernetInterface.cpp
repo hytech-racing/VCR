@@ -129,19 +129,6 @@ void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &m
 
 void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
 {
-    //PedalsSystemData_s
-    // shared_state.interface_data.recvd_pedals_data.pedals_data.accel_is_implausible = msg_in.pedals_system_data.accel_is_implausible;
-    // shared_state.interface_data.recvd_pedals_data.pedals_data.brake_is_implausible = msg_in.pedals_system_data.brake_is_implausible;
-    // shared_state.interface_data.recvd_pedals_data.pedals_data.brake_is_pressed = msg_in.pedals_system_data.brake_is_pressed;
-    // shared_state.interface_data.recvd_pedals_data.pedals_data.accel_is_pressed = msg_in.pedals_system_data.accel_is_pressed;
-    // shared_state.interface_data.recvd_pedals_data.pedals_data.mech_brake_is_active = msg_in.pedals_system_data.mech_brake_is_active;
-    // shared_state.interface_data.recvd_pedals_data.pedals_data.brake_and_accel_pressed_implausibility_high = msg_in.pedals_system_data.brake_and_accel_pressed_implausibility_high;
-    // shared_state.interface_data.recvd_pedals_data.pedals_data.implausibility_has_exceeded_max_duration = msg_in.pedals_system_data.implausibility_has_exceeded_max_duration;
-    // shared_state.interface_data.recvd_pedals_data.pedals_data.accel_percent = msg_in.pedals_system_data.accel_percent;
-    // shared_state.interface_data.recvd_pedals_data.pedals_data.brake_percent = msg_in.pedals_system_data.brake_percent;
-    // shared_state.interface_data.recvd_pedals_data.pedals_data.regen_percent = msg_in.pedals_system_data.regen_percent;
-    // shared_state.interface_data.recvd_pedals_data.last_recv_millis = curr_millis;
-
     // //DashInputState_s
     // shared_state.interface_data.dash_input_state.data_btn_is_pressed = msg_in.dash_input_state.data_btn_is_pressed;
     // shared_state.interface_data.dash_input_state.dial_state = (ControllerMode_e) msg_in.dash_input_state.dial_state;

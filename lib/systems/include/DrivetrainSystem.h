@@ -84,7 +84,7 @@ public:
     DrivetrainState_e get_state();
     DrivetrainStatus_s get_status();
 
-    // DrivetrainDynamicReport_s get_dynamic_data();
+    // DrivetrainDynamicReport_s get_dynamic_data();    
 
     struct InverterFuncts {
         std::function<void(float desired_rpm, float torque_limit_nm)> set_speed;
