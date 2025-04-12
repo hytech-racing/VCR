@@ -1,4 +1,5 @@
 #include <DrivetrainSystem.h>
+#include <Arduino.h>
 
 //- [x] TODO handle inverter keepalives with correct settings of inverter flags for their associated states
 
@@ -45,6 +46,7 @@ bool DrivetrainSystem::drivetrain_ready()
 
 DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVariant cmd) 
 {
+
     auto state = _evaluate_state_machine(cmd);
 
     DrivetrainStatus_s status;
@@ -245,6 +247,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
         case DrivetrainState_e::ERROR:
         {
+            _set_drivetrain_disabled();
             bool user_requesting_error_reset = etl::holds_alternative<DrivetrainResetError_s>(cmd) && (etl::get<DrivetrainResetError_s>(cmd).reset_errors); 
             bool inverter_error_present = false;
             
@@ -262,7 +265,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         }
         case DrivetrainState_e::CLEARING_ERRORS: 
         {
-
+            _set_drivetrain_disabled();
             bool inverter_error_present = false;
             inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
 

@@ -82,7 +82,7 @@ constexpr unsigned long MAX_ALLOWED_DB_LATENCY_MS = 20; // milliseconds
 
 /* Inverter constants */
 constexpr int INVERTER_EN_PIN = 2;
-constexpr int INVERTER_MINIMUM_HV_VOLTAGE = 400;
+constexpr int INVERTER_MINIMUM_HV_VOLTAGE = 60;
 
 /* Task loop rates & priorities */
 constexpr unsigned long adc0_sample_period_us = 250;                 // 250 us = 4 kHz
