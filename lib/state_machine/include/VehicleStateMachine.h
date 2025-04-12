@@ -21,7 +21,7 @@ class VehicleStateMachine
             etl::delegate<bool()> check_drivetrain_error_ocurred, 
             etl::delegate<bool()> check_drivetrain_ready, // when calling this function the initialization of the drivetrain is occuring, returning false during and true when finished
             etl::delegate<void()> start_buzzer,
-            etl::delegate<void()> command_drivetrain,
+            etl::delegate<void(bool)> command_drivetrain,
             etl::delegate<bool()> check_pedals_timeout,
             etl::delegate<void()> reset_pedals_timeout
         ) :  
@@ -59,7 +59,7 @@ class VehicleStateMachine
         etl::delegate<bool()> _check_drivetrain_error_ocurred; 
         etl::delegate<bool()> _check_drivetrain_ready; 
         etl::delegate<void()> _start_buzzer;
-        etl::delegate<void()> _command_drivetrain; // Shouldn't need to pass anything; logic will be handled in the lambda
+        etl::delegate<void(bool)> _command_drivetrain; // Shouldn't need to pass anything; logic will be handled in the lambda
         etl::delegate<bool()> _check_pedals_timeout;
         etl::delegate<void()> _reset_pedals_timeout;
 };

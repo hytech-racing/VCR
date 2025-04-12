@@ -230,15 +230,12 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
             bool valid_drivetrain_command = etl::holds_alternative<DrivetrainCommand_s>(cmd);
             
-            if(inverter_error_present)
-            {
+            if (inverter_error_present) {
                 _set_drivetrain_disabled();
                 _set_state(DrivetrainState_e::ERROR);
                 break;
-            }
-            else if (valid_drivetrain_command) {
+            } else if (valid_drivetrain_command) {
                 DrivetrainCommand_s drivetrain_command = etl::get<DrivetrainCommand_s>(cmd);
-                
                 
                 _set_drivetrain_command(drivetrain_command);
             }

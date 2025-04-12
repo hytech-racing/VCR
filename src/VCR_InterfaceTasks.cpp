@@ -98,8 +98,6 @@ bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     return true;
 }
 
-
-
 bool init_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS); // NOLINT 

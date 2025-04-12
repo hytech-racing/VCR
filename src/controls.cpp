@@ -16,7 +16,7 @@ VCRControls::VCRControls(DrivetrainSystem *dt_system, uint32_t max_allowed_db_la
 
 }
 
-void VCRControls::handle_drivetrain_command()
+void VCRControls::handle_drivetrain_command(bool ready_to_drive)
 {
     if(_dt_system != nullptr)
     {
@@ -27,9 +27,14 @@ void VCRControls::handle_drivetrain_command()
         {
             DrivetrainResetError_s cmd = {true};
             _dt_system->evaluate_drivetrain(cmd);
-        } else {
+        } else if (ready_to_drive) {
             auto dt_command = _tc_mux.get_drivetrain_command(mode, TorqueLimit_e::TCMUX_MID_TORQUE, vcr_data);
             _debug_dt_command = dt_command;
+            _dt_system->evaluate_drivetrain(dt_command);
+        } else {
+            DrivetrainInit_s dt_command = {
+                .init_drivetrain = UNINITIALIZED
+            };
             _dt_system->evaluate_drivetrain(dt_command);
         }
 
