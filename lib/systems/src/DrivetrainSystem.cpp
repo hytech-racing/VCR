@@ -59,9 +59,9 @@ DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVa
     DrivetrainStatus_s status;
     status.all_inverters_connected = (_inverter_interfaces.FL.get_status().connected && _inverter_interfaces.FR.get_status().connected && _inverter_interfaces.RL.get_status().connected && _inverter_interfaces.RR.get_status().connected);
     // while not all inverters are connected, some may still be here so we can return the entire status for partially connected drivetrain.
-    status.inverter_statuses = {_inverter_interfaces.FL.get_status(), 
-                                _inverter_interfaces.FR.get_status(), 
-                                _inverter_interfaces.RL.get_status(), 
+    status.inverter_statuses = {_inverter_interfaces.FL.get_status(),
+                                _inverter_interfaces.FR.get_status(),
+                                _inverter_interfaces.RL.get_status(),
                                 _inverter_interfaces.RR.get_status() };
 
     bool attempting_init_while_not_connected = ((state == DrivetrainState_e::NOT_CONNECTED) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED));
@@ -90,10 +90,10 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             bool connected_hv_present = false;
             connected_hv_present = (_check_inverter_flags(_check_inverter_connected_flag) && _check_inverter_flags(_check_inverter_hv_present_flag)); 
             
-            if(connected_no_hv_present)
+            if (connected_no_hv_present)
             {
                 _set_state(DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT);
-            } else if(connected_hv_present)
+            } else if (connected_hv_present)
             {
                 _set_state(DrivetrainState_e::NOT_ENABLED_HV_PRESENT);
             }

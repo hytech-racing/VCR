@@ -38,13 +38,21 @@ enum class DrivetrainState_e
     CLEARING_ERRORS = 8
 };
 
+/**
+ * When user calls evaluate_drivetrain(), this is part of the returned status to
+ * indicate if the command was successful, invalid, or 
+ */
 enum class DrivetrainCmdResponse_e
 {
     COMMAND_OK = 0,
-    CANNOT_INIT_NOT_CONNECTED = 1,
+    CANNOT_INIT_NOT_CONNECTED = 1, // When requesting init but inverters are not yet requested
     COMMAND_INVALID = 2
 };
 
+/**
+ * Actual struct that gets returned on drivetrain evaluation. Contains the current DSM state,
+ * the command response (OK, INVALID, etc), and each corner's inverter status.
+ */
 struct DrivetrainStatus_s
 {
     bool all_inverters_connected;
@@ -53,6 +61,14 @@ struct DrivetrainStatus_s
     DrivetrainState_e state;
 };
 
+
+
+
+/**
+ * There are three types of commands going into the DrivetrainSystem. There is the
+ * normal DrivetrainCommand (see SharedFirmwareTypes.h), a "reset error" command,
+ * and a "init" command.
+ */
 struct DrivetrainResetError_s
 {
     bool reset_errors; // true: reset the errors present on inverters, false: dont
@@ -60,7 +76,7 @@ struct DrivetrainResetError_s
 
 enum DrivetrainModeRequest_e 
 {
-    UNINITIALIZED = 0,
+    UNINITIALIZED = 0, // If sending a DrivetrainInit command with UNIITIALIZED, it will not initialize
     INIT_DRIVE_MODE = 1
 };
 
@@ -69,23 +85,38 @@ struct DrivetrainInit_s
     DrivetrainModeRequest_e init_drivetrain;
 };
 
+/**
+ * The DrivetrainSystem is primarily responsible for two things:
+ * 1) Updating its internal state machine
+ * 2) Determining what commands to give each InverterInterface
+ */
+
 class DrivetrainSystem
 {
 public:
+    /**
+     * etl::variants allow multiple types to be treated as a single type-- almost like an enum of types.
+     * Here, we're just saying that when we refer to CmdVariant, the parameter can be any one of these
+     * three options.
+     */
     using CmdVariant = etl::variant<DrivetrainCommand_s, DrivetrainInit_s, DrivetrainResetError_s>;
     DrivetrainSystem() = delete;
     
-    // these are functions for interaction with the state machine mostly
+    /**
+     * Functions for VSM state transitions (VSM needs to know drivetrain's status to trigger its
+     * state transitions).
+     */
     bool hv_over_threshold();
     bool drivetrain_error_present();
     bool drivetrain_ready();
     void reset_dt_error();
 
+    /**
+     * Drivetrain state machine (DSM) functions
+     */
     DrivetrainStatus_s evaluate_drivetrain(CmdVariant cmd);
     DrivetrainState_e get_state();
     DrivetrainStatus_s get_status();
-
-    // DrivetrainDynamicReport_s get_dynamic_data();    
 
     struct InverterFuncts {
         std::function<void(float desired_rpm, float torque_limit_nm)> set_speed;
@@ -96,12 +127,14 @@ public:
     };
     
     DrivetrainSystem(veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces);
+    
 private:
+    /**
+     * Internal functions for handling DSM state transitions.
+     */
     bool _check_inverter_flags(std::function<bool(const InverterStatus_s&)> flag_check_func);
     bool _drivetrain_active(float min_active_rpm);
-
     void _set_state(DrivetrainState_e state);
-    
     void _set_drivetrain_disabled();
     void _set_drivetrain_keepalive_idle();
     void _set_enable_drivetrain_hv();
@@ -110,12 +143,15 @@ private:
     void _set_drivetrain_command(DrivetrainCommand_s cmd);
 
     DrivetrainState_e _evaluate_state_machine(CmdVariant cmd);
-
-private:
-    const float _active_rpm_level = 100;
-    veh_vec<InverterFuncts> _inverter_interfaces;
     DrivetrainState_e _state;
     DrivetrainStatus_s _status;
+
+    const float _active_rpm_level = 100;
+    veh_vec<InverterFuncts> _inverter_interfaces;
+
+    /**
+     * Lambda functions defined on construction for the DSM state transitions.
+     */
     std::function<bool(const InverterStatus_s &)> _check_inverter_ready_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_connected_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_quit_dc_flag;

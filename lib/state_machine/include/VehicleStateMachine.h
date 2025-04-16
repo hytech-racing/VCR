@@ -62,9 +62,15 @@ class VehicleStateMachine
 
         VehicleState_e _current_state;
 
+        /**
+         * Timestamp when entering WANTING_RECALIBRATE_PEDALS to ensure we stay there
+         * for 1000ms before actually sending the recalibration command.
+         */
         uint32_t _last_entered_waiting_state_ms = 0;
 
-        // Lambdas neccesary for state machine to work
+        /**
+         * Lambdas necessary for state machine to work.
+         */
         etl::delegate<bool()> _check_hv_over_threshold; 
         etl::delegate<bool()> _is_start_button_pressed; 
         etl::delegate<bool()> _is_brake_pressed; 
@@ -72,7 +78,7 @@ class VehicleStateMachine
         etl::delegate<bool()> _check_drivetrain_ready; 
         etl::delegate<void()> _start_buzzer;
         etl::delegate<void()> _send_recalibrate_pedals_message;
-        etl::delegate<void(bool)> _command_drivetrain; // Shouldn't need to pass anything; logic will be handled in the lambda
+        etl::delegate<void(bool)> _command_drivetrain; // Passes in true/false depending on whether we're in RTD or not.
         etl::delegate<bool()> _check_pedals_timeout;
         etl::delegate<void()> _reset_pedals_timeout;
         etl::delegate<bool()> _is_inverter_reset_button_pressed;
