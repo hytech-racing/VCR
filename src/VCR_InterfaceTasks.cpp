@@ -86,7 +86,7 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = 
         ADCSingletonInstance::instance().adc0.data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
 
-    Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
+    // Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
 
     return true;
 }
@@ -157,7 +157,7 @@ bool handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::Tas
 bool enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
-    Serial.println("uhh");
+    // Serial.println("uhh");
 
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();

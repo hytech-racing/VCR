@@ -104,6 +104,7 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
             }
 
+            // Serial.printf("current_millis - _last_entered_waiting_state_ms : %d - %d\n", current_millis, _last_entered_waiting_state_ms);
             if (_is_calibrate_pedals_button_pressed() && (current_millis - _last_entered_waiting_state_ms > 1000))
             {
                 _set_state(VehicleState_e::RECALIBRATING_PEDALS, current_millis);
@@ -183,7 +184,7 @@ void VehicleStateMachine::_handle_entry_logic(VehicleState_e new_state, unsigned
         case VehicleState_e::READY_TO_DRIVE:
             break;
         case VehicleState_e::WANTING_RECALIBRATE_PEDALS:
-            _last_entered_waiting_state_ms = millis;
+            _last_entered_waiting_state_ms = curr_millis;
             break;
         case VehicleState_e::RECALIBRATING_PEDALS:
             break;

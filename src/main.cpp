@@ -167,6 +167,9 @@ bool debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskIn
 
     Serial.print("Start button pressed: ");
     Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
+
+    Serial.print("pedal recalibrate button pressed: ");
+    Serial.println(vcr_data.interface_data.dash_input_state.preset_btn_is_pressed);
     
     Serial.print("mc reset button pressed: ");
     Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
@@ -262,7 +265,7 @@ void setup() {
     // scheduler.schedule(vcr_data_ethernet_send);
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(main_task);
-    // scheduler.schedule(debug_state_print_task);
+    scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     
     // scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
