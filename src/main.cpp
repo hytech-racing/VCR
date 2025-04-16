@@ -227,7 +227,7 @@ void setup() {
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_not_ok>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_drivetrain_reset_pressed>(VCFInterfaceInstance::instance()),
-        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_calibrate_pedals_button_pressed>(VCFInterfaceInstance::instance()),
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_recalibrate_pedals_button_pressed>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<DrivetrainSystem, &DrivetrainSystem::reset_dt_error, drivetrain_system>()
     );
 

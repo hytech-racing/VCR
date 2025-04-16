@@ -23,12 +23,12 @@ class VehicleStateMachine
             etl::delegate<bool()> check_drivetrain_error_ocurred, 
             etl::delegate<bool()> check_drivetrain_ready, // when calling this function the initialization of the drivetrain is occuring, returning false during and true when finished
             etl::delegate<void()> start_buzzer,
-            etl:;delegate<void()> recalibrate_pedals,
+            etl::delegate<void()> recalibrate_pedals,
             etl::delegate<void(bool)> command_drivetrain,
             etl::delegate<bool()> check_pedals_timeout,
             etl::delegate<void()> reset_pedals_timeout,
             etl::delegate<bool()> is_inverter_reset_button_pressed,
-            etl:;delegate<void()>, is_calibrate_pedals_button_pressed,
+            etl::delegate<bool()> is_calibrate_pedals_button_pressed,
             etl::delegate<void()> reset_inverter_error
         ) :  
         _check_hv_over_threshold(check_hv_over_threshold),
@@ -76,7 +76,7 @@ class VehicleStateMachine
         etl::delegate<bool()> _check_pedals_timeout;
         etl::delegate<void()> _reset_pedals_timeout;
         etl::delegate<bool()> _is_inverter_reset_button_pressed;
-        etl:;delegate<bool()> _is_calibrate_pedals_button_pressed;
+        etl::delegate<bool()> _is_calibrate_pedals_button_pressed;
         etl::delegate<void()> _reset_inverter_error;
 };
 

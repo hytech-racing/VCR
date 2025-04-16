@@ -23,7 +23,7 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
 
             if (_is_calibrate_pedals_button_pressed())
             {
-                set_state(VehicleState_e::WANTING_RECALIBRATE_PEDALS, current_millis);
+                _set_state(VehicleState_e::WANTING_RECALIBRATE_PEDALS, current_millis);
             }
             
             _command_drivetrain(false);
@@ -95,7 +95,7 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
             }
             break;
         }
-        case VehicleState_e::WANTING_CALIBRATE_PEDALS:
+        case VehicleState_e::WANTING_RECALIBRATE_PEDALS:
         {
             _command_drivetrain(false);
             
@@ -104,14 +104,14 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
             }
 
-            if (_is_calibrate_pedals_button_pressed() && (current_millis - _last_entered_waiting_ms > 1000))
+            if (_is_calibrate_pedals_button_pressed() && (current_millis - _last_entered_waiting_state_ms > 1000))
             {
-                _set_state(VehicleState_e::CALIBRATING_PEDALS, current_millis);
+                _set_state(VehicleState_e::RECALIBRATING_PEDALS, current_millis);
             }
 
             break;
         }
-        case VehicleState_e::CALIBRATING_PEDALS:
+        case VehicleState_e::RECALIBRATING_PEDALS:
         {
             _command_drivetrain(false);
             
