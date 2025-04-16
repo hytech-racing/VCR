@@ -109,7 +109,7 @@ etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_
 bool drivetrain_initialized = false;
 TorqueControllerSimple mode0;
 
-bool run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     auto new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data, {
         .vcr_data_send_socket = vcr_data_send_socket,
@@ -123,7 +123,7 @@ bool run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& task
     vcr_data.system_data = sys_data;
     vcr_data.interface_data = new_interface_data;
 
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
 /* Task Declarations */
@@ -139,7 +139,7 @@ HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_
 HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
 
-bool debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     Serial.println("timestamp\t:\taccel\t:\tbrake");
     Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
@@ -173,7 +173,7 @@ bool debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskIn
     
     Serial.print("mc reset button pressed: ");
     Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
 HT_TASK::Task debug_state_print_task(HT_TASK::DUMMY_FUNCTION, debug_print, 100, 100000); //NOLINT (priority and loop rate)
@@ -265,7 +265,7 @@ void setup() {
     // scheduler.schedule(vcr_data_ethernet_send);
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(main_task);
-    scheduler.schedule(debug_state_print_task);
+    // scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     
     // scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
