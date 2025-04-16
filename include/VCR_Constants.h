@@ -5,8 +5,8 @@
 /* -------------------------------------------------- */
 /*                 Teensy 4.1 GPIO pins               */
 /* -------------------------------------------------- */
-constexpr int ADC0_CS = 10; // MCP3208. ADC0 in VCR schematic. Used for valuable telem data.
-constexpr int ADC1_CS = 11; // MCP3208. ADC1 in VCR schematic. Used for extra thermistors or extra sensors while testing.
+constexpr int ADC0_CS = 40; // MCP3208. ADC0 in VCR schematic. Used for valuable telem data.
+constexpr int ADC1_CS = 39; // MCP3208. ADC1 in VCR schematic. Used for extra thermistors or extra sensors while testing.
 constexpr int BRAKELIGHT_CONTROL_PIN = 32;
 
 
