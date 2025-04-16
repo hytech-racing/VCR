@@ -18,7 +18,7 @@ class VCRControls
 
     public:
         explicit VCRControls(DrivetrainSystem *dt_system, uint32_t max_allowed_db_latency_ms);
-        void handle_drivetrain_command();
+        void handle_drivetrain_command(bool ready_to_drive);
         DrivetrainCommand_s _debug_dt_command = {};
     private:
         TorqueControllerSimple _mode0; // this needs to be first for tc_mux to have a valid capture

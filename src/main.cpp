@@ -128,7 +128,7 @@ bool run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& task
 
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
-HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
+// HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
 HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, watchdog_priority, kick_watchdog_period_us); 
 HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, ams_priority, ams_update_period_us);
 HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, suspension_priority, suspension_can_period_us);
@@ -182,6 +182,8 @@ void setup() {
     vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
 
     pinMode(INVERTER_ENABLE_PIN, OUTPUT);
+
+    SPI.begin();
     
     // Create all singletons
     IOExpanderInstance::create(0);
@@ -220,7 +222,7 @@ void setup() {
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
-        etl::delegate<void()>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
+        etl::delegate<void(bool)>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_not_ok>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_drivetrain_reset_pressed>(VCFInterfaceInstance::instance()),
@@ -247,7 +249,9 @@ void setup() {
     handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(VCRCANInterfaceImpl::TELEM_CAN, CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
 
-    // scheduler.schedule(adc_0_sample_task);
+    init_adc_bundle();
+
+    scheduler.schedule(adc_0_sample_task);
     // scheduler.schedule(adc_1_sample_task);
     scheduler.schedule(kick_watchdog_task);
     scheduler.schedule(ams_system_task);
@@ -256,13 +260,11 @@ void setup() {
     // scheduler.schedule(vcr_data_ethernet_send);
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(main_task);
-    scheduler.schedule(debug_state_print_task);
+    // scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     
     // scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
 
-    
-    init_adc_bundle();
     // while(!Serial) {}; // hold your horses
 }
 

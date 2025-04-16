@@ -14,11 +14,14 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
             {
                 _reset_inverter_error();
             }
+
             if (_check_hv_over_threshold()) 
             {
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
                 break;
             }
+            
+            _command_drivetrain(false);
             
             break;
         }
@@ -30,7 +33,9 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 _reset_inverter_error();
             }
             
-            hal_printf("start button : brake_pressed = %d %d\n", _is_start_button_pressed(), _is_brake_pressed());
+            _command_drivetrain(false);
+            // hal_printf("start button : brake_pressed = %d %d\n", _is_start_button_pressed(), _is_brake_pressed());
+
             if (!_check_hv_over_threshold()) 
             {
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
@@ -42,12 +47,12 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 _set_state(VehicleState_e::WANTING_READY_TO_DRIVE, current_millis);
                 break;
             }
-
             
             break;
         }
         case VehicleState_e::WANTING_READY_TO_DRIVE: 
         {
+            _command_drivetrain(false);
             if (!_check_hv_over_threshold())
             {
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis); 
@@ -64,14 +69,14 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
 
         case VehicleState_e::READY_TO_DRIVE: 
         {
+            _command_drivetrain(true);
+            
             if (!_check_hv_over_threshold()) 
             {
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
                 break;
             }
 
-
-            // TODO this shouldnt de-latch us. 
             if (_check_drivetrain_error_ocurred())
             {
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
@@ -83,9 +88,6 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
                 break;
             }
-
-            
-            
             break;
         }
 
@@ -106,7 +108,7 @@ void VehicleStateMachine::_set_state(VehicleState_e new_state, unsigned long cur
 
 void VehicleStateMachine::_handle_exit_logic(VehicleState_e prev_state, unsigned long curr_millis)
 {
-    hal_printf("Exiting state %d\n", prev_state);
+    // hal_printf("Exiting state %d\n", prev_state);
     switch (prev_state)
     {
         case VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE:

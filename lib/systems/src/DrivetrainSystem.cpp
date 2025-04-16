@@ -53,6 +53,7 @@ void DrivetrainSystem::reset_dt_error()
 
 DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVariant cmd) 
 {
+
     auto state = _evaluate_state_machine(cmd);
 
     DrivetrainStatus_s status;
@@ -111,7 +112,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         }
 
         case DrivetrainState_e::NOT_ENABLED_HV_PRESENT:
-        {   
+        {
             bool inverter_error_present = false;
             inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
             if(inverter_error_present)
@@ -225,34 +226,29 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
         case DrivetrainState_e::ENABLED_DRIVE_MODE:
         {
-            if(!(_check_inverter_flags(_check_inverter_hv_present_flag)))
-            {
-                _set_state(DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT);
-                break;
-            }
 
+            // State Transitions
             bool inverter_error_present = false;
             inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);  
 
             bool valid_drivetrain_command = etl::holds_alternative<DrivetrainCommand_s>(cmd);
             
-            if(inverter_error_present)
-            {
-                _set_drivetrain_disabled();
+            if (inverter_error_present) {
                 _set_state(DrivetrainState_e::ERROR);
-                break;
-            }
-            else if (valid_drivetrain_command) {
+            } else if(!(_check_inverter_flags(_check_inverter_hv_present_flag))) {
+                _set_state(DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT);
+            } else if (valid_drivetrain_command) {
                 DrivetrainCommand_s drivetrain_command = etl::get<DrivetrainCommand_s>(cmd);
-                
-                
                 _set_drivetrain_command(drivetrain_command);
+            } else if (!valid_drivetrain_command) {
+                _set_state(DrivetrainState_e::INVERTERS_ENABLED);
             }
             break;
         }
 
         case DrivetrainState_e::ERROR:
         {
+            _set_drivetrain_disabled();
             bool user_requesting_error_reset = etl::holds_alternative<DrivetrainResetError_s>(cmd) && (etl::get<DrivetrainResetError_s>(cmd).reset_errors); 
             bool inverter_error_present = false;
             
@@ -265,12 +261,12 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             } else if(user_requesting_error_reset && (!inverter_error_present))
             {
                 _set_state(DrivetrainState_e::NOT_ENABLED_HV_PRESENT);
-            }
+            } 
             break;
         }
         case DrivetrainState_e::CLEARING_ERRORS: 
         {
-
+            _set_drivetrain_disabled();
             bool inverter_error_present = false;
             inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
 

@@ -67,7 +67,7 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
 
     vcr_data.interface_data.current_sensor_data.twentyfour_volt_sensor = 
         ADCSingletonInstance::instance().adc0.data.conversions[GLV_SENSE_CHANNEL].conversion;
-
+        
     vcr_data.interface_data.current_sensor_data.current_sensor_unfiltered = 
         ADCSingletonInstance::instance().adc0.data.conversions[CURRENT_SENSE_CHANNEL].conversion;
 
@@ -86,9 +86,10 @@ bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = 
         ADCSingletonInstance::instance().adc0.data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
 
+    Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
+
     return true;
 }
-
 
 bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -97,8 +98,6 @@ bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
 
     return true;
 }
-
-
 
 bool init_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -115,8 +114,6 @@ bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo
     return true;
 }
 
-
-
 bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     WatchdogInstance::create(WATCHDOG_KICK_INTERVAL_MS); // NOLINT
@@ -130,6 +127,7 @@ bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& 
 
     digitalWrite(INVERTER_ENABLE_PIN, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::WANTING_READY_TO_DRIVE
                     || VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE); // Enables inverters when in WAITING_RTD or READY_TO_DRIVE mode
+    
     return true;
 }
 
@@ -158,6 +156,9 @@ bool handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::Tas
 
 bool enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
+
+    Serial.println("uhh");
+
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();
 

@@ -173,6 +173,8 @@ void InverterInterface::set_speed(float desired_rpm, float torque_limit_nm)
     _inverter_control_inputs.speed_rpm_setpoint = static_cast<int16_t>(desired_rpm);
 
     // float converted_torque = std::abs(torque_limit_nm * (1000/9.8));
+    // Serial.println("set torq");
+    // Serial.println(fabs(torque_limit_nm));
     _inverter_control_inputs.positive_torque_limit = ::fabs(torque_limit_nm);
     _inverter_control_inputs.negative_torque_limit = -1.0f * ::fabs(torque_limit_nm);
 }
