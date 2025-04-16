@@ -20,6 +20,11 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
                 break;
             }
+
+            if (_is_calibrate_pedals_button_pressed())
+            {
+                set_state(VehicleState_e::WANTING_RECALIBRATE_PEDALS, current_millis);
+            }
             
             _command_drivetrain(false);
             
@@ -90,7 +95,38 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
             }
             break;
         }
+        case VehicleState_e::WANTING_CALIBRATE_PEDALS:
+        {
+            _command_drivetrain(false);
+            
+            if (!_is_calibrate_pedals_button_pressed())
+            {
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
+            }
 
+            if (_is_calibrate_pedals_button_pressed() && (current_millis - _last_entered_waiting_ms > 1000))
+            {
+                _set_state(VehicleState_e::CALIBRATING_PEDALS, current_millis);
+            }
+
+            break;
+        }
+        case VehicleState_e::CALIBRATING_PEDALS:
+        {
+            _command_drivetrain(false);
+            
+            if (!_is_calibrate_pedals_button_pressed())
+            {
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
+            }
+            
+            if (_is_calibrate_pedals_button_pressed())
+            {
+                _send_recalibrate_pedals_message();
+            }
+
+            break;
+        }
         default: 
         {
             break;
@@ -119,6 +155,12 @@ void VehicleStateMachine::_handle_exit_logic(VehicleState_e prev_state, unsigned
             break;
         case VehicleState_e::READY_TO_DRIVE:
             break;
+        case VehicleState_e::WANTING_RECALIBRATE_PEDALS:
+            _last_entered_waiting_state_ms = 0;
+            break;
+        case VehicleState_e::RECALIBRATING_PEDALS:
+            _last_entered_waiting_state_ms = 0;
+            break;
         default:
             break;
     }
@@ -139,6 +181,11 @@ void VehicleStateMachine::_handle_entry_logic(VehicleState_e new_state, unsigned
             break;
         }
         case VehicleState_e::READY_TO_DRIVE:
+            break;
+        case VehicleState_e::WANTING_RECALIBRATE_PEDALS:
+            _last_entered_waiting_state_ms = millis;
+            break;
+        case VehicleState_e::RECALIBRATING_PEDALS:
             break;
         default:
             break;

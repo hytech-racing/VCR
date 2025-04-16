@@ -75,5 +75,14 @@ void VCFInterface::send_buzzer_start_message()
 {
     DASHBOARD_BUZZER_CONTROL_t ctrl = {};
     ctrl.dash_buzzer_flag = true;
+    ctrl.in_pedal_calibration_state = false;
+    CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
+void VCFInterface::send_recalibrate_pedals_message()
+{
+    DASHBOARD_BUZZER_CONTROL_t ctrl = {};
+    ctrl.dash_buzzer_flag = false;
+    ctrl.in_pedal_calibration_state = true;
     CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }

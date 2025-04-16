@@ -222,10 +222,12 @@ void setup() {
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_recalibrate_pedals_message>(VCFInterfaceInstance::instance()),
         etl::delegate<void(bool)>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_not_ok>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_drivetrain_reset_pressed>(VCFInterfaceInstance::instance()),
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_calibrate_pedals_button_pressed>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<DrivetrainSystem, &DrivetrainSystem::reset_dt_error, drivetrain_system>()
     );
 
