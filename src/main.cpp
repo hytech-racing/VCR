@@ -265,7 +265,7 @@ void setup() {
     // scheduler.schedule(vcr_data_ethernet_send);
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(main_task);
-    // scheduler.schedule(debug_state_print_task);
+    scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     
     // scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout

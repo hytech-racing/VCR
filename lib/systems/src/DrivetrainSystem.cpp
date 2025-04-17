@@ -53,7 +53,6 @@ void DrivetrainSystem::reset_dt_error()
 
 DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVariant cmd) 
 {
-
     auto state = _evaluate_state_machine(cmd);
 
     DrivetrainStatus_s status;

@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "SystemTimeInterface.h"
+#include "Logger.h"
 
 template <std::size_t num_controllers>
 DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command(ControllerMode_e requested_controller_type,
@@ -26,6 +27,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
 
     if( (!_controller_evals[active_controller_mode_index]) || (!_controller_evals[req_controller_mode_index]))
     {
+        hal_println("controller nullptr");
         _active_status.active_error = TorqueControllerMuxError_e::ERROR_CONTROLLER_NULL_POINTER;
         return empty_command;
     }
