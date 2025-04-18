@@ -43,34 +43,34 @@ constexpr float REFERENCE_SENSE_SCALE = (float)(24/((2.77149877/3.3)*4096)); //u
 constexpr int REFERENCE_SENSE_OFFSET = 0; //No offset for REFERENCE_SENSE
 
 //Values are from the old MCU rev15
-constexpr float RL_LOADCELL_SCALE = 0.1149f;
-constexpr float RL_LOADCELL_OFFSET = 13.526f / RL_LOADCELL_SCALE;
-constexpr float RR_LOADCELL_SCALE = 0.118f;
-constexpr float RR_LOADCELL_OFFSET = 25.721f / RR_LOADCELL_SCALE;
+constexpr float RL_LOADCELL_SCALE = 1;
+constexpr float RL_LOADCELL_OFFSET = 0;
+constexpr float RR_LOADCELL_SCALE = 1;
+constexpr float RR_LOADCELL_OFFSET = 0;
 
 //does not matter that much
 constexpr float RL_SUS_POT_SCALE = 1;
-constexpr int RL_SUS_POT_OFFSET = 1;
+constexpr int RL_SUS_POT_OFFSET = 0;
 constexpr float RR_SUS_POT_SCALE = 1;
-constexpr int RR_SUS_POT_OFFSET = 1;
+constexpr int RR_SUS_POT_OFFSET = 0;
 
 //figure out values
 const float THERMISTOR_0_SCALE = 1;
-const float THERMISTOR_0_OFFSET = 1; 
+const float THERMISTOR_0_OFFSET = 0; 
 const float THERMISTOR_1_SCALE = 1;
-const float THERMISTOR_1_OFFSET = 1; 
+const float THERMISTOR_1_OFFSET = 0; 
 const float THERMISTOR_2_SCALE = 1;
-const float THERMISTOR_2_OFFSET = 1; 
+const float THERMISTOR_2_OFFSET = 0; 
 const float THERMISTOR_3_SCALE = 1;
-const float THERMISTOR_3_OFFSET = 1; 
+const float THERMISTOR_3_OFFSET = 0; 
 const float THERMISTOR_4_SCALE = 1;
-const float THERMISTOR_4_OFFSET = 1; 
+const float THERMISTOR_4_OFFSET = 0; 
 const float THERMISTOR_5_SCALE = 1;
-const float THERMISTOR_5_OFFSET = 1; 
+const float THERMISTOR_5_OFFSET = 0; 
 const float THERMISTOR_6_SCALE = 1;
-const float THERMISTOR_6_OFFSET = 1; 
+const float THERMISTOR_6_OFFSET = 0; 
 const float THERMISTOR_7_SCALE = 1;
-const float THERMISTOR_7_OFFSET = 1; 
+const float THERMISTOR_7_OFFSET = 0; 
 
 /* Watchdog constants */
 constexpr int INVERTER_ENABLE_PIN = 2;
