@@ -141,38 +141,51 @@ HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_bra
 
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    Serial.println("timestamp\t:\taccel\t:\tbrake");
-    Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
-    Serial.print("\t:\t");
-    Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
-    Serial.print("\t:\t");
-    Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
-    Serial.println();
-    Serial.println("pedals heartbeat good:");
-    Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
-    Serial.println();
-    Serial.println();
-    Serial.println();
-    Serial.println();
+    // Serial.println("timestamp\t:\taccel\t:\tbrake");
+    // Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
+    // Serial.print("\t:\t");
+    // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
+    // Serial.print("\t:\t");
+    // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
+    // Serial.println();
+    // Serial.println("pedals heartbeat good:");
+    // Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
+    // Serial.println();
+    // Serial.println();
+    // Serial.println();
+    // Serial.println();
 
-    Serial.println("state machine state");
+    // Serial.println("state machine state");
 
-    Serial.println(state_global);
-    Serial.println("desired speeds, torq lim");
-    Serial.println(controls._debug_dt_command.desired_speeds.FL);
-    Serial.println(controls._debug_dt_command.torque_limits.FL);
+    // Serial.println(state_global);
+    // Serial.println("desired speeds, torq lim");
+    // Serial.println(controls._debug_dt_command.desired_speeds.FL);
+    // Serial.println(controls._debug_dt_command.torque_limits.FL);
 
-    Serial.println("drivetrain system state: ");
-    Serial.println(static_cast<int>(drivetrain_system.get_state()));
+    // Serial.println("drivetrain system state: ");
+    // Serial.println(static_cast<int>(drivetrain_system.get_state()));
 
-    Serial.print("Start button pressed: ");
-    Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
+    // Serial.print("Start button pressed: ");
+    // Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
 
-    Serial.print("pedal recalibrate button pressed: ");
-    Serial.println(vcr_data.interface_data.dash_input_state.preset_btn_is_pressed);
+    // Serial.print("pedal recalibrate button pressed: ");
+    // Serial.println(vcr_data.interface_data.dash_input_state.preset_btn_is_pressed);
     
-    Serial.print("mc reset button pressed: ");
-    Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
+    // Serial.print("mc reset button pressed: ");
+    // Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
+
+    Serial.print("Load Cell RR: ");
+    Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
+
+    Serial.print("Load Cell RL: ");
+    Serial.println(vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog);
+
+    Serial.print("SusPot RR: ");
+    Serial.println(vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog);
+
+    Serial.print("SusPot RL: ");
+    Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
+
     return HT_TASK::TaskResponse::YIELD;
 }
 
