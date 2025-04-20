@@ -175,9 +175,21 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
 
     Serial.println("IOExpander testing");
-    Serial.println(vcr_data.interface_data.shutdown_sensing_data.imd_is_ok);
+    Serial.println("Shutdown Data");
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.l_bms_relay);
     Serial.println(vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.m_imd_relay);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.imd_is_ok);
+    Serial.println("Linked Data");
     Serial.println(vcr_data.interface_data.ethernet_is_linked.acu_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.drivebrain_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.vcf_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.teensy_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.debug_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
 
 
     // Serial.print("Load Cell RR: ");
