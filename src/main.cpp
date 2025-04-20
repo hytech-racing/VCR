@@ -174,6 +174,24 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     Serial.print("mc reset button pressed: ");
     Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
 
+    Serial.println("IOExpander testing");
+    Serial.println("Shutdown Data");
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.l_bms_relay);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.m_imd_relay);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.imd_is_ok);
+    Serial.println("Linked Data");
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.acu_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.drivebrain_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.vcf_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.teensy_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.debug_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
+
+
     // Serial.print("Load Cell RR: ");
     // Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
 
@@ -202,7 +220,7 @@ void setup() {
     SPI.begin();
     
     // Create all singletons
-    IOExpanderInstance::create(0);
+    // IOExpanderInstance::create(0);
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
@@ -281,7 +299,7 @@ void setup() {
     scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     
-    // scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
+    scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
 
     // while(!Serial) {}; // hold your horses
 }
