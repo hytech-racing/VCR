@@ -125,9 +125,6 @@ HT_TASK::TaskResponse run_kick_watchdog(const unsigned long& sysMicros, const HT
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
 
-    digitalWrite(INVERTER_ENABLE_PIN, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::WANTING_READY_TO_DRIVE
-                    || VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE); // Enables inverters when in WAITING_RTD or READY_TO_DRIVE mode
-    
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -148,6 +145,8 @@ HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicr
 
 HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
+    digitalWrite(INVERTER_ENABLE_PIN, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::WANTING_READY_TO_DRIVE
+                    || VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE); // Enables inverters when in WAITING_RTD or READY_TO_DRIVE mode
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &VCRCANInterfaceImpl::INVERTER_CAN);
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
     return HT_TASK::TaskResponse::YIELD;
@@ -158,6 +157,14 @@ HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, 
 {
 
     // Serial.println("uhh");
+    if (VehicleStateMachineInstance::instance().get_state() != VehicleState_e::WANTING_READY_TO_DRIVE
+            && VehicleStateMachineInstance::instance().get_state() != VehicleState_e::READY_TO_DRIVE)
+    {
+        CANInterfacesInstance::instance().fl_inverter_interface.set_speed(0, 0);
+        CANInterfacesInstance::instance().fr_inverter_interface.set_speed(0, 0);
+        CANInterfacesInstance::instance().rl_inverter_interface.set_speed(0, 0);
+        CANInterfacesInstance::instance().rr_inverter_interface.set_speed(0, 0);
+    }
 
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();
