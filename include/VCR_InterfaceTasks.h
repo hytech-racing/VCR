@@ -63,6 +63,12 @@ bool enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::
  */
 bool enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 
+bool enqueue_inverter_temp_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
+
+bool enqueue_inverter_status_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
+
+
+
 /**
  * handles sending of all data on all interfaces
  */

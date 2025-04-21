@@ -22,6 +22,9 @@ struct InverterCANIds_s
     uint32_t inv_control_word_id; 
     uint32_t inv_control_input_id; 
     uint32_t inv_control_parameter_id; 
+
+    uint32_t inv_temps_id;
+    uint32_t inv_status_id;
 };
 
 /**
@@ -36,11 +39,15 @@ class InverterInterface
             uint32_t inv_control_word_id,
             uint32_t inv_control_input_id,
             uint32_t inv_control_params_id,
+            uint32_t inv_temps_id,
+            uint32_t inv_status_id,
             InverterParams_s inverter_params) : _inverter_params(inverter_params)
         { 
             inverter_ids.inv_control_word_id = inv_control_word_id;
             inverter_ids.inv_control_parameter_id = inv_control_params_id;
             inverter_ids.inv_control_input_id = inv_control_input_id;
+            inverter_ids.inv_temps_id = inv_temps_id;
+            inverter_ids.inv_status_id = inv_status_id;
         }
 
         /* receiving callbacks */
@@ -60,6 +67,10 @@ class InverterInterface
         void send_INV_CONTROL_WORD();
 
         void send_INV_CONTROL_PARAMS(); 
+
+        void send_INV_TEMP_DATA(); //sending inverter temp data on telem can bus
+
+        void send_INV_STATUS_DATA(); //sending inverter status on telem can bus
 
         /* Inverter Functs */
         void set_speed(float desired_rpm, float torque_limit_nm); 

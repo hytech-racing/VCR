@@ -181,6 +181,24 @@ bool enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::Ta
     return true;
 }
 
+
+bool enqueue_inverter_temp_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_TEMP_DATA();
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_TEMP_DATA();
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_TEMP_DATA();
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_TEMP_DATA();
+}
+
+bool enqueue_inverter_status_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_STATUS_DATA();
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_STATUS_DATA();
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_STATUS_DATA();
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_STATUS_DATA();
+}
+
+
 bool init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     IOExpanderInstance::create(0x20);
