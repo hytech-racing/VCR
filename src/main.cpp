@@ -55,10 +55,10 @@ qindesign::network::EthernetUDP acu_all_data_recv_socket;
 /* Drivetrain Initialization */
 
 // Inverter Interfaces
-InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
-InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
-InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
-InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
+InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, INV1_TEMPS_CANID, INV1_STATUS_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
+InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, INV2_TEMPS_CANID, INV2_STATUS_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
+InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, INV3_TEMPS_CANID, INV3_STATUS_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
+InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, INV4_TEMPS_CANID, INV4_STATUS_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
 
 // Inverter Functs
 DrivetrainSystem::InverterFuncts fl_inverter_functs = {
@@ -138,6 +138,10 @@ HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_et
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
 HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
+
+HT_TASK::Task enqueue_inverter_temp_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_temp_data, inverter_send_priority, 1000000UL); // NOLINT (1 Hz)
+HT_TASK::Task enqueue_inverter_status_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_status_data, inverter_send_priority, 1000000UL); //NOLINT (1 Hz)
+
 
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -291,7 +295,7 @@ void setup() {
     // scheduler.schedule(adc_1_sample_task);
     scheduler.schedule(kick_watchdog_task);
     scheduler.schedule(ams_system_task);
-    // scheduler.schedule(enqueue_suspension_CAN_task);
+    scheduler.schedule(enqueue_suspension_CAN_task);
     scheduler.schedule(send_CAN_task);
     // scheduler.schedule(vcr_data_ethernet_send);
     scheduler.schedule(enqueue_inverter_CAN_task);
@@ -299,9 +303,9 @@ void setup() {
     scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     
-    scheduler.schedule(IOExpander_read_task); // Commented out because i2c timeout
-
-    // while(!Serial) {}; // hold your horses
+    scheduler.schedule(IOExpander_read_task);
+    scheduler.schedule(enqueue_inverter_temp_task);
+    scheduler.schedule(enqueue_inverter_status_task);
 }
 
 void loop() {

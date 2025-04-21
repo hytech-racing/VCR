@@ -164,6 +164,36 @@ void InverterInterface::send_INV_CONTROL_PARAMS()
     CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_PARAMETER_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_parameter_id);
 }
 
+
+void InverterInterface::send_INV_TEMP_DATA()
+{
+    INV1_TEMPS_t msg_out;
+    msg_out.inverter_temp_ro = _feedback_data.temps.inverter_temp;
+    msg_out.motor_temp_ro = _feedback_data.temps.motor_temp;
+    msg_out.igbt_temp_ro = _feedback_data.temps.igbt_temp;
+
+    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_TEMPS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, inverter_ids.inv_temps_id);
+}
+
+void InverterInterface::send_INV_STATUS_DATA()
+{
+    INV1_STATUS_t msg_out;
+    msg_out.system_ready = _feedback_data.status.connected;
+    msg_out.error = _feedback_data.status.error;
+    msg_out.warning = _feedback_data.status.warning;
+    msg_out.dc_bus_voltage = _feedback_data.status.dc_bus_voltage;
+    msg_out.dc_on = _feedback_data.status.dc_on;
+    msg_out.derating_on = _feedback_data.status.derating_on;
+    msg_out.diagnostic_number = _feedback_data.status.diagnostic_number;
+    msg_out.error = _feedback_data.status.error;
+    msg_out.inverter_on = _feedback_data.status.inverter_on;
+    msg_out.quit_dc_on = _feedback_data.status.quit_dc_on;
+    msg_out.quit_inverter_on = _feedback_data.status.quit_inverter_on;
+
+    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_STATUS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, inverter_ids.inv_status_id);
+
+}
+
 /**
  * Methods for use as inverter functs
  */
