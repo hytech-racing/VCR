@@ -262,6 +262,7 @@ void setup() {
     // while(!Serial) {}; // hold your horses
 
     scheduler.schedule(enqueue_inverter_temp_task);
+    scheduler.schedule(enqueue_inverter_status_task);
 }
 
 void loop() {

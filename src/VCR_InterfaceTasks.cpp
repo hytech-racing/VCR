@@ -133,7 +133,7 @@ bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo&
     WatchdogInstance::create(WATCHDOG_KICK_INTERVAL_MS); // NOLINT
     pinMode(WATCHDOG_PIN, OUTPUT);
     return true;
-}
+}   
 
 bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
