@@ -166,6 +166,9 @@ HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, 
         CANInterfacesInstance::instance().rr_inverter_interface.set_speed(0, 0);
     }
 
+    digitalWrite(INVERTER_ENABLE_PIN, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::WANTING_READY_TO_DRIVE
+        || VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE); // Enables inverters when in WAITING_RTD or READY_TO_DRIVE mode
+
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();
 
