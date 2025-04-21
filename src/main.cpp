@@ -139,8 +139,8 @@ HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_
 HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
 
-HT_TASK::Task enqueue_inverter_temp_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_temp_data, inverter_send_priority, 1000000UL); // NOLINT (1 Hz)
-HT_TASK::Task enqueue_inverter_status_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_status_data, inverter_send_priority, 1000000UL); //NOLINT (1 Hz)
+HT_TASK::Task enqueue_inverter_temp_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_temp_data, 23, 300000UL); // NOLINT (1 Hz)
+HT_TASK::Task enqueue_inverter_status_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_status_data, 24, 300000UL); //NOLINT (1 Hz)
 
 
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
@@ -285,7 +285,8 @@ void setup() {
     acu_all_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUAllData_port);
 
     // Initialize CAN
-    const uint32_t CAN_baudrate = 500000;
+    const uint32_t CAN_baudrate = 1000000;
+   
     handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(VCRCANInterfaceImpl::TELEM_CAN, CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
 

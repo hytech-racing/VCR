@@ -168,9 +168,9 @@ void InverterInterface::send_INV_CONTROL_PARAMS()
 void InverterInterface::send_INV_TEMP_DATA()
 {
     INV1_TEMPS_t msg_out;
-    msg_out.inverter_temp_ro = _feedback_data.temps.inverter_temp;
-    msg_out.motor_temp_ro = _feedback_data.temps.motor_temp;
-    msg_out.igbt_temp_ro = _feedback_data.temps.igbt_temp;
+    msg_out.inverter_temp_ro = HYTECH_motor_temp_ro_toS(_feedback_data.temps.inverter_temp);
+    msg_out.motor_temp_ro = HYTECH_motor_temp_ro_toS(_feedback_data.temps.motor_temp);
+    msg_out.igbt_temp_ro = HYTECH_motor_temp_ro_toS(_feedback_data.temps.igbt_temp);
 
     CAN_util::enqueue_msg(&msg_out, &Pack_INV1_TEMPS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, inverter_ids.inv_temps_id);
 }

@@ -189,6 +189,8 @@ HT_TASK::TaskResponse enqueue_inverter_temp_data(const unsigned long& sysMicros,
     CANInterfacesInstance::instance().rl_inverter_interface.send_INV_TEMP_DATA();
     CANInterfacesInstance::instance().rr_inverter_interface.send_INV_TEMP_DATA();
 
+    Serial.println("sending temp data");
+
     return HT_TASK::TaskResponse::YIELD;
 }
 
