@@ -285,10 +285,11 @@ void setup() {
     acu_all_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUAllData_port);
 
     // Initialize CAN
-    const uint32_t CAN_baudrate = 1000000;
+    const uint32_t telem_CAN_baudrate = 1000000;
+    const uint32_t inv_CAN_baudrate = 500000;
    
-    handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
-    handle_CAN_setup(VCRCANInterfaceImpl::TELEM_CAN, CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
+    handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
+    handle_CAN_setup(VCRCANInterfaceImpl::TELEM_CAN, telem_CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
 
     init_adc_bundle();
 
