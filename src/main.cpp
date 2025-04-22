@@ -95,7 +95,9 @@ DrivetrainSystem::InverterFuncts rr_inverter_functs = {
 
 veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr_inverter_functs, rl_inverter_functs, rr_inverter_functs);
 
-DrivetrainSystem drivetrain_system(inverter_functs);
+etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create([](bool set_active) { digitalWrite(INVERTER_ENABLE_PIN, static_cast<int>(set_active)); });
+
+DrivetrainSystem drivetrain_system(inverter_functs, set_ef_pin_active);
 
 VCRControls controls(&drivetrain_system, MAX_ALLOWED_DB_LATENCY_MS);
 
@@ -139,61 +141,60 @@ HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_
 HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
 
-HT_TASK::Task enqueue_inverter_temp_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_temp_data, 23, 300000UL); // NOLINT (1 Hz)
-HT_TASK::Task enqueue_inverter_status_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_status_data, 24, 300000UL); //NOLINT (1 Hz)
-
-
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    Serial.println("timestamp\t:\taccel\t:\tbrake");
-    Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
-    Serial.print("\t:\t");
-    Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
-    Serial.print("\t:\t");
-    Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
-    Serial.println();
-    Serial.println("pedals heartbeat good:");
-    Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
-    Serial.println();
-    Serial.println();
-    Serial.println();
-    Serial.println();
+    // Serial.println("timestamp\t:\taccel\t:\tbrake");
+    // Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
+    // Serial.print("\t:\t");
+    // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
+    // Serial.print("\t:\t");
+    // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
+    // Serial.println();
+    // Serial.println("pedals heartbeat good:");
+    // Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
+    // Serial.println();
+    // Serial.println();
+    // Serial.println();
+    // Serial.println();
 
-    Serial.println("state machine state");
+    // Serial.println("state machine state");
 
-    Serial.println(state_global);
-    Serial.println("desired speeds, torq lim");
-    Serial.println(controls._debug_dt_command.desired_speeds.FL);
-    Serial.println(controls._debug_dt_command.torque_limits.FL);
+    // Serial.println(state_global);
+    // Serial.println("desired speeds, torq lim");
+    // Serial.println(controls._debug_dt_command.desired_speeds.FL);
+    // Serial.println(controls._debug_dt_command.torque_limits.FL);
 
-    Serial.println("drivetrain system state: ");
+    Serial.print("Drivetrain system state: ");
     Serial.println(static_cast<int>(drivetrain_system.get_state()));
 
-    Serial.print("Start button pressed: ");
-    Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
+    Serial.print("Vehicle statemachine state: ");
+    Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
 
-    Serial.print("pedal recalibrate button pressed: ");
-    Serial.println(vcr_data.interface_data.dash_input_state.preset_btn_is_pressed);
+    // Serial.print("Start button pressed: ");
+    // Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
+
+    // Serial.print("pedal recalibrate button pressed: ");
+    // Serial.println(vcr_data.interface_data.dash_input_state.preset_btn_is_pressed);
     
-    Serial.print("mc reset button pressed: ");
-    Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
+    // Serial.print("mc reset button pressed: ");
+    // Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
 
-    Serial.println("IOExpander testing");
-    Serial.println("Shutdown Data");
-    Serial.println(vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok);
-    Serial.println(vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay);
-    Serial.println(vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok);
-    Serial.println(vcr_data.interface_data.shutdown_sensing_data.l_bms_relay);
-    Serial.println(vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
-    Serial.println(vcr_data.interface_data.shutdown_sensing_data.m_imd_relay);
-    Serial.println(vcr_data.interface_data.shutdown_sensing_data.imd_is_ok);
-    Serial.println("Linked Data");
-    Serial.println(vcr_data.interface_data.ethernet_is_linked.acu_link);
-    Serial.println(vcr_data.interface_data.ethernet_is_linked.drivebrain_link);
-    Serial.println(vcr_data.interface_data.ethernet_is_linked.vcf_link);
-    Serial.println(vcr_data.interface_data.ethernet_is_linked.teensy_link);
-    Serial.println(vcr_data.interface_data.ethernet_is_linked.debug_link);
-    Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
+    // Serial.println("IOExpander testing");
+    // Serial.println("Shutdown Data");
+    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok);
+    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay);
+    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok);
+    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.l_bms_relay);
+    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
+    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.m_imd_relay);
+    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.imd_is_ok);
+    // Serial.println("Linked Data");
+    // Serial.println(vcr_data.interface_data.ethernet_is_linked.acu_link);
+    // Serial.println(vcr_data.interface_data.ethernet_is_linked.drivebrain_link);
+    // Serial.println(vcr_data.interface_data.ethernet_is_linked.vcf_link);
+    // Serial.println(vcr_data.interface_data.ethernet_is_linked.teensy_link);
+    // Serial.println(vcr_data.interface_data.ethernet_is_linked.debug_link);
+    // Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
 
 
     // Serial.print("Load Cell RR: ");
@@ -219,9 +220,9 @@ void setup() {
     vcr_data.fw_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
     vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
 
-    pinMode(INVERTER_ENABLE_PIN, OUTPUT);
-
     SPI.begin();
+
+    pinMode(INVERTER_ENABLE_PIN, OUTPUT);
     
     // Create all singletons
     // IOExpanderInstance::create(0);
@@ -261,7 +262,7 @@ void setup() {
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_recalibrate_pedals_message>(VCFInterfaceInstance::instance()),
-        etl::delegate<void(bool)>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
+        etl::delegate<void(bool, bool)>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_not_ok>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_drivetrain_reset_pressed>(VCFInterfaceInstance::instance()),
@@ -306,8 +307,6 @@ void setup() {
     scheduler.schedule(update_brakelight_task);
     
     scheduler.schedule(IOExpander_read_task);
-    scheduler.schedule(enqueue_inverter_temp_task);
-    scheduler.schedule(enqueue_inverter_status_task);
 }
 
 void loop() {

@@ -28,6 +28,7 @@ void on_inverter_can_receive(const CAN_message_t &msg) {
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
     inverter_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
+    telem_can_tx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
 void on_telem_can_receive(const CAN_message_t &msg) {

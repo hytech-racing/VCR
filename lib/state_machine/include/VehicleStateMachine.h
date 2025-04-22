@@ -10,7 +10,7 @@ enum class VehicleState_e {
     WANTING_READY_TO_DRIVE = 3,
     READY_TO_DRIVE = 4,
     WANTING_RECALIBRATE_PEDALS = 5,
-    RECALIBRATING_PEDALS = 6
+    RECALIBRATING_PEDALS = 6    
 };
 
 class VehicleStateMachine
@@ -24,7 +24,7 @@ class VehicleStateMachine
             etl::delegate<bool()> check_drivetrain_ready, // when calling this function the initialization of the drivetrain is occuring, returning false during and true when finished
             etl::delegate<void()> start_buzzer,
             etl::delegate<void()> recalibrate_pedals,
-            etl::delegate<void(bool)> command_drivetrain,
+            etl::delegate<void(bool, bool)> command_drivetrain,
             etl::delegate<bool()> check_pedals_timeout,
             etl::delegate<void()> reset_pedals_timeout,
             etl::delegate<bool()> is_inverter_reset_button_pressed,
@@ -78,7 +78,7 @@ class VehicleStateMachine
         etl::delegate<bool()> _check_drivetrain_ready; 
         etl::delegate<void()> _start_buzzer;
         etl::delegate<void()> _send_recalibrate_pedals_message;
-        etl::delegate<void(bool)> _command_drivetrain; // Passes in true/false depending on whether we're in RTD or not.
+        etl::delegate<void(bool, bool)> _command_drivetrain; // Passes in true/false depending on whether we're in RTD or not.
         etl::delegate<bool()> _check_pedals_timeout;
         etl::delegate<void()> _reset_pedals_timeout;
         etl::delegate<bool()> _is_inverter_reset_button_pressed;

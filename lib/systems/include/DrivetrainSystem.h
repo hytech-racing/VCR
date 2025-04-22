@@ -2,6 +2,7 @@
 #define DRIVETRAINSYSTEM
 
 #include "etl/variant.h"
+#include "etl/delegate.h"
 
 #include <array>
 #include <functional>
@@ -10,6 +11,7 @@
 #include "SharedFirmwareTypes.h"
 #include "SysClock.h"
 #include <shared_types.h>
+#include "SystemTimeInterface.h"
 
 // requirements:
 // - [ ] must support ability to initialize the drivetrain 
@@ -32,10 +34,9 @@ enum class DrivetrainState_e
     NOT_ENABLED_HV_PRESENT = 2,
     INVERTERS_READY = 3,
     INVERTERS_HV_ENABLED = 4,
-    INVERTERS_ENABLED = 5,
-    ENABLED_DRIVE_MODE = 6,
-    ERROR = 7, 
-    CLEARING_ERRORS = 8
+    ENABLED_DRIVE_MODE = 5,
+    ERROR = 6, 
+    CLEARING_ERRORS = 7
 };
 
 /**
@@ -126,7 +127,7 @@ public:
         std::function<MotorMechanics_s()> get_motor_mechanics; 
     };
     
-    DrivetrainSystem(veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces);
+    DrivetrainSystem(veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay = 50);
     
 private:
     /**
@@ -158,7 +159,14 @@ private:
     std::function<bool(const InverterStatus_s &)> _check_inverter_no_errors_present;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_present_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_not_present_flag;
-    std::function<bool(const InverterStatus_s &)> _check_inverter_enabled;    
+    std::function<bool(const InverterStatus_s &)> _check_inverter_enabled;  
+
+    /**
+     * Delegate function for setting ef active
+     */
+    etl::delegate<void(bool)> _set_ef_active_pin;
+    unsigned long _last_toggled_ef_active = 0; 
+    unsigned long _ef_pin_enable_delay;
 };
 
 #endif /* DRIVETRAINSYSTEM */
