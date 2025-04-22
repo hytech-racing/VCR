@@ -48,6 +48,7 @@ void VCFInterface::receive_dashboard_message(const CAN_message_t &msg, unsigned 
     _curr_data.dash_input_state.left_paddle_is_pressed = dash_msg.left_shifter_button;
     _curr_data.dash_input_state.right_paddle_is_pressed = dash_msg.right_shifter_button;
     _curr_data.dash_input_state.dial_state = (ControllerMode_e) dash_msg.dash_dial_mode;
+    
 }
 
 
@@ -75,5 +76,14 @@ void VCFInterface::send_buzzer_start_message()
 {
     DASHBOARD_BUZZER_CONTROL_t ctrl = {};
     ctrl.dash_buzzer_flag = true;
-    CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer);
+    ctrl.in_pedal_calibration_state = false;
+    CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
+void VCFInterface::send_recalibrate_pedals_message()
+{
+    DASHBOARD_BUZZER_CONTROL_t ctrl = {};
+    ctrl.dash_buzzer_flag = false;
+    ctrl.in_pedal_calibration_state = true;
+    CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }

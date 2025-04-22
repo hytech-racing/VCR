@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "SystemTimeInterface.h"
+#include "Logger.h"
 
 template <std::size_t num_controllers>
 DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command(ControllerMode_e requested_controller_type,
@@ -26,6 +27,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
 
     if( (!_controller_evals[active_controller_mode_index]) || (!_controller_evals[req_controller_mode_index]))
     {
+        hal_println("controller nullptr");
         _active_status.active_error = TorqueControllerMuxError_e::ERROR_CONTROLLER_NULL_POINTER;
         return empty_command;
     }
@@ -85,7 +87,7 @@ TorqueControllerMuxError_e TorqueControllerMux<num_controllers>::can_switch_cont
     auto speeds = active_drivetrain_data.measuredSpeeds.as_array();
     auto desired_torq_lims = desired_controller_out.torque_limits.as_array();
     auto prev_torq_lims = previous_controller_command.torque_limits.as_array();
-    for (int i = 0; i < _num_motors; i++)
+    for (size_t i = 0; i < _num_motors; i++)
     {
         speedPreventsModeChange = (::abs(speeds[i] * RPM_TO_METERS_PER_SECOND) >= _max_change_speed);
         // only if the torque delta is positive do we not want to switch to the new one
@@ -124,7 +126,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_torque_limit(con
     float avg_torque = 0;
     // get the average torque accross all 4 wheels
     auto torq_lims = out.torque_limits.as_array();
-    for (int i = 0; i < torq_lims.size(); i++)
+    for (size_t i = 0; i < torq_lims.size(); i++)
     {
         avg_torque += abs(torq_lims[i]);
     }
@@ -158,8 +160,6 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_power_limit(cons
     float net_torque_mag = 0;
     float net_power = 0;
 
-    // calculate current mechanical power
-    auto torque_limits = out.torque_limits.as_array();
 
     net_torque_mag += out.torque_limits.FL;
     net_torque_mag += out.torque_limits.FR;
@@ -214,7 +214,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
     DrivetrainDynamicReport_s dt_data = drivetrain_data;
     auto speeds = dt_data.measuredSpeeds.as_array();
     auto command_speeds = out.desired_speeds.as_array();
-    for (int i = 0; i < _num_motors; i++)
+    for (size_t i = 0; i < _num_motors; i++)
     {
         maxWheelSpeed = std::max(maxWheelSpeed, abs(speeds[i]) * RPM_TO_KILOMETERS_PER_HOUR);
         allWheelsRegen &= (command_speeds[i] < abs(speeds[i]) || command_speeds[i] == 0);

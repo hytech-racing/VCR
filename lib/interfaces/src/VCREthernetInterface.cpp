@@ -73,6 +73,13 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.ams_data.total_pack_voltage = shared_state.system_data.ams_data.total_pack_voltage;
     out.ams_data.ams_ok = shared_state.system_data.ams_data.ams_ok;
 
+    //TorqueControllerMuxStatus
+    out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) shared_state.system_data.tc_mux_status.active_error;
+    out.tcmux_status.active_controller_mode = (hytech_msgs_ControllerMode_e) shared_state.system_data.tc_mux_status.active_controller_mode;
+    out.tcmux_status.active_torque_limit_enum = (hytech_msgs_TorqueLimit_e) shared_state.system_data.tc_mux_status.active_torque_limit_enum;
+    out.tcmux_status.active_torque_limit_value = shared_state.system_data.tc_mux_status.active_torque_limit_value;
+    out.tcmux_status.output_is_bypassing_limits = shared_state.system_data.tc_mux_status.output_is_bypassing_limits;    
+
     // Buzzer
     out.buzzer_is_active = shared_state.system_data.buzzer_is_active;
     
@@ -84,26 +91,27 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
 
 }
 
-void VCREthernetInterface::receive_pb_msg_acu_all_data(const hytech_msgs_ACUAllData_s &msg_in, VCRData_s &shared_state)
+void VCREthernetInterface::receive_pb_msg_acu_all_data(const hytech_msgs_ACUAllData &msg_in, VCRData_s &shared_state)
 {
-    shared_state.interface_data.acu_all_data = {};
-    for (size_t i = 0; i < msg_in.voltages_count; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
-    {
-        shared_state.interface_data.acu_all_data.voltages[i] = msg_in.voltages[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
-    }
+    // TODO: Make this work with repeated fields (they broke)
+    // shared_state.interface_data.acu_all_data = {};
+    // for (size_t i = 0; i < 126; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
+    // {
+    //     shared_state.interface_data.acu_all_data.voltages[i] = msg_in.cell_voltages[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
+    // }
 
-    for (size_t i = 0; i < msg_in.cell_temperatures_count; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
-    {
-        shared_state.interface_data.acu_all_data.cell_temperatures[i] = msg_in.cell_temperatures[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
-    }
+    // for (size_t i = 0; i < 48; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
+    // {
+    //     shared_state.interface_data.acu_all_data.cell_temperatures[i] = msg_in.cell_temperatures[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
+    // }
 
-    for (size_t i = 0; i < msg_in.board_humidities_count; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
-    {
-        shared_state.interface_data.acu_all_data.board_humidities[i] = msg_in.board_humidities[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
-    }
+    // for (size_t i = 0; i < 6; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
+    // {
+    //     shared_state.interface_data.acu_all_data.board_humidities[i] = msg_in.board_humidities[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
+    // }
 }
 
-void VCREthernetInterface::receive_pb_msg_acu_core_data(const hytech_msgs_ACUCoreData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
+void VCREthernetInterface::receive_pb_msg_acu_core_data(const hytech_msgs_ACUCoreData &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
 {
     shared_state.interface_data.stamped_acu_core_data.acu_data.avg_cell_voltage = msg_in.avg_cell_voltage;
     shared_state.interface_data.stamped_acu_core_data.acu_data.max_cell_temp = msg_in.max_cell_temp;
@@ -121,29 +129,16 @@ void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &m
 
 void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
 {
-    //PedalsSystemData_s
-    shared_state.interface_data.recvd_pedals_data.pedals_data.accel_is_implausible = msg_in.pedals_system_data.accel_is_implausible;
-    shared_state.interface_data.recvd_pedals_data.pedals_data.brake_is_implausible = msg_in.pedals_system_data.brake_is_implausible;
-    shared_state.interface_data.recvd_pedals_data.pedals_data.brake_is_pressed = msg_in.pedals_system_data.brake_is_pressed;
-    shared_state.interface_data.recvd_pedals_data.pedals_data.accel_is_pressed = msg_in.pedals_system_data.accel_is_pressed;
-    shared_state.interface_data.recvd_pedals_data.pedals_data.mech_brake_is_active = msg_in.pedals_system_data.mech_brake_is_active;
-    shared_state.interface_data.recvd_pedals_data.pedals_data.brake_and_accel_pressed_implausibility_high = msg_in.pedals_system_data.brake_and_accel_pressed_implausibility_high;
-    shared_state.interface_data.recvd_pedals_data.pedals_data.implausibility_has_exceeded_max_duration = msg_in.pedals_system_data.implausibility_has_exceeded_max_duration;
-    shared_state.interface_data.recvd_pedals_data.pedals_data.accel_percent = msg_in.pedals_system_data.accel_percent;
-    shared_state.interface_data.recvd_pedals_data.pedals_data.brake_percent = msg_in.pedals_system_data.brake_percent;
-    shared_state.interface_data.recvd_pedals_data.pedals_data.regen_percent = msg_in.pedals_system_data.regen_percent;
-    shared_state.interface_data.recvd_pedals_data.last_recv_millis = curr_millis;
-
-    //DashInputState_s
-    shared_state.interface_data.dash_input_state.data_btn_is_pressed = msg_in.dash_input_state.data_btn_is_pressed;
-    shared_state.interface_data.dash_input_state.dial_state = (ControllerMode_e) msg_in.dash_input_state.dial_state;
-    shared_state.interface_data.dash_input_state.dim_btn_is_pressed = msg_in.dash_input_state.dim_btn_is_pressed;
-    shared_state.interface_data.dash_input_state.left_paddle_is_pressed = msg_in.dash_input_state.left_paddle_is_pressed;
-    shared_state.interface_data.dash_input_state.right_paddle_is_pressed = msg_in.dash_input_state.right_paddle_is_pressed;
-    shared_state.interface_data.dash_input_state.mc_reset_btn_is_pressed = msg_in.dash_input_state.mc_reset_btn_is_pressed;
-    shared_state.interface_data.dash_input_state.mode_btn_is_pressed = msg_in.dash_input_state.mode_btn_is_pressed;
-    shared_state.interface_data.dash_input_state.preset_btn_is_pressed = msg_in.dash_input_state.preset_btn_is_pressed;
-    shared_state.interface_data.dash_input_state.start_btn_is_pressed = msg_in.dash_input_state.start_btn_is_pressed;
+    // //DashInputState_s
+    // shared_state.interface_data.dash_input_state.data_btn_is_pressed = msg_in.dash_input_state.data_btn_is_pressed;
+    // shared_state.interface_data.dash_input_state.dial_state = (ControllerMode_e) msg_in.dash_input_state.dial_state;
+    // shared_state.interface_data.dash_input_state.dim_btn_is_pressed = msg_in.dash_input_state.dim_btn_is_pressed;
+    // shared_state.interface_data.dash_input_state.left_paddle_is_pressed = msg_in.dash_input_state.left_paddle_is_pressed;
+    // shared_state.interface_data.dash_input_state.right_paddle_is_pressed = msg_in.dash_input_state.right_paddle_is_pressed;
+    // shared_state.interface_data.dash_input_state.mc_reset_btn_is_pressed = msg_in.dash_input_state.mc_reset_btn_is_pressed;
+    // shared_state.interface_data.dash_input_state.mode_btn_is_pressed = msg_in.dash_input_state.mode_btn_is_pressed;
+    // shared_state.interface_data.dash_input_state.preset_btn_is_pressed = msg_in.dash_input_state.preset_btn_is_pressed;
+    // shared_state.interface_data.dash_input_state.start_btn_is_pressed = msg_in.dash_input_state.start_btn_is_pressed;
 }
 	
 void VCREthernetInterface::copy_inverter_data(const InverterData_s &original, hytech_msgs_InverterData_s &destination)
