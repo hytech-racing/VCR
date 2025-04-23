@@ -48,7 +48,7 @@ using VCRAsynchronousInterfacesInstance = etl::singleton<VCRAsynchronousInterfac
 struct ProtobufSockets_s {
     qindesign::network::EthernetUDP &vcr_data_send_socket;
     qindesign::network::EthernetUDP &vcf_data_recv_socket;
-    qindesign::network::EthernetUDP &acu_core_data_recv_socket;
+    qindesign::network::EthernetClient &acu_core_data_recv_socket;
     qindesign::network::EthernetUDP &acu_all_data_recv_socket;
 };
 

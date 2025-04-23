@@ -49,7 +49,7 @@ FlexCAN_Type<CAN2> VCRCANInterfaceImpl::INVERTER_CAN;
 /* Ethernet message sockets */
 qindesign::network::EthernetUDP vcr_data_send_socket;
 qindesign::network::EthernetUDP vcf_data_recv_socket;
-qindesign::network::EthernetUDP acu_core_data_recv_socket;
+qindesign::network::EthernetClient acu_core_data_recv_socket;
 qindesign::network::EthernetUDP acu_all_data_recv_socket;
 
 /* Drivetrain Initialization */
@@ -221,7 +221,7 @@ void setup() {
     vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
 
     SPI.begin();
-
+    
     pinMode(INVERTER_ENABLE_PIN, OUTPUT);
     
     // Create all singletons
@@ -241,6 +241,8 @@ void setup() {
         rr_inverter_int
     );
     VCRAsynchronousInterfacesInstance::create(CANInterfacesInstance::instance());
+
+    qindesign::network::Ethernet.begin(EthernetIPDefsInstance::instance().vcr_ip, EthernetIPDefsInstance::instance().car_subnet, EthernetIPDefsInstance::instance().default_gateway, EthernetIPDefsInstance::instance().default_gateway);
 
     // VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
     //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
@@ -282,7 +284,7 @@ void setup() {
         EthernetIPDefsInstance::instance().default_gateway, EthernetIPDefsInstance::instance().car_subnet);
     vcr_data_send_socket.begin(EthernetIPDefsInstance::instance().VCRData_port);
     vcf_data_recv_socket.begin(EthernetIPDefsInstance::instance().VCFData_port);
-    acu_core_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUCoreData_port);
+    acu_core_data_recv_socket.connect(EthernetIPDefsInstance::instance().acu_ip, EthernetIPDefsInstance::instance().ACUCoreData_port);
     acu_all_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUAllData_port);
 
     // Initialize CAN
