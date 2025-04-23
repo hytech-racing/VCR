@@ -169,6 +169,49 @@ HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, 
     return HT_TASK::TaskResponse::YIELD;
 }
 
+HT_TASK::TaskResponse enqueue_inverter_temp_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_TEMP_DATA();
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_TEMP_DATA();
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_TEMP_DATA();
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_TEMP_DATA();
+ 
+    return HT_TASK::TaskResponse::YIELD;
+}
+
+HT_TASK::TaskResponse enqueue_inverter_status_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_STATUS_DATA();
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_STATUS_DATA();
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_STATUS_DATA();
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_STATUS_DATA();
+ 
+    return HT_TASK::TaskResponse::YIELD;
+}
+
+
+HT_TASK::TaskResponse enqueue_inverter_dynamics_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_DYNAMICS_DATA();
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_DYNAMICS_DATA();
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_DYNAMICS_DATA();
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_DYNAMICS_DATA();
+
+    return HT_TASK::TaskResponse::YIELD;
+}
+
+HT_TASK::TaskResponse enqueue_inverter_torque_limits(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    CANInterfacesInstance::instance().fl_inverter_interface.send_INV_TORQUE_LIMITS();
+    CANInterfacesInstance::instance().fr_inverter_interface.send_INV_TORQUE_LIMITS();
+    CANInterfacesInstance::instance().rl_inverter_interface.send_INV_TORQUE_LIMITS();
+    CANInterfacesInstance::instance().rr_inverter_interface.send_INV_TORQUE_LIMITS();
+
+    return HT_TASK::TaskResponse::YIELD; 
+}
+
+
+
 HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     IOExpanderInstance::create(0x20);
