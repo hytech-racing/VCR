@@ -63,11 +63,6 @@ HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros
 HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 
 
-HT_TASK::TaskResponse enqueue_inverter_temp_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-HT_TASK::TaskResponse enqueue_inverter_status_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-HT_TASK::TaskResponse enqueue_inverter_dynamics_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-HT_TASK::TaskResponse enqueue_inverter_torque_limits(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-
 
 /**
  * handles sending of all data on all interfaces

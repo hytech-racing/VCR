@@ -40,17 +40,12 @@ class InverterInterface
             uint32_t inv_control_word_id,
             uint32_t inv_control_input_id,
             uint32_t inv_control_params_id,
-            uint32_t inv_temps_id,
-            uint32_t inv_status_id,
-            uint32_t inv_dynamics_id,
             InverterParams_s inverter_params) : _inverter_params(inverter_params)
         { 
             inverter_ids.inv_control_word_id = inv_control_word_id;
             inverter_ids.inv_control_parameter_id = inv_control_params_id;
             inverter_ids.inv_control_input_id = inv_control_input_id;
-            inverter_ids.inv_temps_id = inv_temps_id;
-            inverter_ids.inv_status_id = inv_status_id;
-            inverter_ids.inv_dynamics_id = inv_dynamics_id;
+ 
         }
 
         /* receiving callbacks */
