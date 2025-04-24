@@ -105,7 +105,7 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
             }
 
             // Serial.printf("current_millis - _last_entered_waiting_state_ms : %d - %d\n", current_millis, _last_entered_waiting_state_ms);
-            if (_is_calibrate_pedals_button_pressed() && (current_millis - _last_entered_waiting_state_ms > 1000))
+            if (_is_calibrate_pedals_button_pressed() && (current_millis - _last_entered_waiting_state_ms > 3000))
             {
                 _set_state(VehicleState_e::RECALIBRATING_PEDALS, current_millis);
             }

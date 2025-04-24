@@ -36,8 +36,8 @@ stateDiagram-v2
     tsna --> tsa : If HV is over threshold
     tsna --> wcp : Pedal calibration button is pressed
 
-    wcp --> cp : Pedal calibration button held for >1000ms
-    wcp --> tsna : Pedal calibration button released within 1000ms
+    wcp --> cp : Pedal calibration button held for >3000ms
+    wcp --> tsna : Pedal calibration button released within 3000ms
 
     cp --> tsna : Pedal calibration button released
 
