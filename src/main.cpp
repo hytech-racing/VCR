@@ -99,8 +99,6 @@ etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create(
 
 DrivetrainSystem drivetrain_system(inverter_functs, set_ef_pin_active);
 
-VCRControls controls(&drivetrain_system, MAX_ALLOWED_DB_LATENCY_MS);
-
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
@@ -113,6 +111,8 @@ TorqueControllerSimple mode0;
 
 HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
+    bool torque_mode_cycle_button_was_pressed = vcr_data.interface_data.dash_input_state.mode_btn_is_pressed;
+
     auto new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data, {
         .vcr_data_send_socket = vcr_data_send_socket,
         .vcf_data_recv_socket = vcf_data_recv_socket,
@@ -120,6 +120,14 @@ HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TAS
         .acu_all_data_recv_socket = acu_all_data_recv_socket
     });
     auto sys_data = evaluate_async_systems(new_interface_data);
+
+    // If torque button was released (it was pressed before updating and now it's not)
+    if (torque_mode_cycle_button_was_pressed && !vcr_data.interface_data.dash_input_state.mode_btn_is_pressed)
+    {
+        VCRControlsInstance::instance().cycle_torque_limit();
+        VCFInterfaceInstance::instance().enqueue_torque_mode_LED_message(VCRControlsInstance::instance().get_current_torque_limit());
+    }
+
     auto state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
     state_global = static_cast<uint16_t>(state);
     vcr_data.system_data = sys_data;
@@ -163,8 +171,8 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
     // Serial.println(state_global);
     // Serial.println("desired speeds, torq lim");
-    // Serial.println(controls._debug_dt_command.desired_speeds.FL);
-    // Serial.println(controls._debug_dt_command.torque_limits.FL);
+    // Serial.println(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FL);
+    // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
 
     Serial.print("Drivetrain system state: ");
     Serial.println(static_cast<int>(drivetrain_system.get_state()));
@@ -251,11 +259,12 @@ void setup() {
     //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
     //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
     //     etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
-    //     etl::delegate<void()>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
+    //     etl::delegate<void()>::create<VCRControls, &VCRControls::handle_drivetrain_command, VCRControlsInstance::instance()>(), 
     //     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_ok>(VCFInterfaceInstance::instance()),
     //     etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance())
     // );
 
+    VCRControlsInstance::create(&drivetrain_system, MAX_ALLOWED_DB_LATENCY_MS);
     VehicleStateMachineInstance::create(
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_start_button_pressed>(VCFInterfaceInstance::instance()),
@@ -264,7 +273,7 @@ void setup() {
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_recalibrate_pedals_message>(VCFInterfaceInstance::instance()),
-        etl::delegate<void(bool, bool)>::create<VCRControls, &VCRControls::handle_drivetrain_command, controls>(), 
+        etl::delegate<void(bool, bool)>::create<VCRControls, &VCRControls::handle_drivetrain_command>(VCRControlsInstance::instance()), 
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_not_ok>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_drivetrain_reset_pressed>(VCFInterfaceInstance::instance()),

@@ -4,7 +4,7 @@
 //- [x] TODO handle inverter keepalives with correct settings of inverter flags for their associated states
 
 DrivetrainSystem::DrivetrainSystem(
-    veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay)
+    veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay_ms)
     : _inverter_interfaces(inverter_interfaces), _state(DrivetrainState_e::NOT_CONNECTED),
     _check_inverter_ready_flag([](const InverterStatus_s & status) -> bool {return status.system_ready;}),
     _check_inverter_connected_flag([](const InverterStatus_s & status) -> bool {return status.connected;}),
@@ -14,7 +14,7 @@ DrivetrainSystem::DrivetrainSystem(
     _check_inverter_hv_not_present_flag([](const InverterStatus_s & status) -> bool {return !status.hv_present;}), 
     _check_inverter_enabled([](const InverterStatus_s & status) -> bool {return status.quit_inverter_on;}),
     _set_ef_active_pin(set_ef_active_pin), 
-    _ef_pin_enable_delay(ef_pin_enable_delay) { };
+    _ef_pin_enable_delay_ms(ef_pin_enable_delay_ms) { };
 
 
 DrivetrainState_e DrivetrainSystem::get_state()
@@ -175,7 +175,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
             // State Outputs (Note: trying to make inverters ready and inverters enabled true in this state)
             _set_ef_active_pin(true);
-            if (sys_time::hal_millis() - _last_toggled_ef_active > _ef_pin_enable_delay) {
+            if (sys_time::hal_millis() - _last_toggled_ef_active > _ef_pin_enable_delay_ms) {
                 _set_enable_drivetrain();
             } else {
                 _set_enable_drivetrain_hv(); 
