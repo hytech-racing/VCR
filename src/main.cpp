@@ -122,7 +122,7 @@ HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TAS
     auto sys_data = evaluate_async_systems(new_interface_data);
 
     // If torque button was released (it was pressed before updating and now it's not)
-    if (torque_mode_cycle_button_was_pressed && !vcr_data.interface_data.dash_input_state.mode_btn_is_pressed)
+    if (torque_mode_cycle_button_was_pressed && !new_interface_data.dash_input_state.mode_btn_is_pressed)
     {
         VCRControlsInstance::instance().cycle_torque_limit();
         VCFInterfaceInstance::instance().enqueue_torque_mode_LED_message(VCRControlsInstance::instance().get_current_torque_limit());
@@ -188,6 +188,9 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     
     // Serial.print("mc reset button pressed: ");
     // Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
+    
+    Serial.print("torque mode cycle button pressed: ");
+    Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
 
     // Serial.println("IOExpander testing");
     // Serial.println("Shutdown Data");
