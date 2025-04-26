@@ -86,6 +86,6 @@ VehicleState_e evaluate_state_machine(const VCRSystemData_s &system_data,
                                   VehicleStateMachine &state_machine);
 
 
-HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
 #endif // __VCR_SYSTEMTASKS_H__

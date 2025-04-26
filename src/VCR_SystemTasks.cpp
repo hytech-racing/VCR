@@ -31,22 +31,7 @@ VCRInterfaceData_s sample_async_data(
     return ret;
 }
 
-VCRSystemData_s evaluate_async_systems(const VCRInterfaceData_s &interface_data) {
-    VCRSystemData_s sys_data = {};
-
-
-    /*
-    this could include: 
-    - controllers we want to always be evaluating regardless of if they are active or not
-    - low-level filters / estimators
-    - debug systems
-    - low-level parameter system 
-    - <etc>
-    */ 
-    return sys_data;
-}
-
-HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
     etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
@@ -54,7 +39,6 @@ HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TAS
     bool torque_mode_cycle_button_was_pressed = vcr_data.interface_data.dash_input_state.mode_btn_is_pressed;
 
     VCRInterfaceData_s new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data);
-    VCRSystemData_s sys_data = evaluate_async_systems(new_interface_data);
 
     // If torque button was released (it was pressed before updating and now it's not)
     if (torque_mode_cycle_button_was_pressed && !new_interface_data.dash_input_state.mode_btn_is_pressed)
@@ -64,9 +48,8 @@ HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TAS
     }
 
     VehicleState_e state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
-    sys_data.vehicle_state_machine_state = state;
     
-    vcr_data.system_data = sys_data;
+    vcr_data.system_data.vehicle_state_machine_state = state;
     vcr_data.interface_data = new_interface_data;
 
     return HT_TASK::TaskResponse::YIELD;

@@ -84,6 +84,4 @@ HT_TASK::TaskResponse run_update_brakelight_task(const unsigned long& sysMicros,
  */
 HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized VCR)
 
-HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-
 #endif /* VCR_INTERFACETASKS */
