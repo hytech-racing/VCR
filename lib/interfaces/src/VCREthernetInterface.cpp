@@ -91,35 +91,6 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
 
 }
 
-void VCREthernetInterface::receive_pb_msg_acu_all_data(const hytech_msgs_ACUAllData &msg_in, VCRData_s &shared_state)
-{
-    // TODO: Make this work with repeated fields (they broke)
-    // shared_state.interface_data.acu_all_data = {};
-    // for (size_t i = 0; i < 126; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
-    // {
-    //     shared_state.interface_data.acu_all_data.voltages[i] = msg_in.cell_voltages[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
-    // }
-
-    // for (size_t i = 0; i < 48; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
-    // {
-    //     shared_state.interface_data.acu_all_data.cell_temperatures[i] = msg_in.cell_temperatures[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
-    // }
-
-    // for (size_t i = 0; i < 6; ++i) //NOLINT this array indexing is fine because this is using generated code. trust.
-    // {
-    //     shared_state.interface_data.acu_all_data.board_humidities[i] = msg_in.board_humidities[i]; //NOLINT this array indexing is fine because this is using generated code. trust.
-    // }
-}
-
-void VCREthernetInterface::receive_pb_msg_acu_core_data(const hytech_msgs_ACUCoreData &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
-{
-    shared_state.interface_data.stamped_acu_core_data.acu_data.avg_cell_voltage = msg_in.avg_cell_voltage;
-    shared_state.interface_data.stamped_acu_core_data.acu_data.max_cell_temp = msg_in.max_cell_temp;
-    shared_state.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = msg_in.min_cell_voltage;
-    shared_state.interface_data.stamped_acu_core_data.acu_data.pack_voltage = msg_in.pack_voltage;
-    shared_state.interface_data.stamped_acu_core_data.last_recv_millis = curr_millis;
-}
-
 void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
 {
     //TODO: Finish this function. This function could parse the message and put it into shared_state, but depending

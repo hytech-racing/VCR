@@ -14,26 +14,6 @@ namespace VCREthernetInterface
     hytech_msgs_VCRData_s make_vcr_data_msg(const VCRData_s &shared_state);
 
     /**
-     * Function to take a populated protoc struct from ACU and update the VCR state.
-     * 
-     * @param msg_in A reference to a populated protoc struct.
-     * @param shared_state A reference to the VCR state.
-     * 
-     * @post After this function completes, shared_state will have updated contents of ACUCoreData.
-     */
-    void receive_pb_msg_acu_core_data(const hytech_msgs_ACUCoreData &msg_in, VCRData_s &shared_state, unsigned long curr_millis);
-
-    /**
-     * Function to take a populated protoc struct from ACU and update the VCR state.
-     * 
-     * @param msg_in A reference to a populated protoc struct.
-     * @param shared_state A reference to the VCR state.
-     * 
-     * @post After this function completes, shared_state will have updated contents of ACUAllData.
-     */
-    void receive_pb_msg_acu_all_data(const hytech_msgs_ACUAllData &msg_in, VCRData_s &shared_state);
-
-    /**
      * Function to take a populated protoc struct from the drivebrain and update the VCR state.
      * 
      * @param msg_in A reference to a populated protoc struct.

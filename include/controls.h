@@ -32,9 +32,9 @@ class VCRControls
          */
         void cycle_torque_limit()
         {
-            int torque_limit_int = (int) _torque_limit;
-            int new_torque_limit = (torque_limit_int + 1) % ((int) TorqueLimit_e::TCMUX_NUM_TORQUE_LIMITS);
-            _torque_limit = (TorqueLimit_e) new_torque_limit;
+            size_t torque_limit_int = static_cast<size_t>(_torque_limit);
+            size_t new_torque_limit = (torque_limit_int + 1) % (static_cast<size_t>(TorqueLimit_e::TCMUX_NUM_TORQUE_LIMITS));
+            _torque_limit = static_cast<TorqueLimit_e>(new_torque_limit);
         }
         TorqueLimit_e get_current_torque_limit() {return _torque_limit;}
 

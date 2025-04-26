@@ -47,7 +47,7 @@ void VCFInterface::receive_dashboard_message(const CAN_message_t &msg, unsigned 
     _curr_data.dash_input_state.left_paddle_is_pressed = dash_msg.left_shifter_button;
     _curr_data.dash_input_state.right_paddle_is_pressed = dash_msg.right_shifter_button;
     _curr_data.dash_input_state.mode_btn_is_pressed = dash_msg.mode_button; // change torque limit
-    _curr_data.dash_input_state.dial_state = (ControllerMode_e) dash_msg.dash_dial_mode;
+    _curr_data.dash_input_state.dial_state = static_cast<ControllerMode_e>(dash_msg.dash_dial_mode);
     
 }
 
