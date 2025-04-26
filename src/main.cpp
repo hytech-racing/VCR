@@ -37,8 +37,8 @@
 #include "DrivetrainSystem.h"
 #include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
-
 #include "controls.h"
+
 /* From pio-git-hash */
 #include "device_fw_version.h"
 
@@ -99,8 +99,6 @@ DrivetrainSystem drivetrain_system(inverter_functs, set_ef_pin_active);
 
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
-
-bool drivetrain_initialized = false;
 
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
@@ -225,18 +223,6 @@ void setup() {
         rr_inverter_int
     );
     VCRAsynchronousInterfacesInstance::create(CANInterfacesInstance::instance());
-
-    // VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
-    //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
-    //     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_start_button_pressed>(VCFInterfaceInstance::instance()), 
-    //     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_brake_pressed>(VCFInterfaceInstance::instance()),
-    //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
-    //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
-    //     etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
-    //     etl::delegate<void()>::create<VCRControls, &VCRControls::handle_drivetrain_command, VCRControlsInstance::instance()>(), 
-    //     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_ok>(VCFInterfaceInstance::instance()),
-    //     etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance())
-    // );
 
     VCRControlsInstance::create(&drivetrain_system, MAX_ALLOWED_DB_LATENCY_MS);
     VehicleStateMachineInstance::create(
