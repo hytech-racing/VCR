@@ -3,15 +3,7 @@
 
 #include <etl/delegate.h>
 #include <etl/singleton.h>
-
-enum class VehicleState_e {
-    TRACTIVE_SYSTEM_NOT_ACTIVE = 1, 
-    TRACTIVE_SYSTEM_ACTIVE = 2,
-    WANTING_READY_TO_DRIVE = 3,
-    READY_TO_DRIVE = 4,
-    WANTING_RECALIBRATE_PEDALS = 5,
-    RECALIBRATING_PEDALS = 6    
-};
+#include "SharedFirmwareTypes.h"
 
 class VehicleStateMachine
 {

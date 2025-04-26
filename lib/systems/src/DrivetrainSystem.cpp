@@ -1,7 +1,5 @@
 #include <DrivetrainSystem.h>
 
-//- [x] TODO handle inverter keepalives with correct settings of inverter flags for their associated states
-
 DrivetrainSystem::DrivetrainSystem(
     veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay_ms)
     : _inverter_interfaces(inverter_interfaces), _state(DrivetrainState_e::NOT_CONNECTED),

@@ -49,8 +49,6 @@ FlexCAN_Type<CAN2> VCRCANInterfaceImpl::INVERTER_CAN;
 /* Ethernet message sockets */
 qindesign::network::EthernetUDP vcr_data_send_socket;
 qindesign::network::EthernetUDP vcf_data_recv_socket;
-qindesign::network::EthernetUDP acu_core_data_recv_socket;
-qindesign::network::EthernetUDP acu_all_data_recv_socket;
 
 /* Drivetrain Initialization */
 
@@ -102,38 +100,7 @@ DrivetrainSystem drivetrain_system(inverter_functs, set_ef_pin_active);
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
-
-uint16_t state_global;
-etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
-
 bool drivetrain_initialized = false;
-
-HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    bool torque_mode_cycle_button_was_pressed = vcr_data.interface_data.dash_input_state.mode_btn_is_pressed;
-
-    auto new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data, {
-        .vcr_data_send_socket = vcr_data_send_socket,
-        .vcf_data_recv_socket = vcf_data_recv_socket,
-        .acu_core_data_recv_socket = acu_core_data_recv_socket,
-        .acu_all_data_recv_socket = acu_all_data_recv_socket
-    });
-    auto sys_data = evaluate_async_systems(new_interface_data);
-
-    // If torque button was released (it was pressed before updating and now it's not)
-    if (torque_mode_cycle_button_was_pressed && !new_interface_data.dash_input_state.mode_btn_is_pressed)
-    {
-        VCRControlsInstance::instance().cycle_torque_limit();
-        VCFInterfaceInstance::instance().enqueue_torque_mode_LED_message(VCRControlsInstance::instance().get_current_torque_limit());
-    }
-
-    auto state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
-    state_global = static_cast<uint16_t>(state);
-    vcr_data.system_data = sys_data;
-    vcr_data.interface_data = new_interface_data;
-
-    return HT_TASK::TaskResponse::YIELD;
-}
 
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
@@ -168,7 +135,7 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
     // Serial.println("state machine state");
 
-    // Serial.println(state_global);
+    // Serial.println(vcr_data.system_data.vehicle_state_machine_state);
     // Serial.println("desired speeds, torq lim");
     // Serial.println(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FL);
     // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
@@ -241,6 +208,8 @@ void setup() {
     
     // Create all singletons
     // IOExpanderInstance::create(0);
+    ProtobufSocketsInstance::create(vcr_data_send_socket, vcf_data_recv_socket);
+
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
@@ -298,8 +267,6 @@ void setup() {
         EthernetIPDefsInstance::instance().default_gateway, EthernetIPDefsInstance::instance().car_subnet);
     vcr_data_send_socket.begin(EthernetIPDefsInstance::instance().VCRData_port);
     vcf_data_recv_socket.begin(EthernetIPDefsInstance::instance().VCFData_port);
-    acu_core_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUCoreData_port);
-    acu_all_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUAllData_port);
 
     // Initialize CAN
     const uint32_t telem_CAN_baudrate = 1000000;
