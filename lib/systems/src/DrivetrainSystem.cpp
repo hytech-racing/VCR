@@ -153,8 +153,6 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             bool hv_present = false;
             hv_present = _check_inverter_flags(_check_inverter_hv_present_flag);
 
-            Serial.println(requesting_init);
-
             if (inverter_error_present) {
                 _set_state(DrivetrainState_e::ERROR);
             } else if (!hv_present) {
