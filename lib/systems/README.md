@@ -3,13 +3,18 @@
 
 ### list of features
 
-- [ ] ability to initialize inverters 
-- [ ] ability to command inverters 
-- [ ] ability to switch inverter control modes
+- [X] Ability to initialize inverters
+    - User must call `evaluate_drivetrain()` and pass in an instance of `DrivetrainInit_s`
+- [X] Ability to command inverters
+    - User may call `evaluate_drivetrain()` and pass in a `DrivetrainCommand_s`
+- [ ] Ability to switch inverter control modes*
+    - All commands are technically speed commands. See the `README.md` in the inv
 - [ ] ability to detect timeout of initialization of inverters
 - [ ] ability to change parameters of inverters
-- [ ] detailed error status for invalid usage of drivetrain system
-- [ ] ability to get all data available from inverter
+- [X] detailed error status for invalid usage of drivetrain system
+    - User may call `get_status().inverter_statuses`
+- [X] ability to get all data available from inverter
+    - User may call `get_status().inverter_statuses`
 
 ### interface / usage description
 

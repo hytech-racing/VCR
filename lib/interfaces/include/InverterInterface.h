@@ -66,14 +66,6 @@ class InverterInterface
 
         void send_INV_CONTROL_PARAMS(); 
 
-        void send_INV_TEMP_DATA(); //sending inverter temp data on telem can bus
-
-        void send_INV_STATUS_DATA(); //sending inverter status on telem can bus
-
-        void send_INV_DYNAMICS_DATA();
-
-        void send_INV_TORQUE_LIMITS();
-
         /* Inverter Functs */
         void set_speed(float desired_rpm, float torque_limit_nm); 
 

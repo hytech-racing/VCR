@@ -14,6 +14,12 @@ MotorMechanics_s FR_motor_mechanics = {};
 MotorMechanics_s RL_motor_mechanics = {};
 MotorMechanics_s RR_motor_mechanics = {};
 
+bool ef_is_active = false;
+void set_ef_active_pin(bool value)
+{
+    ef_is_active = value;
+}
+
 class MockInverterInterface {
 
 public:
@@ -73,7 +79,7 @@ MockInverterInterface RL(RL_status, RL_motor_mechanics);
 MockInverterInterface RR(RR_status, RR_motor_mechanics);
 
 veh_vec<DrivetrainSystem::InverterFuncts> mock_inverter_functs = {FL.inverter_functs, FR.inverter_functs, RL.inverter_functs, RR.inverter_functs};
-DrivetrainSystem drivetrain = DrivetrainSystem(mock_inverter_functs);
+DrivetrainSystem drivetrain = DrivetrainSystem(mock_inverter_functs, etl::delegate<void(bool)>::create<set_ef_active_pin>());
 
 DrivetrainInit_s init = {DrivetrainModeRequest_e::INIT_DRIVE_MODE};
 DrivetrainResetError_s reset = {true};
