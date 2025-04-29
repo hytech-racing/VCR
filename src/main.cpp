@@ -107,7 +107,6 @@ uint16_t state_global;
 etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 
 bool drivetrain_initialized = false;
-TorqueControllerSimple mode0;
 
 HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
