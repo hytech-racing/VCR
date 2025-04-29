@@ -1,4 +1,5 @@
 #include <DrivetrainSystem.h>
+#include "Logger.h"
 
 //- [x] TODO handle inverter keepalives with correct settings of inverter flags for their associated states
 
@@ -152,6 +153,8 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
             bool hv_present = false;
             hv_present = _check_inverter_flags(_check_inverter_hv_present_flag);
+
+            hal_printf("requesting init : inverters ready : quit dc on : hv_present\n %d : %d : %d : %d\n", requesting_init, inverters_ready, quit_dc_on, hv_present);
 
             if (inverter_error_present) {
                 _set_state(DrivetrainState_e::ERROR);

@@ -1,8 +1,12 @@
 #include "controllers/SimpleLaunchController.h"
 #include <stdlib.h> /* abs */
+#include "Logger.h"
 
 DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, uint32_t curr_millis)
 {
+    hal_print("in state ");
+    hal_println((int) _launch_state);
+
     DrivetrainCommand_s out = {
         {0.0f, 0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f, 0.0f}

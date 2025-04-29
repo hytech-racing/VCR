@@ -24,8 +24,10 @@ enum class LaunchStates_e
 /// @brief contains constants for tick behavior/progression(_threshold variables used to determine when to move to the next step) and defaults(DEFAULT_launch_speed_target_rpm)
 namespace LaunchControllerParams
 {
-    const int16_t DEFAULT_INIT_SPEED_RPM = 1500; // Target RPM as soon as simple launch begins
-    const float DEFAULT_LAUNCH_RATE_M_PER_SEC_SQ = 11.76;
+    // const int16_t DEFAULT_INIT_SPEED_RPM = 1500; // Target RPM as soon as simple launch begins
+    const int16_t DEFAULT_INIT_SPEED_RPM = 500; // Target RPM as soon as simple launch begins
+    // const float DEFAULT_LAUNCH_RATE_M_PER_SEC_SQ = 11.76;
+    const float DEFAULT_LAUNCH_RATE_M_PER_SEC_SQ = 3.0f;
     const float launch_ready_accel_threshold = .1;
     const float launch_ready_brake_threshold = .2;
     const float launch_ready_speed_threshold = 5.0 * METERS_PER_SECOND_TO_RPM; // rpm
@@ -69,7 +71,8 @@ private:
         float secs_since_launch = (curr_millis - _time_of_launch) / 1000.0f;
         float calculated_rpm = (int16_t) (secs_since_launch * _launch_rate_target_m_per_sec_sq * METERS_PER_SECOND_TO_RPM);
         calculated_rpm += _init_speed_target_rpm;
-        calculated_rpm = std::min( (int) PhysicalParameters::AMK_MAX_RPM, std::max(0, (int) calculated_rpm));
+        // calculated_rpm = std::min( (int) PhysicalParameters::AMK_MAX_RPM, std::max(0, (int) calculated_rpm));
+        calculated_rpm = std::min( (int) 5000, std::max(0, (int) calculated_rpm));
         return calculated_rpm;
     }
 
