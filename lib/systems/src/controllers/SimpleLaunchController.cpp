@@ -1,11 +1,8 @@
 #include "controllers/SimpleLaunchController.h"
 #include <stdlib.h> /* abs */
-#include "Logger.h"
 
 DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, uint32_t curr_millis)
 {
-    hal_print("in state ");
-    hal_println((int) _launch_state);
 
     DrivetrainCommand_s out = {
         {0.0f, 0.0f, 0.0f, 0.0f},
@@ -27,10 +24,14 @@ DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, 
     {
     case LaunchStates_e::LAUNCH_NOT_READY:
 
-        out.torque_limits.FL = brake_torque_req;
-        out.torque_limits.FR = brake_torque_req;
-        out.torque_limits.RL = brake_torque_req;
-        out.torque_limits.RR = brake_torque_req;
+        // out.torque_limits.FL = brake_torque_req;
+        // out.torque_limits.FR = brake_torque_req;
+        // out.torque_limits.RL = brake_torque_req;
+        // out.torque_limits.RR = brake_torque_req;
+        out.torque_limits.FL = 0.0f;
+        out.torque_limits.FR = 0.0f;
+        out.torque_limits.RL = 0.0f;
+        out.torque_limits.RR = 0.0f;
 
         // init launch vars
         _launch_speed_target_rpm = 0;
@@ -45,10 +46,14 @@ DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, 
         break;
     case LaunchStates_e::LAUNCH_READY:
 
-        out.torque_limits.FL = brake_torque_req;
-        out.torque_limits.FR = brake_torque_req;
-        out.torque_limits.RL = brake_torque_req;
-        out.torque_limits.RR = brake_torque_req;
+        // out.torque_limits.FL = brake_torque_req;
+        // out.torque_limits.FR = brake_torque_req;
+        // out.torque_limits.RL = brake_torque_req;
+        // out.torque_limits.RR = brake_torque_req;
+        out.torque_limits.FL = 0.0f;
+        out.torque_limits.FR = 0.0f;
+        out.torque_limits.RL = 0.0f;
+        out.torque_limits.RR = 0.0f;
 
         // init launch vars
         _launch_speed_target_rpm = 0;

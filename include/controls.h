@@ -39,13 +39,15 @@ class VCRControls
         }
         TorqueLimit_e get_current_torque_limit() {return _torque_limit;}
 
+        SimpleLaunchController& get_launch_controller() {return _mode3;}
+
         DrivetrainCommand_s _debug_dt_command = {};
     private:
         TorqueControllerSimple _mode0; // this needs to be first for tc_mux to have a valid capture
         SimpleLaunchController _mode3;
         DrivebrainController _mode4;
         TCMuxType _tc_mux;
-        TorqueLimit_e _torque_limit = TorqueLimit_e::TCMUX_MID_TORQUE;
+        TorqueLimit_e _torque_limit = TorqueLimit_e::TCMUX_FULL_TORQUE;
         DrivetrainSystem *_dt_system = nullptr;
 
 };

@@ -83,4 +83,5 @@ private:
     int16_t _init_speed_target_rpm;
 
 };
+
 #endif // LAUNCH_CONTROLLER_H
