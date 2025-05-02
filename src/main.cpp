@@ -107,7 +107,6 @@ uint16_t state_global;
 etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 
 bool drivetrain_initialized = false;
-TorqueControllerSimple mode0;
 
 HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -179,6 +178,9 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
     Serial.print("Vehicle statemachine state: ");
     Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
+
+    Serial.print("launch controller state: ");
+    Serial.println(static_cast<int>(VCRControlsInstance::instance().get_launch_controller().get_launch_state()));
 
     // Serial.print("Start button pressed: ");
     // Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);

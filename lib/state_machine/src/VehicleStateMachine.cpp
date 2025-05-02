@@ -39,7 +39,6 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
             }
             
             _command_drivetrain(false, false);
-            // hal_printf("start button : brake_pressed = %d %d\n", _is_start_button_pressed(), _is_brake_pressed());
 
             if (!_check_hv_over_threshold()) 
             {
@@ -104,7 +103,6 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
             }
 
-            // Serial.printf("current_millis - _last_entered_waiting_state_ms : %d - %d\n", current_millis, _last_entered_waiting_state_ms);
             if (_is_calibrate_pedals_button_pressed() && (current_millis - _last_entered_waiting_state_ms > 3000))
             {
                 _set_state(VehicleState_e::RECALIBRATING_PEDALS, current_millis);
@@ -145,7 +143,6 @@ void VehicleStateMachine::_set_state(VehicleState_e new_state, unsigned long cur
 
 void VehicleStateMachine::_handle_exit_logic(VehicleState_e prev_state, unsigned long curr_millis)
 {
-    // hal_printf("Exiting state %d\n", prev_state);
     switch (prev_state)
     {
         case VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE:
