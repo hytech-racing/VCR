@@ -60,6 +60,11 @@ HT_TASK::TaskResponse init_adc_bundle()
     return HT_TASK::TaskResponse::YIELD;
 }
 
+float apply_iir_filter(float alpha, float old_value, float new_value)
+{
+    return (alpha * new_value) + (1 - alpha) * (old_value);
+}
+
 HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
@@ -74,19 +79,21 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
     vcr_data.interface_data.current_sensor_data.current_refererence_unfiltered = 
         ADCSingletonInstance::instance().adc0.data.conversions[REFERENCE_SENSE_CHANNEL].conversion;
 
-    vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog = 
-        ADCSingletonInstance::instance().adc0.data.conversions[RL_LOADCELL_CHANNEL].conversion;
+    vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
+        vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog,
+        ADCSingletonInstance::instance().adc0.data.conversions[RL_LOADCELL_CHANNEL].conversion);
 
-    vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = 
-        ADCSingletonInstance::instance().adc0.data.conversions[RR_LOADCELL_CHANNEL].conversion;
+    vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
+        vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog,
+        ADCSingletonInstance::instance().adc0.data.conversions[RR_LOADCELL_CHANNEL].conversion);
 
-    vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = 
-        ADCSingletonInstance::instance().adc0.data.conversions[RL_SUS_POT_CHANNEL].raw; // Just use raw for suspots
+    vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
+        vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog,
+        ADCSingletonInstance::instance().adc0.data.conversions[RL_SUS_POT_CHANNEL].raw);
 
-    vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = 
-        ADCSingletonInstance::instance().adc0.data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
-
-    // Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
+    vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
+        vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog,
+        ADCSingletonInstance::instance().adc0.data.conversions[RR_SUS_POT_CHANNEL].raw);
 
     return HT_TASK::TaskResponse::YIELD;
 }
