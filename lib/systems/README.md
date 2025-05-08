@@ -1,44 +1,46 @@
 
 ## Drivetrain System (tentative design docs)
 
-### list of features
+### List of features
 
 - [X] Ability to initialize inverters
     - User must call `evaluate_drivetrain()` and pass in an instance of `DrivetrainInit_s`
 - [X] Ability to command inverters
     - User may call `evaluate_drivetrain()` and pass in a `DrivetrainCommand_s`
 - [ ] Ability to switch inverter control modes*
-    - All commands are technically speed commands. See the `README.md` in the inv
-- [ ] ability to detect timeout of initialization of inverters
-- [ ] ability to change parameters of inverters
-- [X] detailed error status for invalid usage of drivetrain system
+    - All commands are technically speed commands. See the `README.md` in the interfaces library.
+- [ ] Ability to detect timeout of initialization of inverters
+- [ ] Ability to change parameters of inverters
+- [X] Detailed error status for invalid usage of drivetrain system
     - User may call `get_status().inverter_statuses`
-- [X] ability to get all data available from inverter
+- [X] Ability to get all data available from inverter
     - User may call `get_status().inverter_statuses`
 
-### interface / usage description
+### Usage Description
 
-the user of the drivetrain system will be expected to use the `evaluate_drivetrain` function to interact / command and receive the current status of the drivetrain. 
+The user must call the `evaluate_drivetrain` function. This will:
+1) Update the state machine (internal to drivetrain)
+2) Update the command in each InverterInterface
+3) Return the current state of the Drivetrain state machine (DSM)
 
-#### initialization
-the user shall call the `evaluate_drivetrain` function with the cmdvariant type set to the initialization struct and populated with desired mode to put the drivetrain into. the user should continuously call the `evaluate_drivetrain` with this struct until the drivetrain's state reaches the initialization state expected.
+#### Initialization
+The user must call the `evaluate_drivetrain` function with the `CmdVariant` type set to `DrivetrainInit_s`. The user should continuously call the `evaluate_drivetrain` with this struct until the drivetrain's state reaches the expected state.
 
-#### drivetrain commanding
+#### Drivetrain Commanding
 
-once initialized, the user is able to command the drivetrain with either speed or torque commands. 
+Once initialized, the user may command the drivetrain with either speed or torque commands*.
+- All commands are technically speed commands. See the `README.md` in interfaces library.
 
-The user may switch between command modes so long as the drivetrain is not active / the car is not driving (all inverter RPMs < 100). this is purely for safety, however this needs to be tested for the exact requirements to switch between control modes during runtime.
+### State Machine
 
-### state machine description
+Instead of the drivetrain system being a direct API interface on top of the inverter interface with calls to the drivetrain system that call the lower-level inverter interface immediately to queue CAN messages, the drivetrain system will instead update pieces of the inverter interface's internal state (such as bit flags) for it to send periodically.
 
-Instead of the drivetrain system being a direct api interface on top of the inverter interface with calls to the drivetrain system that call the lower-level inverter interface immediately to queue CAN messages, the drivetrain system will instead update pieces of the inverter interface's internal state (such as bit flags) for it to send periodically.
-
-This is being done to simplify the interaction between the inverters and the rest of our firmware and to resolve the CAN saturation issues that were occuring with the last drivetrain system / inverter interface issues that were hackily solved with a metro timer dictating when the queue of CAN messages that were being sent out from the inverter could be appended to.
+This allows more control over the send rate of the InverterInterface (necessary to manage CAN saturation).
 
 
 ```
 ---
-title: drivetrain state machine
+title: Drivetrain State Machine
 ---
 stateDiagram-v2
 
@@ -86,31 +88,19 @@ stateDiagram-v2
     clear_err --> not_en_hv: on successful reset of errors (either internally to the drivetrain system or of the inverters themselves)
 ```
 
-## drivebrain controller system
+## Drivebrain Controller System
 
 Drivebrain Controller for fail-safe pass-through control of the car
   
-this class is the "controller" that allows for pass-through control as commanded by the drivebrain. It also calculates the latency of the most recent input and checks to see if the most recent input is still valid and has not expired. If the input has expired then it switches over to the fail-safe control mode (MODE0) to allow for safe failing even while the car is driving so that we dont lose hard-braking capabilities.
+This class is the "controller" that allows pass-through control as commanded by the DriveBrain. It also calculates the latency of the most recent input and
+checks if a command has "expired". If the input has expired, it switches over to the fail-safe control mode (MODE0) to allow for safe failing even while the car is driving.
 
-The controller can clear it's own fault by switching off of this operating mode and then swapping back to this operating mode. The fault clears the first time this controller gets evaluated while switch from the swapped-to mode back to this pass through mode. 
+The driver may clear this fault by manually switching to another mode (with the dial) and returning to this pass-through mode.
 
-- all controllers get evaluated once when being evaluated as a mode to switch to. during this evaluation is when the fault clears.
+### Latency Measurement:
+- Latency is measured by the difference in times in received messages from drivebrain over CAN. If the difference is too great, we swap to MODE0 control. The
+transition delay is negligible.
 
-### latency measurement:
-- the latency is measured by the difference in times in received messages from drivebrain over CAN. if the difference is too great, we swap to MODE0 control. it is assumed that the transmission delay is negligible
-
-### config and I/O
-config: 
-
-- maximum allowed latency 
-
-- assigned controller mode of the drivebrain control mode (currently defaults to MODE4)
-
-inputs:
-
-- the current car state from which it gets the latest drivebrain input, current controller mode and the stamped drivebrain message data
-outputs:
-
-- drivetrain command either from drivebrain or mode0 depending on if an error is present
-
-- getter for the internal state of the drivebrain controller (error present, etc.)
+### Configuration (Defined on construction)
+- Maximum allowed latency (milliseconds)
+- Assigned controller mode of the drivebrain control mode (currently defaults to MODE4)
