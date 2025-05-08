@@ -1,6 +1,6 @@
 #include "VCREthernetInterface.h"
 #include "SharedFirmwareTypes.h"
-
+#include <Arduino.h>
 #include <algorithm>
 
 hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &shared_state)
@@ -11,12 +11,19 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.has_ams_data = true;
     out.has_current_sensor_data = true;
     out.has_drivetrain_data = true;
+
+    out.drivetrain_data.has_measuredMagnetizingCurrents = true;
+    out.drivetrain_data.has_measuredSpeeds = true;
+    out.drivetrain_data.has_measuredTorqueCurrents = true;
+    out.drivetrain_data.has_measuredTorques = true;
+    
     out.has_ethernet_is_linked = true;
     out.has_firmware_version_info = true;
     out.has_inverter_data = true;
     out.has_rear_loadcell_data = true;
     out.has_rear_suspot_data = true;
     out.has_shutdown_sensing_data = true;
+    out.has_tcmux_status = true;
 
     //RearLoadCellData_s
     out.rear_loadcell_data.RL_loadcell_analog = shared_state.interface_data.rear_loadcell_data.RL_loadcell_analog;
