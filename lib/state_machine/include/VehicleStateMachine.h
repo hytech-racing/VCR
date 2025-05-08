@@ -13,7 +13,7 @@ class VehicleStateMachine
             etl::delegate<bool()> is_start_button_pressed, 
             etl::delegate<bool()> is_brake_pressed, 
             etl::delegate<bool()> check_drivetrain_error_ocurred, 
-            etl::delegate<bool()> check_drivetrain_ready, // when calling this function the initialization of the drivetrain is occuring, returning false during and true when finished
+            etl::delegate<bool()> check_drivetrain_ready,
             etl::delegate<void()> start_buzzer,
             etl::delegate<void()> recalibrate_pedals,
             etl::delegate<void(bool, bool)> command_drivetrain,
