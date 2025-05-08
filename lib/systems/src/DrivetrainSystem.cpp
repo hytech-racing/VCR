@@ -231,6 +231,9 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             // State Outputs
             _set_drivetrain_disabled();
             _set_ef_active_pin(false);
+
+            DrivetrainCommand_s drivetrain_command = {{0, 0, 0, 0}, {0.0f, 0.0f, 0.0f, 0.0f}};
+            _set_drivetrain_command(drivetrain_command); // Explicitly set RPMs and torques to 0 while in ERROR state
             
             // State Transitions
             bool user_requesting_error_reset = etl::holds_alternative<DrivetrainResetError_s>(cmd) && (etl::get<DrivetrainResetError_s>(cmd).reset_errors); 
