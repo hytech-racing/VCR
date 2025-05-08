@@ -1,5 +1,5 @@
-#ifndef __VehicleState_e_MACHINE__
-#define __VehicleState_e_MACHINE__
+#ifndef VEHICLE_STATE_MACHINE_H
+#define VEHICLE_STATE_MACHINE_H
 
 #include <etl/delegate.h>
 #include <etl/singleton.h>
@@ -80,4 +80,4 @@ class VehicleStateMachine
 
 using VehicleStateMachineInstance = etl::singleton<VehicleStateMachine>;
 
-#endif
+#endif // VEHICLE_STATE_MACHINE_H

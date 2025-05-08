@@ -61,7 +61,6 @@ VCFCANInterfaceData_s VCFInterface::get_latest_data() {
 
     // only in the situation where the hearbeat has yet to be established or the heartbeat is ok do we re-evaluate the heartbeat.
     // if hearbeat is is not ok, the only thing that should be able to reset it is the state machine via the reset_pedals_heartbeat function
-    
     if(_first_received_message_heartbeat_init || _curr_data.stamped_pedals.heartbeat_ok)
     {
         _first_received_message_heartbeat_init = false;

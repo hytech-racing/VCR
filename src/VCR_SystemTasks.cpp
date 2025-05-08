@@ -47,7 +47,7 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
         VCFInterfaceInstance::instance().enqueue_torque_mode_LED_message(VCRControlsInstance::instance().get_current_torque_limit());
     }
 
-    VehicleState_e state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
+    VehicleState_e state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis()); // NOLINT (linter says state is not initialized?)
     
     vcr_data.system_data.vehicle_state_machine_state = state;
     vcr_data.interface_data = new_interface_data;

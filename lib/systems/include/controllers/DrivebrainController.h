@@ -1,5 +1,5 @@
-#ifndef __DRIVEBRAINCONTROLLER_H__
-#define __DRIVEBRAINCONTROLLER_H__
+#ifndef DRIVEBRAINCONTROLLER_H
+#define DRIVEBRAINCONTROLLER_H
 
 #include "controllers/SimpleController.h"
 #include "SharedFirmwareTypes.h"
@@ -85,4 +85,4 @@ private:
     TorqueControllerSimple _emergency_control;
 };
 
-#endif // __DRIVEBRAINCONTROLLER_H__
+#endif // DRIVEBRAINCONTROLLER_H
