@@ -100,7 +100,7 @@ constexpr unsigned long ams_update_period_us = 10000;                // 10 000 u
 constexpr unsigned long ams_priority = 2;
 constexpr unsigned long suspension_can_period_us = 4000;             // 4 000 us = 250 Hz
 constexpr unsigned long suspension_priority = 4;
-constexpr unsigned long ethernet_update_period = 10000;              // 10 000 us = 100 Hz
+constexpr unsigned long ethernet_update_period = 100000;              // 100 000 us = 10 Hz
 constexpr unsigned long ethernet_send_priority = 6;
 constexpr unsigned long inv_send_period = 12000;                     // 4 000 us = 250 Hz
 constexpr unsigned long inverter_send_priority = 5;
