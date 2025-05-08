@@ -9,6 +9,7 @@ bool drivetrain_ready;
 bool drivetrain_commanded;
 bool buzzer_active;
 bool pedals_timeout;
+bool pedals_recald=false;
 
 etl::delegate<bool()> mock_hv_over_threshold = etl::delegate<bool()>::create([]() -> bool {
     return hv_over_threshold;
@@ -60,6 +61,12 @@ etl::delegate<void()> mock_pedals_reset = etl::delegate<void()>::create([]() -> 
     return;
 });
 
+etl::delegate<void()> mock_recal_pedals = etl::delegate<void()>::create([]() -> void {
+    pedals_recald = true;
+    return;
+});
+
+
 VehicleStateMachine state_machine = VehicleStateMachine(
     mock_hv_over_threshold,
     mock_start_btn,
@@ -67,9 +74,10 @@ VehicleStateMachine state_machine = VehicleStateMachine(
     mock_drivetrain_error,
     mock_drivetrain_ready,
     mock_start_buzzer,
+    mock_recal_pedals,
     mock_command_drivetrain,
     mock_pedals_timeout,
-    mock_pedals_reset
+    mock_pedals_reset,
 );
 
 TEST (VehicleStateMachine, TractiveSystemNotActive) {

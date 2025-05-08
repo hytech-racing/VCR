@@ -14,16 +14,16 @@
 #include "SystemTimeInterface.h"
 
 // requirements:
-// - [ ] must support ability to initialize the drivetrain 
-// - [ ] ability to command inverters individually and be able to return a failure status when attempting to send invalid command for a certain state
-// - [ ] contain a state machine for managing the state of the drivetrain as a whole (aka: all inverters have the same state)
-//  - [ ] initialization states included
+// - [x] must support ability to initialize the drivetrain 
+// - [x] ability to command inverters individually and be able to return a failure status when attempting to send invalid command for a certain state
+// - [x] contain a state machine for managing the state of the drivetrain as a whole (aka: all inverters have the same state)
+//  - [x] initialization states included
 //  - [ ] different control mode states
-// - [ ] single point of interaction / control of the drivetrain that can receive "commands"
+// - [x] single point of interaction / control of the drivetrain that can receive "commands"
 //      (at least for now, need to see how this works out once we start using it)
-// - [ ] be decoupled from the inverter class
+// - [x] be decoupled from the inverter class
 //      std::function / etl::delegate registered functions for the inverter interface. mostly for ease of testing.
-// - [ ] be able to reset drivetrain
+// - [x] be able to reset drivetrain
     // - [ ] 
 
 // TODO move these into the shared types after finishing the system 

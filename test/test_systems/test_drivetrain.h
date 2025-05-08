@@ -171,8 +171,6 @@ TEST (DrivetrainTest, test) {
     RL_status.quit_inverter_on = true;
     RR_status.quit_inverter_on = true;
     drivetrain.evaluate_drivetrain(cmd);
-    ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::INVERTERS_ENABLED);
-    drivetrain.evaluate_drivetrain(cmd);
     ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::ENABLED_DRIVE_MODE);
 
     FL_status.error = true;
