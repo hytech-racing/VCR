@@ -1,5 +1,7 @@
 #include "VCREthernetInterface.h"
 #include "SharedFirmwareTypes.h"
+#include "ht_can_version.h"
+#include "hytech_msgs_version.h"
 
 #include <algorithm>
 
@@ -8,7 +10,6 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
 	hytech_msgs_VCRData_s out;
 
     //has_data
-    out.has_ams_data = true;
     out.has_current_sensor_data = true;
     out.has_drivetrain_data = true;
     out.has_ethernet_is_linked = true;
@@ -63,16 +64,6 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredTorqueCurrents, out.drivetrain_data.measuredTorqueCurrents);
     copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
 
-    //AMSSystemData_s
-    out.ams_data.min_cell_voltage = shared_state.system_data.ams_data.min_cell_voltage;
-    out.ams_data.average_cell_voltage = shared_state.system_data.ams_data.average_cell_voltage;
-    out.ams_data.max_cell_voltage = shared_state.system_data.ams_data.max_cell_voltage;
-    out.ams_data.min_temp_celsius = shared_state.system_data.ams_data.min_temp_celsius;
-    out.ams_data.average_temp_celsius = shared_state.system_data.ams_data.average_temp_celsius;
-    out.ams_data.max_temp_celsius = shared_state.system_data.ams_data.max_temp_celsius;
-    out.ams_data.total_pack_voltage = shared_state.system_data.ams_data.total_pack_voltage;
-    out.ams_data.ams_ok = shared_state.system_data.ams_data.ams_ok;
-
     //TorqueControllerMuxStatus
     out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) shared_state.system_data.tc_mux_status.active_error;
     out.tcmux_status.active_controller_mode = (hytech_msgs_ControllerMode_e) shared_state.system_data.tc_mux_status.active_controller_mode;
@@ -86,9 +77,11 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.firmware_version_info.project_is_dirty = shared_state.fw_version_info.project_is_dirty;
     out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;
     std::copy(shared_state.fw_version_info.fw_version_hash.begin(), shared_state.fw_version_info.fw_version_hash.end(), out.firmware_version_info.git_hash);
-    
-    return out;
+    out.msg_versions.ht_can_version = HT_CAN_LIB_VERSION;
+    std::copy(version, version + std::min(strlen(version), sizeof(out.msg_versions.ht_proto_version) - 1), out.msg_versions.ht_proto_version);    
+    out.msg_versions.ht_proto_version[sizeof(out.msg_versions.ht_proto_version) - 1] = '\0';
 
+    return out;
 }
 
 void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in, VCRData_s &shared_state, unsigned long curr_millis)

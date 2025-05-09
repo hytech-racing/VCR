@@ -61,8 +61,21 @@ etl::delegate<void()> mock_pedals_reset = etl::delegate<void()>::create([]() -> 
     return;
 });
 
-etl::delegate<void()> mock_recal_pedals = etl::delegate<void()>::create([]() -> void {
-    pedals_recald = true;
+etl::delegate<void()> calibrate_pedals = etl::delegate<void()>::create([]() -> void {
+    called_recalibrate_pedals = true;
+    return;
+});
+
+etl::delegate<bool()> mock_inverter_button_pressed = etl::delegate<bool()>::create([]() -> bool {
+    return inverter_button_pressed;
+});
+
+etl::delegate<bool()> mock_calibrate_pedals_pressed = etl::delegate<bool()>::create([]() -> bool {
+    return calibrate_pedals_pressed;
+});
+
+etl::delegate<void()> mock_reset_inverter_error = etl::delegate<void()>::create([]() -> void {
+    called_reset_inverter_error = true;
     return;
 });
 
