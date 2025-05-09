@@ -1,6 +1,7 @@
 #include "VCREthernetInterface.h"
 #include "SharedFirmwareTypes.h"
-#include <Arduino.h>
+#include "ht_can_version.h"
+#include "hytech_msgs_version.h"
 #include <algorithm>
 
 hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &shared_state)
@@ -8,7 +9,6 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
 	hytech_msgs_VCRData_s out;
 
     //has_data
-    out.has_ams_data = true;
     out.has_current_sensor_data = true;
     out.has_drivetrain_data = true;
 
@@ -16,14 +16,14 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.drivetrain_data.has_measuredSpeeds = true;
     out.drivetrain_data.has_measuredTorqueCurrents = true;
     out.drivetrain_data.has_measuredTorques = true;
-    
+
     out.has_ethernet_is_linked = true;
     out.has_firmware_version_info = true;
-    out.has_inverter_data = true;
     out.has_rear_loadcell_data = true;
     out.has_rear_suspot_data = true;
     out.has_shutdown_sensing_data = true;
     out.has_tcmux_status = true;
+    out.has_msg_versions = true;
 
     //RearLoadCellData_s
     out.rear_loadcell_data.RL_loadcell_analog = shared_state.interface_data.rear_loadcell_data.RL_loadcell_analog;
@@ -53,10 +53,15 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.ethernet_is_linked.vcf_link = shared_state.interface_data.ethernet_is_linked.vcf_link;
 
     //veh_vec<InverterData>
+
     copy_inverter_data(shared_state.interface_data.inverter_data.FL, out.inverter_data.FL);
+    out.inverter_data.has_FL = true;
     copy_inverter_data(shared_state.interface_data.inverter_data.FR, out.inverter_data.FR);
+    out.inverter_data.has_FR = true;
     copy_inverter_data(shared_state.interface_data.inverter_data.RL, out.inverter_data.RL);
+    out.inverter_data.has_RL = true;
     copy_inverter_data(shared_state.interface_data.inverter_data.RR, out.inverter_data.RR);
+    out.inverter_data.has_RR = true;
 
     //CurrentSensorData_s
     out.current_sensor_data.twentyfour_volt_sensor = shared_state.interface_data.current_sensor_data.twentyfour_volt_sensor;
@@ -69,16 +74,6 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredTorques, out.drivetrain_data.measuredTorques);
     copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredTorqueCurrents, out.drivetrain_data.measuredTorqueCurrents);
     copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
-
-    //AMSSystemData_s
-    out.ams_data.min_cell_voltage = shared_state.system_data.ams_data.min_cell_voltage;
-    out.ams_data.average_cell_voltage = shared_state.system_data.ams_data.average_cell_voltage;
-    out.ams_data.max_cell_voltage = shared_state.system_data.ams_data.max_cell_voltage;
-    out.ams_data.min_temp_celsius = shared_state.system_data.ams_data.min_temp_celsius;
-    out.ams_data.average_temp_celsius = shared_state.system_data.ams_data.average_temp_celsius;
-    out.ams_data.max_temp_celsius = shared_state.system_data.ams_data.max_temp_celsius;
-    out.ams_data.total_pack_voltage = shared_state.system_data.ams_data.total_pack_voltage;
-    out.ams_data.ams_ok = shared_state.system_data.ams_data.ams_ok;
 
     //TorqueControllerMuxStatus
     out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) shared_state.system_data.tc_mux_status.active_error;
@@ -93,7 +88,10 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.firmware_version_info.project_is_dirty = shared_state.fw_version_info.project_is_dirty;
     out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;
     std::copy(shared_state.fw_version_info.fw_version_hash.begin(), shared_state.fw_version_info.fw_version_hash.end(), out.firmware_version_info.git_hash);
-    
+    out.msg_versions.ht_can_version = HT_CAN_LIB_VERSION;
+    strncpy(out.msg_versions.ht_proto_version, version, sizeof(out.msg_versions.ht_proto_version));
+    out.msg_versions.ht_proto_version[sizeof(out.msg_versions.ht_proto_version) - 1] = '\0';
+
     return out;
 
 }
