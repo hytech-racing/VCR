@@ -37,8 +37,8 @@
 #include "DrivetrainSystem.h"
 #include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
-
 #include "controls.h"
+
 /* From pio-git-hash */
 #include "device_fw_version.h"
 
@@ -49,8 +49,6 @@ FlexCAN_Type<CAN2> VCRCANInterfaceImpl::INVERTER_CAN;
 /* Ethernet message sockets */
 qindesign::network::EthernetUDP vcr_data_send_socket;
 qindesign::network::EthernetUDP vcf_data_recv_socket;
-qindesign::network::EthernetUDP acu_core_data_recv_socket;
-qindesign::network::EthernetUDP acu_all_data_recv_socket;
 
 /* Drivetrain Initialization */
 
@@ -102,39 +100,6 @@ DrivetrainSystem drivetrain_system(inverter_functs, set_ef_pin_active);
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
-
-uint16_t state_global;
-etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
-
-bool drivetrain_initialized = false;
-
-HT_TASK::TaskResponse run_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    bool torque_mode_cycle_button_was_pressed = vcr_data.interface_data.dash_input_state.mode_btn_is_pressed;
-
-    auto new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data, {
-        .vcr_data_send_socket = vcr_data_send_socket,
-        .vcf_data_recv_socket = vcf_data_recv_socket,
-        .acu_core_data_recv_socket = acu_core_data_recv_socket,
-        .acu_all_data_recv_socket = acu_all_data_recv_socket
-    });
-    auto sys_data = evaluate_async_systems(new_interface_data);
-
-    // If torque button was released (it was pressed before updating and now it's not)
-    if (torque_mode_cycle_button_was_pressed && !new_interface_data.dash_input_state.mode_btn_is_pressed)
-    {
-        VCRControlsInstance::instance().cycle_torque_limit();
-        VCFInterfaceInstance::instance().enqueue_torque_mode_LED_message(VCRControlsInstance::instance().get_current_torque_limit());
-    }
-
-    auto state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
-    state_global = static_cast<uint16_t>(state);
-    vcr_data.system_data = sys_data;
-    vcr_data.interface_data = new_interface_data;
-
-    return HT_TASK::TaskResponse::YIELD;
-}
-
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
 // HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
@@ -143,9 +108,9 @@ HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, ams_pri
 HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, suspension_priority, suspension_can_period_us);
 HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, inverter_send_priority, inv_send_period);
 HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, send_can_priority); // Sends all messages from the CAN queue
-HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority);
+HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority, ethernet_update_period);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
-HT_TASK::Task main_task(HT_TASK::DUMMY_FUNCTION, run_main_task, main_task_priority, main_task_period_us);
+HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
 
 
@@ -168,7 +133,7 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
     // Serial.println("state machine state");
 
-    // Serial.println(state_global);
+    // Serial.println(vcr_data.system_data.vehicle_state_machine_state);
     // Serial.println("desired speeds, torq lim");
     // Serial.println(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FL);
     // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
@@ -241,12 +206,22 @@ void setup() {
     
     // Create all singletons
     // IOExpanderInstance::create(0);
+    ProtobufSocketsInstance::create(vcr_data_send_socket, vcf_data_recv_socket);
+    EthernetIPDefsInstance::create();
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
         EthernetIPDefsInstance::instance().drivebrain_ip,
         EthernetIPDefsInstance::instance().VCRData_port,
         &vcr_data_send_socket);
+
+    // Initializes all ethernet
+    // uint8_t mac[6]; // NOLINT (mac addresses are always 6 bytes)
+    // qindesign::network::Ethernet.macAddress(&mac[0]);
+    qindesign::network::Ethernet.begin(EthernetIPDefsInstance::instance().vcr_ip, EthernetIPDefsInstance::instance().car_subnet, EthernetIPDefsInstance::instance().default_gateway);
+    vcr_data_send_socket.begin(EthernetIPDefsInstance::instance().VCRData_port);
+    vcf_data_recv_socket.begin(EthernetIPDefsInstance::instance().VCFData_port);
+
     CANInterfacesInstance::create(
         VCFInterfaceInstance::instance(),
         DrivebrainInterfaceInstance::instance(), 
@@ -256,18 +231,6 @@ void setup() {
         rr_inverter_int
     );
     VCRAsynchronousInterfacesInstance::create(CANInterfacesInstance::instance());
-
-    // VehicleStateMachine vehicle_statemachine = VehicleStateMachine(
-    //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
-    //     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_start_button_pressed>(VCFInterfaceInstance::instance()), 
-    //     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_brake_pressed>(VCFInterfaceInstance::instance()),
-    //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
-    //     etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
-    //     etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
-    //     etl::delegate<void()>::create<VCRControls, &VCRControls::handle_drivetrain_command, VCRControlsInstance::instance()>(), 
-    //     etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_ok>(VCFInterfaceInstance::instance()),
-    //     etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance())
-    // );
 
     VCRControlsInstance::create(&drivetrain_system, MAX_ALLOWED_DB_LATENCY_MS);
     VehicleStateMachineInstance::create(
@@ -289,18 +252,6 @@ void setup() {
     // Scheduler timing function
     scheduler.setTimingFunction(micros);
 
-    // Initializes all ethernet
-    EthernetIPDefsInstance::create();
-    uint8_t mac[6]; // NOLINT (mac addresses are always 6 bytes)
-    qindesign::network::Ethernet.macAddress(&mac[0]);
-    qindesign::network::Ethernet.begin(mac,
-        EthernetIPDefsInstance::instance().vcr_ip, EthernetIPDefsInstance::instance().default_dns,
-        EthernetIPDefsInstance::instance().default_gateway, EthernetIPDefsInstance::instance().car_subnet);
-    vcr_data_send_socket.begin(EthernetIPDefsInstance::instance().VCRData_port);
-    vcf_data_recv_socket.begin(EthernetIPDefsInstance::instance().VCFData_port);
-    acu_core_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUCoreData_port);
-    acu_all_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUAllData_port);
-
     // Initialize CAN
     const uint32_t telem_CAN_baudrate = 1000000;
     const uint32_t inv_CAN_baudrate = 500000;
@@ -316,9 +267,9 @@ void setup() {
     scheduler.schedule(ams_system_task);
     scheduler.schedule(enqueue_suspension_CAN_task);
     scheduler.schedule(send_CAN_task);
-    // scheduler.schedule(vcr_data_ethernet_send);
+    scheduler.schedule(vcr_data_ethernet_send);
     scheduler.schedule(enqueue_inverter_CAN_task);
-    scheduler.schedule(main_task);
+    scheduler.schedule(async_main_task);
     scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     

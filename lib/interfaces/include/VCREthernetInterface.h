@@ -3,6 +3,8 @@
 
 #include "hytech_msgs.pb.h"
 #include "SharedFirmwareTypes.h"
+#include "ProtobufMsgInterface.h"
+
 namespace VCREthernetInterface 
 {
     /**

@@ -18,7 +18,7 @@ DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cel
                        .rear_suspot_data = rear_suspot_data},
       _drivebrain_ip(drivebrain_ip),
       _vcr_data_port(vcr_data_port),
-      _udp_socket(udp_socket) {};
+      _udp_socket(udp_socket) { };
 
 StampedDrivetrainCommand_s DrivebrainInterface::get_latest_data() {
     return _latest_drivebrain_command;

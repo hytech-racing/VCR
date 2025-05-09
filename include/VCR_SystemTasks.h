@@ -12,6 +12,8 @@
 #include "shared_types.h"
 #include "SystemTimeInterface.h"
 #include "QNEthernet.h"
+#include "ht_sched.hpp"
+#include "controls.h"
 
 
 /**
@@ -46,11 +48,15 @@ using VCRAsynchronousInterfacesInstance = etl::singleton<VCRAsynchronousInterfac
  * Wrapper to contain all Protobuf send/recv sockets.
  */
 struct ProtobufSockets_s {
+    explicit ProtobufSockets_s(qindesign::network::EthernetUDP &vcr_data_send, qindesign::network::EthernetUDP &vcf_data_recv) :
+        vcr_data_send_socket(vcr_data_send),
+        vcf_data_recv_socket(vcf_data_recv) {};
+
     qindesign::network::EthernetUDP &vcr_data_send_socket;
     qindesign::network::EthernetUDP &vcf_data_recv_socket;
-    qindesign::network::EthernetUDP &acu_core_data_recv_socket;
-    qindesign::network::EthernetUDP &acu_all_data_recv_socket;
 };
+
+using ProtobufSocketsInstance = etl::singleton<ProtobufSockets_s>;
 
 /**
  * Reads all asynchronously-arriving data (CAN and Ethernet) from their respective buffers and updates their
@@ -78,5 +84,8 @@ VCRSystemData_s evaluate_async_systems(const VCRInterfaceData_s &interface_data)
 VehicleState_e evaluate_state_machine(const VCRSystemData_s &system_data,
                                   const VCRInterfaceData_s &interface_data,
                                   VehicleStateMachine &state_machine);
+
+
+HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
 #endif // __VCR_SYSTEMTASKS_H__

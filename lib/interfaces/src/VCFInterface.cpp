@@ -61,7 +61,6 @@ VCFCANInterfaceData_s VCFInterface::get_latest_data() {
 
     // only in the situation where the hearbeat has yet to be established or the heartbeat is ok do we re-evaluate the heartbeat.
     // if hearbeat is is not ok, the only thing that should be able to reset it is the state machine via the reset_pedals_heartbeat function
-    
     if(_first_received_message_heartbeat_init || _curr_data.stamped_pedals.heartbeat_ok)
     {
         _first_received_message_heartbeat_init = false;
@@ -77,7 +76,7 @@ void VCFInterface::send_buzzer_start_message()
     DASHBOARD_BUZZER_CONTROL_t ctrl = {};
     ctrl.dash_buzzer_flag = true;
     ctrl.in_pedal_calibration_state = false;
-    ctrl.torque_limit_enum_value = 0xFF; // MAX_VALUE indicates "ignore this value"
+    ctrl.torque_limit_enum_value = 0xFF; // MAX_VALUE indicates "ignore this value" //NOLINT
     CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
@@ -86,7 +85,7 @@ void VCFInterface::send_recalibrate_pedals_message()
     DASHBOARD_BUZZER_CONTROL_t ctrl = {};
     ctrl.dash_buzzer_flag = false;
     ctrl.in_pedal_calibration_state = true;
-    ctrl.torque_limit_enum_value = 0xFF; // MAX_VALUE indicates "ignore this value"
+    ctrl.torque_limit_enum_value = 0xFF; // MAX_VALUE indicates "ignore this value" //NOLINT
     CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 

@@ -48,7 +48,7 @@ public:
         _init_speed_target_rpm(LaunchControllerParams::DEFAULT_INIT_SPEED_RPM)
     { }
 
-    DrivetrainCommand_s evaluate(const VCRData_s &vcr_data, unsigned long curr_millis);
+    DrivetrainCommand_s evaluate(const VCRData_s &vcr_data, uint32_t curr_millis);
 
     LaunchStates_e get_launch_state() { return _launch_state; }
 

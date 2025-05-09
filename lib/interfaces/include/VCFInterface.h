@@ -1,5 +1,5 @@
-#ifndef __VCFINTERFACE_H__
-#define __VCFINTERFACE_H__
+#ifndef VCFINTERFACE_H
+#define VCFINTERFACE_H
 
 #include "FlexCAN_T4.h"
 

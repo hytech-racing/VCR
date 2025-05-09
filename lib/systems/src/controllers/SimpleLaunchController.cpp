@@ -11,10 +11,11 @@ DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, 
 
     const PedalsSystemData_s &pedalsData = vcr_data.interface_data.recvd_pedals_data.pedals_data;
     
-    int16_t brake_torque_req = pedalsData.brake_percent * PhysicalParameters::MAX_REGEN_TORQUE;
+    int16_t brake_torque_req = static_cast<int16_t>(pedalsData.brake_percent * PhysicalParameters::MAX_REGEN_TORQUE);
 
     float max_speed = 0;
-    std::array<float, 4> wheel_rpms = vcr_data.system_data.drivetrain_data.measuredSpeeds.as_array(); 
+    veh_vec<speed_rpm> measured_speeds = vcr_data.system_data.drivetrain_data.measuredSpeeds;
+    std::array<float, 4> wheel_rpms = measured_speeds.as_array();
     for (int i = 0; i < 4; i++)
     {
         max_speed = std::max(max_speed, abs(wheel_rpms[i]));
@@ -24,14 +25,10 @@ DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, 
     {
     case LaunchStates_e::LAUNCH_NOT_READY:
 
-        // out.torque_limits.FL = brake_torque_req;
-        // out.torque_limits.FR = brake_torque_req;
-        // out.torque_limits.RL = brake_torque_req;
-        // out.torque_limits.RR = brake_torque_req;
-        out.torque_limits.FL = 0.0f;
-        out.torque_limits.FR = 0.0f;
-        out.torque_limits.RL = 0.0f;
-        out.torque_limits.RR = 0.0f;
+        out.torque_limits.FL = brake_torque_req;
+        out.torque_limits.FR = brake_torque_req;
+        out.torque_limits.RL = brake_torque_req;
+        out.torque_limits.RR = brake_torque_req;
 
         // init launch vars
         _launch_speed_target_rpm = 0;
@@ -46,14 +43,10 @@ DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, 
         break;
     case LaunchStates_e::LAUNCH_READY:
 
-        // out.torque_limits.FL = brake_torque_req;
-        // out.torque_limits.FR = brake_torque_req;
-        // out.torque_limits.RL = brake_torque_req;
-        // out.torque_limits.RR = brake_torque_req;
-        out.torque_limits.FL = 0.0f;
-        out.torque_limits.FR = 0.0f;
-        out.torque_limits.RL = 0.0f;
-        out.torque_limits.RR = 0.0f;
+        out.torque_limits.FL = brake_torque_req;
+        out.torque_limits.FR = brake_torque_req;
+        out.torque_limits.RL = brake_torque_req;
+        out.torque_limits.RR = brake_torque_req;
 
         // init launch vars
         _launch_speed_target_rpm = 0;
