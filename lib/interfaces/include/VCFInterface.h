@@ -1,5 +1,5 @@
-#ifndef __VCFINTERFACE_H__
-#define __VCFINTERFACE_H__
+#ifndef VCFINTERFACE_H
+#define VCFINTERFACE_H
 
 #include "FlexCAN_T4.h"
 
@@ -25,14 +25,19 @@ public:
 
     bool is_start_button_pressed() { return _curr_data.dash_input_state.start_btn_is_pressed; }
     bool is_brake_pressed() {return _curr_data.stamped_pedals.pedals_data.brake_is_pressed; }
+    bool is_drivetrain_reset_pressed() {return _curr_data.dash_input_state.mc_reset_btn_is_pressed; }
+    bool is_recalibrate_pedals_button_pressed() {return _curr_data.dash_input_state.preset_btn_is_pressed; }
     bool is_pedals_heartbeat_not_ok() {return !_curr_data.stamped_pedals.heartbeat_ok; }
     void reset_pedals_heartbeat();
     
     void receive_pedals_message(const CAN_message_t& msg, unsigned long curr_millis);
+    void receive_dashboard_message(const CAN_message_t& msg, unsigned long curr_millis);
     
     VCFCANInterfaceData_s get_latest_data();
 
     void send_buzzer_start_message();
+    void send_recalibrate_pedals_message();
+    void enqueue_torque_mode_LED_message(TorqueLimit_e torque_mode);
 
 private:
 

@@ -121,8 +121,13 @@ template <std::size_t num_controllers> class TorqueControllerMux {
         {TorqueLimit_e::TCMUX_FULL_TORQUE, PhysicalParameters::AMK_MAX_TORQUE},
         {TorqueLimit_e::TCMUX_MID_TORQUE, 15.0f},
         {TorqueLimit_e::TCMUX_LOW_TORQUE, 10.0f}};
+    
+    
+    
+    float _max_change_speed;
+    float _max_torque_pos_change_delta;
+    float _max_power_limit; 
     size_t _num_motors;
-    float _max_change_speed, _max_torque_pos_change_delta, _max_power_limit;
     DrivetrainCommand_s _prev_command = {};
     TorqueControllerMuxStatus_s _active_status = {};
     TorqueControllerMuxError_e

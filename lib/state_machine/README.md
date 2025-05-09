@@ -30,8 +30,16 @@ stateDiagram-v2
     tsa : TRACTIVE_SYSTEM_ACTIVE
     wrtd : WANTING_READY_TO_DRIVE
     rtd : READY_TO_DRIVE
+    wcp : WANTING_CALIBRATE_PEDALS
+    cp : CALIBRATING_PEDALS
 
     tsna --> tsa : If HV is over threshold
+    tsna --> wcp : Pedal calibration button is pressed
+
+    wcp --> cp : Pedal calibration button held for >3000ms
+    wcp --> tsna : Pedal calibration button released within 3000ms
+
+    cp --> tsna : Pedal calibration button released
 
     tsa --> tsna : If HV is under threshold
     tsa --> wrtd : If the brake and start button are pressed

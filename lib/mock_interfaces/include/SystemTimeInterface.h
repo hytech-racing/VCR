@@ -1,7 +1,6 @@
-#ifndef __SYSTEMTIMEINTERFACE_H__
-#define __SYSTEMTIMEINTERFACE_H__
+#ifndef SYSTEMTIMEINTERFACE_H
+#define SYSTEMTIMEINTERFACE_H
 
-// 
 namespace sys_time
 {
     unsigned long hal_millis();
@@ -13,4 +12,4 @@ namespace sys_time
 
 
 
-#endif // __SYSTEMTIMEINTERFACE_H__
+#endif // SYSTEMTIMEINTERFACE_H

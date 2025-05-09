@@ -22,6 +22,10 @@ struct InverterCANIds_s
     uint32_t inv_control_word_id; 
     uint32_t inv_control_input_id; 
     uint32_t inv_control_parameter_id; 
+
+    uint32_t inv_temps_id;
+    uint32_t inv_status_id;
+    uint32_t inv_dynamics_id;
 };
 
 /**
@@ -41,6 +45,7 @@ class InverterInterface
             inverter_ids.inv_control_word_id = inv_control_word_id;
             inverter_ids.inv_control_parameter_id = inv_control_params_id;
             inverter_ids.inv_control_input_id = inv_control_input_id;
+ 
         }
 
         /* receiving callbacks */

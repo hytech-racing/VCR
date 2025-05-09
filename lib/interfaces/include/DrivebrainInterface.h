@@ -1,5 +1,5 @@
-#ifndef __DRIVEBRAININTERFACE_H__
-#define __DRIVEBRAININTERFACE_H__
+#ifndef DRIVEBRAININTERFACE_H
+#define DRIVEBRAININTERFACE_H
 
 #include "IPAddress.h"
 #include "etl/singleton.h"
@@ -39,4 +39,4 @@ class DrivebrainInterface {
 };
 
 using DrivebrainInterfaceInstance = etl::singleton<DrivebrainInterface>;
-#endif // __DRIVEBRAININTERFACE_H__
+#endif // DRIVEBRAININTERFACE_H

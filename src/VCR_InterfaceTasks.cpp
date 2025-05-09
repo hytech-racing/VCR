@@ -8,13 +8,9 @@
 /* From shared-systems-lib */
 #include "Logger.h"
 
-/* From shared_firmware_types library */
-#include "SharedFirmwareTypes.h"
-
 /* Local includes */
 #include "VCREthernetInterface.h"
 #include "VCR_Constants.h"
-#include "BuzzerController.h"
 #include "VCR_Globals.h"
 
 #include "AMSSystem.h"
@@ -23,7 +19,7 @@
 #include "IOExpanderUtils.h"
 
 
-bool init_adc_bundle()
+HT_TASK::TaskResponse init_adc_bundle()
 {
 
     float adc0_scales[channels_within_mcp_adc], adc0_offsets[channels_within_mcp_adc], adc1_scales[channels_within_mcp_adc], adc1_offsets[channels_within_mcp_adc];  // NOLINT (C-style arrays)
@@ -61,111 +57,110 @@ bool init_adc_bundle()
 
     ADCSingletonInstance::create(adc0_scales, adc0_offsets, adc1_scales, adc1_offsets);
 
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
-bool run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+float apply_iir_filter(float alpha, float old_value, float new_value)
+{
+    return (alpha * new_value) + (1 - alpha) * (old_value);
+}
+
+HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
     ADCSingletonInstance::instance().adc0.tick();
 
     vcr_data.interface_data.current_sensor_data.twentyfour_volt_sensor = 
         ADCSingletonInstance::instance().adc0.data.conversions[GLV_SENSE_CHANNEL].conversion;
-
+        
     vcr_data.interface_data.current_sensor_data.current_sensor_unfiltered = 
         ADCSingletonInstance::instance().adc0.data.conversions[CURRENT_SENSE_CHANNEL].conversion;
 
     vcr_data.interface_data.current_sensor_data.current_refererence_unfiltered = 
         ADCSingletonInstance::instance().adc0.data.conversions[REFERENCE_SENSE_CHANNEL].conversion;
 
-    vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog = 
-        ADCSingletonInstance::instance().adc0.data.conversions[RL_LOADCELL_CHANNEL].conversion;
+    vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
+        vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog,
+        ADCSingletonInstance::instance().adc0.data.conversions[RL_LOADCELL_CHANNEL].conversion);
 
-    vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = 
-        ADCSingletonInstance::instance().adc0.data.conversions[RR_LOADCELL_CHANNEL].conversion;
+    vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
+        vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog,
+        ADCSingletonInstance::instance().adc0.data.conversions[RR_LOADCELL_CHANNEL].conversion);
 
-    vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = 
-        ADCSingletonInstance::instance().adc0.data.conversions[RL_SUS_POT_CHANNEL].raw; // Just use raw for suspots
+    vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
+        vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog,
+        ADCSingletonInstance::instance().adc0.data.conversions[RL_SUS_POT_CHANNEL].raw);
 
-    vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = 
-        ADCSingletonInstance::instance().adc0.data.conversions[RR_SUS_POT_CHANNEL].raw; // Just use raw for suspots
+    vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
+        vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog,
+        ADCSingletonInstance::instance().adc0.data.conversions[RR_SUS_POT_CHANNEL].raw);
 
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
-
-bool run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
     ADCSingletonInstance::instance().adc1.tick();
 
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
-bool run_update_buzzer_controller_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    vcr_data.system_data.buzzer_is_active = BuzzerController::getInstance().buzzer_is_active(sys_time::hal_millis()); //NOLINT
-    return true;
-}
-
-
-
-bool init_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse init_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS); // NOLINT 
     pinMode(SOFTWARE_OK_PIN, OUTPUT);
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
-bool run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     AMSSystemInstance::instance().update_ams_system(sys_time::hal_millis(), vcr_data);
     // digitalWrite(SOFTWARE_OK_PIN, vcr_data.system_data.ams_data.ams_ok);
     digitalWrite(SOFTWARE_OK_PIN, true);
-    digitalWrite(2, true);
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
-
-
-bool init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     WatchdogInstance::create(WATCHDOG_KICK_INTERVAL_MS); // NOLINT
     pinMode(WATCHDOG_PIN, OUTPUT);
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
-bool run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
-    return true;
+
+    return HT_TASK::TaskResponse::YIELD;
 }
 
 // CAN send tasks
 
 // adds rear suspension and vcr status CAN messages to the sent on next mega loop run 
-bool enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
-bool handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(VCREthernetInterface::make_vcr_data_msg(vcr_data));
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
-bool handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &VCRCANInterfaceImpl::INVERTER_CAN);
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
 
-bool enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
+
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();
 
@@ -178,18 +173,24 @@ bool enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::Ta
     CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
     // VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
-bool init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+
+
+
+HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     IOExpanderInstance::create(0x20);
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
 }
 
-bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     // NOLINTBEGIN
+
+    // TODO: Make this consistent with VCF implementation (make sure internal pullups are configured)
+
     uint16_t data = 0;
     data = IOExpanderInstance::instance().read();
     vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 0);
@@ -207,6 +208,18 @@ bool read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& ta
     vcr_data.interface_data.ethernet_is_linked.debug_link = IOExpanderUtils::getBit(data, 1, 4);
     vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 1, 5);
 
-    return true;
+    return HT_TASK::TaskResponse::YIELD;
     // NOLINTEND
+}
+
+HT_TASK::TaskResponse init_update_brakelight_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    pinMode(BRAKELIGHT_CONTROL_PIN, OUTPUT);
+    return HT_TASK::TaskResponse::YIELD;
+}
+
+HT_TASK::TaskResponse run_update_brakelight_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    digitalWrite(BRAKELIGHT_CONTROL_PIN, vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_is_pressed);
+    return HT_TASK::TaskResponse::YIELD;
 }
