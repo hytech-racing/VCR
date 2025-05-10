@@ -3,6 +3,7 @@
 #include "SystemTimeInterface.h"
 #include "VCR_InterfaceTasks.h"
 #include "ht_task.hpp"
+#include "ACUInterface.h"
 
 
 /* From shared-systems-lib */
@@ -13,7 +14,6 @@
 #include "VCR_Constants.h"
 #include "VCR_Globals.h"
 
-#include "AMSSystem.h"
 #include "DrivebrainInterface.h"
 #include "IOExpander.h"
 #include "IOExpanderUtils.h"
@@ -106,18 +106,17 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
     return HT_TASK::TaskResponse::YIELD;
 }
 
-HT_TASK::TaskResponse init_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse init_acu_heartbeat(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    AMSSystemInstance::create(HEARTBEAT_INTERVAL_MS); // NOLINT 
+    ACUInterfaceInstance::create(sys_time::hal_millis(), ACU_ACU_OK_MAX_HEARTBEAT_MS); // NOLINT 
     pinMode(SOFTWARE_OK_PIN, OUTPUT);
     return HT_TASK::TaskResponse::YIELD;
 }
 
-HT_TASK::TaskResponse run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse update_acu_heartbeat(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    AMSSystemInstance::instance().update_ams_system(sys_time::hal_millis(), vcr_data);
-    // digitalWrite(SOFTWARE_OK_PIN, vcr_data.system_data.ams_data.ams_ok);
-    digitalWrite(SOFTWARE_OK_PIN, true);
+    ACUCANInterfaceData_s data = ACUInterfaceInstance::instance().get_latest_data(sys_time::hal_millis());
+    digitalWrite(SOFTWARE_OK_PIN, data.heartbeat_ok);
     return HT_TASK::TaskResponse::YIELD;
 }
 

@@ -72,8 +72,8 @@ HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, c
 /**
  * This task will tick the AMS system and will update the software shutdown if necessary.
  */
-HT_TASK::TaskResponse init_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-HT_TASK::TaskResponse run_ams_system_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+HT_TASK::TaskResponse init_acu_heartbeat(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+HT_TASK::TaskResponse update_acu_heartbeat(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
 /**
  * This task reads the received pedals data and determines whether to turn on the brake light or not.
