@@ -3,7 +3,6 @@
 #include "VCRCANInterfaceImpl.h"
 
 void ACUInterface::receive_acu_ok_message(const CAN_message_t &msg, unsigned long curr_millis) {
-    Serial.println("Received ACU OK message");
     ACU_OK_t acu_msg = {};
     Unpack_ACU_OK_hytech(&acu_msg, &msg.buf[0], msg.len);
     _curr_data.imd_ok = acu_msg.imd_ok;
