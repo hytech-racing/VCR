@@ -11,6 +11,8 @@ struct ACUCANInterfaceData_s {
     bool bms_ok;
     bool imd_ok;
     uint64_t last_recv_millis; 
+
+    bool heartbeat_ok;
 };
 
 class ACUInterface {
@@ -27,7 +29,7 @@ public:
     bool is_bms_ok() { return _curr_data.bms_ok; }
     uint64_t get_last_received_msg_time() { return _curr_data.last_recv_millis; }
     bool has_received_first_acu_heartbeat() { return _received_first_acu_heartbeat; }
-    ACUCANInterfaceData_s get_latest_data() { return _curr_data; };
+    ACUCANInterfaceData_s get_latest_data(uint64_t curr_millis);
 
 private:
     ACUCANInterfaceData_s _curr_data;
