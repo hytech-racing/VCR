@@ -22,7 +22,6 @@ void VCRControls::handle_drivetrain_command(bool wanting_ready_to_drive, bool re
 {
     if(_dt_system != nullptr)
     {
-        // Testing code (mode 0 and mode 4)
         ControllerMode_e mode = vcr_data.interface_data.dash_input_state.dial_state;
 
         if(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed)
