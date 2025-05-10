@@ -11,7 +11,7 @@ DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, 
 
     const PedalsSystemData_s &pedalsData = vcr_data.interface_data.recvd_pedals_data.pedals_data;
     
-    int16_t brake_torque_req = pedalsData.brake_percent * PhysicalParameters::MAX_REGEN_TORQUE;
+    int16_t brake_torque_req = static_cast<int16_t>(pedalsData.brake_percent * PhysicalParameters::MAX_REGEN_TORQUE);
 
     float max_speed = 0;
     veh_vec<speed_rpm> measured_speeds = vcr_data.system_data.drivetrain_data.measuredSpeeds;

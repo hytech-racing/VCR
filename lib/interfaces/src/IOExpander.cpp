@@ -14,11 +14,11 @@ IOExpander::IOExpander(uint8_t addr) : mcp(MCP23017(addr, Wire2))
     // mcp.writeRegister(MCP23017Register::GPIO_A, 0x00);  //Reset port A 
     // mcp.writeRegister(MCP23017Register::GPIO_B, 0x00);  //Reset port B
     
-    mcp.writeRegister(MCP23017Register::GPPU_B, 0xFF);  //Internal pull-ups
-    mcp.writeRegister(MCP23017Register::GPPU_A, 0xFF);  //Internal pull-ups
+    mcp.writeRegister(MCP23017Register::GPPU_B, 0xFF);  // NOLINT Internal pull-ups
+    mcp.writeRegister(MCP23017Register::GPPU_A, 0xFF);  // NOLINT Internal pull-ups
 
-    mcp.writeRegister(MCP23017Register::IPOL_A, 0xFF);  //Polarity (inverted)
-    mcp.writeRegister(MCP23017Register::IPOL_B, 0xFF);  //Polarity (inverted)
+    mcp.writeRegister(MCP23017Register::IPOL_A, 0xFF);  // NOLINT Polarity (inverted)
+    mcp.writeRegister(MCP23017Register::IPOL_B, 0xFF);  // NOLINT Polarity (inverted)
 }
 
 uint16_t IOExpander::read() 
