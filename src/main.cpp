@@ -241,12 +241,14 @@ void setup() {
     
     // Create all singletons
     // IOExpanderInstance::create(0);
+    EthernetIPDefsInstance::create();
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
         EthernetIPDefsInstance::instance().drivebrain_ip,
         EthernetIPDefsInstance::instance().VCRData_port,
         &vcr_data_send_socket);
+
     CANInterfacesInstance::create(
         VCFInterfaceInstance::instance(),
         DrivebrainInterfaceInstance::instance(), 
@@ -289,13 +291,7 @@ void setup() {
     // Scheduler timing function
     scheduler.setTimingFunction(micros);
 
-    // Initializes all ethernet
-    EthernetIPDefsInstance::create();
-    uint8_t mac[6]; // NOLINT (mac addresses are always 6 bytes)
-    qindesign::network::Ethernet.macAddress(&mac[0]);
-    qindesign::network::Ethernet.begin(mac,
-        EthernetIPDefsInstance::instance().vcr_ip, EthernetIPDefsInstance::instance().default_dns,
-        EthernetIPDefsInstance::instance().default_gateway, EthernetIPDefsInstance::instance().car_subnet);
+    qindesign::network::Ethernet.begin(EthernetIPDefsInstance::instance().vcr_ip, EthernetIPDefsInstance::instance().car_subnet, EthernetIPDefsInstance::instance().default_gateway);
     vcr_data_send_socket.begin(EthernetIPDefsInstance::instance().VCRData_port);
     vcf_data_recv_socket.begin(EthernetIPDefsInstance::instance().VCFData_port);
     acu_core_data_recv_socket.begin(EthernetIPDefsInstance::instance().ACUCoreData_port);
