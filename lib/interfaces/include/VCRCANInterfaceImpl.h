@@ -20,6 +20,7 @@
 
 #include "DrivebrainInterface.h"
 #include "VCFInterface.h"
+#include "ACUInterface.h"
 
 #include "InverterInterface.h"
 
@@ -35,6 +36,7 @@ template <CAN_DEV_TABLE CAN_DEV> using FlexCAN_Type = FlexCAN_T4<CAN_DEV, RX_SIZ
 struct CANInterfaces {
     explicit CANInterfaces(
         VCFInterface &vcf_int, 
+        ACUInterface &acu_int,
         DrivebrainInterface &db_int, 
         InverterInterface &fl_inv_int,
         InverterInterface &fr_inv_int,
@@ -42,6 +44,7 @@ struct CANInterfaces {
         InverterInterface &rr_inv_int
     )
         : vcf_interface(vcf_int), 
+          acu_interface(acu_int),
           db_interface(db_int),
           fl_inverter_interface(fl_inv_int),
           fr_inverter_interface(fr_inv_int),
@@ -49,6 +52,7 @@ struct CANInterfaces {
           rr_inverter_interface(rr_inv_int) {}
 
     VCFInterface &vcf_interface;
+    ACUInterface &acu_interface;
     DrivebrainInterface &db_interface;
     InverterInterface &fl_inverter_interface;
     InverterInterface &fr_inverter_interface;

@@ -77,7 +77,7 @@ struct DrivetrainResetError_s
 
 enum DrivetrainModeRequest_e 
 {
-    UNINITIALIZED = 0,
+    UNINITIALIZED = 0, // If sending a DrivetrainInit command with UNIITIALIZED, it will not initialize
     INIT_DRIVE_MODE = 1
 };
 

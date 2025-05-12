@@ -6,6 +6,7 @@
 #include "SharedFirmwareTypes.h"
 
 #include "VCFInterface.h"
+#include "ACUInterface.h"
 #include "VCREthernetInterface.h"
 #include "VCRCANInterfaceImpl.h"
 #include "VCR_SystemTasks.h"
@@ -23,6 +24,7 @@ VCRInterfaceData_s sample_async_data(
                         sys_time::hal_millis(), recv_call);
 
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
+    auto acu_data = interface_ref_container.can_interfaces.acu_interface.get_latest_data(sys_time::hal_millis());
     auto drivebrain_data = interface_ref_container.can_interfaces.db_interface.get_latest_data();
     ret.recvd_pedals_data = vcf_data.stamped_pedals;
     ret.dash_input_state = vcf_data.dash_input_state;

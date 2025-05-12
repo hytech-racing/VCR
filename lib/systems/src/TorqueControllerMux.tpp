@@ -50,8 +50,11 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
     if (!_mux_bypass_limits[active_controller_mode_index])
     {
         _active_status.active_torque_limit_enum = requested_torque_limit;
-        current_output = apply_regen_limit(current_output, input_state.system_data.drivetrain_data);
-        // std::cout << "output torques before " << current_output.inverter_torque_limit[0] << " " << current_output.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
+
+        if (current_output.desired_speeds.FL == 0.0f && current_output.desired_speeds.FR == 0.0f && current_output.desired_speeds.RL == 0.0f && current_output.desired_speeds.RR == 0.0f)
+        {
+            current_output = apply_regen_limit(current_output, input_state.system_data.drivetrain_data);
+        }
 
         current_output = apply_torque_limit(current_output, _torque_limit_map[requested_torque_limit]);
         // std::cout << "output torques after " << current_output.inverter_torque_limit[0] << " " <<current_output.inverter_torque_limit[1] << " " <<current_output.command.inverter_torque_limit[2] << " " <<current_output.command.inverter_torque_limit[3] << std::endl;

@@ -104,7 +104,7 @@ HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
 // HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
 HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, watchdog_priority, kick_watchdog_period_us); 
-HT_TASK::Task ams_system_task(init_ams_system_task, run_ams_system_task, ams_priority, ams_update_period_us);
+HT_TASK::Task ams_system_task(init_acu_heartbeat, update_acu_heartbeat, ams_priority, ams_update_period_us);
 HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, suspension_priority, suspension_can_period_us);
 HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, inverter_send_priority, inv_send_period);
 HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, send_can_priority, send_can_period_us); // Sends all messages from the CAN queue
@@ -224,6 +224,7 @@ void setup() {
 
     CANInterfacesInstance::create(
         VCFInterfaceInstance::instance(),
+        ACUInterfaceInstance::instance(),
         DrivebrainInterfaceInstance::instance(), 
         fl_inverter_int,
         fr_inverter_int,

@@ -39,7 +39,6 @@ void on_telem_can_receive(const CAN_message_t &msg) {
 void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis) {
     switch (msg.id) {
 
-    
     case PEDALS_SYSTEM_DATA_CANID: 
     {
         interfaces.vcf_interface.receive_pedals_message(msg, millis);
@@ -48,6 +47,11 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
     case DASH_INPUT_CANID:
     {
         interfaces.vcf_interface.receive_dashboard_message(msg, millis);
+        break;
+    }
+    case ACU_OK_CANID:
+    {
+        interfaces.acu_interface.receive_acu_ok_message(msg, millis);
         break;
     }
     case DRIVEBRAIN_TORQUE_LIM_INPUT_CANID: 

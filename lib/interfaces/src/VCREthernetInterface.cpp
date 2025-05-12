@@ -92,11 +92,10 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;
     std::copy(shared_state.fw_version_info.fw_version_hash.begin(), shared_state.fw_version_info.fw_version_hash.end(), out.firmware_version_info.git_hash);
     out.msg_versions.ht_can_version = HT_CAN_LIB_VERSION;
-    strncpy(out.msg_versions.ht_proto_version, version, sizeof(out.msg_versions.ht_proto_version));
+    std::copy(version, version + std::min(strlen(version), sizeof(out.msg_versions.ht_proto_version) - 1), out.msg_versions.ht_proto_version);    
     out.msg_versions.ht_proto_version[sizeof(out.msg_versions.ht_proto_version) - 1] = '\0';
 
     return out;
-
 }
 
 void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
