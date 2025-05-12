@@ -10,6 +10,8 @@
 struct VCFCANInterfaceData_s {
     StampedPedalsSystemData_s stamped_pedals;
     DashInputState_s dash_input_state;
+    FrontLoadCellData_s front_loadcell_data;
+    FrontSusPotData_s front_suspot_data;
 };
 
 class VCFInterface {
@@ -32,6 +34,7 @@ public:
     
     void receive_pedals_message(const CAN_message_t& msg, unsigned long curr_millis);
     void receive_dashboard_message(const CAN_message_t& msg, unsigned long curr_millis);
+    void receive_front_suspension_message(const CAN_message_t &msg, unsigned long curr_millis);
     
     VCFCANInterfaceData_s get_latest_data();
 

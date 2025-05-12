@@ -5,6 +5,7 @@
 #include "SharedFirmwareTypes.h"
 #include "TorqueControllerMux.hpp"
 #include "controllers/SimpleController.h"
+#include "controllers/LoadCellVectoringTorqueController.h"
 #include "controllers/SimpleLaunchController.h"
 #include "controllers/DrivebrainController.h"
 #include "etl/singleton.h"
@@ -44,6 +45,7 @@ class VCRControls
         DrivetrainCommand_s _debug_dt_command = {};
     private:
         TorqueControllerSimple _mode0; // this needs to be first for tc_mux to have a valid capture
+        LoadCellVectoringTorqueController _mode1;
         SimpleLaunchController _mode3;
         DrivebrainController _mode4;
         TCMuxType _tc_mux;

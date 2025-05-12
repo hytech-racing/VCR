@@ -44,6 +44,11 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
         interfaces.vcf_interface.receive_pedals_message(msg, millis);
         break;
     }
+    case FRONT_SUSPENSION_CANID:
+    {
+        interfaces.vcf_interface.receive_front_suspension_message(msg, millis);
+        break;
+    }
     case DASH_INPUT_CANID:
     {
         interfaces.vcf_interface.receive_dashboard_message(msg, millis);

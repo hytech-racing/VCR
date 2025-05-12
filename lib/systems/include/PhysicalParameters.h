@@ -6,7 +6,6 @@ namespace PhysicalParameters
     const float AMK_MAX_RPM = 20000;
     const float AMK_MAX_TORQUE = 21.42f; 
     const float MAX_REGEN_TORQUE = 10.0f;
-
 }
 
 constexpr const float GEARBOX_RATIO               = 11.83f;

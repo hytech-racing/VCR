@@ -82,15 +82,19 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
     vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog,
         ADCSingletonInstance::instance().adc0.data.conversions[RL_LOADCELL_CHANNEL].conversion);
+    vcr_data.interface_data.rear_loadcell_data.valid_RL_sample = ((ADCSingletonInstance::instance().adc0.data.conversions[RL_LOADCELL_CHANNEL].raw != 4095) 
+                                                                && (ADCSingletonInstance::instance().adc0.data.conversions[RL_LOADCELL_CHANNEL].status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
 
     vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog,
         ADCSingletonInstance::instance().adc0.data.conversions[RR_LOADCELL_CHANNEL].conversion);
+    vcr_data.interface_data.rear_loadcell_data.valid_RR_sample = ((ADCSingletonInstance::instance().adc0.data.conversions[RR_LOADCELL_CHANNEL].raw != 4095) 
+                                                                && (ADCSingletonInstance::instance().adc0.data.conversions[RR_LOADCELL_CHANNEL].status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
 
     vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog,
         ADCSingletonInstance::instance().adc0.data.conversions[RL_SUS_POT_CHANNEL].raw);
-
+    
     vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog,
         ADCSingletonInstance::instance().adc0.data.conversions[RR_SUS_POT_CHANNEL].raw);
