@@ -95,8 +95,6 @@ veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr
 
 etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create([](bool set_active) { digitalWrite(INVERTER_ENABLE_PIN, static_cast<int>(set_active)); });
 
-DrivetrainSystem drivetrain_system(inverter_functs, set_ef_pin_active);
-
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
@@ -139,15 +137,15 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
 
     Serial.print("Drivetrain system state: ");
-    Serial.println(static_cast<int>(drivetrain_system.get_state()));
+    Serial.println(static_cast<int>(DrivetrainInstance::instance().get_state()));
     Serial.print("Diagnostic FL #: ");
-    Serial.print(drivetrain_system.get_status().inverter_statuses.FL.diagnostic_number);
+    Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FL.diagnostic_number);
     Serial.print(" FR #: ");
-    Serial.print(drivetrain_system.get_status().inverter_statuses.FR.diagnostic_number);
+    Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FR.diagnostic_number);
     Serial.print(" RL #: ");
-    Serial.print(drivetrain_system.get_status().inverter_statuses.RL.diagnostic_number);
+    Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.RL.diagnostic_number);
     Serial.print(" RR #: ");
-    Serial.println(drivetrain_system.get_status().inverter_statuses.RR.diagnostic_number);
+    Serial.println(DrivetrainInstance::instance().get_status().inverter_statuses.RR.diagnostic_number);
 
     Serial.print("Vehicle statemachine state: ");
     Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
@@ -232,6 +230,7 @@ void setup() {
         EthernetIPDefsInstance::instance().drivebrain_ip,
         EthernetIPDefsInstance::instance().VCRData_port,
         &vcr_data_send_socket);
+    DrivetrainInstance::create(inverter_functs, set_ef_pin_active);
 
     // Initializes all ethernet
     // uint8_t mac[6]; // NOLINT (mac addresses are always 6 bytes)
@@ -251,13 +250,13 @@ void setup() {
     );
     VCRAsynchronousInterfacesInstance::create(CANInterfacesInstance::instance());
 
-    VCRControlsInstance::create(&drivetrain_system, MAX_ALLOWED_DB_LATENCY_MS);
+    VCRControlsInstance::create(&DrivetrainInstance::instance(), MAX_ALLOWED_DB_LATENCY_MS);
     VehicleStateMachineInstance::create(
-        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold, drivetrain_system>(), 
+        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold>(DrivetrainInstance::instance()), 
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_start_button_pressed>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_brake_pressed>(VCFInterfaceInstance::instance()),
-        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present, drivetrain_system>(),
-        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready, drivetrain_system>(),
+        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present>(DrivetrainInstance::instance()),
+        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready>(DrivetrainInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_recalibrate_pedals_message>(VCFInterfaceInstance::instance()),
         etl::delegate<void(bool, bool)>::create<VCRControls, &VCRControls::handle_drivetrain_command>(VCRControlsInstance::instance()), 
@@ -265,7 +264,7 @@ void setup() {
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_drivetrain_reset_pressed>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_recalibrate_pedals_button_pressed>(VCFInterfaceInstance::instance()),
-        etl::delegate<void()>::create<DrivetrainSystem, &DrivetrainSystem::reset_dt_error, drivetrain_system>()
+        etl::delegate<void()>::create<DrivetrainSystem, &DrivetrainSystem::reset_dt_error>(DrivetrainInstance::instance())
     );
 
     // Scheduler timing function

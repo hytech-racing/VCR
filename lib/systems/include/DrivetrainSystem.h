@@ -3,6 +3,7 @@
 
 #include "etl/variant.h"
 #include "etl/delegate.h"
+#include "etl/singleton.h"
 
 #include <array>
 #include <functional>
@@ -48,9 +49,6 @@ struct DrivetrainStatus_s
     DrivetrainCmdResponse_e cmd_resp;
     DrivetrainState_e state;
 };
-
-
-
 
 /**
  * There are three types of commands going into the DrivetrainSystem. There is the
@@ -155,5 +153,7 @@ private:
     unsigned long _last_toggled_ef_active = 0; 
     unsigned long _ef_pin_enable_delay_ms;
 };
+
+using DrivetrainInstance = etl::singleton<DrivetrainSystem>;
 
 #endif /* DRIVETRAINSYSTEM */

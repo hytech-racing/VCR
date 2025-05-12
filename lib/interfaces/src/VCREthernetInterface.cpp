@@ -97,13 +97,29 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.msg_versions.ht_proto_version[sizeof(out.msg_versions.ht_proto_version) - 1] = '\0';
 
     // VCR Status
-    std::array<char, sizeof(out.status.vehicle_state)> state_label = {};
+    const char* state_label = "UNKNOWN";
     switch (shared_state.system_data.vehicle_state_machine_state) {
-
+        case VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE: { state_label = "TRACTIVE SYSTEM NOT ACTIVE"; break; }
+        case VehicleState_e::TRACTIVE_SYSTEM_ACTIVE : { state_label = "TRACTIVE SYSTEM ACTIVE"; break; }
+        case VehicleState_e::WANTING_READY_TO_DRIVE : { state_label = "WANTING READY TO DRIVE"; break; }
+        case VehicleState_e::READY_TO_DRIVE : { state_label = "READY TO DRIVE"; break; }
+        case VehicleState_e::WANTING_RECALIBRATE_PEDALS : { state_label = "REQ RECALIBRATING PEDALS"; break; }
+        case VehicleState_e::RECALIBRATING_PEDALS : { state_label = "RECALIBRATING PEDALS"; break; }
+        default: { state_label = "UNKNOWN"; break; }
     }
-    switch (shared_state.system_data.)
-    std::copy(state_label.begin(), state_label.end(), out.status.vehicle_state);
-    std::copy(state_label.begin(), state_label.end(), out.status.drivetrain_state);
+    std::copy(state_label, state_label + std::min(strlen(state_label), sizeof(out.status.vehicle_state) - 1), out.status.vehicle_state);
+    switch (shared_state.system_data.drivetrain_state_machine_state) {
+        case DrivetrainState_e::NOT_CONNECTED : { state_label = "NOT CONNECTED"; break; }
+        case DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT : { state_label = "NOT ENABLED NO HV PRESENT"; break; }
+        case DrivetrainState_e::NOT_ENABLED_HV_PRESENT : { state_label = "NOT ENABLED HV PRESENT"; break; }
+        case DrivetrainState_e::INVERTERS_READY : { state_label = "INVERTERS READY"; break; }
+        case DrivetrainState_e::INVERTERS_HV_ENABLED : { state_label = "INVERTERS HV ENABLED"; break; }
+        case DrivetrainState_e::ENABLED_DRIVE_MODE : { state_label = "ENABLED DRIVE MODE"; break; }
+        case DrivetrainState_e::ERROR : { state_label = "ERRORED"; break; }
+        case DrivetrainState_e::CLEARING_ERRORS : { state_label = "CLEARING ERRORS"; break; }
+        default: { state_label = "UNKNOWN"; break; }
+    }
+    std::copy(state_label, state_label + std::min(strlen(state_label), sizeof(out.status.drivetrain_state) - 1), out.status.drivetrain_state);
     out.status.vehicle_state[sizeof(out.status.vehicle_state) - 1] = '\0';
     out.status.drivetrain_state[sizeof(out.status.drivetrain_state) - 1] = '\0';
     out.status.pedals_heartbeat_ok = shared_state.system_data.vcf_heartbeat_data.heartbeat_ok;

@@ -54,9 +54,10 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
     auto tc_mux_status = VCRControlsInstance::instance().get_tc_mux_status();
     vcr_data.system_data.tc_mux_status = tc_mux_status;
 
-    VehicleState_e state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis()); // NOLINT (linter says state is not initialized?)
-    vcr_data.system_data.vehicle_state_machine_state = state;
+    vcr_data.system_data.vehicle_state_machine_state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
     
+    vcr_data.system_data.drivetrain_state_machine_state = DrivetrainInstance::instance().get_state();
+
     vcr_data.interface_data = new_interface_data;
 
     return HT_TASK::TaskResponse::YIELD;
