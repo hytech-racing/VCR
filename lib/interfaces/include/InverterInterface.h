@@ -40,12 +40,13 @@ class InverterInterface
             uint32_t inv_control_word_id,
             uint32_t inv_control_input_id,
             uint32_t inv_control_params_id,
-            InverterParams_s inverter_params) : _inverter_params(inverter_params)
+            float & measured_speed,
+            float & measured_torque,
+            InverterParams_s inverter_params) : _measured_speed(measured_speed), _measured_torque(measured_torque), _inverter_params(inverter_params)
         { 
             inverter_ids.inv_control_word_id = inv_control_word_id;
             inverter_ids.inv_control_parameter_id = inv_control_params_id;
             inverter_ids.inv_control_input_id = inv_control_input_id;
- 
         }
 
         /* receiving callbacks */
@@ -87,6 +88,8 @@ class InverterInterface
         InverterControlWord_s _inverter_control_word;
         InverterControlParams_s _inverter_control_params;
         InverterFeedbackData_s _feedback_data;
+        float & _measured_speed;
+        float & _measured_torque;
         InverterParams_s _inverter_params;
 };
 
