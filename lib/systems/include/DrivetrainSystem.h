@@ -26,19 +26,6 @@
 // - [x] be able to reset drivetrain
     // - [ ] 
 
-// TODO move these into the shared types after finishing the system 
-enum class DrivetrainState_e
-{
-    NOT_CONNECTED = 0,
-    NOT_ENABLED_NO_HV_PRESENT = 1,
-    NOT_ENABLED_HV_PRESENT = 2,
-    INVERTERS_READY = 3,
-    INVERTERS_HV_ENABLED = 4,
-    ENABLED_DRIVE_MODE = 5,
-    ERROR = 6, 
-    CLEARING_ERRORS = 7
-};
-
 /**
  * When user calls evaluate_drivetrain(), this is part of the returned status to
  * indicate if the command was successful, invalid, or 

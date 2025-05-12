@@ -24,6 +24,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.has_shutdown_sensing_data = true;
     out.has_tcmux_status = true;
     out.has_msg_versions = true;
+    out.has_status = true;
 
     //RearLoadCellData_s
     out.rear_loadcell_data.RL_loadcell_analog = shared_state.interface_data.rear_loadcell_data.RL_loadcell_analog;
@@ -94,6 +95,18 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.msg_versions.ht_can_version = HT_CAN_LIB_VERSION;
     std::copy(version, version + std::min(strlen(version), sizeof(out.msg_versions.ht_proto_version) - 1), out.msg_versions.ht_proto_version);    
     out.msg_versions.ht_proto_version[sizeof(out.msg_versions.ht_proto_version) - 1] = '\0';
+
+    // VCR Status
+    std::array<char, sizeof(out.status.vehicle_state)> state_label = {};
+    switch (shared_state.system_data.vehicle_state_machine_state) {
+
+    }
+    switch (shared_state.system_data.)
+    std::copy(state_label.begin(), state_label.end(), out.status.vehicle_state);
+    std::copy(state_label.begin(), state_label.end(), out.status.drivetrain_state);
+    out.status.vehicle_state[sizeof(out.status.vehicle_state) - 1] = '\0';
+    out.status.drivetrain_state[sizeof(out.status.drivetrain_state) - 1] = '\0';
+    out.status.pedals_heartbeat_ok = shared_state.system_data.vcf_heartbeat_data.heartbeat_ok;
 
     return out;
 }
