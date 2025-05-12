@@ -58,7 +58,11 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
         _active_status.active_torque_limit_value = _torque_limit_map[requested_torque_limit];
         // std::cout << "output torques before pw " << current_output.inverter_torque_limit[0] << " " << current_output.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
 
-        current_output = apply_power_limit(current_output, input_state.system_data.drivetrain_data, _max_power_limit, _torque_limit_map[requested_torque_limit]);
+        // Do not apply power limit when regen braking
+        if (current_output.desired_speeds.FL != 0.0f || current_output.desired_speeds.FR != 0.0f || current_output.desired_speeds.RL != 0.0f || current_output.desired_speeds.RR != 0.0f)
+        {
+            current_output = apply_power_limit(current_output, input_state.system_data.drivetrain_data, _max_power_limit, _torque_limit_map[requested_torque_limit]);
+        }
         // std::cout << "output torques after pw " << current_output.inverter_torque_limit[0] << " " << current_output.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
         current_output = apply_positive_speed_limit(current_output);
         _active_status.output_is_bypassing_limits = false;

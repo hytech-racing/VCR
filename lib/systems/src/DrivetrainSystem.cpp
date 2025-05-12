@@ -1,7 +1,5 @@
 #include <DrivetrainSystem.h>
 
-//- [x] TODO handle inverter keepalives with correct settings of inverter flags for their associated states
-
 DrivetrainSystem::DrivetrainSystem(
     veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay_ms)
     : _inverter_interfaces(inverter_interfaces), _state(DrivetrainState_e::NOT_CONNECTED),
@@ -233,6 +231,9 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             // State Outputs
             _set_drivetrain_disabled();
             _set_ef_active_pin(false);
+
+            DrivetrainCommand_s drivetrain_command = {{0, 0, 0, 0}, {0.0f, 0.0f, 0.0f, 0.0f}};
+            _set_drivetrain_command(drivetrain_command); // Explicitly set RPMs and torques to 0 while in ERROR state
             
             // State Transitions
             bool user_requesting_error_reset = etl::holds_alternative<DrivetrainResetError_s>(cmd) && (etl::get<DrivetrainResetError_s>(cmd).reset_errors); 
@@ -251,8 +252,10 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         {
             // State Outputs
             _set_drivetrain_error_reset();
-            _set_drivetrain_disabled();
             _set_ef_active_pin(false);
+
+            DrivetrainCommand_s drivetrain_command = {{0, 0, 0, 0}, {0.0f, 0.0f, 0.0f, 0.0f}};
+            _set_drivetrain_command(drivetrain_command); // Explicitly set RPMs and torques to 0 while in ERROR state
  
             // State Transitions
             bool inverter_error_present = false;

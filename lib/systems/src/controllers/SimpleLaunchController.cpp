@@ -25,14 +25,10 @@ DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, 
     {
     case LaunchStates_e::LAUNCH_NOT_READY:
 
-        // out.torque_limits.FL = brake_torque_req;
-        // out.torque_limits.FR = brake_torque_req;
-        // out.torque_limits.RL = brake_torque_req;
-        // out.torque_limits.RR = brake_torque_req;
-        out.torque_limits.FL = 0.0f;
-        out.torque_limits.FR = 0.0f;
-        out.torque_limits.RL = 0.0f;
-        out.torque_limits.RR = 0.0f;
+        out.torque_limits.FL = brake_torque_req;
+        out.torque_limits.FR = brake_torque_req;
+        out.torque_limits.RL = brake_torque_req;
+        out.torque_limits.RR = brake_torque_req;
 
         // init launch vars
         _launch_speed_target_rpm = 0;
@@ -47,14 +43,10 @@ DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, 
         break;
     case LaunchStates_e::LAUNCH_READY:
 
-        // out.torque_limits.FL = brake_torque_req;
-        // out.torque_limits.FR = brake_torque_req;
-        // out.torque_limits.RL = brake_torque_req;
-        // out.torque_limits.RR = brake_torque_req;
-        out.torque_limits.FL = 0.0f;
-        out.torque_limits.FR = 0.0f;
-        out.torque_limits.RL = 0.0f;
-        out.torque_limits.RR = 0.0f;
+        out.torque_limits.FL = brake_torque_req;
+        out.torque_limits.FR = brake_torque_req;
+        out.torque_limits.RL = brake_torque_req;
+        out.torque_limits.RR = brake_torque_req;
 
         // init launch vars
         _launch_speed_target_rpm = 0;

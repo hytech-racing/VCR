@@ -1,5 +1,5 @@
-#ifndef __VCRCANINTERFACEIMPL_H__
-#define __VCRCANINTERFACEIMPL_H__
+#ifndef VCRCANINTERFACEIMPL_H
+#define VCRCANINTERFACEIMPL_H
 
 #include <cstdint>
 
@@ -90,4 +90,4 @@ namespace VCRCANInterfaceImpl {
     
 }; // namespace VCRCANInterfaceImpl
 
-#endif // __VCRCANINTERFACEIMPL_H__
+#endif // VCRCANINTERFACEIMPL_H

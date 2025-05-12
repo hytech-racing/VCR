@@ -62,10 +62,8 @@ HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros
  */
 HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 
-
-
 /**
- * handles sending of all data on all interfaces
+ * Sends all CAN data from the TX buffers of both telem and inverter CAN lines.
  */
 HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 
@@ -81,6 +79,9 @@ HT_TASK::TaskResponse update_acu_heartbeat(const unsigned long& sysMicros, const
 HT_TASK::TaskResponse init_update_brakelight_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 HT_TASK::TaskResponse run_update_brakelight_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
-// task for sending all ethernet data
+/**
+ * Task for sending all ethernet data
+ */
 HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized VCR)
+
 #endif /* VCR_INTERFACETASKS */

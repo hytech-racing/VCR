@@ -1,5 +1,5 @@
-#ifndef __SHARED_TYPES_H__
-#define __SHARED_TYPES_H__
+#ifndef SHARED_TYPES_H
+#define SHARED_TYPES_H
 #include <stdint.h>
 namespace HTUnits
 {
@@ -103,5 +103,5 @@ struct InverterFeedbackData_s
     InverterControlFeedback_s control_feedback;
 };
 
-#endif // __SHARED_TYPES_H__
+#endif // SHARED_TYPES_H
 
