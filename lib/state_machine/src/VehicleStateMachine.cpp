@@ -62,7 +62,10 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis); 
                 break;
             }
-
+            if (_check_drivetrain_error_ocurred()) {
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
+                break;
+            }
             if (_check_drivetrain_ready())
             {
                 _set_state(VehicleState_e::READY_TO_DRIVE, current_millis);
@@ -173,13 +176,13 @@ void VehicleStateMachine::_handle_entry_logic(VehicleState_e new_state, unsigned
         case VehicleState_e::TRACTIVE_SYSTEM_ACTIVE:
             break;
         case VehicleState_e::WANTING_READY_TO_DRIVE:
+            break;
+        case VehicleState_e::READY_TO_DRIVE:
         {
             _start_buzzer();
             _reset_pedals_timeout();
             break;
         }
-        case VehicleState_e::READY_TO_DRIVE:
-            break;
         case VehicleState_e::WANTING_RECALIBRATE_PEDALS:
             _last_entered_waiting_state_ms = curr_millis;
             break;
