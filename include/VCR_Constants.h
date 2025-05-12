@@ -101,13 +101,13 @@ constexpr unsigned long ams_update_period_us = 5000;                 // 5 000 us
 constexpr unsigned long ams_priority = 2;
 constexpr unsigned long suspension_can_period_us = 4000;             // 4 000 us = 250 Hz
 constexpr unsigned long suspension_priority = 4;
-constexpr unsigned long ethernet_update_period = 50000;              // 50 000 us = 20 Hz
+constexpr unsigned long ethernet_update_period = 100000;             // 50 000 us = 20 Hz
 constexpr unsigned long ethernet_send_priority = 6;
-constexpr unsigned long inv_send_period = 12000;                     // 4 000 us = 250 Hz
+constexpr unsigned long inv_send_period = 5000;                      // 5 000 us = 200 Hz
 constexpr unsigned long inverter_send_priority = 5;
 constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
 constexpr unsigned long ioexpander_priority = 100;
-constexpr unsigned long send_can_period_us = 500;                    // 500 us = 2 000 Hz
+constexpr unsigned long send_can_period_us = 1000;                   // 1 000 us = 1 000 Hz
 constexpr unsigned long send_can_priority = 2;
 constexpr unsigned long main_task_period_us = 100;                   // 100 us = 10 kHz
 constexpr unsigned long main_task_priority = 0;

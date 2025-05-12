@@ -42,6 +42,8 @@ class VCRControls
 
         SimpleLaunchController& get_launch_controller() {return _mode3;}
 
+        TorqueControllerMuxStatus_s get_tc_mux_status() { return _tc_mux.get_tc_mux_status(); }
+
         DrivetrainCommand_s _debug_dt_command = {};
     private:
         TorqueControllerSimple _mode0; // this needs to be first for tc_mux to have a valid capture

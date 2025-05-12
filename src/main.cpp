@@ -53,10 +53,10 @@ qindesign::network::EthernetUDP vcf_data_recv_socket;
 /* Drivetrain Initialization */
 
 // Inverter Interfaces
-InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, vcr_data.system_data.drivetrain_data.measuredSpeeds.FL, vcr_data.system_data.drivetrain_data.measuredTorques.FL, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
-InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, vcr_data.system_data.drivetrain_data.measuredSpeeds.FR, vcr_data.system_data.drivetrain_data.measuredTorques.FR, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
-InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, vcr_data.system_data.drivetrain_data.measuredSpeeds.RL, vcr_data.system_data.drivetrain_data.measuredTorques.RL, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
-InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, vcr_data.system_data.drivetrain_data.measuredSpeeds.RR, vcr_data.system_data.drivetrain_data.measuredTorques.RR, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE});
+InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, vcr_data.system_data.drivetrain_data.measuredSpeeds.FL, vcr_data.system_data.drivetrain_data.measuredTorques.FL, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, vcr_data.system_data.drivetrain_data.measuredSpeeds.FR, vcr_data.system_data.drivetrain_data.measuredTorques.FR, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, vcr_data.system_data.drivetrain_data.measuredSpeeds.RL, vcr_data.system_data.drivetrain_data.measuredTorques.RL, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, vcr_data.system_data.drivetrain_data.measuredSpeeds.RR, vcr_data.system_data.drivetrain_data.measuredTorques.RR, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
 
 // Inverter Functs
 DrivetrainSystem::InverterFuncts fl_inverter_functs = {

@@ -11,8 +11,10 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
     const FrontLoadCellData_s &front_lc_data = vcr_data.interface_data.front_loadcell_data;
     const RearLoadCellData_s &rear_lc_data = vcr_data.interface_data.rear_loadcell_data;
 
-    veh_vec<uint32_t> load_cell_data = {front_lc_data.FL_loadcell_analog, front_lc_data.FR_loadcell_analog,
-                                    rear_lc_data.RL_loadcell_analog, rear_lc_data.RR_loadcell_analog};
+    veh_vec<float> load_cell_data(static_cast<float>(front_lc_data.FL_loadcell_analog), 
+                                  static_cast<float>(front_lc_data.FR_loadcell_analog),
+                                  static_cast<float>(rear_lc_data.RL_loadcell_analog), 
+                                  static_cast<float>(rear_lc_data.RR_loadcell_analog));
     
     // Do sanity checks on raw data - FIX
     _load_cell_error_counts.FL = front_lc_data.valid_FL_sample ? 0 : _load_cell_error_counts.FL + 1;
@@ -27,7 +29,7 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
 
         // Both pedals are not pressed and no implausibility has been detected
         // accel_request goes between 1.0 and -1.0
-        float accel_request = pedals_data.accel_percent - pedals_data.regen_percent;
+        float accel_request = pedals_data.accel_percent - pedals_data.brake_percent;
         float torque_request = 0;
 
         if (accel_request >= 0.0)
@@ -49,12 +51,9 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
         {
             // Negative torque request
             // No load cell vectoring on regen
-            torque_request = PhysicalParameters::MAX_REGEN_TORQUE * accel_request * -1.0;
+            torque_request = PhysicalParameters::MAX_REGEN_TORQUE * accel_request * -1.0F;
 
-            out.desired_speeds.FL = 0.0;
-            out.desired_speeds.FR = 0.0;
-            out.desired_speeds.RL = 0.0;
-            out.desired_speeds.RR = 0.0;
+            out.desired_speeds = {0.0F, 0.0F, 0.0F, 0.0F};
 
             out.torque_limits.FL = torque_request * _front_regen_torque_scale;
             out.torque_limits.FR = torque_request * _front_regen_torque_scale;
