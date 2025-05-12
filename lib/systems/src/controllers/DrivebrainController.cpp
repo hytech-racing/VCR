@@ -66,7 +66,6 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     }
     else
     {
-        
         _timing_failure = true;
         output = _emergency_control.evaluate(state, curr_millis);
     }
