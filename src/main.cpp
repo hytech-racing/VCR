@@ -140,6 +140,14 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
     Serial.print("Drivetrain system state: ");
     Serial.println(static_cast<int>(drivetrain_system.get_state()));
+    Serial.print("Diagnostic FL #: ");
+    Serial.print(drivetrain_system.get_status().inverter_statuses.FL.diagnostic_number);
+    Serial.print(" FR #: ");
+    Serial.print(drivetrain_system.get_status().inverter_statuses.FR.diagnostic_number);
+    Serial.print(" RL #: ");
+    Serial.print(drivetrain_system.get_status().inverter_statuses.RL.diagnostic_number);
+    Serial.print(" RR #: ");
+    Serial.println(drivetrain_system.get_status().inverter_statuses.RR.diagnostic_number);
 
     Serial.print("Vehicle statemachine state: ");
     Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
@@ -189,6 +197,16 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.print("SusPot RL: ");
     // Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
 
+    /* Drivebrain data */
+    Serial.print("Latest Drivebrain data: ");
+    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+    Serial.print(" ");
+    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FR);
+    Serial.print(" ");
+    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
+    Serial.print(" ");
+    Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+    
     return HT_TASK::TaskResponse::YIELD;
 }
 

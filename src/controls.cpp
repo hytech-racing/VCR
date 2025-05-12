@@ -39,10 +39,6 @@ void VCRControls::handle_drivetrain_command(bool wanting_ready_to_drive, bool re
             };
             _dt_system->evaluate_drivetrain(dt_command);
         }
-
-        
-        // TODO if the user is requesting mc error reset, the dt command needs to be the error reset command
-
     }
 }
 
