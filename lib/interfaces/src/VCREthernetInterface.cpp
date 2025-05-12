@@ -84,6 +84,9 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
 
     // Buzzer
     out.buzzer_is_active = shared_state.system_data.buzzer_is_active;
+
+    // GLV Measurement
+    out.measured_glv = shared_state.interface_data.current_sensor_data.twentyfour_volt_sensor;
     
     out.firmware_version_info.project_is_dirty = shared_state.fw_version_info.project_is_dirty;
     out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;

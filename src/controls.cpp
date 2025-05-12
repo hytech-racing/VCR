@@ -12,7 +12,7 @@ VCRControls::VCRControls(DrivetrainSystem *dt_system, uint32_t max_allowed_db_la
         [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode3.evaluate(state, curr_millis); },
         [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode4.evaluate(state, curr_millis); }
     },
-    {true, true, true, true, true}),
+    {false, false, false, false, false}),
     _dt_system(dt_system)
 {
 
@@ -22,14 +22,9 @@ void VCRControls::handle_drivetrain_command(bool wanting_ready_to_drive, bool re
 {
     if(_dt_system != nullptr)
     {
-        // Testing code (mode 0 and mode 4)
         ControllerMode_e mode = vcr_data.interface_data.dash_input_state.dial_state;
 
-        if(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed)
-        {
-            DrivetrainResetError_s cmd = {true};
-            _dt_system->evaluate_drivetrain(cmd);
-        } else if (ready_to_drive) {
+        if (ready_to_drive) {
             auto dt_command = _tc_mux.get_drivetrain_command(mode, _torque_limit, vcr_data);
             _debug_dt_command = dt_command;
             _dt_system->evaluate_drivetrain(dt_command);

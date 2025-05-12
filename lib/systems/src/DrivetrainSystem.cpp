@@ -252,8 +252,10 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         {
             // State Outputs
             _set_drivetrain_error_reset();
-            _set_drivetrain_disabled();
             _set_ef_active_pin(false);
+
+            DrivetrainCommand_s drivetrain_command = {{0, 0, 0, 0}, {0.0f, 0.0f, 0.0f, 0.0f}};
+            _set_drivetrain_command(drivetrain_command); // Explicitly set RPMs and torques to 0 while in ERROR state
  
             // State Transitions
             bool inverter_error_present = false;

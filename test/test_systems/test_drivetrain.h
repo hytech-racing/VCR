@@ -499,10 +499,10 @@ TEST (DrivetrainTest, test) {
     drivetrain.evaluate_drivetrain(reset);
     ASSERT_EQ(drivetrain.get_state(), DrivetrainState_e::CLEARING_ERRORS);
     ASSERT_EQ(ef_is_active, false);
-    ASSERT_CONTROL_WORD_EQ(FL.get_control_word(), {false, false, false, false});
-    ASSERT_CONTROL_WORD_EQ(FR.get_control_word(), {false, false, false, false});
-    ASSERT_CONTROL_WORD_EQ(RL.get_control_word(), {false, false, false, false});
-    ASSERT_CONTROL_WORD_EQ(RR.get_control_word(), {false, false, false, false});
+    ASSERT_CONTROL_WORD_EQ(FL.get_control_word(), {false, true, true, true});
+    ASSERT_CONTROL_WORD_EQ(FR.get_control_word(), {false, true, true, true});
+    ASSERT_CONTROL_WORD_EQ(RL.get_control_word(), {false, true, true, true});
+    ASSERT_CONTROL_WORD_EQ(RR.get_control_word(), {false, true, true, true});
     ASSERT_CONTROL_INPUT_EQ(FL.get_control_input(), {0, 0.0f, 0.0f});
     ASSERT_CONTROL_INPUT_EQ(FR.get_control_input(), {0, 0.0f, 0.0f});
     ASSERT_CONTROL_INPUT_EQ(RL.get_control_input(), {0, 0.0f, 0.0f});
