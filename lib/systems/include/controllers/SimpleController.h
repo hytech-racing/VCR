@@ -28,14 +28,23 @@ public:
     amk_max_rpm(_amk_max_rpm_default),
     amk_max_torque(_amk_max_torque),
     amk_max_regen_torque(_amk_max_regen_torque) {}
+    TorqueControllerSimpleParams_s(float rts, float rrts, float max_rpm, float max_torq, float max_reg_tor)
+    : rear_torque_scale(rts),
+    rear_regen_torque_scale(rrts),
+    amk_max_rpm(max_rpm),
+    amk_max_torque(max_torq),
+    amk_max_regen_torque(max_reg_tor) {}
+    
 };
 
 class TorqueControllerSimple
 {
 public:
     /// @brief simple TC with tunable F/R torque balance. Accel torque balance can be tuned independently of regen torque balance
-    TorqueControllerSimple(TorqueControllerSimpleParams_s params = TorqueControllerSimpleParams_s())
+    TorqueControllerSimple(TorqueControllerSimpleParams_s params)
         : _params(params)
+    { }
+    TorqueControllerSimple()
     { }
     /// @brief calculates torque output based off max torque and simple torque scaling
     DrivetrainCommand_s evaluate(const VCRData_s &state, unsigned long curr_millis);

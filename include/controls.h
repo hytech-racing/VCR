@@ -47,6 +47,9 @@ class VCRControls
         DrivetrainCommand_s _debug_dt_command = {};
     private:
         TorqueControllerSimple _mode0; // this needs to be first for tc_mux to have a valid capture
+        TorqueControllerSimple _mode0_10_mps; // this needs to be first for tc_mux to have a valid capture
+        TorqueControllerSimple _mode0_15_mps;
+        TorqueControllerSimple _mode0_20_mps;
         LoadCellVectoringTorqueController _mode1;
         SimpleLaunchController _mode3;
         DrivebrainController _mode4;
