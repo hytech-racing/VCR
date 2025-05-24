@@ -1,6 +1,7 @@
 #include "controllers/DrivebrainController.h"
 #include "SharedFirmwareTypes.h"
 #include <cstdint>
+#include <Arduino.h>
 
 DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsigned long curr_millis)
 {
@@ -25,6 +26,11 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
 
     if((static_cast<int64_t>(curr_millis) - static_cast<int64_t>(_last_worst_latency_timestamp)) > debug_timestamp_period_ms)
     {    
+        Serial.println("last speed setpoint timestamp:");
+        Serial.println(_worst_message_latencies.worst_speed_setpoint_latency_so_far);
+        Serial.println("last speed setpoint timestamp:");
+        Serial.println(_worst_message_latencies.worst_torque_lim_latency_so_far);
+        Serial.println("");
         _last_worst_latency_timestamp = curr_millis;
         _worst_message_latencies = {-1, -1};
     }

@@ -45,6 +45,9 @@ class VCRControls
         TorqueControllerMuxStatus_s get_tc_mux_status() { return _tc_mux.get_tc_mux_status(); }
 
         DrivetrainCommand_s _debug_dt_command = {};
+        
+        bool drivebrain_is_in_control();
+        bool drivebrain_timing_failure();
     private:
         TorqueControllerSimple _mode0; // this needs to be first for tc_mux to have a valid capture
         LoadCellVectoringTorqueController _mode1;

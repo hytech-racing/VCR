@@ -12,7 +12,7 @@ VCRControls::VCRControls(DrivetrainSystem *dt_system, uint32_t max_allowed_db_la
         [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode3.evaluate(state, curr_millis); },
         [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode4.evaluate(state, curr_millis); }
     },
-    {false, false, false, false, false}),
+    {true, false, false, false, false}),
     _dt_system(dt_system)
 {
 
@@ -42,4 +42,13 @@ void VCRControls::handle_drivetrain_command(bool wanting_ready_to_drive, bool re
     }
 }
 
-        
+bool VCRControls::drivebrain_is_in_control()
+{
+    auto status = _tc_mux.get_tc_mux_status();
+    return (!_mode4.get_timing_failure_status()) && (status.active_controller_mode==ControllerMode_e::MODE_4);
+}
+
+bool VCRControls::drivebrain_timing_failure()
+{
+    return _mode4.get_timing_failure_status();
+}

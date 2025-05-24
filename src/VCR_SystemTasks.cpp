@@ -60,5 +60,8 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
 
     vcr_data.interface_data = new_interface_data;
 
+    vcr_data.system_data.db_cntrl_status.drivebrain_is_in_control = VCRControlsInstance::instance().drivebrain_is_in_control();
+    vcr_data.system_data.db_cntrl_status.drivebrain_controller_timing_failure = VCRControlsInstance::instance().drivebrain_timing_failure();
+    
     return HT_TASK::TaskResponse::YIELD;
 }
