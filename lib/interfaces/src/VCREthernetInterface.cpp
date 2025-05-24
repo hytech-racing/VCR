@@ -1,5 +1,6 @@
 #include "VCREthernetInterface.h"
 #include "SharedFirmwareTypes.h"
+#include "base_msgs.pb.h"
 #include "ht_can_version.h"
 #include "hytech_msgs_version.h"
 #include <algorithm>
@@ -24,6 +25,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.has_shutdown_sensing_data = true;
     out.has_tcmux_status = true;
     out.has_msg_versions = true;
+    out.has_status = true;
 
     //RearLoadCellData_s
     out.rear_loadcell_data.RL_loadcell_analog = shared_state.interface_data.rear_loadcell_data.RL_loadcell_analog;
@@ -94,6 +96,18 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.msg_versions.ht_can_version = HT_CAN_LIB_VERSION;
     std::copy(version, version + std::min(strlen(version), sizeof(out.msg_versions.ht_proto_version) - 1), out.msg_versions.ht_proto_version);    
     out.msg_versions.ht_proto_version[sizeof(out.msg_versions.ht_proto_version) - 1] = '\0';
+
+    // // VCR Status
+    // const char* state_label = "UNKNOWN";
+    out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(shared_state.system_data.vehicle_state_machine_state);
+    out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(shared_state.system_data.drivetrain_state_machine_state);
+    
+    out.status.drivebrain_controller_timing_failure = shared_state.system_data.db_cntrl_status.drivebrain_controller_timing_failure;
+    out.status.drivebrain_is_in_control = shared_state.system_data.db_cntrl_status.drivebrain_is_in_control;
+    
+    
+    
+    out.status.pedals_heartbeat_ok = shared_state.system_data.vcf_heartbeat_data.heartbeat_ok;
 
     return out;
 }

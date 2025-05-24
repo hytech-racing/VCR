@@ -27,6 +27,8 @@ VCRInterfaceData_s sample_async_data(
     auto acu_data = interface_ref_container.can_interfaces.acu_interface.get_latest_data(sys_time::hal_millis());
     auto drivebrain_data = interface_ref_container.can_interfaces.db_interface.get_latest_data();
     ret.recvd_pedals_data = vcf_data.stamped_pedals;
+    ret.front_loadcell_data = vcf_data.front_loadcell_data;
+    ret.front_suspot_data = vcf_data.front_suspot_data;
     ret.dash_input_state = vcf_data.dash_input_state;
     ret.latest_drivebrain_command = drivebrain_data;
 
@@ -49,10 +51,17 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
         VCFInterfaceInstance::instance().enqueue_torque_mode_LED_message(VCRControlsInstance::instance().get_current_torque_limit());
     }
 
-    VehicleState_e state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis()); // NOLINT (linter says state is not initialized?)
+    auto tc_mux_status = VCRControlsInstance::instance().get_tc_mux_status();
+    vcr_data.system_data.tc_mux_status = tc_mux_status;
+
+    vcr_data.system_data.vehicle_state_machine_state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
     
-    vcr_data.system_data.vehicle_state_machine_state = state;
+    vcr_data.system_data.drivetrain_state_machine_state = DrivetrainInstance::instance().get_state();
+
     vcr_data.interface_data = new_interface_data;
 
+    vcr_data.system_data.db_cntrl_status.drivebrain_is_in_control = VCRControlsInstance::instance().drivebrain_is_in_control();
+    vcr_data.system_data.db_cntrl_status.drivebrain_controller_timing_failure = VCRControlsInstance::instance().drivebrain_timing_failure();
+    
     return HT_TASK::TaskResponse::YIELD;
 }

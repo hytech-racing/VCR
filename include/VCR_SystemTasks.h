@@ -14,6 +14,7 @@
 #include "QNEthernet.h"
 #include "ht_sched.hpp"
 #include "controls.h"
+#include "TorqueControllerMux.hpp"
 
 
 /**

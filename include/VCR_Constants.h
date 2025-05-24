@@ -43,10 +43,15 @@ constexpr float REFERENCE_SENSE_SCALE = (float)(24/((2.77149877/3.3)*4096)); //u
 constexpr int REFERENCE_SENSE_OFFSET = 0; //No offset for REFERENCE_SENSE
 
 //Values are from the old MCU rev15
-constexpr float RL_LOADCELL_SCALE = 1;
-constexpr float RL_LOADCELL_OFFSET = 0;
-constexpr float RR_LOADCELL_SCALE = 1;
-constexpr float RR_LOADCELL_OFFSET = 0;
+// constexpr float RL_LOADCELL_SCALE = 0.74391;
+// constexpr float RL_LOADCELL_OFFSET = -2.076;
+// constexpr float RR_LOADCELL_SCALE = 0.7605;
+// constexpr float RR_LOADCELL_OFFSET = -5.809;
+
+constexpr float RL_LOADCELL_SCALE = 0.8095;
+constexpr float RL_LOADCELL_OFFSET = -5.788;
+constexpr float RR_LOADCELL_SCALE = 0.8169;
+constexpr float RR_LOADCELL_OFFSET = -7.478;
 
 //does not matter that much
 constexpr float RL_SUS_POT_SCALE = 1;
@@ -79,7 +84,7 @@ constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
 constexpr unsigned long WATCHDOG_KICK_INTERVAL_MS = 10UL;
 constexpr unsigned long VCF_PEDALS_MAX_HEARTBEAT_MS = 50UL;         // 20ms at 60mph is about 0.5 meters
 constexpr uint64_t ACU_ACU_OK_MAX_HEARTBEAT_MS = 500;
-constexpr unsigned long MAX_ALLOWED_DB_LATENCY_MS = 20; // milliseconds
+constexpr unsigned long MAX_ALLOWED_DB_LATENCY_MS = 40; // milliseconds
 
 /* Inverter constants */
 constexpr int INVERTER_EN_PIN = 2;
@@ -101,13 +106,13 @@ constexpr unsigned long ams_update_period_us = 5000;                 // 5 000 us
 constexpr unsigned long ams_priority = 2;
 constexpr unsigned long suspension_can_period_us = 4000;             // 4 000 us = 250 Hz
 constexpr unsigned long suspension_priority = 4;
-constexpr unsigned long ethernet_update_period = 50000;              // 50 000 us = 20 Hz
+constexpr unsigned long ethernet_update_period = 100000;             // 50 000 us = 20 Hz
 constexpr unsigned long ethernet_send_priority = 6;
-constexpr unsigned long inv_send_period = 12000;                     // 4 000 us = 250 Hz
+constexpr unsigned long inv_send_period = 5000;                      // 5 000 us = 200 Hz
 constexpr unsigned long inverter_send_priority = 5;
 constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
 constexpr unsigned long ioexpander_priority = 100;
-constexpr unsigned long send_can_period_us = 500;                    // 500 us = 2 000 Hz
+constexpr unsigned long send_can_period_us = 1000;                   // 1 000 us = 1 000 Hz
 constexpr unsigned long send_can_priority = 2;
 constexpr unsigned long main_task_period_us = 100;                   // 100 us = 10 kHz
 constexpr unsigned long main_task_priority = 0;
