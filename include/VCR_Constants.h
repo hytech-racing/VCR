@@ -43,15 +43,12 @@ constexpr float REFERENCE_SENSE_SCALE = (float)(24/((2.77149877/3.3)*4096)); //u
 constexpr int REFERENCE_SENSE_OFFSET = 0; //No offset for REFERENCE_SENSE
 
 //Values are from the old MCU rev15
-// constexpr float RL_LOADCELL_SCALE = 0.74391;
-// constexpr float RL_LOADCELL_OFFSET = -2.076;
-// constexpr float RR_LOADCELL_SCALE = 0.7605;
-// constexpr float RR_LOADCELL_OFFSET = -5.809;
 
-constexpr float RL_LOADCELL_SCALE = 0.8095;
-constexpr float RL_LOADCELL_OFFSET = -5.788;
-constexpr float RR_LOADCELL_SCALE = 0.8169;
-constexpr float RR_LOADCELL_OFFSET = -7.478;
+constexpr float LBS_TO_NEWTONS = 4.4482216153;
+constexpr float RL_LOADCELL_SCALE = 0.19 * LBS_TO_NEWTONS;
+constexpr float RL_LOADCELL_OFFSET = 0.0;
+constexpr float RR_LOADCELL_SCALE = 0.19 * LBS_TO_NEWTONS;
+constexpr float RR_LOADCELL_OFFSET = 0;
 
 //does not matter that much
 constexpr float RL_SUS_POT_SCALE = 1;
