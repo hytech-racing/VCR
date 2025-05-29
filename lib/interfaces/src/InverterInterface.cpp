@@ -91,10 +91,6 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     _feedback_data.motor_mechanics.actual_power = unpacked_msg.actual_power_w; // NOLINT (watts)
     _feedback_data.motor_mechanics.actual_torque = HYTECH_actual_torque_nm_ro_fromS(unpacked_msg.actual_torque_nm_ro);
     _feedback_data.motor_mechanics.actual_speed = unpacked_msg.actual_speed_rpm;
-
-    _measured_speed = _feedback_data.motor_mechanics.actual_speed;
-    _measured_torque = _feedback_data.motor_mechanics.actual_torque;
-
     _feedback_data.motor_mechanics.new_data = true;
     _feedback_data.motor_mechanics.last_recv_millis = curr_millis;
 }
