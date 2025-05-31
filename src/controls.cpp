@@ -12,7 +12,7 @@ VCRControls::VCRControls(DrivetrainSystem *dt_system, uint32_t max_allowed_db_la
         [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode3.evaluate(state, curr_millis); },
         [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode4.evaluate(state, curr_millis); }
     },
-    {true, false, false, false, false}),
+    {false, false, false, false, true}),
     _dt_system(dt_system)
 {
 
