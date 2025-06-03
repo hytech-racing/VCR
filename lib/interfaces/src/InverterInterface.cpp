@@ -30,7 +30,6 @@ MotorMechanics_s InverterInterface::get_motor_mechanics() {
     return mm_struct;
 }
 
-
 InverterControlFeedback_s InverterInterface::get_control_params() {
     InverterControlFeedback_s cf_struct = _feedback_data.control_feedback;
     _feedback_data.control_feedback.new_data = false;
@@ -139,7 +138,7 @@ void InverterInterface::send_INV_SETPOINT_COMMAND()
             msg_out.speed_setpoint_rpm = _inverter_control_speed_inputs.speed_rpm_setpoint;
             msg_out.positive_torque_limit_ro = HYTECH_positive_torque_limit_ro_toS(_inverter_control_speed_inputs.positive_torque_limit);
             msg_out.negative_torque_limit_ro = HYTECH_negative_torque_limit_ro_toS(_inverter_control_speed_inputs.negative_torque_limit);
-
+            
             CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_input_id);
             break;
         }
