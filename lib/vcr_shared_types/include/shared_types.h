@@ -30,6 +30,11 @@ struct InverterControlInput_s
     float negative_torque_limit;
 };
 
+struct InverterTorqueControlInput_s
+{
+    float torque_setpoint;
+};
+
 struct InverterControlParams_s
 {
     uint16_t speed_control_kp; 
