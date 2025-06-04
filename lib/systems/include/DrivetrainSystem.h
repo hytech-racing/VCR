@@ -69,7 +69,7 @@ enum class DrivetrainModeRequest_e
 enum class DrivetrainControlMode_e
 {
     SPEED_CONTROL=0,
-    TORQUE_CONTROL =1, // will use the speed setpoint within the drivetrain speed command struct as the torque command
+    TORQUE_CONTROL =1, // will use the torque limits within the drivetrain speed command struct as the torque command
 };
 
 struct DrivetrainInit_s 
