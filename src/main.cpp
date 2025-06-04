@@ -53,14 +53,15 @@ qindesign::network::EthernetUDP vcf_data_recv_socket;
 /* Drivetrain Initialization */
 
 // Inverter Interfaces
-InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
-InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
-InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
-InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}, InverterControlMode_e::TORQUE_CONTROL); //NOLINT
+InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}, InverterControlMode_e::TORQUE_CONTROL); //NOLINT
+InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}, InverterControlMode_e::TORQUE_CONTROL); //NOLINT
+InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}, InverterControlMode_e::TORQUE_CONTROL); //NOLINT
 
 // Inverter Functs
 DrivetrainSystem::InverterFuncts fl_inverter_functs = {
     .set_speed = [](float desired_rpm, float torque_limit_nm) { fl_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_torque = [](float desired_torque_nm, float torque_limit_nm) {fl_inverter_int.set_torque(desired_torque_nm, torque_limit_nm); },
     .set_idle = []() { fl_inverter_int.set_idle(); },
     .set_inverter_control_word = [](InverterControlWord_s control_word) { fl_inverter_int.set_inverter_control_word(control_word); },
     .get_status = []() { return fl_inverter_int.get_status(); },
@@ -69,6 +70,7 @@ DrivetrainSystem::InverterFuncts fl_inverter_functs = {
 
 DrivetrainSystem::InverterFuncts fr_inverter_functs = {
     .set_speed = [](float desired_rpm, float torque_limit_nm) { fr_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_torque = [](float desired_torque_nm, float torque_limit_nm) {fr_inverter_int.set_torque(desired_torque_nm, torque_limit_nm); },
     .set_idle = []() { fr_inverter_int.set_idle(); },
     .set_inverter_control_word = [](InverterControlWord_s control_word) { fr_inverter_int.set_inverter_control_word(control_word); },
     .get_status = []() { return fr_inverter_int.get_status(); },
@@ -77,6 +79,7 @@ DrivetrainSystem::InverterFuncts fr_inverter_functs = {
 
 DrivetrainSystem::InverterFuncts rl_inverter_functs = {
     .set_speed = [](float desired_rpm, float torque_limit_nm) { rl_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_torque = [](float desired_torque_nm, float torque_limit_nm) { rl_inverter_int.set_torque(desired_torque_nm, torque_limit_nm); },
     .set_idle = []() { rl_inverter_int.set_idle(); },
     .set_inverter_control_word = [](InverterControlWord_s control_word) { rl_inverter_int.set_inverter_control_word(control_word); },
     .get_status = []() { return rl_inverter_int.get_status(); },
@@ -85,6 +88,7 @@ DrivetrainSystem::InverterFuncts rl_inverter_functs = {
 
 DrivetrainSystem::InverterFuncts rr_inverter_functs = {
     .set_speed = [](float desired_rpm, float torque_limit_nm) { rr_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
+    .set_torque = [](float desired_torque_nm, float torque_limit_nm) { rr_inverter_int.set_torque(desired_torque_nm, torque_limit_nm); },
     .set_idle = []() { rr_inverter_int.set_idle(); },
     .set_inverter_control_word = [](InverterControlWord_s control_word) { rr_inverter_int.set_inverter_control_word(control_word); },
     .get_status = []() { return rr_inverter_int.get_status(); },
@@ -197,13 +201,13 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
     /* Drivebrain data */
     Serial.print("Latest Drivebrain data: ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_setpoints.veh_vec_data.FL);
     Serial.print(" ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FR);
+    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_setpoints.veh_vec_data.FR);
     Serial.print(" ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
+    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_setpoints.veh_vec_data.RL);
     Serial.print(" ");
-    Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+    Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_setpoints.veh_vec_data.FL);
     
     return HT_TASK::TaskResponse::YIELD;
 }
@@ -230,7 +234,9 @@ void setup() {
         EthernetIPDefsInstance::instance().drivebrain_ip,
         EthernetIPDefsInstance::instance().VCRData_port,
         &vcr_data_send_socket);
-    DrivetrainInstance::create(inverter_functs, set_ef_pin_active);
+    constexpr unsigned long ef_pin_enable_delay_ms = 50;
+    
+    DrivetrainInstance::create(inverter_functs, set_ef_pin_active, ef_pin_enable_delay_ms, DrivetrainControlMode_e::TORQUE_CONTROL);
 
     // Initializes all ethernet
     // uint8_t mac[6]; // NOLINT (mac addresses are always 6 bytes)

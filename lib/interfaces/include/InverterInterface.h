@@ -70,7 +70,7 @@ class InverterInterface
 
         /* Inverter Functs */
         void set_speed(float desired_rpm, float torque_limit_nm);  // note :only usable in speed control mode
-        void set_torque(float desired_torque_nm); // note: only usable in torque control mode
+        void set_torque(float desired_torque_nm, float torque_limit_nm); // note: only usable in torque control mode
 
         void set_idle();
 

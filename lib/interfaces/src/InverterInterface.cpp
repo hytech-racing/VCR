@@ -138,13 +138,20 @@ void InverterInterface::send_INV_SETPOINT_COMMAND()
             msg_out.speed_setpoint_rpm = _inverter_control_speed_inputs.speed_rpm_setpoint;
             msg_out.positive_torque_limit_ro = HYTECH_positive_torque_limit_ro_toS(_inverter_control_speed_inputs.positive_torque_limit);
             msg_out.negative_torque_limit_ro = HYTECH_negative_torque_limit_ro_toS(_inverter_control_speed_inputs.negative_torque_limit);
-            
-            CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_input_id);
+            msg_out.torque_setpoint_nm_ro = 0;
+            CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, _inverter_ids.inv_control_input_id);
             break;
         }
 
         case InverterControlMode_e::TORQUE_CONTROL:
         {
+            INV1_CONTROL_INPUT_t msg_out;
+
+            msg_out.speed_setpoint_rpm = 0;
+            msg_out.positive_torque_limit_ro = HYTECH_positive_torque_limit_ro_toS(_inverter_control_torq_input.positive_torque_limit);
+            msg_out.negative_torque_limit_ro = HYTECH_negative_torque_limit_ro_toS(_inverter_control_torq_input.negative_torque_limit);
+            msg_out.torque_setpoint_nm_ro = HYTECH_torque_limit_ro_toS(_inverter_control_torq_input.torque_setpoint);
+            CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, _inverter_ids.inv_control_input_id);
             break;
         }
 
@@ -152,8 +159,6 @@ void InverterInterface::send_INV_SETPOINT_COMMAND()
         {
             break;
         }
-    
-        break;
     }
     
     // CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, inverter_ids.inv_control_input_id);
@@ -168,7 +173,7 @@ void InverterInterface::send_INV_CONTROL_WORD()
     msg_out.inverter_enable = _inverter_control_word.inverter_enable;
     msg_out.remove_error = _inverter_control_word.remove_error;
 
-    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_WORD_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_word_id);
+    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_WORD_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, _inverter_ids.inv_control_word_id);
     // CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_WORD_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, inverter_ids.inv_control_word_id);
     
 }
@@ -181,7 +186,7 @@ void InverterInterface::send_INV_CONTROL_PARAMS()
     msg_out.speed_control_ki = _inverter_control_params.speed_control_ki;
     msg_out.speed_control_kd = _inverter_control_params.speed_control_kd;
 
-    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_PARAMETER_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_parameter_id);
+    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_PARAMETER_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, _inverter_ids.inv_control_parameter_id);
     // CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_PARAMETER_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, inverter_ids.inv_control_parameter_id);
 }
 
@@ -199,13 +204,22 @@ void InverterInterface::set_speed(float desired_rpm, float torque_limit_nm)
     _inverter_control_speed_inputs.negative_torque_limit = -1.0f * ::fabs(torque_limit_nm);
 }
 
-
+void InverterInterface::set_torque(float desired_torque_nm, float torque_limit_nm)
+{
+    _inverter_control_torq_input.positive_torque_limit = ::fabs(torque_limit_nm);
+    _inverter_control_torq_input.negative_torque_limit = -1.0f * ::fabs(torque_limit_nm);
+    _inverter_control_torq_input.torque_setpoint = desired_torque_nm;
+}
 
 void InverterInterface::set_idle() 
 {
-    _inverter_control_speed_inputs.negative_torque_limit = 0; 
-    _inverter_control_speed_inputs.positive_torque_limit = 0;
-    _inverter_control_speed_inputs.speed_rpm_setpoint = 0;
+    _inverter_control_speed_inputs.negative_torque_limit = 0.0f; 
+    _inverter_control_speed_inputs.positive_torque_limit = 0.0f;
+    _inverter_control_speed_inputs.speed_rpm_setpoint = 0.0f;
+
+    _inverter_control_torq_input.positive_torque_limit = 0.0f;
+    _inverter_control_torq_input.negative_torque_limit = 0.0f;
+    _inverter_control_torq_input.torque_setpoint = 0.0f;
 }
 
 void InverterInterface::set_inverter_control_word(InverterControlWord_s control_word) 

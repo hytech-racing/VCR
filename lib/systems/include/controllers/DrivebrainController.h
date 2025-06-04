@@ -55,7 +55,7 @@ public:
                          ControllerMode_e assigned_controller_mode = ControllerMode_e::MODE_4)
         : _last_worst_latency_timestamp(0), _emergency_control()
     {
-        _worst_message_latencies = {-1, -1};
+        _worst_message_latencies = {-1};
         _params = {allowed_latency, assigned_controller_mode};
     }
 
@@ -78,8 +78,7 @@ private:
 
     unsigned long _last_worst_latency_timestamp;
     struct {
-        int64_t worst_speed_setpoint_latency_so_far;
-        int64_t worst_torque_lim_latency_so_far;
+        int64_t worst_torque_setpoint_latency_so_far;
     } _worst_message_latencies;
     bool _timing_failure = false;
     TorqueControllerSimple _emergency_control;

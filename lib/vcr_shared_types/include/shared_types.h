@@ -32,6 +32,8 @@ struct InverterControlInput_s
 
 struct InverterTorqueControlInput_s
 {
+    float positive_torque_limit;
+    float negative_torque_limit;
     float torque_setpoint;
 };
 

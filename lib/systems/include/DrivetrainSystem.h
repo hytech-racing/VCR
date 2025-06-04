@@ -60,10 +60,16 @@ struct DrivetrainResetError_s
     bool reset_errors; // true: reset the errors present on inverters, false: dont
 };
 
-enum DrivetrainModeRequest_e 
+enum class DrivetrainModeRequest_e 
 {
     UNINITIALIZED = 0, // If sending a DrivetrainInit command with UNIITIALIZED, it will not initialize
     INIT_DRIVE_MODE = 1
+};
+
+enum class DrivetrainControlMode_e
+{
+    SPEED_CONTROL=0,
+    TORQUE_CONTROL =1, // will use the speed setpoint within the drivetrain speed command struct as the torque command
 };
 
 struct DrivetrainInit_s 
@@ -106,13 +112,14 @@ public:
 
     struct InverterFuncts {
         std::function<void(float desired_rpm, float torque_limit_nm)> set_speed;
+        std::function<void(float desired_torque_nm, float torque_limit_nm)> set_torque;
         std::function<void()> set_idle;
         std::function<void(InverterControlWord_s control_word)> set_inverter_control_word;
         std::function<InverterStatus_s()> get_status;
         std::function<MotorMechanics_s()> get_motor_mechanics; 
     };
     
-    DrivetrainSystem(veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay_ms = 50);
+    DrivetrainSystem(veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay_ms = 50, DrivetrainControlMode_e control_mode = DrivetrainControlMode_e::SPEED_CONTROL);
     
 private:
     /**
@@ -152,6 +159,7 @@ private:
     etl::delegate<void(bool)> _set_ef_active_pin;
     unsigned long _last_toggled_ef_active = 0; 
     unsigned long _ef_pin_enable_delay_ms;
+    DrivetrainControlMode_e _control_mode;
 };
 
 using DrivetrainInstance = etl::singleton<DrivetrainSystem>;

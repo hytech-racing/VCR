@@ -59,13 +59,10 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
         interfaces.acu_interface.receive_acu_ok_message(msg, millis);
         break;
     }
-    case DRIVEBRAIN_TORQUE_LIM_INPUT_CANID: 
+
+    case DRIVEBRAIN_DESIRED_TORQUE_INPUT_CANID:
     {
-        interfaces.db_interface.receive_drivebrain_torque_lim_command(msg, millis);
-        break;
-    }
-    case DRIVEBRAIN_SPEED_SET_INPUT_CANID: {
-        interfaces.db_interface.receive_drivebrain_speed_command(msg, millis);
+        interfaces.db_interface.receive_drivebrain_torque_setpoint(msg, millis);
         break;
     }
 
