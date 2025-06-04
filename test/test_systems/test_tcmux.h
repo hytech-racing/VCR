@@ -348,14 +348,11 @@ TEST(TorqueControllerMuxTesting, test_drivebrain_and_simple_controller_integrati
     TorqueControllerSimple simple_controller;
     DrivebrainController db_controller(10);
 
-    StampedDrivetrainCommand_s data;
-    data.desired_speeds.last_recv_millis = 1000;
-    data.desired_speeds.recvd = true;
-    data.torque_limits.last_recv_millis = 1000;
+    StampedDrivetrainTorqueCommand_s data;
+    data.torque_setpoints.last_recv_millis = 1000;
+    data.torque_setpoints.recvd = true;
     sys_time::set_millis(1000);
-    data.torque_limits.recvd = true;
-    data.torque_limits.veh_vec_data = {1, 1, 1, 1};
-    data.desired_speeds.veh_vec_data = {1, 1, 1, 1};
+    data.torque_setpoints.veh_vec_data = {1, 1, 1, 1};
 
     // TorqueControllerMuxStatus_s status = {};
     // status.active_controller_mode = current_control_mode;
@@ -381,11 +378,11 @@ TEST(TorqueControllerMuxTesting, test_drivebrain_and_simple_controller_integrati
     res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
 
     EXPECT_FALSE(db_controller.get_timing_failure_status());
-    EXPECT_FLOAT_EQ(res.desired_speeds.FL, data.desired_speeds.veh_vec_data.FL);
+    EXPECT_FLOAT_EQ(res.torque_limits.FL, data.torque_setpoints.veh_vec_data.FL); // TODO unfuck the hack
     
-    data.desired_speeds.last_recv_millis = 3000;
-    data.torque_limits.last_recv_millis = 2000;
-    sys_time::set_millis(3000);
+    // set the last recv millis to be way before the current time
+    data.torque_setpoints.last_recv_millis = 3000;
+    sys_time::set_millis(3500);
     state.interface_data.latest_drivebrain_command = data;
     res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
     
@@ -394,7 +391,7 @@ TEST(TorqueControllerMuxTesting, test_drivebrain_and_simple_controller_integrati
 
     state.interface_data.dash_input_state.data_btn_is_pressed = true;
     res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
-    data.torque_limits.last_recv_millis = 3000;
+    data.torque_setpoints.last_recv_millis = 3500;
     state.interface_data.latest_drivebrain_command = data;
     res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
     EXPECT_FALSE(db_controller.get_timing_failure_status());
