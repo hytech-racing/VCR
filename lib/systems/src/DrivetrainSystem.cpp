@@ -1,8 +1,9 @@
+#include "PhysicalParameters.h"
 #include <DrivetrainSystem.h>
 
 DrivetrainSystem::DrivetrainSystem(
-    veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay_ms)
-    : _inverter_interfaces(inverter_interfaces), _state(DrivetrainState_e::NOT_CONNECTED),
+    veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay_ms, DrivetrainControlMode_e control_mode)
+    : _state(DrivetrainState_e::NOT_CONNECTED), _inverter_interfaces(inverter_interfaces),
     _check_inverter_ready_flag([](const InverterStatus_s & status) -> bool {return status.system_ready;}),
     _check_inverter_connected_flag([](const InverterStatus_s & status) -> bool {return status.connected;}),
     _check_inverter_quit_dc_flag([](const InverterStatus_s & status) -> bool {return status.quit_dc_on;}),
@@ -11,7 +12,8 @@ DrivetrainSystem::DrivetrainSystem(
     _check_inverter_hv_not_present_flag([](const InverterStatus_s & status) -> bool {return !status.hv_present;}), 
     _check_inverter_enabled([](const InverterStatus_s & status) -> bool {return status.quit_inverter_on;}),
     _set_ef_active_pin(set_ef_active_pin), 
-    _ef_pin_enable_delay_ms(ef_pin_enable_delay_ms) { };
+    _ef_pin_enable_delay_ms(ef_pin_enable_delay_ms),
+    _control_mode(control_mode) { };
 
 
 DrivetrainState_e DrivetrainSystem::get_state()
@@ -43,7 +45,7 @@ void DrivetrainSystem::reset_dt_error()
 {
     DrivetrainResetError_s reset_cmd = {true};
     DrivetrainSystem::CmdVariant var = reset_cmd;
-    auto state = evaluate_drivetrain(reset_cmd).state;
+    (void) evaluate_drivetrain(reset_cmd).state;
 }
 
 DrivetrainStatus_s DrivetrainSystem::evaluate_drivetrain(DrivetrainSystem::CmdVariant cmd) 
@@ -359,12 +361,33 @@ void DrivetrainSystem::_set_drivetrain_error_reset()
         func.set_idle();
     }
 }
+
 void DrivetrainSystem::_set_drivetrain_command(DrivetrainCommand_s cmd)
 {
-    _inverter_interfaces.FL.set_speed(cmd.desired_speeds.FL, cmd.torque_limits.FL);
-    _inverter_interfaces.FR.set_speed(cmd.desired_speeds.FR, cmd.torque_limits.FR);
-    _inverter_interfaces.RL.set_speed(cmd.desired_speeds.RL, cmd.torque_limits.RL);
-    _inverter_interfaces.RR.set_speed(cmd.desired_speeds.RR, cmd.torque_limits.RR);
+    // TODO FIX THIS THIS IS A HACK TEMPORARILY 
+    switch (_control_mode)
+    {
+        case DrivetrainControlMode_e::SPEED_CONTROL:
+        {
+            _inverter_interfaces.FL.set_speed(cmd.desired_speeds.FL, cmd.torque_limits.FL);
+            _inverter_interfaces.FR.set_speed(cmd.desired_speeds.FR, cmd.torque_limits.FR);
+            _inverter_interfaces.RL.set_speed(cmd.desired_speeds.RL, cmd.torque_limits.RL);
+            _inverter_interfaces.RR.set_speed(cmd.desired_speeds.RR, cmd.torque_limits.RR);
+            break;
+        }
+        // TODO FIX THIS THIS IS A HACK TEMPORARILY 
+        case DrivetrainControlMode_e::TORQUE_CONTROL:
+        {
+            _inverter_interfaces.FL.set_torque(cmd.torque_limits.FL, PhysicalParameters::AMK_MAX_TORQUE);
+            _inverter_interfaces.FR.set_torque(cmd.torque_limits.FR, PhysicalParameters::AMK_MAX_TORQUE);
+            _inverter_interfaces.RL.set_torque(cmd.torque_limits.RL, PhysicalParameters::AMK_MAX_TORQUE);
+            _inverter_interfaces.RR.set_torque(cmd.torque_limits.RR, PhysicalParameters::AMK_MAX_TORQUE);
+            break;
+        } 
+        default:
+            break;
+    }
+    
 }
 
 bool DrivetrainSystem::_drivetrain_active(float min_active_rpm)

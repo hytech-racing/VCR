@@ -22,12 +22,13 @@ struct InverterCANIds_s
     uint32_t inv_control_word_id; 
     uint32_t inv_control_input_id; 
     uint32_t inv_control_parameter_id; 
-
-    uint32_t inv_temps_id;
-    uint32_t inv_status_id;
-    uint32_t inv_dynamics_id;
 };
 
+enum class InverterControlMode_e
+{
+    SPEED_CONTROL=0,
+    TORQUE_CONTROL=1
+};
 /**
  * Inverter interface
  */
@@ -41,12 +42,13 @@ class InverterInterface
             uint32_t inv_control_input_id,
             uint32_t inv_control_params_id,
 
-            InverterParams_s inverter_params) : _inverter_params(inverter_params)
-        { 
-            inverter_ids.inv_control_word_id = inv_control_word_id;
-            inverter_ids.inv_control_parameter_id = inv_control_params_id;
-            inverter_ids.inv_control_input_id = inv_control_input_id;
-        }
+            InverterParams_s inverter_params,
+            InverterControlMode_e control_mode = InverterControlMode_e::SPEED_CONTROL) : _inverter_ids({inv_control_word_id, 
+                                                                                  inv_control_input_id, 
+                                                                               inv_control_word_id}), 
+                                                                                        _inverter_params(inverter_params),
+                                                                                        _control_mode(control_mode)
+        { }
 
         /* receiving callbacks */
         void receive_INV_STATUS(const CAN_message_t &can_msg, unsigned long curr_millis);
@@ -67,7 +69,8 @@ class InverterInterface
         void send_INV_CONTROL_PARAMS(); 
 
         /* Inverter Functs */
-        void set_speed(float desired_rpm, float torque_limit_nm); 
+        void set_speed(float desired_rpm, float torque_limit_nm);  // note :only usable in speed control mode
+        void set_torque(float desired_torque_nm, float torque_limit_nm); // note: only usable in torque control mode
 
         void set_idle();
 
@@ -82,12 +85,15 @@ class InverterInterface
 
     private: 
 
-        InverterCANIds_s inverter_ids;
-        InverterControlInput_s _inverter_control_inputs;
+        
+        InverterCANIds_s _inverter_ids;
+        InverterControlInput_s _inverter_control_speed_inputs; // NOTE may not be used in the case that the inverter is in torque control
+        InverterTorqueControlInput_s _inverter_control_torq_input; // NOTE may not be used in the case that the inverter is in torque control
         InverterControlWord_s _inverter_control_word;
         InverterControlParams_s _inverter_control_params;
         InverterFeedbackData_s _feedback_data;
         InverterParams_s _inverter_params;
+        InverterControlMode_e _control_mode;
 };
 
 
