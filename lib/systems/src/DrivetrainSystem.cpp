@@ -1,3 +1,4 @@
+#include "PhysicalParameters.h"
 #include <DrivetrainSystem.h>
 
 DrivetrainSystem::DrivetrainSystem(
@@ -377,10 +378,10 @@ void DrivetrainSystem::_set_drivetrain_command(DrivetrainCommand_s cmd)
         // TODO FIX THIS THIS IS A HACK TEMPORARILY 
         case DrivetrainControlMode_e::TORQUE_CONTROL:
         {
-            _inverter_interfaces.FL.set_torque(cmd.desired_speeds.FL, cmd.torque_limits.FL);
-            _inverter_interfaces.FR.set_torque(cmd.desired_speeds.FR, cmd.torque_limits.FR);
-            _inverter_interfaces.RL.set_torque(cmd.desired_speeds.RL, cmd.torque_limits.RL);
-            _inverter_interfaces.RR.set_torque(cmd.desired_speeds.RR, cmd.torque_limits.RR);
+            _inverter_interfaces.FL.set_torque(cmd.torque_limits.FL, PhysicalParameters::AMK_MAX_TORQUE);
+            _inverter_interfaces.FR.set_torque(cmd.torque_limits.FR, PhysicalParameters::AMK_MAX_TORQUE);
+            _inverter_interfaces.RL.set_torque(cmd.torque_limits.RL, PhysicalParameters::AMK_MAX_TORQUE);
+            _inverter_interfaces.RR.set_torque(cmd.torque_limits.RR, PhysicalParameters::AMK_MAX_TORQUE);
             break;
         } 
         default:
