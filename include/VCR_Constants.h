@@ -42,15 +42,13 @@ constexpr int CURRENT_SENSE_OFFSET = 0; //No offset for CURRENT_SENSE
 constexpr float REFERENCE_SENSE_SCALE = (float)(24/((2.77149877/3.3)*4096)); //unsure about the multiplication by 4.0865
 constexpr int REFERENCE_SENSE_OFFSET = 0; //No offset for REFERENCE_SENSE
 
-//Values are from the old MCU rev15
-
 constexpr float LBS_TO_NEWTONS = 4.4482216153;
 constexpr float RL_LOADCELL_SCALE = 1.0;
 constexpr float RL_LOADCELL_OFFSET = 0.0;
 constexpr float RR_LOADCELL_SCALE = 1.0;
 constexpr float RR_LOADCELL_OFFSET = 0;
 
-//does not matter that much
+
 constexpr float RL_SUS_POT_SCALE = 1;
 constexpr int RL_SUS_POT_OFFSET = 0;
 constexpr float RR_SUS_POT_SCALE = 1;
@@ -103,7 +101,7 @@ constexpr unsigned long ams_update_period_us = 5000;                 // 5 000 us
 constexpr unsigned long ams_priority = 2;
 constexpr unsigned long suspension_can_period_us = 4000;             // 4 000 us = 250 Hz
 constexpr unsigned long suspension_priority = 4;
-constexpr unsigned long ethernet_update_period = 100000;             // 50 000 us = 20 Hz
+constexpr unsigned long ethernet_update_period = 100000;             // 100 000 us = 10 Hz
 constexpr unsigned long ethernet_send_priority = 6;
 constexpr unsigned long inv_send_period = 5000;                      // 5 000 us = 200 Hz
 constexpr unsigned long inverter_send_priority = 5;

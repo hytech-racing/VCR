@@ -82,7 +82,7 @@ private:
         int64_t worst_torque_lim_latency_so_far;
     } _worst_message_latencies;
     bool _timing_failure = false;
-    TorqueControllerSimple _emergency_control;
+    TorqueControllerSimple _emergency_control = {{1.0f, 1.0f, 20000.0f, 10.0f, -15.0f}}; // NOLINT
 };
 
 #endif // DRIVEBRAINCONTROLLER_H
