@@ -49,7 +49,7 @@ void DrivebrainInterface::receive_drivebrain_torque_lim_command(const CAN_messag
     _latest_drivebrain_command.torque_limits.recvd = true;
     _latest_drivebrain_command.torque_limits.last_recv_millis = curr_millis;
 
-    _latest_drivebrain_command.desired_speeds.veh_vec_data = {
+    _latest_drivebrain_command.torque_limits.veh_vec_data = {
         static_cast<float>(
             HYTECH_drivebrain_torque_fl_ro_fromS(drivebrain_msg.drivebrain_torque_fl_ro)),
         static_cast<float>(

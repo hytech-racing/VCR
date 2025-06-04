@@ -3,7 +3,9 @@
 #include "PhysicalParameters.h"
 #include <cmath>
 
+
 #include "SystemTimeInterface.h"
+
 
 template <std::size_t num_controllers>
 DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command(ControllerMode_e requested_controller_type,
@@ -94,7 +96,7 @@ TorqueControllerMuxError_e TorqueControllerMux<num_controllers>::can_switch_cont
     auto prev_torq_lims = previous_controller_command.torque_limits.as_array();
     for (size_t i = 0; i < _num_motors; i++)
     {
-        speedPreventsModeChange = (::abs(speeds[i] * RPM_TO_METERS_PER_SECOND) >= _max_change_speed);
+        speedPreventsModeChange = (fabs(speeds[i] * RPM_TO_METERS_PER_SECOND) >= _max_change_speed);
         // only if the torque delta is positive do we not want to switch to the new one
         torqueDeltaPreventsModeChange = (desired_torq_lims[i] - prev_torq_lims[i]) > _max_torque_pos_change_delta;
         if (speedPreventsModeChange)
@@ -176,17 +178,17 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_power_limit(cons
     net_power += (out.torque_limits.RL * (drivetrain.measuredSpeeds.RL * RPM_TO_RAD_PER_SECOND));
     net_power += (out.torque_limits.RR * (drivetrain.measuredSpeeds.RR * RPM_TO_RAD_PER_SECOND));
     // only evaluate power limit if current power exceeds it
-    auto scale_torque_limit = [](float desired_wheel_torque, float current_wheel_rpm, float net_torque_mag, float power_limit, float max_torque)
+    auto scale_torque_limit = [](float desired_wheel_torque, float current_wheel_rpm, float net_torque_mag, float power_limit, float max_torque) -> float
     {
         float res = desired_wheel_torque;
-
-        float desired_wheel_torque_percentage = ::abs(desired_wheel_torque / net_torque_mag);
+        
+        float desired_wheel_torque_percentage = fabs(desired_wheel_torque / net_torque_mag);
         float corner_power = (desired_wheel_torque_percentage * power_limit);
 
         //     // std::cout <<"corner power " << corner_power <<std::endl;
         
         // power / omega (motor rad/s) to get torque per wheel
-        res = ::abs(corner_power / (current_wheel_rpm * RPM_TO_RAD_PER_SECOND));
+        res = fabs(corner_power / (current_wheel_rpm * RPM_TO_RAD_PER_SECOND));
         res = std::max(0.0f, std::min(res, max_torque)); // ensure torque limit is above zero and below max torque(?)
         // std::cout <<"final torque setpoint " << res <<std::endl;
         return res;
@@ -221,8 +223,8 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
     auto command_speeds = out.desired_speeds.as_array();
     for (size_t i = 0; i < _num_motors; i++)
     {
-        maxWheelSpeed = std::max(maxWheelSpeed, abs(speeds[i]) * RPM_TO_KILOMETERS_PER_HOUR);
-        allWheelsRegen &= (command_speeds[i] < abs(speeds[i]) || command_speeds[i] == 0);
+        maxWheelSpeed = std::max(maxWheelSpeed, static_cast<float>(fabs(speeds[i]) * RPM_TO_KILOMETERS_PER_HOUR));
+        allWheelsRegen &= (command_speeds[i] < static_cast<float>(fabs(speeds[i])) || command_speeds[i] == 0);
     }
 
     // begin limiting regen at noRegenLimitKPH and completely limit regen at fullRegenLimitKPH

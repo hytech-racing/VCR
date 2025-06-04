@@ -83,7 +83,6 @@ void InverterInterface::receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned
 
 void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsigned long curr_millis) 
 {
-
     // Unpack the message
     INV1_DYNAMICS_t unpacked_msg;
     Unpack_INV1_DYNAMICS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
@@ -92,7 +91,6 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     _feedback_data.motor_mechanics.actual_power = unpacked_msg.actual_power_w; // NOLINT (watts)
     _feedback_data.motor_mechanics.actual_torque = HYTECH_actual_torque_nm_ro_fromS(unpacked_msg.actual_torque_nm_ro);
     _feedback_data.motor_mechanics.actual_speed = unpacked_msg.actual_speed_rpm;
-
     _feedback_data.motor_mechanics.new_data = true;
     _feedback_data.motor_mechanics.last_recv_millis = curr_millis;
 }
@@ -151,6 +149,7 @@ void InverterInterface::send_INV_CONTROL_WORD()
     msg_out.remove_error = _inverter_control_word.remove_error;
 
     CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_WORD_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_word_id);
+    
 }
 
 void InverterInterface::send_INV_CONTROL_PARAMS() 
