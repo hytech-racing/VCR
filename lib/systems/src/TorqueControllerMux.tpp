@@ -193,8 +193,8 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_power_limit(cons
         
         // power / omega (motor rad/s) to get torque per wheel
         res = fabs(corner_power / (current_wheel_rpm * RPM_TO_RAD_PER_SECOND));
-        // res = std::min(res, max_torque); // ensure torque limit is below max torque
-        res = std::max(0.0f, std::min(res, max_torque)); // ensure torque limit is above zero and below max torque(?)
+        res = std::min(res, max_torque); // ensure torque limit is below max torque
+        // res = std::max(0.0f, std::min(res, max_torque)); // ensure torque limit is above zero and below max torque(?)
         // std::cout <<"final torque setpoint " << res <<std::endl;
         return res;
     };

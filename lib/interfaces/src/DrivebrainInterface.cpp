@@ -29,9 +29,9 @@ void DrivebrainInterface::receive_drivebrain_torque_setpoint(const CAN_message_t
     DRIVEBRAIN_DESIRED_TORQUE_INPUT_t drivebrain_msg;
     Unpack_DRIVEBRAIN_DESIRED_TORQUE_INPUT_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
 
-    _latest_drivebrain_command.torque_setpoints.last_recv_millis = curr_millis;
+    _latest_drivebrain_command.t_sets.last_recv_millis = curr_millis;
 
-    _latest_drivebrain_command.torque_setpoints.veh_vec_data = {
+    _latest_drivebrain_command.t_sets.veh_vec_data = {
         static_cast<float>(
             HYTECH_drivebrain_torque_fl_ro_fromS(drivebrain_msg.drivebrain_torque_fl_ro)),
         static_cast<float>(

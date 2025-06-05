@@ -201,13 +201,13 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
     /* Drivebrain data */
     Serial.print("Latest Drivebrain data: ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_setpoints.veh_vec_data.FL);
+    Serial.print(vcr_data.interface_data.latest_drivebrain_command.t_sets.veh_vec_data.FL);
     Serial.print(" ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_setpoints.veh_vec_data.FR);
+    Serial.print(vcr_data.interface_data.latest_drivebrain_command.t_sets.veh_vec_data.FR);
     Serial.print(" ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_setpoints.veh_vec_data.RL);
+    Serial.print(vcr_data.interface_data.latest_drivebrain_command.t_sets.veh_vec_data.RL);
     Serial.print(" ");
-    Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_setpoints.veh_vec_data.FL);
+    Serial.println(vcr_data.interface_data.latest_drivebrain_command.t_sets.veh_vec_data.FL);
     
     return HT_TASK::TaskResponse::YIELD;
 }
