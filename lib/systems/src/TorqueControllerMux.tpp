@@ -55,7 +55,9 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
 
         if (current_output.desired_speeds.FL == 0.0f && current_output.desired_speeds.FR == 0.0f && current_output.desired_speeds.RL == 0.0f && current_output.desired_speeds.RR == 0.0f)
         {
-            current_output = apply_regen_limit(current_output, input_state.system_data.drivetrain_data);
+            constexpr float noRegenLimitKPH = 10.0;
+            constexpr float fullRegenLimitKPH = 5.0;
+            current_output = apply_regen_limit(current_output, input_state.system_data.drivetrain_data, noRegenLimitKPH, fullRegenLimitKPH);
         }
 
         current_output = apply_torque_limit(current_output, _torque_limit_map[requested_torque_limit]);
@@ -73,6 +75,8 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
         _active_status.output_is_bypassing_limits = false;
     }
     else{
+        constexpr float no_regen_limit_kph = 5.0f;
+        // current_output = apply_regen_limit(current_output, input_state.system_data.drivetrain_data, no_regen_limit_kph, no_regen_limit_kph);
         _active_status.active_torque_limit_enum = TorqueLimit_e::TCMUX_FULL_TORQUE;
         _active_status.active_torque_limit_value= PhysicalParameters::AMK_MAX_TORQUE;
         _active_status.output_is_bypassing_limits = true;
@@ -189,6 +193,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_power_limit(cons
         
         // power / omega (motor rad/s) to get torque per wheel
         res = fabs(corner_power / (current_wheel_rpm * RPM_TO_RAD_PER_SECOND));
+        // res = std::min(res, max_torque); // ensure torque limit is below max torque
         res = std::max(0.0f, std::min(res, max_torque)); // ensure torque limit is above zero and below max torque(?)
         // std::cout <<"final torque setpoint " << res <<std::endl;
         return res;
@@ -209,11 +214,10 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_power_limit(cons
 
 
 template <std::size_t num_controllers>
-DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(const DrivetrainCommand_s &command, const DrivetrainDynamicReport_s &drivetrain_data)
+DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(const DrivetrainCommand_s &command, const DrivetrainDynamicReport_s &drivetrain_data, float noRegenLimitKPH, float fullRegenLimitKPH)
 {
     DrivetrainCommand_s out = command;
-    const float noRegenLimitKPH = 10.0;
-    const float fullRegenLimitKPH = 5.0;
+    
     float maxWheelSpeed = 0.0;
     float torqueScaleDown = 0.0;
     bool allWheelsRegen = true; // true when all wheels are targeting speeds below the current wheel speed

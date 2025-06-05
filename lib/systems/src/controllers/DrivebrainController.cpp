@@ -10,9 +10,9 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     
     // cases for timing_failure:
     // 1 we have not received any messages from the db (timestamped message recvd flag initialized as false in struct def)
-    bool not_all_messages_recvd = (!db_input.torque_setpoints.recvd);
+    bool not_all_messages_recvd = (!db_input.t_sets.recvd);
     
-    auto last_torque_setpoint_timestamp = db_input.torque_setpoints.last_recv_millis;
+    auto last_torque_setpoint_timestamp = db_input.t_sets.last_recv_millis;
 
     // 2 if the time between the current VCR curr_millis time and the last millis time that we recvd a drivebrain msg is too high
     bool torque_setpoint_msg_too_latent = (::abs((int)(static_cast<int64_t>(curr_millis) - static_cast<int64_t>(last_torque_setpoint_timestamp))) > (int)_params.allowed_latency);

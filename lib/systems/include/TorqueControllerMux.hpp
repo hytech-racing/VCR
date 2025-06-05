@@ -172,7 +172,9 @@ template <std::size_t num_controllers> class TorqueControllerMux {
     /// @return DrivetrainCommand_s to update the drivetrain command in the getDrivetrainCommand
     /// method
     DrivetrainCommand_s apply_regen_limit(const DrivetrainCommand_s &command,
-                                          const DrivetrainDynamicReport_s &drivetrain_data);
+                                          const DrivetrainDynamicReport_s &drivetrain_data,
+                                          float no_regen_limit_kph,
+                                          float full_regen_limit_kph);
 };
 // }
 

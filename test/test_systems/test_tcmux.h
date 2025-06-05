@@ -349,20 +349,22 @@ TEST(TorqueControllerMuxTesting, test_drivebrain_and_simple_controller_integrati
     DrivebrainController db_controller(10);
 
     StampedDrivetrainTorqueCommand_s data;
-    data.torque_setpoints.last_recv_millis = 1000;
-    data.torque_setpoints.recvd = true;
+    data.t_sets.last_recv_millis = 1000;
+    data.t_sets.recvd = true;
     sys_time::set_millis(1000);
-    data.torque_setpoints.veh_vec_data = {1, 1, 1, 1};
+    data.t_sets.veh_vec_data = {0, 0, 0, 0};
 
     // TorqueControllerMuxStatus_s status = {};
     // status.active_controller_mode = current_control_mode;
     PedalsSystemData_s pedals_data = {};
-    pedals_data.brake_percent = 0.20;
+    pedals_data.brake_percent = 0.0;
     pedals_data.accel_percent = 0.0;
 
     VCRData_s state;
+    
     state.interface_data.latest_drivebrain_command = data;
     state.interface_data.recvd_pedals_data.pedals_data = pedals_data;
+    
 
     // VCRData_s state;
     
@@ -376,12 +378,21 @@ TEST(TorqueControllerMuxTesting, test_drivebrain_and_simple_controller_integrati
     
     auto res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
     res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
-
+    state.system_data.drivetrain_data.measuredSpeeds.FL = 10000.0f;
+    state.system_data.drivetrain_data.measuredSpeeds.FR = 10000.0f;
+    state.system_data.drivetrain_data.measuredSpeeds.RL = 10000.0f;
+    state.system_data.drivetrain_data.measuredSpeeds.RR = 10000.0f;
+    EXPECT_TRUE(torque_controller_mux.get_tc_mux_status().active_controller_mode == ControllerMode_e::MODE_1);
+    // std::cout << static_cast<int>(torque_controller_mux.get_tc_mux_status().active_error) <<std::endl;
+    data.t_sets.veh_vec_data = {1, 1, 1, 1};
+    state.interface_data.latest_drivebrain_command = data;
+    res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
+    
     EXPECT_FALSE(db_controller.get_timing_failure_status());
-    EXPECT_FLOAT_EQ(res.torque_limits.FL, data.torque_setpoints.veh_vec_data.FL); // TODO unfuck the hack
+    EXPECT_FLOAT_EQ(res.torque_limits.FL, data.t_sets.veh_vec_data.FL); // TODO unfuck the hack
     
     // set the last recv millis to be way before the current time
-    data.torque_setpoints.last_recv_millis = 3000;
+    data.t_sets.last_recv_millis = 3000;
     sys_time::set_millis(3500);
     state.interface_data.latest_drivebrain_command = data;
     res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
@@ -391,7 +402,7 @@ TEST(TorqueControllerMuxTesting, test_drivebrain_and_simple_controller_integrati
 
     state.interface_data.dash_input_state.data_btn_is_pressed = true;
     res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
-    data.torque_setpoints.last_recv_millis = 3500;
+    data.t_sets.last_recv_millis = 3500;
     state.interface_data.latest_drivebrain_command = data;
     res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
     EXPECT_FALSE(db_controller.get_timing_failure_status());

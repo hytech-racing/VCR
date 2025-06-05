@@ -1,5 +1,6 @@
 #include <InverterInterface.h>
 #include "VCRCANInterfaceImpl.h"
+#include "hytech.h"
 
 #include <Arduino.h>
 /**
@@ -150,8 +151,9 @@ void InverterInterface::send_INV_SETPOINT_COMMAND()
             msg_out.speed_setpoint_rpm = 0;
             msg_out.positive_torque_limit_ro = HYTECH_positive_torque_limit_ro_toS(_inverter_control_torq_input.positive_torque_limit);
             msg_out.negative_torque_limit_ro = HYTECH_negative_torque_limit_ro_toS(_inverter_control_torq_input.negative_torque_limit);
-            msg_out.torque_setpoint_nm_ro = HYTECH_torque_limit_ro_toS(_inverter_control_torq_input.torque_setpoint);
+            msg_out.torque_setpoint_nm_ro = HYTECH_torque_setpoint_nm_ro_toS(_inverter_control_torq_input.torque_setpoint);
             CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, _inverter_ids.inv_control_input_id);
+            CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, _inverter_ids.inv_control_input_id);
             break;
         }
 
