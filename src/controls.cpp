@@ -25,17 +25,16 @@ void VCRControls::handle_drivetrain_command(bool wanting_ready_to_drive, bool re
         ControllerMode_e mode = vcr_data.interface_data.dash_input_state.dial_state;
 
         if (ready_to_drive) {
-            auto dt_command = _tc_mux.get_drivetrain_command(mode, _torque_limit, vcr_data);
-            _debug_dt_command = dt_command;
+            DrivetrainSpeedCommand_s dt_command = _tc_mux.get_drivetrain_command(mode, _torque_limit, vcr_data);
             _dt_system->evaluate_drivetrain(dt_command);
         } else if (wanting_ready_to_drive) {
             DrivetrainInit_s dt_command = {
-                .init_drivetrain = INIT_DRIVE_MODE
+                .init_drivetrain = DrivetrainModeRequest_e::INIT_DRIVE_MODE
             };
             _dt_system->evaluate_drivetrain(dt_command);
         } else {
             DrivetrainInit_s dt_command = {
-                .init_drivetrain = UNINITIALIZED
+                .init_drivetrain = DrivetrainModeRequest_e::UNINITIALIZED
             };
             _dt_system->evaluate_drivetrain(dt_command);
         }

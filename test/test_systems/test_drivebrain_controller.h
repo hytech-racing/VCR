@@ -9,13 +9,10 @@
 auto runTick(DrivebrainController *controller, float last_speed_recv_millis,
              float last_torque_receive_time_millis, ControllerMode_e current_control_mode,
              unsigned long curr_millis, float brakePercent, float accelPercent, bool reset_button_pressed = false) {
-    StampedDrivetrainCommand_s data;
-    data.desired_speeds.last_recv_millis = last_speed_recv_millis;
-    data.desired_speeds.recvd = true;
-    data.torque_limits.last_recv_millis = last_torque_receive_time_millis;
-    data.torque_limits.recvd = true;
-    data.torque_limits.veh_vec_data = {1, 1, 1, 1};
-    data.desired_speeds.veh_vec_data = {1, 1, 1, 1};
+    StampedDrivetrainTorqueCommand_s data;
+    data.t_sets.last_recv_millis = last_torque_receive_time_millis;
+    data.t_sets.recvd = true;
+    data.t_sets.veh_vec_data = {1, 1, 1, 1};
 
     TorqueControllerMuxStatus_s status = {};
     status.active_controller_mode = current_control_mode;
@@ -46,7 +43,7 @@ TEST(DrivebrainControllerTesting, setpoint_too_latent_still_in_control) {
     EXPECT_FLOAT_EQ(torque_controller_output_s.desired_speeds.FL, 0);
 
     TorqueControllerSimpleParams_s params_def;
-    EXPECT_FLOAT_EQ(torque_controller_output_s.torque_limits.FL, params_def.amk_max_regen_torque);
+    EXPECT_FLOAT_EQ(torque_controller_output_s.torque_limits.FL, -1.0f * params_def.amk_max_regen_torque);
 }
 
 TEST(DrivebrainControllerTesting, failing_stay_failing) {
@@ -101,7 +98,7 @@ TEST(DrivebrainControllerTesting, failing_reset_success) {
     torque_controller_output_s =
         runTick(&controller, 1020, 1021, ControllerMode_e::MODE_4, 1023, 0.01f, 0, true);
     EXPECT_FALSE(controller.get_timing_failure_status());
-    EXPECT_FLOAT_EQ(torque_controller_output_s.desired_speeds.FL, 1);
+    EXPECT_FLOAT_EQ(torque_controller_output_s.torque_limits.FL, 1);
 }
 
 #endif // __TEST_DRIVEBRAIN_CONTROLLER_H__
