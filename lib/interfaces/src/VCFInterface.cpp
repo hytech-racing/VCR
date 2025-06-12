@@ -109,3 +109,18 @@ void VCFInterface::enqueue_torque_mode_LED_message(TorqueLimit_e torque_limit)
     ctrl.torque_limit_enum_value = (uint8_t) torque_limit;
     CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
+
+void VCFInterface::enqueue_vehicle_state_message(VehicleState_e vehicle_state)
+{
+    VEHICLE_STATE_t state = {};
+    state.drivetrain_state = static_cast<uint8_t>(vehicle_state);
+    CAN_util::enqueue_msg(&state, &Pack_VEHICLE_STATE_hytech, VCRCANInterfaceImpl::telem_can_rx_buffer);
+}
+
+void VCFInterface::enqueue_drivebrain_in_ctrl_message(bool is_db_in_ctrl)
+{
+    DRIVEBRAIN_STATE_DATA_t software_ctrl_data = {};
+    software_ctrl_data.drivebrain_in_control = is_db_in_ctrl;
+    software_ctrl_data.vn_gps_status = 0; //vn_status needs to added to VCR, doesnt exist atm
+    CAN_util::enqueue_msg(&software_ctrl_data, &Pack_DRIVEBRAIN_STATE_DATA_hytech, VCRCANInterfaceImpl::telem_can_rx_buffer);
+}
