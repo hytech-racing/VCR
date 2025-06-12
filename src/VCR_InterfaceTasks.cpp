@@ -13,6 +13,7 @@
 #include "VCREthernetInterface.h"
 #include "VCR_Constants.h"
 #include "VCR_Globals.h"
+#include "controls.h"
 
 #include "DrivebrainInterface.h"
 #include "IOExpander.h"
@@ -146,6 +147,14 @@ HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros
     DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
     return HT_TASK::TaskResponse::YIELD;
 }
+
+HT_TASK::TaskResponse enqueue_dashboard_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    VCFInterfaceInstance::instance().enqueue_vehicle_state_message(VehicleStateMachineInstance::instance().get_state());
+    VCFInterfaceInstance::instance().enqueue_drivebrain_in_ctrl_message(VCRControlsInstance::instance().drivebrain_is_in_control());
+    return HT_TASK::TaskResponse::YIELD;
+}
+
 
 HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {

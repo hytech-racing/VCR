@@ -107,6 +107,8 @@ constexpr unsigned long inv_send_period = 5000;                      // 5 000 us
 constexpr unsigned long inverter_send_priority = 5;
 constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
 constexpr unsigned long ioexpander_priority = 100;
+constexpr unsigned long dashboard_send_period_us = 200000;         // 200 000 us = 5 Hz
+constexpr unsigned long dashboard_send_priority = 5;
 constexpr unsigned long send_can_period_us = 1000;                   // 1 000 us = 1 000 Hz
 constexpr unsigned long send_can_priority = 2;
 constexpr unsigned long main_task_period_us = 100;                   // 100 us = 10 kHz
