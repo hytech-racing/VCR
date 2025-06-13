@@ -150,8 +150,9 @@ HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros
 
 HT_TASK::TaskResponse enqueue_dashboard_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    VCFInterfaceInstance::instance().enqueue_vehicle_state_message(VehicleStateMachineInstance::instance().get_state());
-    VCFInterfaceInstance::instance().enqueue_drivebrain_in_ctrl_message(VCRControlsInstance::instance().drivebrain_is_in_control());
+    VCFInterfaceInstance::instance().enqueue_vehicle_state_message(VehicleStateMachineInstance::instance().get_state(), 
+                                                                DrivetrainInstance::instance().get_state(),
+                                                                VCRControlsInstance::instance().drivebrain_is_in_control());
     return HT_TASK::TaskResponse::YIELD;
 }
 
