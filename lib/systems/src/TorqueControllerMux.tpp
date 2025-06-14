@@ -184,8 +184,6 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_power_limit(cons
         
         float desired_wheel_torque_percentage = fabs(desired_wheel_torque / net_torque_mag);
         float corner_power = (desired_wheel_torque_percentage * power_limit);
-
-        //     // std::cout <<"corner power " << corner_power <<std::endl;
         
         // power / omega (motor rad/s) to get torque per wheel
         res = fabs(corner_power / (current_wheel_rpm * RPM_TO_RAD_PER_SECOND));

@@ -50,6 +50,8 @@
 
 // - [x] switch to using bound controller evaluation functions instead of using polymorphism
 
+// - [ ] add in array of functions to determine whether or not to ignore bypass of limit (re-apply limits to output) online
+
 /// @brief Contains a max speed for mode changes(5 m/s), a max torque delta for mode change(.5 nm)
 /// and a max power limit(63000 W).
 ///        These values are used in the event that no value is provided for them in the constructor.
@@ -89,6 +91,7 @@ template <std::size_t num_controllers> class TorqueControllerMux {
             num_controllers>
             controller_evals,
         std::array<bool, num_controllers> mux_bypass_limits,
+        std::array<std::function<bool()>, num_controllers> check_online_bypass,
         float max_change_speed = TC_MUX_DEFAULT_PARAMS::MAX_SPEED_FOR_MODE_CHANGE,
         float max_torque_pos_change_delta = TC_MUX_DEFAULT_PARAMS::MAX_TORQUE_DELTA_FOR_MODE_CHANGE,
         float max_power_limit = TC_MUX_DEFAULT_PARAMS::MAX_POWER_LIMIT, size_t num_motors = 4)

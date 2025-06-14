@@ -7,9 +7,9 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
         {0.0f, 0.0f, 0.0f, 0.0f}  // torques
     };
     
-    const PedalsSystemData_s &pedals_data = vcr_data.interface_data.recvd_pedals_data.pedals_data;
-    const FrontLoadCellData_s &front_lc_data = vcr_data.interface_data.front_loadcell_data;
-    const RearLoadCellData_s &rear_lc_data = vcr_data.interface_data.rear_loadcell_data;
+    const PedalsSystemData_s pedals_data = vcr_data.interface_data.recvd_pedals_data.pedals_data;
+    const FrontLoadCellData_s front_lc_data = vcr_data.interface_data.front_loadcell_data;
+    const RearLoadCellData_s rear_lc_data = vcr_data.interface_data.rear_loadcell_data;
 
     // auto average_rpm = (vcr_data.interface_data.inverter_data.RL.speed_rpm +vcr_data.interface_data.inverter_data.RL.speed_rpm)
 
