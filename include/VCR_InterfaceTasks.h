@@ -63,6 +63,11 @@ HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros
 HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 
 /**
+ * Enqueues all data needed for dashboard. 
+ */
+HT_TASK::TaskResponse enqueue_dashboard_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
+
+/**
  * Sends all CAN data from the TX buffers of both telem and inverter CAN lines.
  */
 HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)

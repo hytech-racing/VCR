@@ -41,6 +41,8 @@ public:
     void send_buzzer_start_message();
     void send_recalibrate_pedals_message();
     void enqueue_torque_mode_LED_message(TorqueLimit_e torque_mode);
+    void enqueue_vehicle_state_message(VehicleState_e vehicle_state, DrivetrainState_e drivetrain_state, bool db_is_in_ctrl);
+
 
 private:
 
