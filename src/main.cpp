@@ -112,7 +112,6 @@ HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, main
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
 
 
-
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     // Serial.println("timestamp\t:\taccel\t:\tbrake");

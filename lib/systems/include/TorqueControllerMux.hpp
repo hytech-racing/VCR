@@ -59,6 +59,8 @@ namespace TC_MUX_DEFAULT_PARAMS {
 constexpr const float MAX_SPEED_FOR_MODE_CHANGE = 5.0;        // m/s
 constexpr const float MAX_TORQUE_DELTA_FOR_MODE_CHANGE = 0.5; // Nm
 constexpr const float MAX_POWER_LIMIT = 63000.0;              // watts of mechanical power
+constexpr const float MAX_HIGH_PACK_VOLTAGE_REGEN_NM = 7.0f;
+constexpr const float REGEN_LIMITED_PACK_VOLTAGE = 505.0f;
 }; // namespace TC_MUX_DEFAULT_PARAMS
 
 /// @brief the torque controller muxer that can handle live switching between controller modes
@@ -91,14 +93,20 @@ template <std::size_t num_controllers> class TorqueControllerMux {
             num_controllers>
             controller_evals,
         std::array<bool, num_controllers> mux_bypass_limits,
-        std::array<std::function<bool()>, num_controllers> check_online_bypass,
+        // std::array<std::function<bool()>, num_controllers> check_online_bypass,
         float max_change_speed = TC_MUX_DEFAULT_PARAMS::MAX_SPEED_FOR_MODE_CHANGE,
         float max_torque_pos_change_delta = TC_MUX_DEFAULT_PARAMS::MAX_TORQUE_DELTA_FOR_MODE_CHANGE,
-        float max_power_limit = TC_MUX_DEFAULT_PARAMS::MAX_POWER_LIMIT, size_t num_motors = 4)
+        float max_power_limit = TC_MUX_DEFAULT_PARAMS::MAX_POWER_LIMIT, 
+        size_t num_motors = 4, 
+        float max_high_pack_voltage_regen_nm = TC_MUX_DEFAULT_PARAMS::MAX_HIGH_PACK_VOLTAGE_REGEN_NM,
+        float regen_limited_pack_voltage = TC_MUX_DEFAULT_PARAMS::REGEN_LIMITED_PACK_VOLTAGE)
         : _controller_evals(controller_evals), _mux_bypass_limits(mux_bypass_limits),
           _max_change_speed(max_change_speed),
           _max_torque_pos_change_delta(max_torque_pos_change_delta),
-          _max_power_limit(max_power_limit), _num_motors(num_motors) {}
+          _max_power_limit(max_power_limit), 
+          _num_motors(num_motors),
+          _max_high_pack_voltage_regen_nm(max_high_pack_voltage_regen_nm),
+          _regen_limited_pack_voltage(regen_limited_pack_voltage) {}
 
     const TorqueControllerMuxStatus_s &get_tc_mux_status() { return _active_status; }
 
@@ -131,8 +139,15 @@ template <std::size_t num_controllers> class TorqueControllerMux {
     float _max_torque_pos_change_delta;
     float _max_power_limit; 
     size_t _num_motors;
+    
+    float _max_high_pack_voltage_regen_nm;
+    float _regen_limited_pack_voltage;
+    
     DrivetrainCommand_s _prev_command = {};
     TorqueControllerMuxStatus_s _active_status = {};
+    
+
+    
     TorqueControllerMuxError_e
     can_switch_controller(DrivetrainDynamicReport_s active_drivetrain_data,
                           DrivetrainCommand_s previous_controller_command,
@@ -175,7 +190,7 @@ template <std::size_t num_controllers> class TorqueControllerMux {
     /// @return DrivetrainCommand_s to update the drivetrain command in the getDrivetrainCommand
     /// method
     DrivetrainCommand_s apply_regen_limit(const DrivetrainCommand_s &command,
-                                          const DrivetrainDynamicReport_s &drivetrain_data);
+                                          const DrivetrainDynamicReport_s &drivetrain_data, float pack_voltage);
 };
 // }
 

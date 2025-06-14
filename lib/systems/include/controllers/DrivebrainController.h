@@ -1,7 +1,7 @@
 #ifndef DRIVEBRAINCONTROLLER_H
 #define DRIVEBRAINCONTROLLER_H
 
-#include "controllers/LoadCellVectoringTorqueController.h"
+#include "controllers/SimpleController.h"
 #include "SharedFirmwareTypes.h"
 #include <cmath>
 
@@ -82,7 +82,7 @@ private:
         int64_t worst_torque_lim_latency_so_far;
     } _worst_message_latencies;
     bool _timing_failure = false;
-    LoadCellVectoringTorqueController _emergency_control; // NOLINT
+    TorqueControllerSimple _emergency_control; // NOLINT
 };
 
 #endif // DRIVEBRAINCONTROLLER_H

@@ -32,10 +32,17 @@ VCRInterfaceData_s sample_async_data(
     auto rl_inv_mechanics = interface_ref_container.can_interfaces.rl_inverter_interface.get_motor_mechanics();
     auto rr_inv_mechanics = interface_ref_container.can_interfaces.rr_inverter_interface.get_motor_mechanics();
 
+
+
     ret.inverter_data.FL.speed_rpm = fl_inv_mechanics.actual_speed;
     ret.inverter_data.FR.speed_rpm = fr_inv_mechanics.actual_speed;
     ret.inverter_data.RL.speed_rpm = rl_inv_mechanics.actual_speed;
     ret.inverter_data.RR.speed_rpm = rr_inv_mechanics.actual_speed;
+
+    ret.inverter_data.FL.dc_bus_voltage = interface_ref_container.can_interfaces.fl_inverter_interface.get_status().dc_bus_voltage;
+    ret.inverter_data.FR.dc_bus_voltage = interface_ref_container.can_interfaces.fr_inverter_interface.get_status().dc_bus_voltage;
+    ret.inverter_data.RL.dc_bus_voltage = interface_ref_container.can_interfaces.rl_inverter_interface.get_status().dc_bus_voltage;
+    ret.inverter_data.RR.dc_bus_voltage = interface_ref_container.can_interfaces.rr_inverter_interface.get_status().dc_bus_voltage;
 
     ret.recvd_pedals_data = vcf_data.stamped_pedals;
     ret.front_loadcell_data = vcf_data.front_loadcell_data;

@@ -55,7 +55,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
 
         if (current_output.desired_speeds.FL == 0.0f && current_output.desired_speeds.FR == 0.0f && current_output.desired_speeds.RL == 0.0f && current_output.desired_speeds.RR == 0.0f)
         {
-            current_output = apply_regen_limit(current_output, input_state.system_data.drivetrain_data);
+            current_output = apply_regen_limit(current_output, input_state.system_data.drivetrain_data, input_state.interface_data.inverter_data.FL.dc_bus_voltage);
         }
 
         current_output = apply_torque_limit(current_output, _torque_limit_map[requested_torque_limit]);
@@ -207,7 +207,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_power_limit(cons
 
 
 template <std::size_t num_controllers>
-DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(const DrivetrainCommand_s &command, const DrivetrainDynamicReport_s &drivetrain_data)
+DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(const DrivetrainCommand_s &command, const DrivetrainDynamicReport_s &drivetrain_data, float pack_voltage)
 {
     DrivetrainCommand_s out = command;
     const float noRegenLimitKPH = 10.0;
@@ -235,6 +235,13 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
         out.torque_limits.FR *= torqueScaleDown; 
         out.torque_limits.RL *= torqueScaleDown; 
         out.torque_limits.RR *= torqueScaleDown; 
+    }
+
+    if(pack_voltage > _regen_limited_pack_voltage) {
+        out.torque_limits.FL = std::min(out.torque_limits.FL, _max_high_pack_voltage_regen_nm);
+        out.torque_limits.FR = std::min(out.torque_limits.FR, _max_high_pack_voltage_regen_nm);
+        out.torque_limits.RL = std::min(out.torque_limits.RL, _max_high_pack_voltage_regen_nm);
+        out.torque_limits.RR = std::min(out.torque_limits.RR, _max_high_pack_voltage_regen_nm);
     }
     return out;
 }

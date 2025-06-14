@@ -80,6 +80,7 @@ TEST(TorqueControllerMuxTesting, test_controller_output_swap_logic) {
 
     TorqueControllerMux<2> test({test_func_1, test_func_2}, {false, false});
     VCRData_s state;
+    state.interface_data.inverter_data.FL.dc_bus_voltage = 500.0f;
     set_four_outputs(state.system_data.drivetrain_data.measuredSpeeds, 10000.0);
 
     auto res1 = test.get_drivetrain_command(ControllerMode_e::MODE_0,
@@ -115,6 +116,7 @@ TEST(TorqueControllerMuxTesting, test_torque_diff_swap_limit) {
     set_outputs(inst2, 3, 10);
     TorqueControllerMux<2> test({test_func_1, test_func_2}, {false, false});
     VCRData_s state;
+    state.interface_data.inverter_data.FL.dc_bus_voltage = 500.0f;
 
     state.system_data.drivetrain_data = {};
 
@@ -205,6 +207,7 @@ TEST(TorqueControllerMuxTesting, test_mode0_evaluation) {
         {false});
 
     VCRData_s mode_0_input_state;
+    mode_0_input_state.interface_data.inverter_data.FL.dc_bus_voltage = 500.0f;
     mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.accel_percent = 0.5f;
     mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.brake_percent = 0.0f;
 
@@ -237,6 +240,7 @@ TEST(TorqueControllerMuxTesting, test_power_limit)
     set_four_outputs(drivetrain_data.measuredSpeeds, 1000.0f);
 
     VCRData_s mode_0_input_state;
+    mode_0_input_state.interface_data.inverter_data.FL.dc_bus_voltage = 500.0f;
     mode_0_input_state.system_data.drivetrain_data = drivetrain_data;
     mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.accel_percent = 0.5f;
     mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.brake_percent = 0.0f;
@@ -302,6 +306,7 @@ TEST(TorqueControllerMuxTesting, test_torque_limit) {
     set_four_outputs(drivetrain_data.measuredSpeeds, 500.0f);
 
     VCRData_s mode_0_input_state;
+    mode_0_input_state.interface_data.inverter_data.FL.dc_bus_voltage = 500.0f;
     mode_0_input_state.system_data.drivetrain_data = drivetrain_data;
     mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.accel_percent = 0.5f;
     mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.brake_percent = 0.0f;
@@ -366,7 +371,7 @@ TEST(TorqueControllerMuxTesting, test_drivebrain_and_simple_controller_integrati
     VCRData_s state;
     state.interface_data.latest_drivebrain_command = data;
     state.interface_data.recvd_pedals_data.pedals_data = pedals_data;
-
+    state.interface_data.inverter_data.FL.dc_bus_voltage = 500.0f;
     // VCRData_s state;
     
     
@@ -398,6 +403,62 @@ TEST(TorqueControllerMuxTesting, test_drivebrain_and_simple_controller_integrati
     state.interface_data.latest_drivebrain_command = data;
     res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
     EXPECT_FALSE(db_controller.get_timing_failure_status());
+}
+
+TEST(TorqueControllerMuxTesting, test_regen_limiting_high_pack)
+{
+    TorqueControllerSimple simple_controller;
+    TorqueControllerSimpleParams_s default_simple_tq_cntrller_params;
+    // TorqueControllerMuxStatus_s status = {};
+    // status.active_controller_mode = current_control_mode;
+    PedalsSystemData_s pedals_data = {};
+    pedals_data.brake_percent = 0.0;
+    pedals_data.accel_percent = 0.0;
+
+    VCRData_s state;
+    state.system_data.drivetrain_data.measuredSpeeds.FL = 10000.0f;
+    state.system_data.drivetrain_data.measuredSpeeds.FR = 10000.0f;
+    state.system_data.drivetrain_data.measuredSpeeds.RL = 10000.0f;
+    state.system_data.drivetrain_data.measuredSpeeds.RR = 10000.0f;
+    state.interface_data.recvd_pedals_data.pedals_data = pedals_data;
+    state.interface_data.inverter_data.FL.dc_bus_voltage = 515.0f;
+    // VCRData_s state;
+    
+    
+    TorqueControllerMux<1> torque_controller_mux(
+        {std::bind(&TorqueControllerSimple::evaluate, std::ref(simple_controller),
+                   std::placeholders::_1, std::placeholders::_2)},
+        {false});
+    
+    auto res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, state); 
+    EXPECT_FLOAT_EQ(res.torque_limits.FL, 0);
+    EXPECT_FLOAT_EQ(res.torque_limits.FR, 0);
+    EXPECT_FLOAT_EQ(res.torque_limits.RL, 0);
+    EXPECT_FLOAT_EQ(res.torque_limits.RR, 0);
+    
+    state.interface_data.recvd_pedals_data.pedals_data.brake_percent = 1.0;
+    res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, state); 
+
+    EXPECT_FLOAT_EQ(res.desired_speeds.RR, 0);
+
+    EXPECT_FLOAT_EQ(res.torque_limits.FL, TC_MUX_DEFAULT_PARAMS::MAX_HIGH_PACK_VOLTAGE_REGEN_NM);
+    EXPECT_FLOAT_EQ(res.torque_limits.FR, TC_MUX_DEFAULT_PARAMS::MAX_HIGH_PACK_VOLTAGE_REGEN_NM);
+    EXPECT_FLOAT_EQ(res.torque_limits.RL, TC_MUX_DEFAULT_PARAMS::MAX_HIGH_PACK_VOLTAGE_REGEN_NM);
+    EXPECT_FLOAT_EQ(res.torque_limits.RR, TC_MUX_DEFAULT_PARAMS::MAX_HIGH_PACK_VOLTAGE_REGEN_NM);
+
+    state.interface_data.recvd_pedals_data.pedals_data.brake_percent = 1.0;
+    res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, state); 
+
+    state.interface_data.recvd_pedals_data.pedals_data.brake_percent = 1.0;
+    state.interface_data.inverter_data.FL.dc_bus_voltage = 500.0f;
+    
+    res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, state); 
+    EXPECT_FLOAT_EQ(res.desired_speeds.RR, 0);
+
+    EXPECT_FLOAT_EQ(res.torque_limits.FL, default_simple_tq_cntrller_params.amk_max_regen_torque);
+    EXPECT_FLOAT_EQ(res.torque_limits.FR, default_simple_tq_cntrller_params.amk_max_regen_torque);
+    EXPECT_FLOAT_EQ(res.torque_limits.RL, default_simple_tq_cntrller_params.amk_max_regen_torque);
+    EXPECT_FLOAT_EQ(res.torque_limits.RR, default_simple_tq_cntrller_params.amk_max_regen_torque);
 }
 
 #endif // __TEST_TCMUX__
