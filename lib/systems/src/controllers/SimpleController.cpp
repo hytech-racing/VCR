@@ -1,7 +1,7 @@
 #include "controllers/SimpleController.h"
 #include "SharedFirmwareTypes.h"
 
-#include <iostream>
+// #include <iostream>
 DrivetrainCommand_s TorqueControllerSimple::evaluate(const VCRData_s &state, unsigned long curr_millis)
 {
     // Both pedals are not pressed and no implausibility has been detected
@@ -35,7 +35,7 @@ DrivetrainCommand_s TorqueControllerSimple::evaluate(const VCRData_s &state, uns
         out.torque_limits.FR = torqueRequest * (balance - _params.rear_regen_torque_scale);
         out.torque_limits.RL = torqueRequest * _params.rear_regen_torque_scale;
         out.torque_limits.RR = torqueRequest * _params.rear_regen_torque_scale;
-        std::cout << "out.torque_limits.FL " << out.torque_limits.FL <<std::endl; 
+        // std::cout << "out.torque_limits.FL " << out.torque_limits.FL <<std::endl; 
     }
 
     return out;
