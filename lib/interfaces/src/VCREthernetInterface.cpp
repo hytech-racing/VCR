@@ -1,5 +1,6 @@
 #include "VCREthernetInterface.h"
 #include "SharedFirmwareTypes.h"
+#include "VCR_Constants.h"
 #include "base_msgs.pb.h"
 #include "ht_can_version.h"
 #include "hytech_msgs_version.h"
@@ -26,6 +27,10 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.has_tcmux_status = true;
     out.has_msg_versions = true;
     out.has_status = true;
+
+    out.has_LOC = true;
+
+    out.LOC = shared_state.interface_data.LOC;
 
     //RearLoadCellData_s
     out.rear_loadcell_data.RL_loadcell_analog = shared_state.interface_data.rear_loadcell_data.RL_loadcell_analog;
@@ -117,6 +122,34 @@ void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &m
     //TODO: Finish this function. This function could parse the message and put it into shared_state, but depending
     //      on where things are defined, it might be cleaner for this function to simply return the new data. I do
     //      not know yet. Definitely worth asking Ben.    
+    
+}
+
+void VCREthernetInterface::receive_pb_msg_acu(const hytech_msgs_ACUAllData &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
+{
+    if (!shared_state.system_data.acu_heartbeat_data.last_heartbeat_time) {
+        shared_state.system_data.acu_heartbeat_data.last_heartbeat_time = curr_millis;
+    } else {
+        if (curr_millis - shared_state.system_data.acu_heartbeat_data.last_heartbeat_time > ACU_ACU_OK_MAX_HEARTBEAT_MS) {
+            shared_state.system_data.acu_heartbeat_data.heartbeat_ok = false;
+            shared_state.interface_data.LOC = true;
+        } else {
+            shared_state.system_data.acu_heartbeat_data.heartbeat_ok = true;
+        }
+
+        shared_state.interface_data.stamped_acu_core_data.acu_data.pack_voltage = msg_in.core_data.pack_voltage;
+        shared_state.interface_data.stamped_acu_core_data.acu_data.min_cell_voltage = msg_in.core_data.min_cell_voltage;
+        shared_state.interface_data.stamped_acu_core_data.acu_data.avg_cell_voltage = msg_in.core_data.avg_cell_voltage;
+        shared_state.interface_data.stamped_acu_core_data.acu_data.max_cell_voltage = msg_in.core_data.max_cell_voltage;
+        shared_state.interface_data.stamped_acu_core_data.acu_data.max_cell_temp = msg_in.core_data.max_cell_temp;
+        shared_state.interface_data.stamped_acu_core_data.acu_data.max_board_temp = msg_in.core_data.max_board_temp;
+        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_pack_out_voltage = msg_in.core_data.measured_pack_voltage;
+        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_ts_out_voltage = msg_in.core_data.measured_tractive_system_voltage;
+        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_glv = msg_in.core_data.measured_glv;
+        
+        shared_state.interface_data.stamped_acu_core_data.last_recv_millis = curr_millis;
+        shared_state.system_data.acu_heartbeat_data.last_heartbeat_time = curr_millis;
+    }
 }
 
 void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
