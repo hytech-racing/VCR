@@ -28,7 +28,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.has_msg_versions = true;
     out.has_status = true;
 
-
+    out.has_vcr_loc_data = true;
 
     //RearLoadCellData_s
     out.rear_loadcell_data.RL_loadcell_analog = shared_state.interface_data.rear_loadcell_data.RL_loadcell_analog;
@@ -112,6 +112,9 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     
     out.status.pedals_heartbeat_ok = shared_state.system_data.vcf_heartbeat_data.heartbeat_ok;
 
+    out.vcr_loc_data.ACU_LOC = shared_state.system_data.vcr_loc_data.acu_loc;
+    out.vcr_loc_data.VCF_LOC = shared_state.system_data.vcr_loc_data.vcf_loc;
+
     return out;
 }
 
@@ -130,7 +133,7 @@ void VCREthernetInterface::receive_pb_msg_acu(const hytech_msgs_ACUAllData &msg_
     } else {
         if (curr_millis - shared_state.system_data.acu_heartbeat_data.last_heartbeat_time > ACU_ACU_OK_MAX_HEARTBEAT_MS) {
             shared_state.system_data.acu_heartbeat_data.heartbeat_ok = false;
-            shared_state.interface_data.LOC = true;
+            shared_state.system_data.vcr_loc_data.acu_loc = true;
         } else {
             shared_state.system_data.acu_heartbeat_data.heartbeat_ok = true;
         }
@@ -141,9 +144,9 @@ void VCREthernetInterface::receive_pb_msg_acu(const hytech_msgs_ACUAllData &msg_
         shared_state.interface_data.stamped_acu_core_data.acu_data.max_cell_voltage = msg_in.core_data.max_cell_voltage;
         shared_state.interface_data.stamped_acu_core_data.acu_data.max_cell_temp = msg_in.core_data.max_cell_temp;
         shared_state.interface_data.stamped_acu_core_data.acu_data.max_board_temp = msg_in.core_data.max_board_temp;
-        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_pack_out_voltage = msg_in.core_data.measured_pack_voltage;
-        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_ts_out_voltage = msg_in.core_data.measured_tractive_system_voltage;
-        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_glv = msg_in.core_data.measured_glv;
+        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_pack_out_voltage = msg_in.core_data.pack_voltage;
+        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_ts_out_voltage = msg_in.core_data.max_measured_tractive_system_voltage; // should we use max or min?
+        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_glv = msg_in.core_data.max_measured_glv; // should we use max or min?
         
         shared_state.interface_data.stamped_acu_core_data.last_recv_millis = curr_millis;
         shared_state.system_data.acu_heartbeat_data.last_heartbeat_time = curr_millis;
@@ -153,15 +156,28 @@ void VCREthernetInterface::receive_pb_msg_acu(const hytech_msgs_ACUAllData &msg_
 void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
 {
     // //DashInputState_s
-    // shared_state.interface_data.dash_input_state.data_btn_is_pressed = msg_in.dash_input_state.data_btn_is_pressed;
-    // shared_state.interface_data.dash_input_state.dial_state = (ControllerMode_e) msg_in.dash_input_state.dial_state;
-    // shared_state.interface_data.dash_input_state.dim_btn_is_pressed = msg_in.dash_input_state.dim_btn_is_pressed;
-    // shared_state.interface_data.dash_input_state.left_paddle_is_pressed = msg_in.dash_input_state.left_paddle_is_pressed;
-    // shared_state.interface_data.dash_input_state.right_paddle_is_pressed = msg_in.dash_input_state.right_paddle_is_pressed;
-    // shared_state.interface_data.dash_input_state.mc_reset_btn_is_pressed = msg_in.dash_input_state.mc_reset_btn_is_pressed;
-    // shared_state.interface_data.dash_input_state.mode_btn_is_pressed = msg_in.dash_input_state.mode_btn_is_pressed;
-    // shared_state.interface_data.dash_input_state.preset_btn_is_pressed = msg_in.dash_input_state.preset_btn_is_pressed;
-    // shared_state.interface_data.dash_input_state.start_btn_is_pressed = msg_in.dash_input_state.start_btn_is_pressed;
+    if (!shared_state.system_data.vcf_heartbeat_data.last_heartbeat_time) {
+        shared_state.system_data.vcf_heartbeat_data.heartbeat_ok = true;
+    } else {
+        if (curr_millis - shared_state.system_data.vcf_heartbeat_data.last_heartbeat_time > VCF_PEDALS_MAX_HEARTBEAT_MS) {
+            shared_state.system_data.vcf_heartbeat_data.heartbeat_ok = false;
+            shared_state.system_data.vcr_loc_data.vcf_loc = true;
+        } else {
+            shared_state.system_data.vcf_heartbeat_data.heartbeat_ok = true;
+        }
+        shared_state.interface_data.dash_input_state.data_btn_is_pressed = msg_in.dash_input_state.data_btn_is_pressed;
+        shared_state.interface_data.dash_input_state.dial_state = (ControllerMode_e) msg_in.dash_input_state.dial_state;
+        shared_state.interface_data.dash_input_state.dim_btn_is_pressed = msg_in.dash_input_state.dim_btn_is_pressed;
+        shared_state.interface_data.dash_input_state.left_paddle_is_pressed = msg_in.dash_input_state.left_paddle_is_pressed;
+        shared_state.interface_data.dash_input_state.right_paddle_is_pressed = msg_in.dash_input_state.right_paddle_is_pressed;
+        shared_state.interface_data.dash_input_state.mc_reset_btn_is_pressed = msg_in.dash_input_state.mc_reset_btn_is_pressed;
+        shared_state.interface_data.dash_input_state.mode_btn_is_pressed = msg_in.dash_input_state.mode_btn_is_pressed;
+        shared_state.interface_data.dash_input_state.preset_btn_is_pressed = msg_in.dash_input_state.preset_btn_is_pressed;
+        shared_state.interface_data.dash_input_state.start_btn_is_pressed = msg_in.dash_input_state.start_btn_is_pressed;
+
+    
+        shared_state.system_data.vcf_heartbeat_data.last_heartbeat_time = curr_millis;
+    }
 }
 	
 void VCREthernetInterface::copy_inverter_data(const InverterData_s &original, hytech_msgs_InverterData_s &destination)
