@@ -28,9 +28,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.has_msg_versions = true;
     out.has_status = true;
 
-    out.has_LOC = true;
 
-    out.LOC = shared_state.interface_data.LOC;
 
     //RearLoadCellData_s
     out.rear_loadcell_data.RL_loadcell_analog = shared_state.interface_data.rear_loadcell_data.RL_loadcell_analog;
