@@ -23,6 +23,7 @@
 #include "ACUInterface.h"
 
 #include "InverterInterface.h"
+#include "TTPMSSensorInterface.h"
 
 using CANRXBufferType = Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)>;
 using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_message_t)>;
@@ -59,6 +60,7 @@ struct CANInterfaces {
     InverterInterface &rl_inverter_interface;
     InverterInterface &rr_inverter_interface;
 
+    TTPMSSensorInterface tpms_interface;
 };
 
 using CANInterfacesInstance = etl::singleton<CANInterfaces>;
