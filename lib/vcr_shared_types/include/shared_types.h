@@ -108,6 +108,7 @@ struct TTPMSSensorData_s {
     uint16_t bttery_voltage; 
     uint16_t pressure;
     uint16_t gauge_pressure;
+
     uint16_t infrared_temp[16];
     uint16_t transmission_count;
     uint16_t rssi;
@@ -115,12 +116,12 @@ struct TTPMSSensorData_s {
     uint16_t sensor_node_id;
 };
 
-struct TTPMSSensors_s {
-    TTPMSSensorData_s lf_sensor;
-    TTPMSSensorData_s rf_sensor;
-    TTPMSSensorData_s lr_sensor;
-    TTPMSSensorData_s rr_sensor;
-};
+// struct TTPMSSensors_s {
+//     TTPMSSensorData_s fl_sensor;
+//     TTPMSSensorData_s fr_sensor;
+//     TTPMSSensorData_s rl_sensor;
+//     TTPMSSensorData_s rr_sensor;
+// };
 
 #endif // SHARED_TYPES_H
 

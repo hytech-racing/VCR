@@ -60,7 +60,10 @@ struct CANInterfaces {
     InverterInterface &rl_inverter_interface;
     InverterInterface &rr_inverter_interface;
 
-    TTPMSSensorInterface tpms_interface;
+    TTPMSSensorInterface &lf_ttpms_interface;
+    TTPMSSensorInterface &rf_ttpms_interface;
+    TTPMSSensorInterface &lr_ttpms_interface;
+    TTPMSSensorInterface &rr_ttpms_interface;
 };
 
 using CANInterfacesInstance = etl::singleton<CANInterfaces>;
