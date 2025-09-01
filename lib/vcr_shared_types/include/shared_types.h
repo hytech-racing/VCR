@@ -105,7 +105,7 @@ struct InverterFeedbackData_s
 
 struct TTPMSSensorData_s {
     uint16_t serial_number;
-    uint16_t bttery_voltage; 
+    uint16_t battery_voltage; 
     uint16_t pressure;
     uint16_t gauge_pressure;
 

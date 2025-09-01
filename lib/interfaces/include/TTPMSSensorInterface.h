@@ -25,7 +25,7 @@ enum TTPMS_Sensor_Channel {
 #define UNPACK_TTPMS_1(WHEEL) \
     WHEEL##_TTPMS_1_t unpacked_sensor_data_##WHEEL; \
     Unpack_##WHEEL##_TTPMS_1_hytech(&unpacked_sensor_data_##WHEEL, msg.buf, msg.len); \
-    latest_sensors_data.bttery_voltage = unpacked_sensor_data_##WHEEL.WHEEL##_TTPMS_BAT_V; \
+    latest_sensors_data.battery_voltage = unpacked_sensor_data_##WHEEL.WHEEL##_TTPMS_BAT_V; \
     latest_sensors_data.serial_number  = unpacked_sensor_data_##WHEEL.WHEEL##_TTPMS_SN; \
     latest_sensors_data.pressure       = unpacked_sensor_data_##WHEEL.WHEEL##_TTPMS_P; \
     latest_sensors_data.gauge_pressure = unpacked_sensor_data_##WHEEL.WHEEL##_TTPMS_P_GAUGE;
