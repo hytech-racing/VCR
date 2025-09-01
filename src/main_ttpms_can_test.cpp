@@ -2,19 +2,74 @@
 
 #include "CANInterface.h"
 #include "TTPMSSensorInterface.h"
+#include "InverterInterface.h"
+#include "VCFInterface.h"
+#include "ACUInterface.h"
+#include "DrivebrainInterface.h"
 #include "hytech.h"
-
+#include "VCRCANInterfaceImpl.h"
+#include "etl/singleton.h"
+#include "VCR_Constants.h"
 
 FlexCAN_T4<CAN2> MAIN_CAN;
 
+InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+TTPMSSensorInterface fl_ttpms_int;
+TTPMSSensorInterface fr_ttpms_int;
+TTPMSSensorInterface rl_ttpms_int;
+TTPMSSensorInterface rr_ttpms_int;
+
+
+
 void on_recv(const CAN_message_t &msg)
 {
-    
+    CANInterfacesInstance::create(
+    VCFInterfaceInstance::instance(),
+    ACUInterfaceInstance::instance(),
+    DrivebrainInterfaceInstance::instance(), 
+    fl_inverter_int,
+    fr_inverter_int,
+    rl_inverter_int,
+    rr_inverter_int,
+    fl_ttpms_int,
+    fr_ttpms_int,
+    rl_ttpms_int,
+    rr_ttpms_int
+);
+    VCRCANInterfaceImpl::vcr_CAN_recv(CANInterfacesInstance::instance(), msg, msg.timestamp);
+
     Serial.print("MB: "); Serial.print(msg.mb);
     Serial.print("  ID: 0x"); Serial.print(msg.id, HEX);
     Serial.print("  EXT: "); Serial.print(msg.flags.extended);
     Serial.print("  LEN: "); Serial.print(msg.len);
-    Serial.print(" DATA: ");
+
+
+
+    TTPMSSensorData_s data = fl_ttpms_int.get_latest_sensor_data();
+    Serial.println("=== TTPMSSensorData ===");
+    Serial.print("Serial #: "); Serial.println(data.serial_number);
+    Serial.print("Battery (mV): "); Serial.println(data.battery_voltage);
+    Serial.print("Pressure: "); Serial.println(data.pressure);
+    Serial.print("Gauge Pressure: "); Serial.println(data.gauge_pressure);
+
+    Serial.println("Infrared Temps:");
+    for (int i = 0; i < 16; i++) {
+        Serial.print("  ["); Serial.print(i); Serial.print("] = ");
+        Serial.println(data.infrared_temp[i]);
+    }
+
+    Serial.print("Transmission Count: "); Serial.println(data.transmission_count);
+    Serial.print("RSSI: "); Serial.println(data.rssi);
+    Serial.print("Sensor Temp: "); Serial.println(data.sensor_temperature);
+    Serial.print("Node ID: "); Serial.println(data.sensor_node_id);
+    Serial.println("=======================");
+    
+
+
+
     Serial.print("  TS: "); Serial.println(msg.timestamp);
 }
     
@@ -28,40 +83,5 @@ void setup()
 void loop()
 {    
     delay(1000);
-
 }
 
- // TTPMSSensorData_s high_level_data = {
-    //     .serial_number = 123,
-    //     .battery_voltage = 220,
-    //     .pressure = 228,
-    //     .gauge_pressure = 227,
-    //     .infrared_temp = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16},
-    //     .transmission_count = 22,
-    //     .rssi = 33,
-    //     .sensor_temperature = 44,
-    //     .sensor_node_id = 55
-    // };
-
-    // LF_TTPMS_1_t packed = {
-    // .LF_TTPMS_SN      = high_level_data.serial_number,
-    // .LF_TTPMS_BAT_V   = high_level_data.battery_voltage,
-    // .LF_TTPMS_P       = high_level_data.pressure,
-    // .LF_TTPMS_P_GAUGE = high_level_data.gauge_pressure
-    // };
-
-
-    // test_msg.id = 0x11;
-    // test_msg.len = 1;
-    // test_msg.buf[0] = 0x45;
-    //     // memmove(test_msg.buf, &packed, sizeof(packed));
-
-    // MAIN_CAN.write(test_msg);
-
-        // Serial.print("SN: ");       Serial.println(unpacked.LF_TTPMS_SN);
-    // Serial.print("Bat V: ");    Serial.println(unpacked.LF_TTPMS_BAT_V);
-    // Serial.print("P: ");        Serial.println(unpacked.LF_TTPMS_P);
-    // Serial.print("P Gauge: ");  Serial.println(unpacked.LF_TTPMS_P_GAUGE);
-
-        // LF_TTPMS_1_t unpacked;
-    // Unpack_LF_TTPMS_1_hytech(&unpacked, msg.buf, msg.len);

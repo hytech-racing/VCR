@@ -41,10 +41,10 @@ enum TTPMS_Sensor_Channel {
 #define UNPACK_AND_POPULATE_TEMP(WHEEL, MSGNUM, OFFSET1, OFFSET2, OFFSET3, OFFSET4) \
     WHEEL##_TTPMS_##MSGNUM##_t unpacked_sensor_data; \
     Unpack_##WHEEL##_TTPMS_##MSGNUM##_hytech(&unpacked_sensor_data, msg.buf, msg.len); \
-    latest_sensors_data.infrared_temp[OFFSET1-1] = unpacked_sensor_data.WHEEL##_TTPMS_T##OFFSET1##_ro; \
-    latest_sensors_data.infrared_temp[OFFSET1] = unpacked_sensor_data.WHEEL##_TTPMS_T##OFFSET2##_ro; \
-    latest_sensors_data.infrared_temp[OFFSET1+1] = unpacked_sensor_data.WHEEL##_TTPMS_T##OFFSET3##_ro; \
-    latest_sensors_data.infrared_temp[OFFSET1+2] = unpacked_sensor_data.WHEEL##_TTPMS_T##OFFSET4##_ro;
+    latest_sensors_data.infrared_temp[(OFFSET1)-1] = unpacked_sensor_data.WHEEL##_TTPMS_T##OFFSET1##_ro; \
+    latest_sensors_data.infrared_temp[(OFFSET1)]   = unpacked_sensor_data.WHEEL##_TTPMS_T##OFFSET2##_ro; \
+    latest_sensors_data.infrared_temp[(OFFSET1)+1] = unpacked_sensor_data.WHEEL##_TTPMS_T##OFFSET3##_ro; \
+    latest_sensors_data.infrared_temp[(OFFSET1)+2] = unpacked_sensor_data.WHEEL##_TTPMS_T##OFFSET4##_ro;
 
 class TTPMSSensorInterface {
 

@@ -91,3 +91,7 @@ void TTPMSSensorInterface::receive_TTPMS_sensor_temp_rr_ch9_ch12(const CAN_messa
 void TTPMSSensorInterface::receive_TTPMS_sensor_temp_rr_ch13_ch16(const CAN_message_t &msg, unsigned long curr_millis) {
     UNPACK_AND_POPULATE_TEMP(RR, 5, 13, 14, 15, 16);
 }
+
+TTPMSSensorData_s TTPMSSensorInterface::get_latest_sensor_data() const {
+    return latest_sensors_data;
+}

@@ -43,7 +43,7 @@ struct CANInterfaces {
         InverterInterface &fr_inv_int,
         InverterInterface &rl_inv_int,
         InverterInterface &rr_inv_int,
-        TTPMSSensorInterface &lf_ttpms_int,
+        TTPMSSensorInterface &fl_ttpms_int,
         TTPMSSensorInterface &fr_ttpms_int,
         TTPMSSensorInterface &rl_ttpms_int,
         TTPMSSensorInterface &rr_ttpms_int
@@ -55,7 +55,7 @@ struct CANInterfaces {
           fr_inverter_interface(fr_inv_int),
           rl_inverter_interface(rl_inv_int),
           rr_inverter_interface(rr_inv_int),
-          lf_ttpms_interface(lf_ttpms_int),
+          fl_ttpms_interface(fl_ttpms_int),
           fr_ttpms_interface(fr_ttpms_int),
           rl_ttpms_interface(rl_ttpms_int),
           rr_ttpms_interface(rr_ttpms_int) {}
@@ -68,7 +68,7 @@ struct CANInterfaces {
     InverterInterface &rl_inverter_interface;
     InverterInterface &rr_inverter_interface;
 
-    TTPMSSensorInterface &lf_ttpms_interface;
+    TTPMSSensorInterface &fl_ttpms_interface;
     TTPMSSensorInterface &fr_ttpms_interface;
     TTPMSSensorInterface &rl_ttpms_interface;
     TTPMSSensorInterface &rr_ttpms_interface;
