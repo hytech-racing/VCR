@@ -2,7 +2,7 @@
 
 #include "hytech.h"
 #include <cstdint>
-
+#include <iostream>
 
 namespace VCRCANInterfaceImpl {
 
@@ -198,6 +198,8 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
    // RF wheel
 {
     case RF_TTPMS_1_CANID: {
+        Serial.println("Receiving pressure and voltage");
+
         interfaces.fr_ttpms_interface.receive_TTPMS_sensor_pressure_and_voltage(msg, millis, TTPMS_Wheel_Location::RF);
         break;
     }

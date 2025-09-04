@@ -3,6 +3,7 @@
 #include "hytech.h"
 
 void TTPMSSensorInterface::receive_TTPMS_sensor_pressure_and_voltage(const CAN_message_t &msg, unsigned long curr_millis, TTPMS_Wheel_Location wheel_location) {
+    Serial.println("Receiving pressure and voltage");
     switch (wheel_location) {
         case TTPMS_Wheel_Location::LF:
             UNPACK_TTPMS_1(LF);
@@ -17,6 +18,11 @@ void TTPMSSensorInterface::receive_TTPMS_sensor_pressure_and_voltage(const CAN_m
             UNPACK_TTPMS_1(RR);
             break;
     }
+    // if (1) {
+    //     RF_TTPMS_1_t rf_ttpms_1;
+    //     Unpack_RF_TTPMS_1_hytech(&rf_ttpms_1, msg.buf, msg.len);
+    //     Serial.print("Serial Number: "); Serial.println(rf_ttpms_1.RF_TTPMS_SN);
+    // }
 }
 
 

@@ -42,13 +42,19 @@ void on_recv(const CAN_message_t &msg)
     VCRCANInterfaceImpl::vcr_CAN_recv(CANInterfacesInstance::instance(), msg, msg.timestamp);
 
     Serial.print("MB: "); Serial.print(msg.mb);
-    Serial.print("  ID: 0x"); Serial.print(msg.id, HEX);
-    Serial.print("  EXT: "); Serial.print(msg.flags.extended);
-    Serial.print("  LEN: "); Serial.print(msg.len);
+    Serial.print("  ID: 0x"); Serial.print(msg.id, HEX); Serial.print(" ");
+    // Serial.print("  EXT: "); Serial.print(msg.flags.extended);
+    // Serial.print("  LEN: "); Serial.print(msg.len);
+    // // if (msg.id == 1076) {
+    //     for ( uint8_t i = 0; i < 8; i++ ) {
+    //         Serial.print(msg.buf[i]); Serial.print(" ");
+    //     }        
+    // // }
+    Serial.println();
 
 
 
-    TTPMSSensorData_s data = fl_ttpms_int.get_latest_sensor_data();
+    TTPMSSensorData_s data = rl_ttpms_int.get_latest_sensor_data();
     Serial.println("=== TTPMSSensorData ===");
     Serial.print("Serial #: "); Serial.println(data.serial_number);
     Serial.print("Battery (mV): "); Serial.println(data.battery_voltage);
@@ -70,7 +76,7 @@ void on_recv(const CAN_message_t &msg)
 
 
 
-    Serial.print("  TS: "); Serial.println(msg.timestamp);
+    // Serial.print("  TS: "); Serial.println(msg.timestamp);
 }
     
 
