@@ -137,22 +137,22 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.println(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FL);
     // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
 
-    Serial.print("Drivetrain system state: ");
-    Serial.println(static_cast<int>(DrivetrainInstance::instance().get_state()));
-    Serial.print("Diagnostic FL #: ");
-    Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FL.diagnostic_number);
-    Serial.print(" FR #: ");
-    Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FR.diagnostic_number);
-    Serial.print(" RL #: ");
-    Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.RL.diagnostic_number);
-    Serial.print(" RR #: ");
-    Serial.println(DrivetrainInstance::instance().get_status().inverter_statuses.RR.diagnostic_number);
+    // Serial.print("Drivetrain system state: ");
+    // Serial.println(static_cast<int>(DrivetrainInstance::instance().get_state()));
+    // Serial.print("Diagnostic FL #: ");
+    // Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FL.diagnostic_number);
+    // Serial.print(" FR #: ");
+    // Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FR.diagnostic_number);
+    // Serial.print(" RL #: ");
+    // Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.RL.diagnostic_number);
+    // Serial.print(" RR #: ");
+    // Serial.println(DrivetrainInstance::instance().get_status().inverter_statuses.RR.diagnostic_number);
 
-    Serial.print("Vehicle statemachine state: ");
-    Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
+    // Serial.print("Vehicle statemachine state: ");
+    // Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
 
-    Serial.print("launch controller state: ");
-    Serial.println(static_cast<int>(VCRControlsInstance::instance().get_launch_controller().get_launch_state()));
+    // Serial.print("launch controller state: ");
+    // Serial.println(static_cast<int>(VCRControlsInstance::instance().get_launch_controller().get_launch_state()));
 
     // Serial.print("Start button pressed: ");
     // Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
@@ -163,8 +163,8 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.print("mc reset button pressed: ");
     // Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
     
-    Serial.print("torque mode cycle button pressed: ");
-    Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
+    // Serial.print("torque mode cycle button pressed: ");
+    // Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
 
     // Serial.println("IOExpander testing");
     // Serial.println("Shutdown Data");
@@ -184,11 +184,11 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
 
 
-    // Serial.print("Load Cell RR: ");
-    // Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
+    Serial.print("Load Cell RR: ");
+    Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
 
-    // Serial.print("Load Cell RL: ");
-    // Serial.println(vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog);
+    Serial.print("Load Cell RL: ");
+    Serial.println(vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog);
 
     // Serial.print("SusPot RR: ");
     // Serial.println(vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog);
@@ -197,14 +197,14 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
 
     /* Drivebrain data */
-    Serial.print("Latest Drivebrain data: ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
-    Serial.print(" ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FR);
-    Serial.print(" ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
-    Serial.print(" ");
-    Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+    // Serial.print("Latest Drivebrain data: ");
+    // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+    // Serial.print(" ");
+    // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FR);
+    // Serial.print(" ");
+    // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
+    // Serial.print(" ");
+    // Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
     
     return HT_TASK::TaskResponse::YIELD;
 }
