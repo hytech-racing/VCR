@@ -42,6 +42,8 @@
 /* From pio-git-hash */
 #include "device_fw_version.h"
 
+extern ThermistorData_s thermistor_data;
+
 /* externed CAN instances */
 FlexCAN_Type<CAN3> VCRCANInterfaceImpl::TELEM_CAN;
 FlexCAN_Type<CAN2> VCRCANInterfaceImpl::INVERTER_CAN;
@@ -100,7 +102,7 @@ HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
-// HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
+HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us); //using adc1 for the temp sensors in place of the thermistors
 HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, watchdog_priority, kick_watchdog_period_us); 
 HT_TASK::Task ams_system_task(init_acu_heartbeat, update_acu_heartbeat, ams_priority, ams_update_period_us);
 HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, suspension_priority, suspension_can_period_us);
@@ -281,7 +283,7 @@ void setup() {
     init_adc_bundle();
 
     scheduler.schedule(adc_0_sample_task);
-    // scheduler.schedule(adc_1_sample_task);
+    scheduler.schedule(adc_1_sample_task);
     scheduler.schedule(kick_watchdog_task);
     scheduler.schedule(ams_system_task);
     scheduler.schedule(enqueue_suspension_CAN_task);

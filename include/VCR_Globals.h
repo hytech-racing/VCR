@@ -35,5 +35,13 @@ struct ADCBundle_s
     MCP_ADC <channels_within_mcp_adc> adc0;
     MCP_ADC <channels_within_mcp_adc> adc1;
 };
+
+struct ThermistorData_s {
+    float temp_sensor1_adc;
+    float temp_sensor2_adc;
+};
+
 using ADCSingletonInstance = etl::singleton<ADCBundle_s>; // Singleton for ADCs. Used to pass ADCs to other systems that need them, such as the TelemetrySystem.
+using ThermistorDataInstance = etl::singleton<ThermistorData_s>;
+
 #endif /* VCR_GLOBALS */
