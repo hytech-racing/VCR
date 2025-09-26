@@ -10,8 +10,6 @@
 #include "hytech_msgs.pb.h"
 #include <cstdint>
 
-extern ThermistorData_s coolant_data;
-
 DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cell_data,
                                          const RearSusPotData_s &rear_suspot_data,
                                          IPAddress drivebrain_ip, uint16_t vcr_data_port,
@@ -75,8 +73,8 @@ void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
 
 void DrivebrainInterface::handle_enqueue_coolant_temp_data() {
     MCU_LOAD_CELLS_t temp_data;
-    temp_data.load_cell_fl = coolant_data.temp_sensor1_adc;
-    temp_data.load_cell_fr = coolant_data.temp_sensor2_adc;
+    temp_data.load_cell_fl = ThermistorDataInstance::instance().temp_sensor1_adc;
+    temp_data.load_cell_fr = ThermistorDataInstance::instance().temp_sensor2_adc;
 
     CAN_util::enqueue_msg(&temp_data, &Pack_MCU_LOAD_CELLS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }

@@ -19,8 +19,6 @@
 #include "IOExpander.h"
 #include "IOExpanderUtils.h"
 
-extern ThermistorData_s thermistor_data;
-
 HT_TASK::TaskResponse init_adc_bundle()
 {
 
@@ -104,11 +102,16 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
     return HT_TASK::TaskResponse::YIELD;
 }
 
+HT_TASK::TaskResponse init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) {
+    ThermistorDataInstance::create();
+}
+
+
 HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
-    thermistor_data.temp_sensor1_adc = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_0].conversion;
-    thermistor_data.temp_sensor2_adc = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_1].conversion;
+    ThermistorDataInstance::instance().temp_sensor1_adc = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_0].conversion;
+    ThermistorDataInstance::instance().temp_sensor2_adc = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_1].conversion;
 
     ADCSingletonInstance::instance().adc1.tick();
 

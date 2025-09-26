@@ -41,6 +41,7 @@ struct ThermistorData_s {
     float temp_sensor2_adc;
 };
 
+
 using ADCSingletonInstance = etl::singleton<ADCBundle_s>; // Singleton for ADCs. Used to pass ADCs to other systems that need them, such as the TelemetrySystem.
 using ThermistorDataInstance = etl::singleton<ThermistorData_s>;
 

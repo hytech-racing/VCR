@@ -14,6 +14,7 @@
 #include <QNEthernet.h>
 #include "VCR_Globals.h"
 
+
 class DrivebrainInterface {
   public:
 
