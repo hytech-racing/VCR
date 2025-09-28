@@ -184,11 +184,11 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
 
 
-    Serial.print("Load Cell RR: ");
-    Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
+    // Serial.print("Load Cell RR: ");
+    // Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
 
-    Serial.print("Load Cell RL: ");
-    Serial.println(vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog);
+    // Serial.print("Load Cell RL: ");
+    // Serial.println(vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog);
 
     // Serial.print("SusPot RR: ");
     // Serial.println(vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog);
@@ -205,6 +205,11 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
     // Serial.print(" ");
     // Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+
+    Serial.print("temp sensor 1:   ");
+    Serial.println(ThermistorDataInstance::instance().temp_sensor1_adc);
+    Serial.print("temp sensor 2:   ");
+    Serial.println(ThermistorDataInstance::instance().temp_sensor2_adc);
     
     return HT_TASK::TaskResponse::YIELD;
 }
