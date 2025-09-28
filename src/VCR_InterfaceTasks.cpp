@@ -110,8 +110,8 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
     vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_1].conversion;
 
     // with a 8.2k resistor for R1 and the sensor as R2, the formula for actual temperature should follow 198 - 31 * ln(analog_value)
-    vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C = log(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog);
-    vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C = log(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog);
+    vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C = 242 - (31 * log(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog));
+    vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C = 242 - (31 * log(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog));
 
     return HT_TASK::TaskResponse::YIELD;
 }
