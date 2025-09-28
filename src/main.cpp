@@ -100,7 +100,7 @@ HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
-HT_TASK::Task adc_1_sample_task(init_read_adc1_task, run_read_adc1_task, adc1_priority, adc1_sample_period_us); //using adc1 for the temp sensors in place of the thermistors
+HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us); //using adc1 for the temp sensors in place of the thermistors
 HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, watchdog_priority, kick_watchdog_period_us); 
 HT_TASK::Task ams_system_task(init_acu_heartbeat, update_acu_heartbeat, ams_priority, ams_update_period_us);
 HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, suspension_priority, suspension_can_period_us);
@@ -205,11 +205,6 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
     // Serial.print(" ");
     // Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
-
-    Serial.print("temp sensor 1:   ");
-    Serial.println(ThermistorDataInstance::instance().temp_sensor1_adc);
-    Serial.print("temp sensor 2:   ");
-    Serial.println(ThermistorDataInstance::instance().temp_sensor2_adc);
     
     return HT_TASK::TaskResponse::YIELD;
 }
@@ -233,6 +228,8 @@ void setup() {
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
+        vcr_data.interface_data.thermistor_data.thermistor_0,
+        vcr_data.interface_data.thermistor_data.thermistor_1,
         EthernetIPDefsInstance::instance().drivebrain_ip,
         EthernetIPDefsInstance::instance().VCRData_port,
         &vcr_data_send_socket);

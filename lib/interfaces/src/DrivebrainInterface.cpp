@@ -12,10 +12,14 @@
 
 DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cell_data,
                                          const RearSusPotData_s &rear_suspot_data,
+                                         const ThermistorData_s &coolant_temperature_data_0,
+                                         const ThermistorData_s &coolant_temperature_data_1,
                                          IPAddress drivebrain_ip, uint16_t vcr_data_port,
                                          qindesign::network::EthernetUDP *udp_socket)
     : _suspension_data{.rear_load_cell_data = rear_load_cell_data,
                        .rear_suspot_data = rear_suspot_data},
+      _thermistor_data{.coolant_temperature_0_data = coolant_temperature_data_0,
+                       .coolant_temperature_1_data = coolant_temperature_data_1},
       _drivebrain_ip(drivebrain_ip),
       _vcr_data_port(vcr_data_port),
       _udp_socket(udp_socket) { };
@@ -71,10 +75,10 @@ void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
                           VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
-void DrivebrainInterface::handle_enqueue_coolant_temp_data() {
+void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
     MCU_LOAD_CELLS_t temp_data;
-    temp_data.load_cell_fl = ThermistorDataInstance::instance().temp_sensor1_adc;
-    temp_data.load_cell_fr = ThermistorDataInstance::instance().temp_sensor2_adc;
+    temp_data.load_cell_fl = _thermistor_data.coolant_temperature_0_data.thermistor_analog;
+    temp_data.load_cell_fr = _thermistor_data.coolant_temperature_1_data.thermistor_analog;
 
     CAN_util::enqueue_msg(&temp_data, &Pack_MCU_LOAD_CELLS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
