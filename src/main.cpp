@@ -208,14 +208,14 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
     
     /* Thermistor Data */
-    Serial.print("Thermistor 0 Analog: ");
-    Serial.print(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog);
-    Serial.print(" Thermistor 0 degrees C: ");
-    Serial.println(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C);
-    Serial.print("Thermistor 1 Analog: ");
-    Serial.print(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog);
-    Serial.print(" Thermistor 1 degrees C: ");
-    Serial.println(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C);
+    // Serial.print("Thermistor 0 Analog: ");
+    // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog);
+    // Serial.print(" Thermistor 0 degrees C: ");
+    // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C);
+    // Serial.print("Thermistor 1 Analog: ");
+    // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog);
+    // Serial.print(" Thermistor 1 degrees C: ");
+    // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C);
 
     return HT_TASK::TaskResponse::YIELD;
 }

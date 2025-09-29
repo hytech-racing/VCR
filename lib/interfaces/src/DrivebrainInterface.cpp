@@ -76,16 +76,11 @@ void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
 }
 
 void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
-    MCU_LOAD_CELLS_t temp_data;
-    temp_data.load_cell_fl = _thermistor_data.coolant_temperature_0_data.thermistor_analog;
-    temp_data.load_cell_fr = _thermistor_data.coolant_temperature_1_data.thermistor_analog;
-    
     REAR_THERMISTORS_DATA_t thermistor_msg;
     thermistor_msg.thermistor_0_deg_C_ro = HYTECH_thermistor_0_deg_C_ro_toS(_thermistor_data.coolant_temperature_0_data.thermistor_degrees_C);
     thermistor_msg.thermistor_1_deg_C_ro = HYTECH_thermistor_1_deg_C_ro_toS(_thermistor_data.coolant_temperature_1_data.thermistor_degrees_C);
 
     CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
-    CAN_util::enqueue_msg(&temp_data, &Pack_MCU_LOAD_CELLS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {
