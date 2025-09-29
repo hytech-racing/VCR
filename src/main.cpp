@@ -100,12 +100,13 @@ HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
-// HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
-HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, watchdog_priority, kick_watchdog_period_us); 
+HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
+HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, watchdog_priority, kick_watchdog_period_us);
 HT_TASK::Task ams_system_task(init_acu_heartbeat, update_acu_heartbeat, ams_priority, ams_update_period_us);
 HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, suspension_priority, suspension_can_period_us);
 HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, inverter_send_priority, inv_send_period);
 HT_TASK::Task enqueue_dashboard_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_dashboard_CAN_data, dashboard_send_priority, dashboard_send_period_us);
+HT_TASK::Task enqueue_coolant_temp_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_coolant_temp_CAN_data, coolant_temp_send_priority, coolant_temp_send_period_us);
 HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, send_can_priority, send_can_period_us); // Sends all messages from the CAN queue
 HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority, ethernet_update_period);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
@@ -137,22 +138,22 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.println(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FL);
     // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
 
-    Serial.print("Drivetrain system state: ");
-    Serial.println(static_cast<int>(DrivetrainInstance::instance().get_state()));
-    Serial.print("Diagnostic FL #: ");
-    Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FL.diagnostic_number);
-    Serial.print(" FR #: ");
-    Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FR.diagnostic_number);
-    Serial.print(" RL #: ");
-    Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.RL.diagnostic_number);
-    Serial.print(" RR #: ");
-    Serial.println(DrivetrainInstance::instance().get_status().inverter_statuses.RR.diagnostic_number);
+    // Serial.print("Drivetrain system state: ");
+    // Serial.println(static_cast<int>(DrivetrainInstance::instance().get_state()));
+    // Serial.print("Diagnostic FL #: ");
+    // Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FL.diagnostic_number);
+    // Serial.print(" FR #: ");
+    // Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FR.diagnostic_number);
+    // Serial.print(" RL #: ");
+    // Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.RL.diagnostic_number);
+    // Serial.print(" RR #: ");
+    // Serial.println(DrivetrainInstance::instance().get_status().inverter_statuses.RR.diagnostic_number);
 
-    Serial.print("Vehicle statemachine state: ");
-    Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
+    // Serial.print("Vehicle statemachine state: ");
+    // Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
 
-    Serial.print("launch controller state: ");
-    Serial.println(static_cast<int>(VCRControlsInstance::instance().get_launch_controller().get_launch_state()));
+    // Serial.print("launch controller state: ");
+    // Serial.println(static_cast<int>(VCRControlsInstance::instance().get_launch_controller().get_launch_state()));
 
     // Serial.print("Start button pressed: ");
     // Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
@@ -163,8 +164,8 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.print("mc reset button pressed: ");
     // Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
     
-    Serial.print("torque mode cycle button pressed: ");
-    Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
+    // Serial.print("torque mode cycle button pressed: ");
+    // Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
 
     // Serial.println("IOExpander testing");
     // Serial.println("Shutdown Data");
@@ -197,15 +198,25 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
 
     /* Drivebrain data */
-    Serial.print("Latest Drivebrain data: ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
-    Serial.print(" ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FR);
-    Serial.print(" ");
-    Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
-    Serial.print(" ");
-    Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+    // Serial.print("Latest Drivebrain data: ");
+    // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+    // Serial.print(" ");
+    // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FR);
+    // Serial.print(" ");
+    // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
+    // Serial.print(" ");
+    // Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
     
+    /* Thermistor Data */
+    // Serial.print("Thermistor 0 Analog: ");
+    // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog);
+    // Serial.print(" Thermistor 0 degrees C: ");
+    // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C);
+    // Serial.print("Thermistor 1 Analog: ");
+    // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog);
+    // Serial.print(" Thermistor 1 degrees C: ");
+    // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C);
+
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -228,6 +239,8 @@ void setup() {
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
+        vcr_data.interface_data.thermistor_data.thermistor_0,
+        vcr_data.interface_data.thermistor_data.thermistor_1,
         EthernetIPDefsInstance::instance().drivebrain_ip,
         EthernetIPDefsInstance::instance().VCRData_port,
         &vcr_data_send_socket);
@@ -281,15 +294,16 @@ void setup() {
     init_adc_bundle();
 
     scheduler.schedule(adc_0_sample_task);
-    // scheduler.schedule(adc_1_sample_task);
+    scheduler.schedule(adc_1_sample_task);
     scheduler.schedule(kick_watchdog_task);
     scheduler.schedule(ams_system_task);
     scheduler.schedule(enqueue_suspension_CAN_task);
     scheduler.schedule(send_CAN_task);
     scheduler.schedule(vcr_data_ethernet_send);
     scheduler.schedule(enqueue_inverter_CAN_task);
+    scheduler.schedule(enqueue_coolant_temp_CAN_task);
     scheduler.schedule(async_main_task);
-    scheduler.schedule(debug_state_print_task);
+    // scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     
     scheduler.schedule(IOExpander_read_task);

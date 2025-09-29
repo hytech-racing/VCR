@@ -19,7 +19,6 @@
 #include "IOExpander.h"
 #include "IOExpanderUtils.h"
 
-
 HT_TASK::TaskResponse init_adc_bundle()
 {
 
@@ -105,8 +104,14 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
 
 HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-
     ADCSingletonInstance::instance().adc1.tick();
+
+    vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_0].conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_1].conversion;
+
+    // with a 8.2k resistor for R1 and the sensor as R2, the formula for actual temperature should follow 198 - 31 * ln(analog_value)
+    vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog)); // log() is ln
+    vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog)); // log() is ln
 
     return HT_TASK::TaskResponse::YIELD;
 }
@@ -148,6 +153,12 @@ HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros
     return HT_TASK::TaskResponse::YIELD;
 }
 
+HT_TASK::TaskResponse enqueue_coolant_temp_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    DrivebrainInterfaceInstance::instance().handle_enqueue_coolant_temp_CAN_data();
+    return HT_TASK::TaskResponse::YIELD;
+}
+
 HT_TASK::TaskResponse enqueue_dashboard_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     VCFInterfaceInstance::instance().enqueue_vehicle_state_message(VehicleStateMachineInstance::instance().get_state(), 
@@ -156,24 +167,8 @@ HT_TASK::TaskResponse enqueue_dashboard_CAN_data(const unsigned long& sysMicros,
     return HT_TASK::TaskResponse::YIELD;
 }
 
-
-HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(VCREthernetInterface::make_vcr_data_msg(vcr_data));
-    return HT_TASK::TaskResponse::YIELD;
-}
-
-HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &VCRCANInterfaceImpl::INVERTER_CAN);
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
-    return HT_TASK::TaskResponse::YIELD;
-}
-
-
 HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().fl_inverter_interface.send_INV_SETPOINT_COMMAND();
 
@@ -189,7 +184,18 @@ HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, 
     return HT_TASK::TaskResponse::YIELD;
 }
 
+HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &VCRCANInterfaceImpl::INVERTER_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
+    return HT_TASK::TaskResponse::YIELD;
+}
 
+HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(VCREthernetInterface::make_vcr_data_msg(vcr_data));
+    return HT_TASK::TaskResponse::YIELD;
+}
 
 
 HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)

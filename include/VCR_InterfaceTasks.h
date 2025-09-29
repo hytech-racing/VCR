@@ -57,6 +57,11 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
 HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 
 /**
+ * Handles sending of coolant temperature data
+*/
+HT_TASK::TaskResponse enqueue_coolant_temp_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
+
+/**
  * Enqueues all inverter CAN data. This will add all inverter data to the CAN queue, and then
  * the send_all_data task will empty the queue.
  */
