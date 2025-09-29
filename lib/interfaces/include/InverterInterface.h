@@ -1,94 +1,188 @@
+
+/******************************************************************************
+ * @file    InverterInterface.h
+ * @brief   Header for any receive/send to the inverters
+ ******************************************************************************/
 #ifndef INVERTERINTERFACE_H
 #define INVERTERINTERFACE_H
+
+/******************************************************************************
+ * Includes
+ ******************************************************************************/
 #include <stdint.h>
-
 #include "FlexCAN_T4.h"
-
 #include <hytech.h>
 #include "DrivetrainSystem.h"
 #include <CANInterface.h>
 #include <shared_types.h>
 
-struct InverterParams_s
-{   
-    float MINIMUM_HV_VOLTAGE; 
+/******************************************************************************
+ * Public Struct Definitions
+ ******************************************************************************/
+/**
+* @struct inverter_params_s
+* @brief contains all the static parameters for an inverter
+*/
+struct inverter_params_s {   
+    float minimum_hv_voltage; 
 };
 
 /**
- * Struct containing id info for this specific inverter interface
- */
-struct InverterCANIds_s
-{
+* @struct inverter_can_ids
+* @brief contains all the can ids relevant one inverter
+*/
+struct inverter_can_ids_s {
     uint32_t inv_control_word_id; 
     uint32_t inv_control_input_id; 
     uint32_t inv_control_parameter_id; 
-
     uint32_t inv_temps_id;
     uint32_t inv_status_id;
     uint32_t inv_dynamics_id;
 };
 
+/******************************************************************************
+ * Public Class Declarations
+ ******************************************************************************/
 /**
- * Inverter interface
+ * @class InverterInterface
+ * A single instance of this class encapsulates all the methods for sending/geting data from a single inverter
  */
-class InverterInterface
-{
+class InverterInterface {
 
     public: 
-        
+        /**
+         * Constructs an instance of the inverter interface
+         * @param inv_control_word_id the CAN ID for the inverter control word
+         * @param inv_control_input_id the CAN ID for the inverter control input
+         * @param inv_control_params_id the CAN ID for the inverter control parameters
+         * @param inverter_params the static parameters for the inverter
+         */
         InverterInterface(
             uint32_t inv_control_word_id,
             uint32_t inv_control_input_id,
             uint32_t inv_control_params_id,
-
-            InverterParams_s inverter_params) : _inverter_params(inverter_params)
-        { 
-            inverter_ids.inv_control_word_id = inv_control_word_id;
-            inverter_ids.inv_control_parameter_id = inv_control_params_id;
-            inverter_ids.inv_control_input_id = inv_control_input_id;
+            inverter_params_s inverter_params) : _inverter_params(inverter_params) { 
+            _inverter_ids.inv_control_word_id = inv_control_word_id;
+            _inverter_ids.inv_control_parameter_id = inv_control_params_id;
+            _inverter_ids.inv_control_input_id = inv_control_input_id;
         }
 
-        /* receiving callbacks */
-        void receive_INV_STATUS(const CAN_message_t &can_msg, unsigned long curr_millis);
+        /**
+         * Receives and processes a status CAN message from the inverter, invoked by the 
+         * CAN interface when a message with the correct ID is received
+         * @param can_msg the CAN message to process
+         * @param can_msg the CAN message to process
+         * @param curr_millis the current time in milliseconds
+         */
+        void receiveInvStatus(const CAN_message_t &can_msg, unsigned long curr_millis);
 
-        void receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned long curr_millis);
+        /**
+         * Receives and processes a temps CAN message from the inverter, invoked by the 
+         * CAN interface when a message with the correct ID is received
+         * @param can_msg the CAN message to process
+         * @param can_msg the CAN message to process
+         * @param curr_millis the current time in milliseconds
+         */
+        void receiveInvTemps(const CAN_message_t &can_msg, unsigned long curr_millis);
 
-        void receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsigned long curr_millis);
+        /**
+         * Receives and processes a dynamics CAN message from the inverter, invoked by the 
+         * CAN interface when a message with the correct ID is received
+         * @param can_msg the CAN message to process
+         * @param can_msg the CAN message to process
+         * @param curr_millis the current time in milliseconds
+         */
+        void recieveInvDynamics(const CAN_message_t &can_msg, unsigned long curr_millis);
 
-        void receive_INV_POWER(const CAN_message_t &can_msg, unsigned long curr_millis);
+        /**
+         * Receives and processes a power CAN message from the inverter, invoked by the 
+         * CAN interface when a message with the correct ID is received
+         * @param can_msg the CAN message to process
+         * @param can_msg the CAN message to process
+         * @param curr_millis the current time in milliseconds
+         */
+        void recieveInvPower(const CAN_message_t &can_msg, unsigned long curr_millis);
 
-        void receive_INV_FEEDBACK(const CAN_message_t &can_msg, unsigned long curr_millis);
+        /**
+         * Receives and processes a feedback CAN message from the inverter, invoked by the CAN interface when a message with the correct ID is received
+         * @param can_msg the CAN message to process
+         * @param curr_millis the current time in milliseconds
+         */
+        void receiveInvFeedback(const CAN_message_t &can_msg, unsigned long curr_millis);
 
-        /* Sending */
-        void send_INV_SETPOINT_COMMAND();
+        /**
+         * Sends the current inverter control inputs to the inverter over CAN
+         */
+        void sendInvSetpointCommand();
 
-        void send_INV_CONTROL_WORD();
+        /**
+         * Sends the current inverter control word to the inverter over CAN
+         */
+        void sendInvControlWord();
 
-        void send_INV_CONTROL_PARAMS(); 
+        /**
+         * Sends the current inverter control parameters to the inverter over CAN
+         */
+        void sendInvControlParams(); 
 
-        /* Inverter Functs */
-        void set_speed(float desired_rpm, float torque_limit_nm); 
+        /**
+         * Sets the desired speed and torque limit for the inverter, populating the struct that is sent
+         * by the sendInvSetpointCommand method
+         * @param desired_rpm the desired speed in RPM
+         * @param torque_limit_nm the torque limit in Nm
+         */
+        void setSpeed(float desired_rpm, float torque_limit_nm); 
 
-        void set_idle();
+        /**
+         * Sets the inverter to idle mode, which disables the inverter but keeps it ready to be re-enabled
+         * without a full power cycle
+         */
+        void setIdle();
 
-        void set_inverter_control_word(InverterControlWord_s control_word);
+        /**
+         * Sets the inverter control word, populating the struct that is sent by the sendInvControlWord method
+         * @param control_word the control word to set
+         */
+        void setInverterControlWord(InverterControlWord_s control_word);
 
-        /* Getters */
-        InverterStatus_s get_status(); 
-        InverterTemps_s get_temps();
-        InverterPower_s get_power();
-        MotorMechanics_s get_motor_mechanics();
-        InverterControlFeedback_s get_control_params();
+        /**
+         * Returns the current inverter status
+         * @return the current inverter status
+         */
+        InverterStatus_s getStatus(); 
+
+        /**
+         * Fetches the latest inverter temps
+         * @return the latest inverter temps
+         */
+        InverterTemps_s getTemps();
+
+        /**
+         * Fetches the latest inverter power data
+         * @return the latest inverter power data
+         */
+        InverterPower_s getPower();
+
+        /**
+         * Fetches the latest motor mechanics data
+         * @return the latest motor mechanics data
+         */
+        MotorMechanics_s getMotorMechanics();
+
+        /**
+         * Fetches the latest inverter control params
+         * @return the latest control params
+         */
+        InverterControlFeedback_s getControlParams();
 
     private: 
 
-        InverterCANIds_s inverter_ids;
+        inverter_can_ids_s _inverter_ids;
         InverterControlInput_s _inverter_control_inputs;
         InverterControlWord_s _inverter_control_word;
         InverterControlParams_s _inverter_control_params;
         InverterFeedbackData_s _feedback_data;
-        InverterParams_s _inverter_params;
+        inverter_params_s _inverter_params;
 };
-
 
 #endif // __INVERTERINTERFACE_H__

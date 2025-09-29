@@ -3,13 +3,9 @@
 
 #include "IPAddress.h"
 #include "etl/singleton.h"
-
 #include "SharedFirmwareTypes.h"
-
 #include "FlexCAN_T4.h"
-
 #include "hytech_msgs.pb.h"
-
 #include "ProtobufMsgInterface.h"
 #include <QNEthernet.h>
 
