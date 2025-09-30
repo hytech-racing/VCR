@@ -8,7 +8,7 @@
 
 auto runTick(DrivebrainController *controller, float last_speed_recv_millis,
              float last_torque_receive_time_millis, ControllerMode_e current_control_mode,
-             unsigned long curr_millis, float brakePercent, float accelPercent) {
+             unsigned long curr_millis, float brakePercent, float accelPercent, bool reset_button_pressed = false) {
     StampedDrivetrainCommand_s data;
     data.desired_speeds.last_recv_millis = last_speed_recv_millis;
     data.desired_speeds.recvd = true;
@@ -24,6 +24,7 @@ auto runTick(DrivebrainController *controller, float last_speed_recv_millis,
     pedals_data.accel_percent = accelPercent;
 
     VCRData_s state;
+    state.interface_data.dash_input_state.data_btn_is_pressed = reset_button_pressed;
     state.interface_data.latest_drivebrain_command = data;
     state.interface_data.recvd_pedals_data.pedals_data = pedals_data;
 
@@ -65,6 +66,8 @@ TEST(DrivebrainControllerTesting, failing_stay_failing) {
 }
 
 TEST(DrivebrainControllerTesting, failing_in_control) {
+    
+    TorqueControllerSimpleParams_s params_def; // has default vals for members of the struct
     DrivebrainController controller(10);
     auto torque_controller_output_s =
         runTick(&controller, 200, 1011, ControllerMode_e::MODE_4, 1032, 0.01f, 0.0f);
@@ -84,7 +87,6 @@ TEST(DrivebrainControllerTesting, failing_in_control) {
 
     EXPECT_TRUE(controller.get_timing_failure_status());
 
-    TorqueControllerSimpleParams_s params_def; // has default vals for members of the struct
     EXPECT_FLOAT_EQ(torque_controller_output_s.torque_limits.FL, 0.0f);
 }
 
@@ -96,9 +98,7 @@ TEST(DrivebrainControllerTesting, failing_reset_success) {
 
     EXPECT_TRUE(controller.get_timing_failure_status());
     torque_controller_output_s =
-        runTick(&controller, 1020, 1021, ControllerMode_e::MODE_3, 1023, 0.01f, 0);
-    torque_controller_output_s =
-        runTick(&controller, 1022, 1022, ControllerMode_e::MODE_4, 1024, 0.01f, 0);
+        runTick(&controller, 1020, 1021, ControllerMode_e::MODE_4, 1023, 0.01f, 0, true);
     EXPECT_FALSE(controller.get_timing_failure_status());
     EXPECT_FLOAT_EQ(torque_controller_output_s.desired_speeds.FL, 1);
 }

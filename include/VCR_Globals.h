@@ -35,5 +35,9 @@ struct ADCBundle_s
     MCP_ADC <channels_within_mcp_adc> adc0;
     MCP_ADC <channels_within_mcp_adc> adc1;
 };
+
+
+
 using ADCSingletonInstance = etl::singleton<ADCBundle_s>; // Singleton for ADCs. Used to pass ADCs to other systems that need them, such as the TelemetrySystem.
+
 #endif /* VCR_GLOBALS */

@@ -1,5 +1,7 @@
 #include "VCFInterface.h"
+#include "SystemTimeInterface.h"
 #include "hytech.h"
+#include "VCRCANInterfaceImpl.h"
 
 void VCFInterface::receive_pedals_message(const CAN_message_t &msg, unsigned long curr_millis) {
     PEDALS_SYSTEM_DATA_t pedals_msg;
@@ -23,11 +25,96 @@ void VCFInterface::receive_pedals_message(const CAN_message_t &msg, unsigned lon
         HYTECH_brake_pedal_ro_fromS(static_cast<float>(pedals_msg.brake_pedal_ro));
     _curr_data.stamped_pedals.last_recv_millis = curr_millis;
 
-    // TODO need to ensure that the pedals data timestamp is within a tollerance
-    // within the state machine
+    // As long as we're using millis() function, loop overrun not a concern
+    
+    if(_curr_data.stamped_pedals.last_recv_millis == 0)
+    {
+        _first_received_message_heartbeat_init = true;
+    }
+    
+    _curr_data.stamped_pedals.last_recv_millis = curr_millis;
+}
+
+void VCFInterface::receive_dashboard_message(const CAN_message_t &msg, unsigned long curr_millis)
+{
+    DASH_INPUT_t dash_msg;
+    Unpack_DASH_INPUT_hytech(&dash_msg, &msg.buf[0], msg.len);
+    _curr_data.dash_input_state.dim_btn_is_pressed = dash_msg.led_dimmer_button;
+    _curr_data.dash_input_state.preset_btn_is_pressed = dash_msg.preset_button; // pedal recalibration button
+    _curr_data.dash_input_state.mc_reset_btn_is_pressed = dash_msg.motor_controller_cycle_button;
+    _curr_data.dash_input_state.start_btn_is_pressed = dash_msg.start_button;
+    _curr_data.dash_input_state.data_btn_is_pressed = dash_msg.data_button_is_pressed;
+    _curr_data.dash_input_state.left_paddle_is_pressed = dash_msg.left_shifter_button;
+    _curr_data.dash_input_state.right_paddle_is_pressed = dash_msg.right_shifter_button;
+    _curr_data.dash_input_state.mode_btn_is_pressed = dash_msg.mode_button; // change torque limit
+    _curr_data.dash_input_state.dial_state = static_cast<ControllerMode_e>(dash_msg.dash_dial_mode);
+    
+}
+
+void VCFInterface::receive_front_suspension_message(const CAN_message_t &msg, unsigned long curr_millis)
+{
+    FRONT_SUSPENSION_t front_suspension_msg;
+    Unpack_FRONT_SUSPENSION_hytech(&front_suspension_msg, &msg.buf[0], msg.len);
+    _curr_data.front_loadcell_data.FL_loadcell_analog = front_suspension_msg.fl_load_cell;
+    _curr_data.front_suspot_data.FL_sus_pot_analog = front_suspension_msg.fl_shock_pot;
+    _curr_data.front_loadcell_data.FR_loadcell_analog = front_suspension_msg.fr_load_cell;
+    _curr_data.front_suspot_data.FR_sus_pot_analog = front_suspension_msg.fr_shock_pot;
+    
+    _curr_data.front_loadcell_data.valid_FL_sample = true; // only sent over CAN if valid from VCF
+    _curr_data.front_loadcell_data.valid_FR_sample = true; // or send validities over CAN
+}
+
+void VCFInterface::reset_pedals_heartbeat()
+{
+    _curr_data.stamped_pedals.heartbeat_ok = true;
 }
 
 VCFCANInterfaceData_s VCFInterface::get_latest_data() {
-    VCFCANInterfaceData_s for_testing;
-    return for_testing;
+
+    // only in the situation where the hearbeat has yet to be established or the heartbeat is ok do we re-evaluate the heartbeat.
+    // if hearbeat is is not ok, the only thing that should be able to reset it is the state machine via the reset_pedals_heartbeat function
+    if(_first_received_message_heartbeat_init || _curr_data.stamped_pedals.heartbeat_ok)
+    {
+        _first_received_message_heartbeat_init = false;
+        _curr_data.stamped_pedals.heartbeat_ok = ((sys_time::hal_millis() - _curr_data.stamped_pedals.last_recv_millis) < _max_heartbeat_interval_ms);
+    } else {
+        _curr_data.stamped_pedals.heartbeat_ok = false;
+    }
+    return _curr_data;
+}
+
+void VCFInterface::send_buzzer_start_message()
+{
+    DASHBOARD_BUZZER_CONTROL_t ctrl = {};
+    ctrl.dash_buzzer_flag = true;
+    ctrl.in_pedal_calibration_state = false;
+    ctrl.torque_limit_enum_value = 0xFF; // MAX_VALUE indicates "ignore this value" //NOLINT
+    CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
+void VCFInterface::send_recalibrate_pedals_message()
+{
+    DASHBOARD_BUZZER_CONTROL_t ctrl = {};
+    ctrl.dash_buzzer_flag = false;
+    ctrl.in_pedal_calibration_state = true;
+    ctrl.torque_limit_enum_value = 0xFF; // MAX_VALUE indicates "ignore this value" //NOLINT
+    CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
+void VCFInterface::enqueue_torque_mode_LED_message(TorqueLimit_e torque_limit)
+{
+    DASHBOARD_BUZZER_CONTROL_t ctrl = {};
+    ctrl.dash_buzzer_flag = false;
+    ctrl.in_pedal_calibration_state = false;
+    ctrl.torque_limit_enum_value = (uint8_t) torque_limit;
+    CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
+void VCFInterface::enqueue_vehicle_state_message(VehicleState_e vehicle_state, DrivetrainState_e drivetrain_state, bool db_is_in_ctrl)
+{
+    CAR_STATES_t state = {};
+    state.vehicle_state = static_cast<uint8_t>(vehicle_state);
+    state.drivetrain_state = static_cast<uint8_t>(drivetrain_state);
+    state.drivebrain_in_control = db_is_in_ctrl;
+    CAN_util::enqueue_msg(&state, &Pack_CAR_STATES_hytech, VCRCANInterfaceImpl::telem_can_rx_buffer);
 }

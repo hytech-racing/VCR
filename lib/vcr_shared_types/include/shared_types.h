@@ -1,5 +1,5 @@
-#ifndef __SHARED_TYPES_H__
-#define __SHARED_TYPES_H__
+#ifndef SHARED_TYPES_H
+#define SHARED_TYPES_H
 #include <stdint.h>
 namespace HTUnits
 {
@@ -26,8 +26,8 @@ struct InverterControlWord_s
 struct InverterControlInput_s 
 {
     int16_t speed_rpm_setpoint;
-    int16_t positive_torque_limit; 
-    int16_t negative_torque_limit;
+    float positive_torque_limit; 
+    float negative_torque_limit;
 };
 
 struct InverterControlParams_s
@@ -103,5 +103,5 @@ struct InverterFeedbackData_s
     InverterControlFeedback_s control_feedback;
 };
 
-#endif // __SHARED_TYPES_H__
+#endif // SHARED_TYPES_H
 

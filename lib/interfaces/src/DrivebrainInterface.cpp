@@ -12,14 +12,17 @@
 
 DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cell_data,
                                          const RearSusPotData_s &rear_suspot_data,
+                                         const ThermistorData_s &coolant_temperature_data_0,
+                                         const ThermistorData_s &coolant_temperature_data_1,
                                          IPAddress drivebrain_ip, uint16_t vcr_data_port,
                                          qindesign::network::EthernetUDP *udp_socket)
     : _suspension_data{.rear_load_cell_data = rear_load_cell_data,
-                       .rear_suspot_data = rear_suspot_data} {
-    _drivebrain_ip = drivebrain_ip;
-    _vcr_data_port = vcr_data_port;
-    _udp_socket = udp_socket;
-}
+                       .rear_suspot_data = rear_suspot_data},
+      _thermistor_data{.coolant_temperature_0_data = coolant_temperature_data_0,
+                       .coolant_temperature_1_data = coolant_temperature_data_1},
+      _drivebrain_ip(drivebrain_ip),
+      _vcr_data_port(vcr_data_port),
+      _udp_socket(udp_socket) { };
 
 StampedDrivetrainCommand_s DrivebrainInterface::get_latest_data() {
     return _latest_drivebrain_command;
@@ -50,7 +53,7 @@ void DrivebrainInterface::receive_drivebrain_torque_lim_command(const CAN_messag
     _latest_drivebrain_command.torque_limits.recvd = true;
     _latest_drivebrain_command.torque_limits.last_recv_millis = curr_millis;
 
-    _latest_drivebrain_command.desired_speeds.veh_vec_data = {
+    _latest_drivebrain_command.torque_limits.veh_vec_data = {
         static_cast<float>(
             HYTECH_drivebrain_torque_fl_ro_fromS(drivebrain_msg.drivebrain_torque_fl_ro)),
         static_cast<float>(
@@ -72,7 +75,15 @@ void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
                           VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
+void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
+    REAR_THERMISTORS_DATA_t thermistor_msg;
+    thermistor_msg.thermistor_0_deg_C_ro = HYTECH_thermistor_0_deg_C_ro_toS(_thermistor_data.coolant_temperature_0_data.thermistor_degrees_C);
+    thermistor_msg.thermistor_1_deg_C_ro = HYTECH_thermistor_1_deg_C_ro_toS(_thermistor_data.coolant_temperature_1_data.thermistor_degrees_C);
+
+    CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {
-    handle_ethernet_socket_send_pb<(size_t)1024>(_drivebrain_ip, _vcr_data_port, _udp_socket, data,
+    handle_ethernet_socket_send_pb<hytech_msgs_VCRData_s_size>(_drivebrain_ip, _vcr_data_port, _udp_socket, data,
                                    hytech_msgs_VCRData_s_fields);
 }

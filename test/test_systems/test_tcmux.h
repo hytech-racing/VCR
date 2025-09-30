@@ -17,10 +17,16 @@ template <typename quad_array_type> void set_four_outputs(quad_array_type &out, 
     out.RR = val;
 }
 
-template <typename cmd_type> void set_outputs(cmd_type &cmd, float mps, float torque) {
-    set_four_outputs(cmd.desired_speeds, METERS_PER_SECOND_TO_RPM * mps);
+template <typename cmd_type> void set_outputs_rpm(cmd_type &cmd, float rpm, float torque) {
+    set_four_outputs(cmd.desired_speeds, rpm);
     set_four_outputs(cmd.torque_limits, torque);
 }
+
+template <typename cmd_type> void set_outputs(cmd_type &cmd, float mps, float torque) {
+    set_outputs_rpm(cmd, METERS_PER_SECOND_TO_RPM*mps, torque);
+}
+
+
 
 TEST(TorqueControllerMuxTesting, test_construction) {
     auto test_func = [](const VCRData_s &state, unsigned long m) -> DrivetrainCommand_s {
@@ -220,44 +226,66 @@ TEST(TorqueControllerMuxTesting, test_mode0_evaluation) {
     // TorqueLimit_e::TCMUX_FULL_TORQUE, mode_1_input_state);
 }
 
-// TEST(TorqueControllerMuxTesting, test_power_limit)
-// {
-//     TestControllerType inst1;
-//     set_output_rpm(inst1, 20000, 10.0);
-//     TorqueControllerMux<1> test({static_cast<Controller *>(&inst1)}, {false});
+TEST(TorqueControllerMuxTesting, test_power_limit)
+{
+    // mode 0
+    TorqueControllerSimpleParams_s standard_params;
+    float max_torque = standard_params.amk_max_torque;
+    TorqueControllerSimple tc_simple(standard_params);
 
-//     DrivetrainDynamicReport_s drivetrain_data = {};
-//     for (int i = 0; i < 4; i++)
-//     {
-//         drivetrain_data.measuredSpeeds[i] = 500.0f;
-//     }
-//     VCRData_s mode_0_input_state({}, {}, drivetrain_data, {}, {.accelPercent = 0.5f,
-//     .brakePercent = 0.0f, .regenPercent = 0.0}, {}, {} , {});
+    DrivetrainDynamicReport_s drivetrain_data = {};
+    set_four_outputs(drivetrain_data.measuredSpeeds, 1000.0f);
 
-//     DrivetrainCommand_s res = test.getDrivetrainCommand(ControllerMode_e::MODE_0,
-//     TorqueLimit_e::TCMUX_FULL_TORQUE, mode_0_input_state);
+    VCRData_s mode_0_input_state;
+    mode_0_input_state.system_data.drivetrain_data = drivetrain_data;
+    mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.accel_percent = 0.5f;
+    mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.brake_percent = 0.0f;
 
-//     for (int i = 0; i < 4; i++)
-//     {
-//         ASSERT_EQ(res.inverter_torque_limit[i], 10.0f);
-//     }
-//     for (int i = 0; i < 4; i++)
-//     {
-//         drivetrain_data.measuredSpeeds[i] = 20000.0f;
-//     }
-//     set_output_rpm(inst1, 20000, 21.0);
+    float new_power_lim = 20000.0f;
+    TorqueControllerMux<1> torque_controller_mux(
+    {std::bind(&TorqueControllerSimple::evaluate, std::ref(tc_simple), std::placeholders::_1,
+                std::placeholders::_2)},
+    {false}, 
+    TC_MUX_DEFAULT_PARAMS::MAX_SPEED_FOR_MODE_CHANGE,
+    TC_MUX_DEFAULT_PARAMS::MAX_TORQUE_DELTA_FOR_MODE_CHANGE,
+    new_power_lim);
+    
+    DrivetrainCommand_s out = torque_controller_mux.get_drivetrain_command(
+        ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, mode_0_input_state);
+    ASSERT_NEAR(out.torque_limits.FL, (max_torque / 2), 0.01);
+    ASSERT_NEAR(out.torque_limits.FR, (max_torque / 2), 0.01);
+    ASSERT_NEAR(out.torque_limits.FR, (max_torque / 2), 0.01);
+    ASSERT_NEAR(out.torque_limits.FR, (max_torque / 2), 0.01);
 
-//     VCRData_s mode_0_input_state_high_power({}, {}, drivetrain_data, {}, {.accelPercent = 1.0f,
-//     .brakePercent = 0.0f, .regenPercent = 0.0}, {}, {}, {}); res =
-//     test.getDrivetrainCommand(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE,
-//     mode_0_input_state_high_power);
 
-//     for (int i = 0; i < 4; i++)
-//     {
-//         ASSERT_LT(res.inverter_torque_limit[i], 7.6); // hardcoded value based on online
-//         calculator
-//     }
-// }
+    float rpm_set = 20000.0f;
+    set_four_outputs(drivetrain_data.measuredSpeeds, rpm_set);
+    mode_0_input_state.system_data.drivetrain_data=drivetrain_data;
+    out = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, mode_0_input_state);
+    
+    ASSERT_NEAR(
+        ((out.torque_limits.FL*(rpm_set * RPM_TO_RAD_PER_SECOND))+
+            (out.torque_limits.FR*(rpm_set * RPM_TO_RAD_PER_SECOND))+
+            (out.torque_limits.RL*(rpm_set * RPM_TO_RAD_PER_SECOND))+
+            (out.torque_limits.RR*(rpm_set * RPM_TO_RAD_PER_SECOND))),
+        new_power_lim, 0.1);
+    mode_0_input_state.interface_data.recvd_pedals_data.pedals_data.accel_percent = 0.6f;
+    set_four_outputs(drivetrain_data.measuredSpeeds, rpm_set);
+    mode_0_input_state.system_data.drivetrain_data=drivetrain_data;
+    (void)torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, mode_0_input_state);
+    (void)torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, mode_0_input_state);
+    (void)torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, mode_0_input_state);
+    (void)torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, mode_0_input_state);
+    out = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, mode_0_input_state);
+    ASSERT_NEAR(
+        ((out.torque_limits.FL*(rpm_set * RPM_TO_RAD_PER_SECOND))+
+            (out.torque_limits.FR*(rpm_set * RPM_TO_RAD_PER_SECOND))+
+            (out.torque_limits.RL*(rpm_set * RPM_TO_RAD_PER_SECOND))+
+            (out.torque_limits.RR*(rpm_set * RPM_TO_RAD_PER_SECOND))),
+        new_power_lim, 0.1);
+
+
+}
 
 TEST(TorqueControllerMuxTesting, test_torque_limit) {
 
@@ -364,7 +392,8 @@ TEST(TorqueControllerMuxTesting, test_drivebrain_and_simple_controller_integrati
     EXPECT_TRUE(db_controller.get_timing_failure_status());
 
 
-    res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_0, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
+    state.interface_data.dash_input_state.data_btn_is_pressed = true;
+    res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
     data.torque_limits.last_recv_millis = 3000;
     state.interface_data.latest_drivebrain_command = data;
     res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
