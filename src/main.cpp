@@ -298,6 +298,7 @@ void setup() {
     scheduler.schedule(kick_watchdog_task);
     scheduler.schedule(ams_system_task);
     scheduler.schedule(enqueue_suspension_CAN_task);
+    scheduler.schedule(enqueue_dashboard_CAN_task);
     scheduler.schedule(send_CAN_task);
     scheduler.schedule(vcr_data_ethernet_send);
     scheduler.schedule(enqueue_inverter_CAN_task);
