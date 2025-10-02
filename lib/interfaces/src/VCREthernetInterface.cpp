@@ -144,9 +144,9 @@ void VCREthernetInterface::receive_pb_msg_acu(const hytech_msgs_ACUAllData &msg_
         shared_state.interface_data.stamped_acu_core_data.acu_data.max_cell_voltage = msg_in.core_data.max_cell_voltage;
         shared_state.interface_data.stamped_acu_core_data.acu_data.max_cell_temp = msg_in.core_data.max_cell_temp;
         shared_state.interface_data.stamped_acu_core_data.acu_data.max_board_temp = msg_in.core_data.max_board_temp;
-        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_pack_out_voltage = msg_in.core_data.pack_voltage;
-        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_ts_out_voltage = msg_in.core_data.max_measured_tractive_system_voltage; // should we use max or min?
-        shared_state.interface_data.stamped_acu_core_data.acu_data.measured_glv = msg_in.core_data.max_measured_glv; // should we use max or min?
+        shared_state.interface_data.stamped_acu_core_data.acu_data.max_measured_pack_out_voltage = msg_in.core_data.pack_voltage;
+        shared_state.interface_data.stamped_acu_core_data.acu_data.max_measured_ts_out_voltage = msg_in.core_data.max_measured_tractive_system_voltage; // should we use max or min?
+        shared_state.interface_data.stamped_acu_core_data.acu_data.max_measured_glv = msg_in.core_data.max_measured_glv; // should we use max or min?
         
         shared_state.interface_data.stamped_acu_core_data.last_recv_millis = curr_millis;
         shared_state.system_data.acu_heartbeat_data.last_heartbeat_time = curr_millis;
