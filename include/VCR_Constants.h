@@ -72,6 +72,10 @@ const float THERMISTOR_6_OFFSET = 0;
 const float THERMISTOR_7_SCALE = 1;
 const float THERMISTOR_7_OFFSET = 0; 
 
+// Coolant Temperature Sensor scale / offsets
+const float COOLANT_TEMP_SCALE = -31;
+const float COOLANT_TEMP_OFFSET = 242;
+
 /* Watchdog constants */
 constexpr int INVERTER_ENABLE_PIN = 2;
 constexpr int WATCHDOG_PIN = 36;
@@ -105,6 +109,8 @@ constexpr unsigned long ethernet_update_period = 100000;             // 100 000 
 constexpr unsigned long ethernet_send_priority = 6;
 constexpr unsigned long inv_send_period = 5000;                      // 5 000 us = 200 Hz
 constexpr unsigned long inverter_send_priority = 5;
+constexpr unsigned long coolant_temp_send_period_us = 100000;        // 100 000 us = 10 Hz
+constexpr unsigned long coolant_temp_send_priority = 9;
 constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
 constexpr unsigned long ioexpander_priority = 100;
 constexpr unsigned long dashboard_send_period_us = 200000;         // 200 000 us = 5 Hz

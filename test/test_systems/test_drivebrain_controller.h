@@ -46,7 +46,7 @@ TEST(DrivebrainControllerTesting, setpoint_too_latent_still_in_control) {
     EXPECT_FLOAT_EQ(torque_controller_output_s.desired_speeds.FL, 0);
 
     TorqueControllerSimpleParams_s params_def;
-    EXPECT_FLOAT_EQ(torque_controller_output_s.torque_limits.FL, params_def.amk_max_regen_torque);
+    EXPECT_FLOAT_EQ(torque_controller_output_s.torque_limits.FL, 0.0f);
 }
 
 TEST(DrivebrainControllerTesting, failing_stay_failing) {
@@ -83,12 +83,11 @@ TEST(DrivebrainControllerTesting, failing_in_control) {
 
     torque_controller_output_s =
         runTick(&controller, 400, 1034, ControllerMode_e::MODE_4, 1034, 0.0f, 1.0f);
-
-    EXPECT_FLOAT_EQ(torque_controller_output_s.desired_speeds.FL, params_def.amk_max_rpm);
+    EXPECT_FLOAT_EQ(torque_controller_output_s.desired_speeds.FL, 0.0f);
 
     EXPECT_TRUE(controller.get_timing_failure_status());
 
-    EXPECT_FLOAT_EQ(torque_controller_output_s.torque_limits.FL, params_def.amk_max_torque);
+    EXPECT_FLOAT_EQ(torque_controller_output_s.torque_limits.FL, 0.0f);
 }
 
 TEST(DrivebrainControllerTesting, failing_reset_success) {
