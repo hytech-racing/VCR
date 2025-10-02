@@ -36,6 +36,16 @@ namespace VCREthernetInterface
     void receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis);
 
     /**
+     * Function to take a populated protoc struct from ACU and update the VCR state.
+     * 
+     * @param msg_in A reference to a populated protoc struct.
+     * @param shared_state A reference to the VCR state.
+     * 
+     * @post After this function completes, shared_state will have updated contents of ACUAllData.
+     */
+    void receive_pb_msg_acu(const hytech_msgs_ACUAllData &msg_in, VCRData_s &shared_state, unsigned long curr_millis);
+
+    /**
      * Helper function to copy an instance of InverterData_s to the protoc struct hytech_msgs_InverterData_s.
      * @param original A populated instance of the InverterData_s defined in shared firmware types.
      * @param destination The destination protoc struct.
