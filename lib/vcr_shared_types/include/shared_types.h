@@ -103,5 +103,25 @@ struct InverterFeedbackData_s
     InverterControlFeedback_s control_feedback;
 };
 
+struct TTPMSSensorData_s {
+    uint16_t serial_number;
+    uint16_t battery_voltage; 
+    uint16_t pressure;
+    uint16_t gauge_pressure;
+
+    uint16_t infrared_temp[16];
+    uint16_t transmission_count;
+    uint16_t rssi;
+    uint16_t sensor_temperature;
+    uint16_t sensor_node_id;
+};
+
+// struct TTPMSSensors_s {
+//     TTPMSSensorData_s fl_sensor;
+//     TTPMSSensorData_s fr_sensor;
+//     TTPMSSensorData_s rl_sensor;
+//     TTPMSSensorData_s rr_sensor;
+// };
+
 #endif // SHARED_TYPES_H
 

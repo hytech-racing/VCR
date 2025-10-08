@@ -23,6 +23,7 @@
 #include "ACUInterface.h"
 
 #include "InverterInterface.h"
+#include "TTPMSSensorInterface.h"
 
 using CANRXBufferType = Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)>;
 using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_message_t)>;
@@ -41,7 +42,11 @@ struct CANInterfaces {
         InverterInterface &fl_inv_int,
         InverterInterface &fr_inv_int,
         InverterInterface &rl_inv_int,
-        InverterInterface &rr_inv_int
+        InverterInterface &rr_inv_int,
+        TTPMSSensorInterface &fl_ttpms_int,
+        TTPMSSensorInterface &fr_ttpms_int,
+        TTPMSSensorInterface &rl_ttpms_int,
+        TTPMSSensorInterface &rr_ttpms_int
     )
         : vcf_interface(vcf_int), 
           acu_interface(acu_int),
@@ -49,7 +54,11 @@ struct CANInterfaces {
           fl_inverter_interface(fl_inv_int),
           fr_inverter_interface(fr_inv_int),
           rl_inverter_interface(rl_inv_int),
-          rr_inverter_interface(rr_inv_int) {}
+          rr_inverter_interface(rr_inv_int),
+          fl_ttpms_interface(fl_ttpms_int),
+          fr_ttpms_interface(fr_ttpms_int),
+          rl_ttpms_interface(rl_ttpms_int),
+          rr_ttpms_interface(rr_ttpms_int) {}
 
     VCFInterface &vcf_interface;
     ACUInterface &acu_interface;
@@ -59,6 +68,10 @@ struct CANInterfaces {
     InverterInterface &rl_inverter_interface;
     InverterInterface &rr_inverter_interface;
 
+    TTPMSSensorInterface &fl_ttpms_interface;
+    TTPMSSensorInterface &fr_ttpms_interface;
+    TTPMSSensorInterface &rl_ttpms_interface;
+    TTPMSSensorInterface &rr_ttpms_interface;
 };
 
 using CANInterfacesInstance = etl::singleton<CANInterfaces>;
