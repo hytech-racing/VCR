@@ -40,6 +40,119 @@ struct inverter_can_ids_s {
     uint32_t inverter_dynamics_id;
 };
 
+/**
+ * @struct inverter_control_word_s
+ * @brief contains the control word to be sent to the inverter
+ */
+struct inverter_control_word_s {
+    bool inverter_enable : 1;
+    bool hv_enable : 1;
+    bool driver_enable : 1;
+    bool remove_error : 1;
+};
+
+/**
+ * @struct inverter_control_input_s
+ * @brief contains the control input to be sent to the inverter
+ */
+struct inverter_control_input_s {
+    int16_t speed_rpm_setpoint;
+    float positive_torque_limit; 
+    float negative_torque_limit;
+};
+
+
+/**
+ * @struct inverter_control_params_ms
+ * @brief contains the inverter control params
+ */
+struct inverter_control_params_s { 
+    uint16_t speed_control_kp; 
+    uint16_t speed_control_ki;
+    uint16_t speed_control_kd;
+};
+
+/**
+ * @struct inverter_status_s
+ * @brief contains the inverter status data
+ */
+struct inverter_status_s {
+    bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
+    bool hv_present : 1;
+    bool connected : 1;
+    bool system_ready : 1;
+    bool error : 1;
+    bool warning : 1;
+    bool quit_dc_on : 1;
+    bool dc_on : 1;
+    bool quit_inverter_on : 1;
+    bool inverter_on : 1;
+    bool derating_on : 1;
+    float dc_bus_voltage;
+    uint16_t diagnostic_number;
+};
+
+/**
+ * @struct inverter_temps_s
+ * @brief contains the inverter temps data
+ */
+struct inverter_temps_s {
+    bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
+    float motor_temp_celcius;
+    float inverter_temp_celcius;
+    float igbt_temp_celcius;
+};
+
+/**
+ * @struct inverter_power_s
+ * @brief contains the inverter power data
+ */
+struct inverter_power_s {
+    bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
+    float active_power_watts;
+    float reactive_power_watts; // TODO check units
+};
+
+/**
+ * @struct inverter_motor_mechanics_s
+ * @brief contains the motor mechanics data
+ */
+struct inverter_motor_mechanics_s {
+    bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
+    float actual_power_watts;
+    float actual_torque_nm;
+    float actual_speed_rpm;
+};
+
+/**
+ * @struct inverter_control_feedback_s
+ * @brief contains the inverter control feedback data
+ */
+struct inverter_control_feedback_s {
+    bool new_data : 1;
+    unsigned long last_recv_millis = 0; 
+    uint16_t speed_control_kp;
+    uint16_t speed_control_ki;
+    uint16_t speed_control_kd;
+};
+
+/**
+ * @struct inverter_feedback_data_s
+ * @brief contains all the feedback data from the inverter (in the form of nested structs)
+ */
+struct inverter_feedback_data_s {
+    inverter_status_s status;
+    inverter_temps_s temps;
+    inverter_power_s power;
+    inverter_motor_mechanics_s motor_mechanics;
+    inverter_control_feedback_s control_feedback;
+};
+
+
 /******************************************************************************
  * Public Class Declarations
  ******************************************************************************/
@@ -101,7 +214,7 @@ class InverterInterface {
          * @param can_msg the CAN message to process
          * @param curr_millis the current time in milliseconds
          */
-        void recieveInverterPower(const CAN_message_t &can_msg, unsigned long curr_millis);
+        void receiveInverterPower(const CAN_message_t &can_msg, unsigned long curr_millis);
 
         /**
          * Receives and processes a feedback CAN message from the inverter, invoked by the CAN interface when a message with the correct ID is received
@@ -143,45 +256,45 @@ class InverterInterface {
          * Sets the inverter control word, populating the struct that is sent by the sendInverterControlWord method
          * @param control_word the control word to set
          */
-        void setInverterControlWord(InverterControlWord_s control_word);
+        void setInverterControlWord(inverter_control_word_s control_word);
 
         /**
          * Returns the current inverter status
          * @return the current inverter status
          */
-        InverterStatus_s getStatus(); 
+        inverter_status_s getStatus(); 
 
         /**
          * Fetches the latest inverter temps
          * @return the latest inverter temps
          */
-        InverterTemps_s getTemps();
+        inverter_temps_s getTemps();
 
         /**
          * Fetches the latest inverter power data
          * @return the latest inverter power data
          */
-        InverterPower_s getPower();
+        inverter_power_s getPower();
 
         /**
          * Fetches the latest motor mechanics data
          * @return the latest motor mechanics data
          */
-        MotorMechanics_s getMotorMechanics();
+        inverter_motor_mechanics_s getMotorMechanics();
 
         /**
          * Fetches the latest inverter control params
          * @return the latest control params
          */
-        InverterControlFeedback_s getControlParams();
+        inverter_control_feedback_s getControlFeedback();
 
     private: 
 
         inverter_can_ids_s _inverter_ids;
-        InverterControlInput_s _inverter_control_inputs;
-        InverterControlWord_s _inverter_control_word;
-        InverterControlParams_s _inverter_control_params;
-        InverterFeedbackData_s _feedback_data;
+        inverter_control_input_s _inverter_control_inputs;
+        inverter_control_word_s _inverter_control_word;
+        inverter_control_params_s _inverter_control_params;
+        inverter_feedback_data_s _feedback_data;
         inverter_params_s _inverter_params;
 };
 
