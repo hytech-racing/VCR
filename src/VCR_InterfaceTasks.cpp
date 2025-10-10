@@ -197,6 +197,12 @@ HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicr
     return HT_TASK::TaskResponse::YIELD;
 }
 
+HT_TASK::TaskResponse handle_send_drivebrain_latency_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    VCRControlsInstance::instance().send_drivebrain_control_message();
+    return HT_TASK::TaskResponse::YIELD;
+}
+
 
 HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {

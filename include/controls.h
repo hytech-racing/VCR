@@ -48,6 +48,10 @@ class VCRControls
         
         bool drivebrain_is_in_control();
         bool drivebrain_timing_failure();
+        void send_drivebrain_control_message() {
+            _mode4.handle_enqueue_drivebrain_latency_status();
+            _mode4.handle_enqueue_drivebrain_latency_times();
+        };
     private:
         TorqueControllerSimple _mode0; // this needs to be first for tc_mux to have a valid capture
         LoadCellVectoringTorqueController _mode1;

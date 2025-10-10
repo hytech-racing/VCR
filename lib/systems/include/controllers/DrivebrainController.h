@@ -3,7 +3,11 @@
 
 #include "controllers/SimpleController.h"
 #include "SharedFirmwareTypes.h"
+#include "hytech.h"
 #include <cmath>
+#include "FlexCAN_T4.h"
+#include "CANInterface.h"
+#include "VCRCANInterfaceImpl.h"
 
 // TODO - [ ] need to validate that the times that are apparent in the drivebrain data
 //            and ensure that they are within tolerence to current sys-tick
@@ -65,6 +69,10 @@ public:
     /// @return torque controller output that gets passed through the TC MUX
     DrivetrainCommand_s evaluate(const VCRData_s &state, unsigned long curr_millis);
 
+    void handle_enqueue_drivebrain_latency_times();
+
+    void handle_enqueue_drivebrain_latency_status();
+
     /// @brief getter for the current status of whether or not the controller has had a timing failure during operation
     /// @return bool of status
     bool get_timing_failure_status() { return _timing_failure; }
@@ -83,6 +91,20 @@ private:
     } _worst_message_latencies;
     bool _timing_failure = false;
     TorqueControllerSimple _emergency_control = {{1.0f, 1.0f, 20000.0f, 10.0f, -15.0f}}; // NOLINT
+
+    struct {
+        uint16_t speed_latency_millis = 0; 
+        uint16_t torque_latency_millis = 0; 
+        uint16_t diff_latency_millis = 0;
+    } _latency_times;
+
+    struct {
+        uint16_t speed_latency_flag = false; 
+        uint16_t torque_latency_flag = false; 
+        uint16_t diff_latency_flag = false;
+        uint16_t not_received_flag = false;
+    } _latency_failure_status;
+
 };
 
 #endif // DRIVEBRAINCONTROLLER_H

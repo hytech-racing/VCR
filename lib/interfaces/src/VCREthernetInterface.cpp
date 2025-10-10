@@ -105,8 +105,6 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.status.drivebrain_controller_timing_failure = shared_state.system_data.db_cntrl_status.drivebrain_controller_timing_failure;
     out.status.drivebrain_is_in_control = shared_state.system_data.db_cntrl_status.drivebrain_is_in_control;
     
-    
-    
     out.status.pedals_heartbeat_ok = shared_state.system_data.vcf_heartbeat_data.heartbeat_ok;
 
     return out;

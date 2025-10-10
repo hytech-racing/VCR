@@ -121,5 +121,8 @@ constexpr unsigned long main_task_period_us = 100;                   // 100 us =
 constexpr unsigned long main_task_priority = 0;
 constexpr unsigned long update_brakelight_priority = 20;
 constexpr unsigned long update_brakelight_period_us = 50000UL;       // 50 000 us = 20 Hz
+constexpr unsigned long db_latency_can_period_us = 50000;  // 50 hz
+constexpr unsigned long db_latency_can_priority = 101;
+
 
 #endif /* VCR_CONSTANTS */
