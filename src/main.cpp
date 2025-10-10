@@ -112,6 +112,7 @@ HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_et
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
 HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
+HT_TASK::Task send_latency_task(HT_TASK::DUMMY_FUNCTION, handle_send_drivebrain_latency_data, db_latency_can_priority, db_latency_can_period_us);
 
 
 
@@ -306,7 +307,7 @@ void setup() {
     scheduler.schedule(async_main_task);
     // scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
-    
+    scheduler.schedule(send_latency_task);
     scheduler.schedule(IOExpander_read_task);
 
 }
