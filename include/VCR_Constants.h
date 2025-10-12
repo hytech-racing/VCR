@@ -73,7 +73,7 @@ const float THERMISTOR_7_SCALE = 1;
 const float THERMISTOR_7_OFFSET = 0; 
 
 // Coolant Temperature Sensor scale / offsets
-constexpr const float COOLANT_TEMP_SCALE = -33;
+constexpr const float COOLANT_TEMP_SCALE = -31.3;
 constexpr const float COOLANT_TEMP_OFFSET = 242;
 constexpr const float TEST_TEMP_SCALE = -46.8;
 constexpr const float TEST_TEMP_OFFSET = 386;

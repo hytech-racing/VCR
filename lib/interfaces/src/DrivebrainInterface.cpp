@@ -82,11 +82,11 @@ void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
 
     CAN_util::enqueue_msg(&rear_thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 
-    FRONT_THERMISTORS_t front_thermistor_msg;
-    front_thermistor_msg.thermistor_motor_fl_ro = HYTECH_thermistor_motor_fl_ro_toS(_thermistor_data.thermistor_0.thermistor_degrees_C);
-    front_thermistor_msg.thermistor_motor_fr_ro = HYTECH_thermistor_motor_fr_ro_toS(_thermistor_data.thermistor_1.thermistor_degrees_C);
+    SAB_THERMISTORS_1_t front_thermistor_msg;
+    front_thermistor_msg.thermistor_acc1_ro = HYTECH_thermistor_acc1_ro_toS(_thermistor_data.thermistor_0.thermistor_degrees_C);
+    front_thermistor_msg.thermistor_acc2_ro = HYTECH_thermistor_acc2_ro_toS(_thermistor_data.thermistor_1.thermistor_degrees_C);
 
-    CAN_util::enqueue_msg(&front_thermistor_msg, &Pack_FRONT_THERMISTORS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+    CAN_util::enqueue_msg(&front_thermistor_msg, &Pack_SAB_THERMISTORS_1_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {
