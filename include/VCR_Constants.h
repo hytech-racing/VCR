@@ -14,6 +14,8 @@ constexpr int BRAKELIGHT_CONTROL_PIN = 32;
 /*                 ADC pins and configs               */
 /* -------------------------------------------------- */
 
+constexpr int ANALOG_RESOLUTION = 12;
+
 /* Channels on adc_0 */
 constexpr int GLV_SENSE_CHANNEL       = 0;
 constexpr int CURRENT_SENSE_CHANNEL   = 1;

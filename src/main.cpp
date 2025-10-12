@@ -243,7 +243,7 @@ void setup() {
     vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
 
     SPI.begin();
-    analogReadResolution(12);
+    analogReadResolution(ANALOG_RESOLUTION);
 
     pinMode(INVERTER_ENABLE_PIN, OUTPUT);
     
