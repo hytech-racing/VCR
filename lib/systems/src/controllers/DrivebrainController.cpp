@@ -93,7 +93,11 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
         output = db_input.get_command();
     } else {
         _timing_failure = true;
-        output = _emergency_control.evaluate(state, curr_millis);
+        DrivetrainCommand_s coast_to_stop = {
+            .desired_speeds = {0.0f, 0.0f, 0.0f, 0.0f},
+            .torque_limits = {0.0f, 0.0f, 0.0f, 0.0f}
+        };
+        output = coast_to_stop;
     }
     return output;
 }
