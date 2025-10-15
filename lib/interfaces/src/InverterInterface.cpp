@@ -17,8 +17,8 @@
  * Getters for status data
  * @return the requested status struct
  */
-inverter_status_s InverterInterface::getStatus() {
-    inverter_status_s inverter_status = _feedback_data.status;
+InverterStatus_s InverterInterface::getStatus() {
+    InverterStatus_s inverter_status = _feedback_data.status;
     _feedback_data.status.new_data = false;
     return inverter_status;
 }
@@ -27,8 +27,8 @@ inverter_status_s InverterInterface::getStatus() {
  * Getters for temp data
  * @return the requested temp struct
  */
-inverter_temps_s InverterInterface::getTemps() {
-    inverter_temps_s inverter_temps = _feedback_data.temps;
+InverterTemps_s InverterInterface::getTemps() {
+    InverterTemps_s inverter_temps = _feedback_data.temps;
     _feedback_data.temps.new_data = false;
     return inverter_temps;
 }
@@ -37,8 +37,8 @@ inverter_temps_s InverterInterface::getTemps() {
  * Getters for power data
  * @return the requested power struct
  */
-inverter_power_s InverterInterface::getPower() {
-    inverter_power_s inverter_power = _feedback_data.power;
+InverterPower_s InverterInterface::getPower() {
+    InverterPower_s inverter_power = _feedback_data.power;
     _feedback_data.power.new_data = false;
     return inverter_power;
 }
@@ -47,8 +47,8 @@ inverter_power_s InverterInterface::getPower() {
  * Getters for motor mechanics data
  * @return the requested motor mechanics struct
  */
-inverter_motor_mechanics_s InverterInterface::getMotorMechanics() {
-    inverter_motor_mechanics_s inverter_motor_mechanics = _feedback_data.motor_mechanics;
+InverterMotorMechanics_s InverterInterface::getMotorMechanics() {
+    InverterMotorMechanics_s inverter_motor_mechanics = _feedback_data.motor_mechanics;
     _feedback_data.motor_mechanics.new_data = false;
     return inverter_motor_mechanics;
 }
@@ -57,8 +57,8 @@ inverter_motor_mechanics_s InverterInterface::getMotorMechanics() {
  * Getters for the control params
  * @return the requested control params struct
  */
-inverter_control_feedback_s InverterInterface::getControlFeedback() {
-    inverter_control_feedback_s inverter_control_feedback = _feedback_data.control_feedback;
+InverterControlFeedback_s InverterInterface::getControlFeedback() {
+    InverterControlFeedback_s inverter_control_feedback = _feedback_data.control_feedback;
     _feedback_data.control_feedback.new_data = false;
     return inverter_control_feedback;
 }
@@ -253,7 +253,7 @@ void InverterInterface::setIdle()
  * Sets the inverter control word
  * @param control_word the desired control word
  */
-void InverterInterface::setInverterControlWord(inverter_control_word_s control_word) 
+void InverterInterface::setInverterControlWord(InverterControlWord_s control_word) 
 {
     _inverter_control_word.driver_enable = control_word.driver_enable;
     _inverter_control_word.hv_enable = control_word.hv_enable;

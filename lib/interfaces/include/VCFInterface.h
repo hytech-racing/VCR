@@ -2,7 +2,6 @@
 #define VCFINTERFACE_H
 
 #include "FlexCAN_T4.h"
-
 #include "shared_types.h"
 #include "SharedFirmwareTypes.h"
 #include "etl/singleton.h"
