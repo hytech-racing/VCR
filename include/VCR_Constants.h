@@ -77,7 +77,6 @@ const float COOLANT_TEMP_SCALE = -31;
 const float COOLANT_TEMP_OFFSET = 242;
 
 /* Watchdog constants */
-constexpr int INVERTER_ENABLE_PIN = 2;
 constexpr int WATCHDOG_PIN = 36;
 constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
 constexpr unsigned long WATCHDOG_KICK_INTERVAL_MS = 10UL;

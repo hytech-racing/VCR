@@ -4,15 +4,17 @@
 #include "etl/variant.h"
 #include "etl/delegate.h"
 #include "etl/singleton.h"
-
 #include <array>
 #include <functional>
 #include "stdint.h"
-
 #include "SharedFirmwareTypes.h"
 #include "SysClock.h"
 #include <shared_types.h>
 #include "SystemTimeInterface.h"
+#include "InverterInterface.h"
+
+constexpr float MIN_ACTIVE_RPM = 100.0;
+constexpr int INVERTER_ENABLE_PIN = 2;
 
 // requirements:
 // - [x] must support ability to initialize the drivetrain 
@@ -77,81 +79,67 @@ struct DrivetrainInit_s
  * 2) Determining what commands to give each InverterInterface
  */
 
-class DrivetrainSystem
-{
-public:
-    /**
-     * etl::variants allow multiple types to be treated as a single type-- almost like an enum of types.
-     * Here, we're just saying that when we refer to CmdVariant, the parameter can be any one of these
-     * three options.
-     */
-    using CmdVariant = etl::variant<DrivetrainCommand_s, DrivetrainInit_s, DrivetrainResetError_s>;
-    DrivetrainSystem() = delete;
-    
-    /**
-     * Functions for VSM state transitions (VSM needs to know drivetrain's status to trigger its
-     * state transitions).
-     */
-    bool hv_over_threshold();
-    bool drivetrain_error_present();
-    bool drivetrain_ready();
-    void reset_dt_error();
+class DrivetrainSystem {
+    public:
+        DrivetrainSystem() = delete;
+        
+        /**
+         * Functions for VSM state transitions (VSM needs to know drivetrain's status to trigger its
+         * state transitions).
+         */
+        bool hv_over_threshold();
+        bool drivetrain_error_present();
+        bool drivetrain_ready();
+        void reset_dt_error();
 
-    /**
-     * Drivetrain state machine (DSM) functions
-     */
-    DrivetrainStatus_s evaluate_drivetrain(CmdVariant cmd);
-    DrivetrainState_e get_state();
-    DrivetrainStatus_s get_status();
+        /**
+         * Drivetrain state machine (DSM) functions
+         */
+        DrivetrainStatus_s evaluate_drivetrain(CmdVariant cmd);
+        DrivetrainState_e get_state();
+        DrivetrainStatus_s get_status();
+        
+        DrivetrainSystem(veh_vec<InverterInterface> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay_ms = 50);
+        
+    private:
+        /**
+         * Internal functions for handling DSM state transitions.
+         */
+        void _setState(DrivetrainState_e state);
+        void _setDrivetrainDisabled();
+        void _setDrivetrainKeepaliveIdle();
+        void _setDrivetrainCommand(DrivetrainCommand_s);
+        void _setEnableDrivetrainHv();
+        void _setEnableDrivetrain();
+        void _setDrivetrainErrorReset();
+        
+        void _setEFActive(bool set_active);
 
-    struct InverterFuncts {
-        std::function<void(float desired_rpm, float torque_limit_nm)> set_speed;
-        std::function<void()> set_idle;
-        std::function<void(InverterControlWord_s control_word)> set_inverter_control_word;
-        std::function<InverterStatus_s()> get_status;
-        std::function<MotorMechanics_s()> get_motor_mechanics; 
-    };
-    
-    DrivetrainSystem(veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay_ms = 50);
-    
-private:
-    /**
-     * Internal functions for handling DSM state transitions.
-     */
-    bool _check_inverter_flags(std::function<bool(const InverterStatus_s&)> flag_check_func);
-    bool _drivetrain_active(float min_active_rpm);
-    void _set_state(DrivetrainState_e state);
-    void _set_drivetrain_disabled();
-    void _set_drivetrain_keepalive_idle();
-    void _set_enable_drivetrain_hv();
-    void _set_enable_drivetrain();
-    void _set_drivetrain_error_reset();
-    void _set_drivetrain_command(DrivetrainCommand_s cmd);
+        bool _checkInvertersConnected(); 
+        bool _checkHvPresent(); 
+        bool _checkInvertersReady(); 
+        bool _checkQuitDcOn(); 
+        bool _checkErrorPresent();
+        bool _checkDrivetrainActive();
+        bool _checkInvertersEnabled();
 
-    DrivetrainState_e _evaluate_state_machine(CmdVariant cmd);
-    DrivetrainState_e _state;
-    DrivetrainStatus_s _status;
+        DrivetrainState_e _evaluate_state_machine(CmdVariant cmd);
 
-    const float _active_rpm_level = 100;
-    veh_vec<InverterFuncts> _inverter_interfaces;
+        DrivetrainState_e _state;
+        DrivetrainStatus_s _status;
+        veh_vec<InverterInterface> _inverter_interfaces;
 
-    /**
-     * Lambda functions defined on construction for the DSM state transitions.
-     */
-    std::function<bool(const InverterStatus_s &)> _check_inverter_ready_flag;
-    std::function<bool(const InverterStatus_s &)> _check_inverter_connected_flag;
-    std::function<bool(const InverterStatus_s &)> _check_inverter_quit_dc_flag;
-    std::function<bool(const InverterStatus_s &)> _check_inverter_no_errors_present;
-    std::function<bool(const InverterStatus_s &)> _check_inverter_hv_present_flag;
-    std::function<bool(const InverterStatus_s &)> _check_inverter_hv_not_present_flag;
-    std::function<bool(const InverterStatus_s &)> _check_inverter_enabled;  
+        bool _init_drivetrain_flag; 
+        bool _reset_errors_flag; 
+        bool _idle_flag; 
+        bool _set_command_flag; 
 
-    /**
-     * Delegate function for setting ef active
-     */
-    etl::delegate<void(bool)> _set_ef_active_pin;
-    unsigned long _last_toggled_ef_active = 0; 
-    unsigned long _ef_pin_enable_delay_ms;
+        /**
+         * Delegate function for setting ef active
+         */
+        etl::delegate<void(bool)> _set_ef_active_pin;
+        unsigned long _last_toggled_ef_active = 0; 
+        unsigned long _ef_pin_enable_delay_ms;
 };
 
 using DrivetrainInstance = etl::singleton<DrivetrainSystem>;
