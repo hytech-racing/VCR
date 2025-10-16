@@ -38,7 +38,7 @@ VCRInterfaceData_s sample_async_data(
     ret.inverter_data.RR.speed_rpm = rr_inv_mechanics.actual_speed;
 
     ret.recvd_pedals_data = vcf_data.stamped_pedals;
-    ret.front_loadcell_data = vcf_data.front_loadcell_data;
+    ret._loadcell_data = vcf_data.front_loadcell_data;
     ret.front_suspot_data = vcf_data.front_suspot_data;
     ret.dash_input_state = vcf_data.dash_input_state;
     ret.latest_drivebrain_command = drivebrain_data;

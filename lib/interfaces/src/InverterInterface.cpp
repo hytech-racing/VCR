@@ -1,48 +1,74 @@
+/******************************************************************************
+ * @file    InverterInterface.h
+ * @brief   Header for any receive/send to the inverters
+ ******************************************************************************/
+
+ /******************************************************************************
+ * Includes
+ ******************************************************************************/
 #include <InverterInterface.h>
 #include "VCRCANInterfaceImpl.h"
-
 #include <Arduino.h>
-/**
- * Getters for the data
- */
 
-InverterStatus_s InverterInterface::get_status() {
-    InverterStatus_s status_struct = _feedback_data.status;
+/******************************************************************************
+ * Public Method Definitions
+ ******************************************************************************/
+/**
+ * Getters for status data
+ * @return the requested status struct
+ */
+InverterStatus_s InverterInterface::getStatus() {
+    InverterStatus_s inverter_status = _feedback_data.status;
     _feedback_data.status.new_data = false;
-    return status_struct;
+    return inverter_status;
 }
-
-InverterTemps_s InverterInterface::get_temps() {
-    InverterTemps_s temps_struct = _feedback_data.temps;
-    _feedback_data.temps.new_data = false;
-    return temps_struct;
-}
-
-InverterPower_s InverterInterface::get_power() {
-    InverterPower_s power_struct = _feedback_data.power;
-    _feedback_data.power.new_data = false;
-    return power_struct;
-}
-
-MotorMechanics_s InverterInterface::get_motor_mechanics() {
-    MotorMechanics_s mm_struct = _feedback_data.motor_mechanics;
-    _feedback_data.motor_mechanics.new_data = false;
-    return mm_struct;
-}
-
-
-InverterControlFeedback_s InverterInterface::get_control_params() {
-    InverterControlFeedback_s cf_struct = _feedback_data.control_feedback;
-    _feedback_data.control_feedback.new_data = false;
-    return cf_struct;
-}
-
 
 /**
- * receiving CAN messages
+ * Getters for temp data
+ * @return the requested temp struct
  */
+InverterTemps_s InverterInterface::getTemps() {
+    InverterTemps_s inverter_temps = _feedback_data.temps;
+    _feedback_data.temps.new_data = false;
+    return inverter_temps;
+}
 
-void InverterInterface::receive_INV_STATUS(const CAN_message_t &can_msg, unsigned long curr_millis)
+/**
+ * Getters for power data
+ * @return the requested power struct
+ */
+InverterPower_s InverterInterface::getPower() {
+    InverterPower_s inverter_power = _feedback_data.power;
+    _feedback_data.power.new_data = false;
+    return inverter_power;
+}
+
+/**
+ * Getters for motor mechanics data
+ * @return the requested motor mechanics struct
+ */
+InverterMotorMechanics_s InverterInterface::getMotorMechanics() {
+    InverterMotorMechanics_s inverter_motor_mechanics = _feedback_data.motor_mechanics;
+    _feedback_data.motor_mechanics.new_data = false;
+    return inverter_motor_mechanics;
+}
+
+/**
+ * Getters for the control params
+ * @return the requested control params struct
+ */
+InverterControlFeedback_s InverterInterface::getControlFeedback() {
+    InverterControlFeedback_s inverter_control_feedback = _feedback_data.control_feedback;
+    _feedback_data.control_feedback.new_data = false;
+    return inverter_control_feedback;
+}
+
+/**
+ * Receives an inverter status message
+ * @param can_msg the CAN message to process
+ * @param curr_millis the current time in milliseconds
+ */
+void InverterInterface::receiveInverterStatus(const CAN_message_t &can_msg, unsigned long curr_millis)
 {
     // Unpack the message
     INV1_STATUS_t unpacked_msg;
@@ -59,13 +85,18 @@ void InverterInterface::receive_INV_STATUS(const CAN_message_t &can_msg, unsigne
     _feedback_data.status.derating_on = unpacked_msg.derating_on;
     _feedback_data.status.dc_bus_voltage = unpacked_msg.dc_bus_voltage;
     _feedback_data.status.diagnostic_number = unpacked_msg.diagnostic_number;
-    _feedback_data.status.hv_present = _feedback_data.status.dc_bus_voltage > _inverter_params.MINIMUM_HV_VOLTAGE;
+    _feedback_data.status.hv_present = _feedback_data.status.dc_bus_voltage > _inverter_params.high_voltage_threshold;
 
     _feedback_data.status.new_data = true;
     _feedback_data.status.last_recv_millis = curr_millis;
 }
 
-void InverterInterface::receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned long curr_millis)
+/**
+ * Receives an inverter temps message
+ * @param can_msg the CAN message to process
+ * @param curr_millis the current time in milliseconds
+ */
+void InverterInterface::receiveInverterTemps(const CAN_message_t &can_msg, unsigned long curr_millis)
 {
 
     // Unpack the message
@@ -73,43 +104,61 @@ void InverterInterface::receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned
     Unpack_INV1_TEMPS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
 
     // Update inverter interface with new data
-    _feedback_data.temps.igbt_temp = HYTECH_igbt_temp_ro_fromS(unpacked_msg.igbt_temp_ro);
-    _feedback_data.temps.inverter_temp = HYTECH_inverter_temp_ro_fromS(unpacked_msg.inverter_temp_ro);
-    _feedback_data.temps.motor_temp = HYTECH_motor_temp_ro_fromS(unpacked_msg.motor_temp_ro);
+    _feedback_data.temps.igbt_temp_celcius = HYTECH_igbt_temp_ro_fromS(unpacked_msg.igbt_temp_ro);
+    _feedback_data.temps.inverter_temp_celcius = HYTECH_inverter_temp_ro_fromS(unpacked_msg.inverter_temp_ro);
+    _feedback_data.temps.motor_temp_celcius = HYTECH_motor_temp_ro_fromS(unpacked_msg.motor_temp_ro);
 
     _feedback_data.temps.new_data = true;
     _feedback_data.temps.last_recv_millis = curr_millis;
 }
 
-void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsigned long curr_millis) 
+
+/**
+ * Receives an inverter dynamics message
+ * @param can_msg the CAN message to process
+ * @param curr_millis the current time in milliseconds
+ */
+void InverterInterface::recieveInverterDynamics(const CAN_message_t &can_msg, unsigned long curr_millis) 
 {
     // Unpack the message
     INV1_DYNAMICS_t unpacked_msg;
     Unpack_INV1_DYNAMICS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
 
     // Update inverter interface with new data
-    _feedback_data.motor_mechanics.actual_power = unpacked_msg.actual_power_w; // NOLINT (watts)
-    _feedback_data.motor_mechanics.actual_torque = HYTECH_actual_torque_nm_ro_fromS(unpacked_msg.actual_torque_nm_ro);
-    _feedback_data.motor_mechanics.actual_speed = unpacked_msg.actual_speed_rpm;
+    _feedback_data.motor_mechanics.actual_power_watts = unpacked_msg.actual_power_w; // NOLINT (watts)
+    _feedback_data.motor_mechanics.actual_torque_nm = HYTECH_actual_torque_nm_ro_fromS(unpacked_msg.actual_torque_nm_ro);
+    _feedback_data.motor_mechanics.actual_speed_rpm = unpacked_msg.actual_speed_rpm;
     _feedback_data.motor_mechanics.new_data = true;
     _feedback_data.motor_mechanics.last_recv_millis = curr_millis;
 }
 
-void InverterInterface::receive_INV_POWER(const CAN_message_t &can_msg, unsigned long curr_millis) 
+
+/**
+ * Receives an inverter power message
+ * @param can_msg the CAN message to process
+ * @param curr_millis the current time in milliseconds
+ */
+void InverterInterface::receiveInverterPower(const CAN_message_t &can_msg, unsigned long curr_millis) 
 {
     // Unpack the message
     INV1_POWER_t unpacked_msg;
     Unpack_INV1_POWER_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
 
     // Update inverter interface with new data
-    _feedback_data.power.active_power = unpacked_msg.active_power_w; // NOLINT (watts)
-    _feedback_data.power.reactive_power = unpacked_msg.reactive_power_var; // NOLINT (watts)
+    _feedback_data.power.active_power_watts = unpacked_msg.active_power_w; // NOLINT (watts)
+    _feedback_data.power.reactive_power_watts = unpacked_msg.reactive_power_var; // NOLINT (watts)
 
     _feedback_data.power.new_data = true;
     _feedback_data.power.last_recv_millis = curr_millis;
 }
 
-void InverterInterface::receive_INV_FEEDBACK(const CAN_message_t &can_msg, unsigned long curr_millis) 
+
+/**
+ * Receives an inverter feedbck message
+ * @param can_msg the CAN message to process
+ * @param curr_millis the current time in milliseconds
+ */
+void InverterInterface::receiveInverterFeedback(const CAN_message_t &can_msg, unsigned long curr_millis) 
 {
     // Unpack the message
     INV1_FEEDBACK_t unpacked_msg;
@@ -124,11 +173,13 @@ void InverterInterface::receive_INV_FEEDBACK(const CAN_message_t &can_msg, unsig
     _feedback_data.control_feedback.last_recv_millis = curr_millis;
 }
 
-/**
- * Sending CAN messages
- */
 
-void InverterInterface::send_INV_SETPOINT_COMMAND() 
+/**
+ * Sends an inverter Setpoint message over CAN. Doesn't need to
+ * take in any parameters because the structs are stored internally
+ * to the interface
+ */
+void InverterInterface::sendInverterSetpointCommand() 
 {
     INV1_CONTROL_INPUT_t msg_out;
 
@@ -136,10 +187,15 @@ void InverterInterface::send_INV_SETPOINT_COMMAND()
     msg_out.positive_torque_limit_ro = HYTECH_positive_torque_limit_ro_toS(_inverter_control_inputs.positive_torque_limit);
     msg_out.negative_torque_limit_ro = HYTECH_negative_torque_limit_ro_toS(_inverter_control_inputs.negative_torque_limit);
 
-    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_input_id);
+    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, _inverter_ids.inverter_control_input_id);
 }
 
-void InverterInterface::send_INV_CONTROL_WORD() 
+/**
+ * Sends an inverter cotrol word over CAN. Doesn't need to
+ * take in any parameters because the structs are stored internally
+ * to the interface
+ */
+void InverterInterface::sendInverterControlWord() 
 {
     INV1_CONTROL_WORD_t msg_out;
 
@@ -148,11 +204,16 @@ void InverterInterface::send_INV_CONTROL_WORD()
     msg_out.inverter_enable = _inverter_control_word.inverter_enable;
     msg_out.remove_error = _inverter_control_word.remove_error;
 
-    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_WORD_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_word_id);
+    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_WORD_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, _inverter_ids.inverter_control_word_id);
     
 }
 
-void InverterInterface::send_INV_CONTROL_PARAMS() 
+/**
+ * Sends inverter control params over CAN. Doesn't need to
+ * take in any parameters because the structs are stored internally
+ * to the interface
+ */
+void InverterInterface::sendInverterControlParams() 
 {
     INV1_CONTROL_PARAMETER_t msg_out;
 
@@ -160,31 +221,39 @@ void InverterInterface::send_INV_CONTROL_PARAMS()
     msg_out.speed_control_ki = _inverter_control_params.speed_control_ki;
     msg_out.speed_control_kd = _inverter_control_params.speed_control_kd;
 
-    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_PARAMETER_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_parameter_id);
+    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_PARAMETER_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, _inverter_ids.inverter_control_parameter_id);
 }
 
 
 
 /**
- * Methods for use as inverter functs
+ * Modifies the desired speed and torque limit for the inverter, populating the struct that is sent
+ * by the sendInverterSetpointCommand method
+ * @param desired_rpm the desired speed in RPM
+ * @param torque_limit_nm the desired torque limit in Nm
  */
-
-void InverterInterface::set_speed(float desired_rpm, float torque_limit_nm) 
+void InverterInterface::setSpeed(float desired_rpm, float torque_limit_nm) 
 {
     _inverter_control_inputs.speed_rpm_setpoint = static_cast<int16_t>(desired_rpm);
-
     _inverter_control_inputs.positive_torque_limit = ::fabs(torque_limit_nm);
     _inverter_control_inputs.negative_torque_limit = -1.0f * ::fabs(torque_limit_nm);
 }
 
-void InverterInterface::set_idle() 
+/**
+ * Sets the inverter to idle (0 RPM, 0 Nm)
+ */
+void InverterInterface::setIdle() 
 {
     _inverter_control_inputs.negative_torque_limit = 0; 
     _inverter_control_inputs.positive_torque_limit = 0;
     _inverter_control_inputs.speed_rpm_setpoint = 0;
 }
 
-void InverterInterface::set_inverter_control_word(InverterControlWord_s control_word) 
+/**
+ * Sets the inverter control word
+ * @param control_word the desired control word
+ */
+void InverterInterface::setInverterControlWord(InverterControlWord_s control_word) 
 {
     _inverter_control_word.driver_enable = control_word.driver_enable;
     _inverter_control_word.hv_enable = control_word.hv_enable;
