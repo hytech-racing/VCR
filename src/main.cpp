@@ -319,7 +319,7 @@ void setup() {
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(enqueue_coolant_temp_CAN_task);
     scheduler.schedule(async_main_task);
-    scheduler.schedule(debug_state_print_task);
+    // scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     scheduler.schedule(send_latency_task);
     scheduler.schedule(IOExpander_read_task);
