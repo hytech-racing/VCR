@@ -33,6 +33,8 @@ HT_TASK::TaskResponse init_adc_bundle();
 HT_TASK::TaskResponse init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
+HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
+
 /**
  * This task will update the buzzer_is_active voidean in the VCRSystemData struct by calling the
  * update function of the buzzer controller.
