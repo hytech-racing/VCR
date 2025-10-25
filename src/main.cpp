@@ -43,6 +43,7 @@
 #include "device_fw_version.h"
 
 /* externed CAN instances */
+FlexCAN_Type<CAN1> VCRCANInterfaceImpl::AUXILLARY_CAN;
 FlexCAN_Type<CAN3> VCRCANInterfaceImpl::TELEM_CAN;
 FlexCAN_Type<CAN2> VCRCANInterfaceImpl::INVERTER_CAN;
 
@@ -286,10 +287,12 @@ void setup() {
 
     // Initialize CAN
     const uint32_t telem_CAN_baudrate = 1000000;
+    const uint32_t auxillary_CAN_baudrate = 1000000;
     const uint32_t inv_CAN_baudrate = 500000;
    
     handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(VCRCANInterfaceImpl::TELEM_CAN, telem_CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
+    handle_CAN_setup(VCRCANInterfaceImpl::AUXILLARY_CAN, auxillary_CAN_baudrate, &VCRCANInterfaceImpl::on_auxillary_can_receive);
 
     init_adc_bundle();
 

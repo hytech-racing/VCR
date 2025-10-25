@@ -22,10 +22,13 @@ VCRInterfaceData_s sample_async_data(
                         sys_time::hal_millis(), recv_call);
     process_ring_buffer(VCRCANInterfaceImpl::telem_can_rx_buffer, interface_ref_container.can_interfaces,
                         sys_time::hal_millis(), recv_call);
+    process_ring_buffer(VCRCANInterfaceImpl::auxillary_can_rx_buffer, interface_ref_container.can_interfaces,
+                        sys_time::hal_millis(), recv_call);
 
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
     auto acu_data = interface_ref_container.can_interfaces.acu_interface.get_latest_data(sys_time::hal_millis());
-    auto drivebrain_data = interface_ref_container.can_interfaces.db_interface.get_latest_data();
+    auto drivebrain_telem_data = interface_ref_container.can_interfaces.db_interface.get_latest_telem_drivebrain_command();
+    auto drivebrain_auxillary_data = interface_ref_container.can_interfaces.db_interface.get_latest_auxillary_drivebrain_command();
 
     auto fl_inv_mechanics = interface_ref_container.can_interfaces.fl_inverter_interface.get_motor_mechanics();
     auto fr_inv_mechanics = interface_ref_container.can_interfaces.fr_inverter_interface.get_motor_mechanics();
@@ -41,7 +44,8 @@ VCRInterfaceData_s sample_async_data(
     ret.front_loadcell_data = vcf_data.front_loadcell_data;
     ret.front_suspot_data = vcf_data.front_suspot_data;
     ret.dash_input_state = vcf_data.dash_input_state;
-    ret.latest_drivebrain_command = drivebrain_data;
+    ret.latest_drivebrain_telem_command = drivebrain_telem_data;
+    ret.latest_drivebrain_auxillary_command = drivebrain_auxillary_data;
 
     return ret;
 }

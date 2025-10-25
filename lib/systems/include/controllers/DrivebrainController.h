@@ -67,7 +67,7 @@ public:
 
     /// @brief getter for the current status of whether or not the controller has had a timing failure during operation
     /// @return bool of status
-    bool get_timing_failure_status() { return _timing_failure; }
+    bool get_timing_failure_status() { return !_should_run_controller; }
 
 private:
     struct
@@ -81,8 +81,12 @@ private:
         int64_t worst_speed_setpoint_latency_so_far;
         int64_t worst_torque_lim_latency_so_far;
     } _worst_message_latencies;
-    bool _timing_failure = false;
+    bool _aux_timing_failure = false;
+    bool _telem_timing_failure = false;
+    bool _should_run_controller = false;
     TorqueControllerSimple _emergency_control = {{1.0f, 1.0f, 20000.0f, 10.0f, -15.0f}}; // NOLINT
+
+    bool _check_drivebrain_command_timing_failure(StampedDrivetrainCommand_s command, unsigned long curr_millis);
 };
 
 #endif // DRIVEBRAINCONTROLLER_H
