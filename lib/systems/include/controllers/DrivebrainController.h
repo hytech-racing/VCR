@@ -83,7 +83,7 @@ private:
     } _worst_message_latencies;
     bool _aux_timing_failure = false;
     bool _telem_timing_failure = false;
-    bool _should_run_controller = false;
+    bool _should_run_controller = true;
     TorqueControllerSimple _emergency_control = {{1.0f, 1.0f, 20000.0f, 10.0f, -15.0f}}; // NOLINT
 
     bool _check_drivebrain_command_timing_failure(StampedDrivetrainCommand_s command, unsigned long curr_millis);

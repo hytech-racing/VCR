@@ -1,6 +1,7 @@
 #include "controllers/DrivebrainController.h"
 #include "SharedFirmwareTypes.h"
 #include <cstdint>
+#include <Arduino.h>
 // #include <Arduino.h>
 
 DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsigned long curr_millis) {

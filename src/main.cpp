@@ -287,7 +287,7 @@ void setup() {
 
     // Initialize CAN
     const uint32_t telem_CAN_baudrate = 1000000;
-    const uint32_t auxillary_CAN_baudrate = 1000000;
+    const uint32_t auxillary_CAN_baudrate = 500000;
     const uint32_t inv_CAN_baudrate = 500000;
    
     handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
