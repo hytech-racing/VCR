@@ -26,6 +26,48 @@ TTPMSSensorInterface rr_ttpms_int;
 
 void on_recv(const CAN_message_t &msg)
 {
+    VCRCANInterfaceImpl::vcr_CAN_recv(CANInterfacesInstance::instance(), msg, msg.timestamp);
+
+    Serial.print("MB: "); Serial.print(msg.mb);
+    Serial.print("  ID: 0x"); Serial.print(msg.id, HEX); Serial.print(" ");
+    Serial.print("  EXT: "); Serial.print(msg.flags.extended);
+    Serial.print("  LEN: "); Serial.print(msg.len); Serial.print(" ");
+    // if (msg.id == 1076) {
+        for ( uint8_t i = 0; i < 8; i++ ) {
+            Serial.print(msg.buf[i], HEX); Serial.print(" ");
+        }        
+    // }
+    Serial.println();
+
+    TTPMSSensorData_s data = rl_ttpms_int.get_latest_sensor_data();
+    Serial.println("=== TTPMSSensorData ===");
+    Serial.print("Serial #: "); Serial.print(data.serial_number);
+    Serial.print(" Battery (mV): "); Serial.print(data.battery_voltage);
+    Serial.print(" Pressure: "); Serial.print(data.pressure);
+    Serial.print(" Gauge Pressure: "); Serial.println(data.gauge_pressure);
+
+    Serial.println("Infrared Temps: ");
+    for (int i = 0; i < 16; i++) {
+        Serial.print("  ["); Serial.print(i); Serial.print("] = ");
+        Serial.print(data.infrared_temp[i]);
+    }
+
+    Serial.println();
+    Serial.print("Transmission Count: "); Serial.print(data.transmission_count);
+    Serial.print(" RSSI: "); Serial.print(data.rssi);
+    Serial.print(" Sensor Temp: "); Serial.print(data.sensor_temperature);
+    Serial.print(" Node ID: "); Serial.println(data.sensor_node_id);
+    Serial.println("=======================");
+
+    Serial.print("  TS: "); Serial.println(msg.timestamp);
+}
+    
+
+void setup()
+{
+    Serial.begin(115200);
+    handle_CAN_setup(MAIN_CAN, 500000, &on_recv);
+
     CANInterfacesInstance::create(
     VCFInterfaceInstance::instance(),
     ACUInterfaceInstance::instance(),
@@ -38,52 +80,7 @@ void on_recv(const CAN_message_t &msg)
     fr_ttpms_int,
     rl_ttpms_int,
     rr_ttpms_int
-);
-    VCRCANInterfaceImpl::vcr_CAN_recv(CANInterfacesInstance::instance(), msg, msg.timestamp);
-
-    Serial.print("MB: "); Serial.print(msg.mb);
-    Serial.print("  ID: 0x"); Serial.print(msg.id, HEX); Serial.print(" ");
-    // Serial.print("  EXT: "); Serial.print(msg.flags.extended);
-    // Serial.print("  LEN: "); Serial.print(msg.len);
-    // // if (msg.id == 1076) {
-    //     for ( uint8_t i = 0; i < 8; i++ ) {
-    //         Serial.print(msg.buf[i]); Serial.print(" ");
-    //     }        
-    // // }
-    Serial.println();
-
-
-
-    TTPMSSensorData_s data = rl_ttpms_int.get_latest_sensor_data();
-    Serial.println("=== TTPMSSensorData ===");
-    Serial.print("Serial #: "); Serial.println(data.serial_number);
-    Serial.print("Battery (mV): "); Serial.println(data.battery_voltage);
-    Serial.print("Pressure: "); Serial.println(data.pressure);
-    Serial.print("Gauge Pressure: "); Serial.println(data.gauge_pressure);
-
-    Serial.println("Infrared Temps:");
-    for (int i = 0; i < 16; i++) {
-        Serial.print("  ["); Serial.print(i); Serial.print("] = ");
-        Serial.println(data.infrared_temp[i]);
-    }
-
-    Serial.print("Transmission Count: "); Serial.println(data.transmission_count);
-    Serial.print("RSSI: "); Serial.println(data.rssi);
-    Serial.print("Sensor Temp: "); Serial.println(data.sensor_temperature);
-    Serial.print("Node ID: "); Serial.println(data.sensor_node_id);
-    Serial.println("=======================");
-    
-
-
-
-    // Serial.print("  TS: "); Serial.println(msg.timestamp);
-}
-    
-
-void setup()
-{
-    Serial.begin(115200);
-    handle_CAN_setup(MAIN_CAN, 500000, &on_recv);
+    );
 }
 
 void loop()
