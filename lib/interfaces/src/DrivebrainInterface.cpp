@@ -75,7 +75,7 @@ void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
     rear_sus_msg.rr_shock_pot = _suspension_data.rear_suspot_data.RR_sus_pot_analog;
 
     CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_hytech,
-                          VCRCANInterfaceImpl::telem_can_rx_buffer); //CHANGE BACK TO TELEM_CAN_TX_BUFFER
+                          VCRCANInterfaceImpl::telem_can_tx_buffer); 
 }
 
 void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
