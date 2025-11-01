@@ -105,7 +105,7 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
 HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     ADCSingletonInstance::instance().adc1.tick();
-
+    
     vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_0].conversion;
     vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_1].conversion;
 
@@ -150,6 +150,12 @@ HT_TASK::TaskResponse run_kick_watchdog(const unsigned long& sysMicros, const HT
 HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
+    return HT_TASK::TaskResponse::YIELD;
+}
+
+HT_TASK::TaskResponse enqueue_controls_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
+{
+    VCRControlsInstance::instance().send_controls_can_messages();
     return HT_TASK::TaskResponse::YIELD;
 }
 

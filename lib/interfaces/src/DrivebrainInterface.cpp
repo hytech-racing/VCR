@@ -10,6 +10,7 @@
 #include "hytech_msgs.pb.h"
 #include <cstdint>
 
+
 DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cell_data,
                                          const RearSusPotData_s &rear_suspot_data,
                                          const ThermistorData_s &coolant_temperature_data_0,

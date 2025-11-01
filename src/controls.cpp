@@ -52,3 +52,8 @@ bool VCRControls::drivebrain_timing_failure()
 {
     return _mode4.get_timing_failure_status();
 }
+
+void VCRControls::send_controls_can_messages() {
+    _mode4.handle_enqueue_latencies();
+    _mode4.handle_enqueue_timing_status();
+}

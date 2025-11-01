@@ -29,6 +29,30 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
         output = _emergency_control.evaluate(state, curr_millis);
     }
 
+    // Handle worst latency updates
+    if (_last_reset_worse_latency_clock == 0) {
+        _last_reset_worse_latency_clock = curr_millis;
+    }
+
+    if (curr_millis - _last_reset_worse_latency_clock > 1000) {
+        _last_reset_worse_latency_clock = curr_millis; 
+        _worst_latency_aux = 0;
+        _worst_latency_telem = 0;
+    }
+
+    int aux_latency_millis = max(
+        curr_millis - db_auxillary_input.desired_speeds.last_recv_millis, 
+        curr_millis - db_auxillary_input.torque_limits.last_recv_millis
+    );
+
+    int telem_latency_millis = max(
+        curr_millis - db_telem_input.desired_speeds.last_recv_millis, 
+        curr_millis - db_telem_input.torque_limits.last_recv_millis
+    );
+
+    _worst_latency_aux = max(_worst_latency_aux, aux_latency_millis);
+    _worst_latency_telem = max(_worst_latency_telem, telem_latency_millis);
+
     return output;
 }
 
@@ -59,6 +83,26 @@ bool DrivebrainController::_check_drivebrain_command_timing_failure(StampedDrive
     }
 
     bool timing_failure = (speed_setpoint_msg_too_latent || torque_limit_message_too_latent || not_all_messages_recvd || latency_diff_too_high);
+
     return timing_failure;
 }
 
+void DrivebrainController::handle_enqueue_timing_status() {
+    DRIVEBRAIN_LATENCY_STATUSES_t msg; 
+
+    msg.db_aux_timing_fault = _aux_timing_failure;
+    msg.db_telem_timing_fault = _telem_timing_failure;
+
+    CAN_util::enqueue_msg(&msg, &Pack_DRIVEBRAIN_LATENCY_STATUSES_hytech,
+                          VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
+void DrivebrainController::handle_enqueue_latencies() {
+    DRIVEBRAIN_LATENCY_TIMES_t msg; 
+
+    msg.aux_latency_millis = _worst_latency_aux;
+    msg.telem_latency_millis = _worst_latency_telem;
+
+    CAN_util::enqueue_msg(&msg, &Pack_DRIVEBRAIN_LATENCY_TIMES_hytech,
+                          VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
