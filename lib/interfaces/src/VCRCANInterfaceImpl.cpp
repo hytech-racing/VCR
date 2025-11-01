@@ -3,11 +3,10 @@
 #include "hytech.h"
 #include <cstdint>
 
-
 namespace VCRCANInterfaceImpl {
 
 // global forwards
-CANRXBufferType CAN1_rxBuffer;
+CANRXBufferType CAN1_rxBuffer; // can1 = aux can
 CANRXBufferType inverter_can_rx_buffer;
 CANRXBufferType telem_can_rx_buffer;
 

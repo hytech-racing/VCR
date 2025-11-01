@@ -123,7 +123,7 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
 
 HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_degrees_C = 0.0183 * pulseCount * 5; 
+    vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_degrees_C = 0.0183 * pulseCount * 5; // NOLINT
 
     pulseCount = 0;
 

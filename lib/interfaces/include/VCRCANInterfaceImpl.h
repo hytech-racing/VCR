@@ -79,6 +79,7 @@ namespace VCRCANInterfaceImpl {
 
     extern FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> TELEM_CAN; // gets defined in main as of right now
     extern FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> INVERTER_CAN; // gets defined in main as of right now
+    //extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> CAN_1; 
 
 
     void on_can1_receive(const CAN_message_t &msg);

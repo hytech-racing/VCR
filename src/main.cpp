@@ -223,7 +223,7 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
 HT_TASK::Task debug_state_print_task(HT_TASK::DUMMY_FUNCTION, debug_print, 100, 100000); //NOLINT (priority and loop rate)
 
-void countPulse() 
+void countPulse() // NOLINT
 {
     pulseCount++;
     
@@ -297,6 +297,7 @@ void setup() {
 
     // Initialize CAN
     const uint32_t telem_CAN_baudrate = 1000000;
+    const uint32_t can1_baudrate = 1000000;
     const uint32_t inv_CAN_baudrate = 500000;
    
     handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
