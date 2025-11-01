@@ -114,6 +114,7 @@ HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_et
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
 HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
+HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
 
 
 
@@ -224,6 +225,12 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
 HT_TASK::Task debug_state_print_task(HT_TASK::DUMMY_FUNCTION, debug_print, 100, 100000); //NOLINT (priority and loop rate)
 
+void countPulse() // NOLINT
+{
+    pulseCount++;
+    
+}
+
 void setup() {
     // Save firmware version
     vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
@@ -233,6 +240,9 @@ void setup() {
     SPI.begin();
 
     pinMode(INVERTER_ENABLE_PIN, OUTPUT);
+    pinMode(FLOWMETER_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(FLOWMETER_PIN), countPulse, RISING);
+    pulseCount = 0;
     
     // Create all singletons
     // IOExpanderInstance::create(0);
@@ -243,6 +253,7 @@ void setup() {
         vcr_data.interface_data.rear_suspot_data,
         vcr_data.interface_data.thermistor_data.thermistor_0,
         vcr_data.interface_data.thermistor_data.thermistor_1,
+        vcr_data.interface_data.thermistor_data.thermistor_2,
         EthernetIPDefsInstance::instance().drivebrain_ip,
         EthernetIPDefsInstance::instance().VCRData_port,
         &vcr_data_send_socket);
@@ -311,7 +322,7 @@ void setup() {
     scheduler.schedule(enqueue_controls_CAN_task);
     // scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
-    
+    scheduler.schedule(update_sample_flowmeter);
     scheduler.schedule(IOExpander_read_task);
 
 }

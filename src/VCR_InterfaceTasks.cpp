@@ -54,6 +54,8 @@ HT_TASK::TaskResponse init_adc_bundle()
     adc1_offsets[THERMISTOR_6] = THERMISTOR_6_OFFSET;
     adc1_scales[THERMISTOR_7] = THERMISTOR_7_SCALE;
     adc1_offsets[THERMISTOR_7] = THERMISTOR_7_OFFSET;
+    
+
 
     ADCSingletonInstance::create(adc0_scales, adc0_offsets, adc1_scales, adc1_offsets);
 
@@ -108,10 +110,22 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
     
     vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_0].conversion;
     vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_1].conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_2].conversion;
 
     // with a 8.2k resistor for R1 and the sensor as R2, the formula for actual temperature should follow 198 - 31 * ln(analog_value)
     vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog)); // log() is ln
     vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog)); // log() is ln
+
+  
+    return HT_TASK::TaskResponse::YIELD;
+}
+
+
+HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_degrees_C = 0.0183 * pulseCount * 5; // NOLINT
+
+    pulseCount = 0;
 
     return HT_TASK::TaskResponse::YIELD;
 }

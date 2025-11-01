@@ -3,7 +3,6 @@
 #include "hytech.h"
 #include <cstdint>
 
-
 namespace VCRCANInterfaceImpl {
 
 // global forwards
