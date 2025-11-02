@@ -209,15 +209,29 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
     
     /* Thermistor Data */
-    // Serial.print("Thermistor 0 Analog: ");
-    // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog);
-    // Serial.print(" Thermistor 0 degrees C: ");
-    // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C);
-    // Serial.print("Thermistor 1 Analog: ");
-    // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog);
-    // Serial.print(" Thermistor 1 degrees C: ");
-    // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C);
+    Serial.print("Thermistor 0 Analog: ");
+    Serial.print(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog);
+    Serial.print(" Thermistor 0 degrees C: ");
+    Serial.println(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C);
+    Serial.print("Thermistor 4 Analog: ");
+    Serial.print(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog);
+    Serial.print(" Thermistor 4 degrees C: ");
+    Serial.println(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_degrees_C);
+    Serial.print("Thermistor 5 Analog: ");
+    Serial.print(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog);
+    Serial.print(" Thermistor 5 degrees C: ");
+    Serial.println(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_degrees_C);
+    Serial.print("Thermistor 6 Analog: ");
+    Serial.print(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog);
+    Serial.print(" Thermistor 6 degrees C: ");
+    Serial.println(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_degrees_C);
+    Serial.print("Thermistor 7 Analog: ");
+    Serial.print(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog);
+    Serial.print(" Thermistor 7 degrees C: ");
+    Serial.println(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C);
 
+    Serial.println();
+ 
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -236,6 +250,7 @@ void setup() {
     vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
 
     SPI.begin();
+    analogReadResolution(ANALOG_RESOLUTION);
 
     pinMode(INVERTER_ENABLE_PIN, OUTPUT);
     pinMode(FLOWMETER_PIN, INPUT_PULLUP);
@@ -316,7 +331,7 @@ void setup() {
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(enqueue_coolant_temp_CAN_task);
     scheduler.schedule(async_main_task);
-    // scheduler.schedule(debug_state_print_task);
+    scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     scheduler.schedule(update_sample_flowmeter);
     scheduler.schedule(IOExpander_read_task);
