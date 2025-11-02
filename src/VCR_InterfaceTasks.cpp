@@ -54,6 +54,8 @@ HT_TASK::TaskResponse init_adc_bundle()
     adc1_offsets[THERMISTOR_6] = THERMISTOR_6_OFFSET;
     adc1_scales[THERMISTOR_7] = THERMISTOR_7_SCALE;
     adc1_offsets[THERMISTOR_7] = THERMISTOR_7_OFFSET;
+    
+
 
     ADCSingletonInstance::create(adc0_scales, adc0_offsets, adc1_scales, adc1_offsets);
 
@@ -126,6 +128,16 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
     vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog));
     vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog));
     vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog));
+  
+    return HT_TASK::TaskResponse::YIELD;
+}
+
+
+HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_degrees_C = 0.0183 * pulseCount * 5; // NOLINT
+
+    pulseCount = 0;
 
     return HT_TASK::TaskResponse::YIELD;
 }
