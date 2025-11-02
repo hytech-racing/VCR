@@ -14,17 +14,17 @@
 
 
 VCRInterfaceData_s sample_async_data(
-    etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, std::string)> recv_call,
+    etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> recv_call,
     VCRAsynchronousInterfaces &interface_ref_container, const VCRInterfaceData_s &cur_vcr_int_data)
 {
     VCRInterfaceData_s ret = cur_vcr_int_data;
     // process ring buffer is from CANInterface. TODO put into namespace
     process_ring_buffer(VCRCANInterfaceImpl::inverter_can_rx_buffer, interface_ref_container.can_interfaces,
-                        sys_time::hal_millis(), recv_call, "inv");
+                        sys_time::hal_millis(), recv_call, CANInterfaceType_e::INVERTER);
     process_ring_buffer(VCRCANInterfaceImpl::telem_can_rx_buffer, interface_ref_container.can_interfaces,
-                        sys_time::hal_millis(), recv_call, "telem");
+                        sys_time::hal_millis(), recv_call, CANInterfaceType_e::TELEM);
     process_ring_buffer(VCRCANInterfaceImpl::auxillary_can_rx_buffer, interface_ref_container.can_interfaces,
-                        sys_time::hal_millis(), recv_call, "aux");
+                        sys_time::hal_millis(), recv_call, CANInterfaceType_e::AUX);
 
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
     auto acu_data = interface_ref_container.can_interfaces.acu_interface.get_latest_data(sys_time::hal_millis());
@@ -54,7 +54,7 @@ VCRInterfaceData_s sample_async_data(
 HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
-    etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, std::string)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, std::string)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
+    etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 
     bool torque_mode_cycle_button_was_pressed = vcr_data.interface_data.dash_input_state.mode_btn_is_pressed;
 

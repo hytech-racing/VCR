@@ -35,7 +35,7 @@ void on_telem_can_receive(const CAN_message_t &msg) {
     telem_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
-void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis, std::string interface_id) {
+void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis, CANInterfaceType_e interface_type) {
     switch (msg.id) {
 
     case PEDALS_SYSTEM_DATA_CANID: 
@@ -60,17 +60,17 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
     }
     case DRIVEBRAIN_TORQUE_LIM_INPUT_CANID: 
     {
-        if (interface_id == "aux") {
+        if (interface_type == CANInterfaceType_e::AUX) {
             interfaces.db_interface.receive_drivebrain_torque_lim_command_auxillary(msg, millis);
-        } else if (interface_id == "telem") {
+        } else if (interface_type == CANInterfaceType_e::TELEM) {
             interfaces.db_interface.receive_drivebrain_torque_lim_command_telem(msg, millis);
         }
         break;
     }
     case DRIVEBRAIN_SPEED_SET_INPUT_CANID: {
-        if (interface_id == "aux") {
+        if (interface_type == CANInterfaceType_e::AUX) {
             interfaces.db_interface.receive_drivebrain_speed_command_auxillary(msg, millis);
-        } else if (interface_id == "telem") {
+        } else if (interface_type == CANInterfaceType_e::TELEM) {
             interfaces.db_interface.receive_drivebrain_speed_command_telem(msg, millis);
         }
          interfaces.db_interface.receive_drivebrain_speed_command_telem(msg, millis);
