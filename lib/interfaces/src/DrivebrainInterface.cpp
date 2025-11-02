@@ -112,12 +112,12 @@ void DrivebrainInterface::receive_drivebrain_torque_lim_command_auxillary(const 
 
 void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
     REAR_SUSPENSION_t rear_sus_msg;
-    // Random values for testing
-    rear_sus_msg.rl_load_cell = 1.05;
-    rear_sus_msg.rr_load_cell = 4.1;
-    rear_sus_msg.rl_shock_pot = 0.1;
-    rear_sus_msg.rr_shock_pot = 10.2;
-
+    
+    rear_sus_msg.rl_load_cell = _suspension_data.rear_load_cell_data.RL_loadcell_analog;
+    rear_sus_msg.rr_load_cell = _suspension_data.rear_load_cell_data.RR_loadcell_analog;
+    rear_sus_msg.rl_shock_pot = _suspension_data.rear_suspot_data.RL_sus_pot_analog;
+    rear_sus_msg.rr_shock_pot = _suspension_data.rear_suspot_data.RR_sus_pot_analog;
+    
     CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_hytech,
                           VCRCANInterfaceImpl::telem_can_tx_buffer); 
 }
