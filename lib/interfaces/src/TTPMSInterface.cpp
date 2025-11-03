@@ -107,19 +107,19 @@ void TTPMSInterface::receiveTemperatureCh1To4(const CAN_message_t &msg, unsigned
         case TTPMSWheelLocation::RF: {
             RF_TTPMS_2_t data;
             Unpack_RF_TTPMS_2_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(4, std::array<uint16_t,4>{data.RF_TTPMS_T1_ro, data.RF_TTPMS_T2_ro, data.RF_TTPMS_T3_ro, data.RF_TTPMS_T4_ro});
+            _updateInfraredTemp(0, std::array<uint16_t,4>{data.RF_TTPMS_T1_ro, data.RF_TTPMS_T2_ro, data.RF_TTPMS_T3_ro, data.RF_TTPMS_T4_ro});
             break;
         }
         case TTPMSWheelLocation::LR: {
             LR_TTPMS_2_t data;
             Unpack_LR_TTPMS_2_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(8, std::array<uint16_t,4>{data.LR_TTPMS_T1_ro, data.LR_TTPMS_T2_ro, data.LR_TTPMS_T3_ro, data.LR_TTPMS_T4_ro});
+            _updateInfraredTemp(0, std::array<uint16_t,4>{data.LR_TTPMS_T1_ro, data.LR_TTPMS_T2_ro, data.LR_TTPMS_T3_ro, data.LR_TTPMS_T4_ro});
             break;
         }
         case TTPMSWheelLocation::RR: {
             RR_TTPMS_2_t data;
             Unpack_RR_TTPMS_2_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(12, std::array<uint16_t,4>{data.RR_TTPMS_T1_ro, data.RR_TTPMS_T2_ro, data.RR_TTPMS_T3_ro, data.RR_TTPMS_T4_ro});
+            _updateInfraredTemp(0, std::array<uint16_t,4>{data.RR_TTPMS_T1_ro, data.RR_TTPMS_T2_ro, data.RR_TTPMS_T3_ro, data.RR_TTPMS_T4_ro});
             break;
         }
     }
@@ -130,28 +130,28 @@ void TTPMSInterface::receiveTemperatureCh5To8(const CAN_message_t &msg, unsigned
         case TTPMSWheelLocation::LF: {
             LF_TTPMS_3_t data;
             Unpack_LF_TTPMS_3_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.LF_TTPMS_T5_ro, data.LF_TTPMS_T6_ro, data.LF_TTPMS_T7_ro, data.LF_TTPMS_T8_ro});
+            _updateInfraredTemp(4, {data.LF_TTPMS_T5_ro, data.LF_TTPMS_T6_ro, data.LF_TTPMS_T7_ro, data.LF_TTPMS_T8_ro});
             break;
         }
         
         case TTPMSWheelLocation::RF: {
             RF_TTPMS_3_t data;
             Unpack_RF_TTPMS_3_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.RF_TTPMS_T5_ro, data.RF_TTPMS_T6_ro, data.RF_TTPMS_T7_ro, data.RF_TTPMS_T8_ro});
+            _updateInfraredTemp(4, {data.RF_TTPMS_T5_ro, data.RF_TTPMS_T6_ro, data.RF_TTPMS_T7_ro, data.RF_TTPMS_T8_ro});
             break;
         }
 
         case TTPMSWheelLocation::LR: {
             LR_TTPMS_3_t data;
             Unpack_LR_TTPMS_3_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.LR_TTPMS_T5_ro, data.LR_TTPMS_T6_ro, data.LR_TTPMS_T7_ro, data.LR_TTPMS_T8_ro});
+            _updateInfraredTemp(4, {data.LR_TTPMS_T5_ro, data.LR_TTPMS_T6_ro, data.LR_TTPMS_T7_ro, data.LR_TTPMS_T8_ro});
             break;
         }
 
         case TTPMSWheelLocation::RR: {
             RR_TTPMS_3_t data;
             Unpack_RR_TTPMS_3_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.RR_TTPMS_T5_ro, data.RR_TTPMS_T6_ro, data.RR_TTPMS_T7_ro, data.RR_TTPMS_T8_ro});
+            _updateInfraredTemp(4, {data.RR_TTPMS_T5_ro, data.RR_TTPMS_T6_ro, data.RR_TTPMS_T7_ro, data.RR_TTPMS_T8_ro});
             break;
         }
     }
@@ -162,28 +162,28 @@ void TTPMSInterface::receiveTemperatureCh9To12(const CAN_message_t &msg, unsigne
         case TTPMSWheelLocation::LF: {
             LF_TTPMS_4_t data;
             Unpack_LF_TTPMS_4_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.LF_TTPMS_T9_ro, data.LF_TTPMS_T10_ro, data.LF_TTPMS_T11_ro, data.LF_TTPMS_T12_ro});
+            _updateInfraredTemp(8, {data.LF_TTPMS_T9_ro, data.LF_TTPMS_T10_ro, data.LF_TTPMS_T11_ro, data.LF_TTPMS_T12_ro});
             break;
         }
         
         case TTPMSWheelLocation::RF: {
             RF_TTPMS_4_t data;
             Unpack_RF_TTPMS_4_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.RF_TTPMS_T9_ro, data.RF_TTPMS_T10_ro, data.RF_TTPMS_T11_ro, data.RF_TTPMS_T12_ro});
+            _updateInfraredTemp(8, {data.RF_TTPMS_T9_ro, data.RF_TTPMS_T10_ro, data.RF_TTPMS_T11_ro, data.RF_TTPMS_T12_ro});
             break;
         }
 
         case TTPMSWheelLocation::LR: {
             LR_TTPMS_4_t data;
             Unpack_LR_TTPMS_4_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.LR_TTPMS_T9_ro, data.LR_TTPMS_T10_ro, data.LR_TTPMS_T11_ro, data.LR_TTPMS_T12_ro});
+            _updateInfraredTemp(8, {data.LR_TTPMS_T9_ro, data.LR_TTPMS_T10_ro, data.LR_TTPMS_T11_ro, data.LR_TTPMS_T12_ro});
             break;
         }
 
         case TTPMSWheelLocation::RR: {
             RR_TTPMS_4_t data;
             Unpack_RR_TTPMS_4_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.RR_TTPMS_T9_ro, data.RR_TTPMS_T10_ro, data.RR_TTPMS_T11_ro, data.RR_TTPMS_T12_ro});
+            _updateInfraredTemp(8, {data.RR_TTPMS_T9_ro, data.RR_TTPMS_T10_ro, data.RR_TTPMS_T11_ro, data.RR_TTPMS_T12_ro});
             break;
         }
     }
@@ -194,28 +194,28 @@ void TTPMSInterface::receiveTemperatureCh13To16(const CAN_message_t &msg, unsign
         case TTPMSWheelLocation::LF: {
             LF_TTPMS_5_t data;
             Unpack_LF_TTPMS_5_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.LF_TTPMS_T13_ro, data.LF_TTPMS_T14_ro, data.LF_TTPMS_T15_ro, data.LF_TTPMS_T16_ro});
+            _updateInfraredTemp(12, {data.LF_TTPMS_T13_ro, data.LF_TTPMS_T14_ro, data.LF_TTPMS_T15_ro, data.LF_TTPMS_T16_ro});
             break;
         }
         
         case TTPMSWheelLocation::RF: {
             RF_TTPMS_5_t data;
             Unpack_RF_TTPMS_5_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.RF_TTPMS_T13_ro, data.RF_TTPMS_T14_ro, data.RF_TTPMS_T15_ro, data.RF_TTPMS_T16_ro});
+            _updateInfraredTemp(12, {data.RF_TTPMS_T13_ro, data.RF_TTPMS_T14_ro, data.RF_TTPMS_T15_ro, data.RF_TTPMS_T16_ro});
             break;
         }
 
         case TTPMSWheelLocation::LR: {
             LR_TTPMS_5_t data;
             Unpack_LR_TTPMS_5_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.LR_TTPMS_T13_ro, data.LR_TTPMS_T14_ro, data.LR_TTPMS_T15_ro, data.LR_TTPMS_T16_ro});
+            _updateInfraredTemp(12, {data.LR_TTPMS_T13_ro, data.LR_TTPMS_T14_ro, data.LR_TTPMS_T15_ro, data.LR_TTPMS_T16_ro});
             break;
         }
 
         case TTPMSWheelLocation::RR: {
             RR_TTPMS_5_t data;
             Unpack_RR_TTPMS_5_hytech(&data, msg.buf, msg.len);
-            _updateInfraredTemp(0, {data.RR_TTPMS_T13_ro, data.RR_TTPMS_T14_ro, data.RR_TTPMS_T15_ro, data.RR_TTPMS_T16_ro});
+            _updateInfraredTemp(12, {data.RR_TTPMS_T13_ro, data.RR_TTPMS_T14_ro, data.RR_TTPMS_T15_ro, data.RR_TTPMS_T16_ro});
             break;
         }
     }
