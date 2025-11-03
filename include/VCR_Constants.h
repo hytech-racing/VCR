@@ -24,7 +24,7 @@ constexpr int RL_SUS_POT_CHANNEL      = 5;
 constexpr int RR_SUS_POT_CHANNEL      = 6;
 // const int UNUSED_CHANNEL       = 7;
 
-/* Channels on ADC_1 */
+/* Channels on adc_1 */
 constexpr int THERMISTOR_0 = 0;
 constexpr int THERMISTOR_1 = 1;
 constexpr int THERMISTOR_2 = 2;
