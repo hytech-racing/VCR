@@ -38,6 +38,7 @@
 #include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
 #include "controls.h"
+#include "TTPMSInterface.h"
 
 /* From pio-git-hash */
 #include "device_fw_version.h"
@@ -58,6 +59,10 @@ InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CA
 InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
 InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
 
+TTPMSInterface lf_ttpms_interface;
+TTPMSInterface fr_ttpms_interface;
+TTPMSInterface lr_ttpms_interface;
+TTPMSInterface rr_ttpms_interface;
 // Inverter Functs
 DrivetrainSystem::InverterFuncts fl_inverter_functs = {
     .set_speed = [](float desired_rpm, float torque_limit_nm) { fl_inverter_int.set_speed(desired_rpm, torque_limit_nm);},
@@ -286,7 +291,11 @@ void setup() {
         fl_inverter_int,
         fr_inverter_int,
         rl_inverter_int,
-        rr_inverter_int
+        rr_inverter_int,
+        lf_ttpms_interface,
+        fr_ttpms_interface,
+        lr_ttpms_interface,
+        rr_ttpms_interface
     );
     VCRAsynchronousInterfacesInstance::create(CANInterfacesInstance::instance());
 
