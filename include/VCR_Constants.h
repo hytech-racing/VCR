@@ -14,6 +14,8 @@ constexpr int BRAKELIGHT_CONTROL_PIN = 32;
 /*                 ADC pins and configs               */
 /* -------------------------------------------------- */
 
+constexpr int ANALOG_RESOLUTION = 12;
+
 /* Channels on adc_0 */
 constexpr int GLV_SENSE_CHANNEL       = 0;
 constexpr int CURRENT_SENSE_CHANNEL   = 1;
@@ -73,8 +75,10 @@ const float THERMISTOR_7_SCALE = 1;
 const float THERMISTOR_7_OFFSET = 0; 
 
 // Coolant Temperature Sensor scale / offsets
-const float COOLANT_TEMP_SCALE = -31;
-const float COOLANT_TEMP_OFFSET = 242;
+constexpr const float COOLANT_TEMP_SCALE = -31.3;
+constexpr const float COOLANT_TEMP_OFFSET = 242;
+constexpr const float TEST_TEMP_SCALE = -46.8;
+constexpr const float TEST_TEMP_OFFSET = 386;
 
 /* Watchdog constants */
 constexpr int INVERTER_ENABLE_PIN = 2;
