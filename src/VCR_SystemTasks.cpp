@@ -55,7 +55,7 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
 
     VCRInterfaceData_s new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data);
     
-    vcr_data.system_data.drivetrain_data.measuredSpeeds = {new_interface_data.inverter_data.FL.speed_rpm, new_interface_data.inverter_data.FR.speed_rpm, new_interface_data.inverter_data.RL.speed_rpm, new_interface_data.inverter_data.RR.speed_rpm};
+    vcr_data.system_data.drivetrain_data.measuredSpeeds = {static_cast<float>(new_interface_data.inverter_data.FL.speed_rpm), static_cast<float>(new_interface_data.inverter_data.FR.speed_rpm), static_cast<float>(new_interface_data.inverter_data.RL.speed_rpm), static_cast<float>(new_interface_data.inverter_data.RR.speed_rpm)};
     
     // If torque button was released (it was pressed before updating and now it's not)
     if (torque_mode_cycle_button_was_pressed && !new_interface_data.dash_input_state.mode_btn_is_pressed)

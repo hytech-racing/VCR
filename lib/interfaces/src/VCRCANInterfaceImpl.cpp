@@ -163,12 +163,93 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
             break;
         }
     }
-    
-    default: {
+
+    // Front Left TTPMS sensor
+ // Front Left
+    case LF_TTPMS_1_CANID:
+        interfaces.lf_ttpms_interface.receivePressureAndVoltage(msg, millis, TTPMSWheelLocation::LF);
         break;
-    }
-    }
+    case LF_TTPMS_2_CANID:
+        interfaces.lf_ttpms_interface.receiveTemperatureCh1To4(msg, millis, TTPMSWheelLocation::LF);
+        break;
+    case LF_TTPMS_3_CANID:
+        interfaces.lf_ttpms_interface.receiveTemperatureCh5To8(msg, millis, TTPMSWheelLocation::LF);
+        break;
+    case LF_TTPMS_4_CANID:
+        interfaces.lf_ttpms_interface.receiveTemperatureCh9To12(msg, millis, TTPMSWheelLocation::LF);
+        break;
+    case LF_TTPMS_5_CANID:
+        interfaces.lf_ttpms_interface.receiveTemperatureCh13To16(msg, millis, TTPMSWheelLocation::LF);
+        break;
+    case LF_TTPMS_6_CANID:
+        interfaces.lf_ttpms_interface.receiveSensorData(msg, millis, TTPMSWheelLocation::LF);
+        break;
+
+    // Front Right
+    case RF_TTPMS_1_CANID:
+        interfaces.fr_ttpms_interface.receivePressureAndVoltage(msg, millis, TTPMSWheelLocation::RF);
+        break;
+    case RF_TTPMS_2_CANID:
+        interfaces.fr_ttpms_interface.receiveTemperatureCh1To4(msg, millis, TTPMSWheelLocation::RF);
+        break;
+    case RF_TTPMS_3_CANID:
+        interfaces.fr_ttpms_interface.receiveTemperatureCh5To8(msg, millis, TTPMSWheelLocation::RF);
+        break;
+    case RF_TTPMS_4_CANID:
+        interfaces.fr_ttpms_interface.receiveTemperatureCh9To12(msg, millis, TTPMSWheelLocation::RF);
+        break;
+    case RF_TTPMS_5_CANID:
+        interfaces.fr_ttpms_interface.receiveTemperatureCh13To16(msg, millis, TTPMSWheelLocation::RF);
+        break;
+    case RF_TTPMS_6_CANID:
+        interfaces.fr_ttpms_interface.receiveSensorData(msg, millis, TTPMSWheelLocation::RF);
+        break;
+
+    // Rear Left
+    case LR_TTPMS_1_CANID:
+        interfaces.lr_ttpms_interface.receivePressureAndVoltage(msg, millis, TTPMSWheelLocation::LR);
+        break;
+    case LR_TTPMS_2_CANID:
+        interfaces.lr_ttpms_interface.receiveTemperatureCh1To4(msg, millis, TTPMSWheelLocation::LR);
+        break;
+    case LR_TTPMS_3_CANID:
+        interfaces.lr_ttpms_interface.receiveTemperatureCh5To8(msg, millis, TTPMSWheelLocation::LR);
+        break;
+    case LR_TTPMS_4_CANID:
+        interfaces.lr_ttpms_interface.receiveTemperatureCh9To12(msg, millis, TTPMSWheelLocation::LR);
+        break;
+    case LR_TTPMS_5_CANID:
+        interfaces.lr_ttpms_interface.receiveTemperatureCh13To16(msg, millis, TTPMSWheelLocation::LR);
+        break;
+    case LR_TTPMS_6_CANID:
+        interfaces.lr_ttpms_interface.receiveSensorData(msg, millis, TTPMSWheelLocation::LR);
+        break;
+
+    // Rear Right
+    case RR_TTPMS_1_CANID:
+        interfaces.rr_ttpms_interface.receivePressureAndVoltage(msg, millis, TTPMSWheelLocation::RR);
+        break;
+    case RR_TTPMS_2_CANID:
+        interfaces.rr_ttpms_interface.receiveTemperatureCh1To4(msg, millis, TTPMSWheelLocation::RR);
+        break;
+    case RR_TTPMS_3_CANID:
+        interfaces.rr_ttpms_interface.receiveTemperatureCh5To8(msg, millis, TTPMSWheelLocation::RR);
+        break;
+    case RR_TTPMS_4_CANID:
+        interfaces.rr_ttpms_interface.receiveTemperatureCh9To12(msg, millis, TTPMSWheelLocation::RR);
+        break;
+    case RR_TTPMS_5_CANID:
+        interfaces.rr_ttpms_interface.receiveTemperatureCh13To16(msg, millis, TTPMSWheelLocation::RR);
+        break;
+    case RR_TTPMS_6_CANID:
+        interfaces.rr_ttpms_interface.receiveSensorData(msg, millis, TTPMSWheelLocation::RR);
+        break;
+
+    default:
+        break;
 }
+}
+
 
 void send_all_CAN_msgs(CANTXBufferType &buffer, FlexCAN_T4_Base *can_interface) {
     CAN_message_t msg;
@@ -180,4 +261,5 @@ void send_all_CAN_msgs(CANTXBufferType &buffer, FlexCAN_T4_Base *can_interface) 
         can_interface->write(msg);
     }
 }
-} // namespace VCRCANInterfaceImpl
+}
+ // namespace VCRCANInterfaceImpl

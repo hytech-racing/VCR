@@ -23,6 +23,7 @@
 #include "ACUInterface.h"
 
 #include "InverterInterface.h"
+#include "TTPMSInterface.h"
 
 using CANRXBufferType = Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)>;
 using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_message_t)>;
@@ -41,7 +42,12 @@ struct CANInterfaces {
         InverterInterface &fl_inv_int,
         InverterInterface &fr_inv_int,
         InverterInterface &rl_inv_int,
-        InverterInterface &rr_inv_int
+        InverterInterface &rr_inv_int,
+        TTPMSInterface &fl_ttpms_int,
+        TTPMSInterface &fr_ttpms_int,
+        TTPMSInterface &lr_ttpms_int,
+        TTPMSInterface &rr_ttpms_int
+
     )
         : vcf_interface(vcf_int), 
           acu_interface(acu_int),
@@ -49,7 +55,11 @@ struct CANInterfaces {
           fl_inverter_interface(fl_inv_int),
           fr_inverter_interface(fr_inv_int),
           rl_inverter_interface(rl_inv_int),
-          rr_inverter_interface(rr_inv_int) {}
+          rr_inverter_interface(rr_inv_int),
+          lf_ttpms_interface(fl_ttpms_int),
+          fr_ttpms_interface(fr_ttpms_int),
+          lr_ttpms_interface(lr_ttpms_int),
+          rr_ttpms_interface(rr_ttpms_int) {}
 
     VCFInterface &vcf_interface;
     ACUInterface &acu_interface;
@@ -58,6 +68,12 @@ struct CANInterfaces {
     InverterInterface &fr_inverter_interface;
     InverterInterface &rl_inverter_interface;
     InverterInterface &rr_inverter_interface;
+    TTPMSInterface &lf_ttpms_interface;
+    TTPMSInterface &fr_ttpms_interface;
+    TTPMSInterface &lr_ttpms_interface;
+    TTPMSInterface &rr_ttpms_interface;
+
+
 
 };
 
