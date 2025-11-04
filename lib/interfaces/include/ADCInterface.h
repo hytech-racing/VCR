@@ -2,6 +2,7 @@
 #define ADCINTERFACE_H
 
 #include "VCR_Globals.h"
+#include "VCR_Constants.h"
 
 #include "MCP_ADC.h"
 #include "SharedFirmwareTypes.h"
@@ -125,6 +126,8 @@ private:
 
 };
 
-using ADCInterfaceInstance = etl::singleton<ADCInterface>;
+using ADCInterfaceInstance = etl::singleton<ADCInterface>; // Singleton for ADCs. Used to pass ADCs to other systems that need them, such as the TelemetrySystem.
+
+
 
 #endif
