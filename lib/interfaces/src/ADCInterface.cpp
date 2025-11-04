@@ -7,11 +7,11 @@ AnalogConversion_s ADCInterface::read_glv() {
   return _adc0.data.conversions[GLV_SENSE_CHANNEL];
 }
 
-AnalogConversion_s ADCInterface::read_current() {
+AnalogConversion_s ADCInterface::read_bspd_current() {
   return _adc0.data.conversions[CURRENT_SENSE_CHANNEL];
 }
 
-AnalogConversion_s ADCInterface::read_reference() {
+AnalogConversion_s ADCInterface::read_bspd_reference_current() {
   return _adc0.data.conversions[REFERENCE_SENSE_CHANNEL];
 }
 

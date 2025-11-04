@@ -30,8 +30,8 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
     ADCInterfaceInstance::instance().tick_adc0();
 
     vcr_data.interface_data.current_sensor_data.twentyfour_volt_sensor = ADCInterfaceInstance::instance().read_glv().conversion;
-    vcr_data.interface_data.current_sensor_data.current_sensor_unfiltered = ADCInterfaceInstance::instance().read_current().conversion;
-    vcr_data.interface_data.current_sensor_data.current_refererence_unfiltered = ADCInterfaceInstance::instance().read_reference().conversion;
+    vcr_data.interface_data.current_sensor_data.current_sensor_unfiltered = ADCInterfaceInstance::instance().read_bspd_current().conversion;
+    vcr_data.interface_data.current_sensor_data.current_refererence_unfiltered = ADCInterfaceInstance::instance().read_bspd_reference_current().conversion;
 
     vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog,

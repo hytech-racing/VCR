@@ -90,9 +90,9 @@ public:
   */
   AnalogConversion_s read_glv();
 
-  AnalogConversion_s read_current();
+  AnalogConversion_s read_bspd_current();
 
-  AnalogConversion_s read_reference();
+  AnalogConversion_s read_bspd_reference_current();
 
   AnalogConversion_s read_rl_loadcell();
 
