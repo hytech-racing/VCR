@@ -32,6 +32,7 @@
 #include "VCR_Globals.h"
 #include "VCR_InterfaceTasks.h"
 #include "VCRCANInterfaceImpl.h"
+#include "ADCInterface.h"
 #include "DrivebrainInterface.h"
 #include "InverterInterface.h"
 #include "DrivetrainSystem.h"
@@ -97,6 +98,7 @@ etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create(
 
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
+
 
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
@@ -318,7 +320,8 @@ void setup() {
     handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(VCRCANInterfaceImpl::TELEM_CAN, telem_CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
 
-    init_adc_bundle();
+    // Initialize ADC interface
+    ADCInterfaceInstance::create();
 
     scheduler.schedule(adc_0_sample_task);
     scheduler.schedule(adc_1_sample_task);

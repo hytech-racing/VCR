@@ -4,6 +4,7 @@
 #include "VCR_InterfaceTasks.h"
 #include "ht_task.hpp"
 #include "ACUInterface.h"
+#include "ADCInterface.h"
 
 
 /* From shared-systems-lib */
@@ -19,49 +20,6 @@
 #include "IOExpander.h"
 #include "IOExpanderUtils.h"
 
-HT_TASK::TaskResponse init_adc_bundle()
-{
-
-    float adc0_scales[channels_within_mcp_adc], adc0_offsets[channels_within_mcp_adc], adc1_scales[channels_within_mcp_adc], adc1_offsets[channels_within_mcp_adc];  // NOLINT (C-style arrays)
-    adc0_scales[GLV_SENSE_CHANNEL] = GLV_SENSE_SCALE;
-    adc0_offsets[GLV_SENSE_CHANNEL] = GLV_SENSE_OFFSET;
-    adc0_scales[CURRENT_SENSE_CHANNEL] = CURRENT_SENSE_SCALE;
-    adc0_offsets[CURRENT_SENSE_CHANNEL] = CURRENT_SENSE_OFFSET;
-    adc0_scales[REFERENCE_SENSE_CHANNEL] = REFERENCE_SENSE_SCALE;
-    adc0_offsets[REFERENCE_SENSE_CHANNEL] = REFERENCE_SENSE_OFFSET;
-    adc0_scales[RL_LOADCELL_CHANNEL] = RL_LOADCELL_SCALE;
-    adc0_offsets[RL_LOADCELL_CHANNEL] = RL_LOADCELL_OFFSET;
-    adc0_scales[RR_LOADCELL_CHANNEL] = RR_LOADCELL_SCALE;
-    adc0_offsets[RR_LOADCELL_CHANNEL] = RR_LOADCELL_OFFSET;
-    adc0_scales[RL_SUS_POT_CHANNEL] = RL_SUS_POT_SCALE;
-    adc0_offsets[RL_SUS_POT_CHANNEL] = RL_SUS_POT_OFFSET;
-    adc0_scales[RR_SUS_POT_CHANNEL] = RR_SUS_POT_SCALE;
-    adc0_offsets[RR_SUS_POT_CHANNEL] = RR_SUS_POT_OFFSET;
-
-    adc1_scales[THERMISTOR_0] = THERMISTOR_0_SCALE;
-    adc1_offsets[THERMISTOR_0] = THERMISTOR_0_OFFSET;
-    adc1_scales[THERMISTOR_1] = THERMISTOR_1_SCALE;
-    adc1_offsets[THERMISTOR_1] = THERMISTOR_1_OFFSET;
-    adc1_scales[THERMISTOR_2] = THERMISTOR_2_SCALE;
-    adc1_offsets[THERMISTOR_2] = THERMISTOR_2_OFFSET;
-    adc1_scales[THERMISTOR_3] = THERMISTOR_3_SCALE;
-    adc1_offsets[THERMISTOR_3] = THERMISTOR_3_OFFSET;
-    adc1_scales[THERMISTOR_4] = THERMISTOR_4_SCALE;
-    adc1_offsets[THERMISTOR_4] = THERMISTOR_4_OFFSET;
-    adc1_scales[THERMISTOR_5] = THERMISTOR_5_SCALE;
-    adc1_offsets[THERMISTOR_5] = THERMISTOR_5_OFFSET;
-    adc1_scales[THERMISTOR_6] = THERMISTOR_6_SCALE;
-    adc1_offsets[THERMISTOR_6] = THERMISTOR_6_OFFSET;
-    adc1_scales[THERMISTOR_7] = THERMISTOR_7_SCALE;
-    adc1_offsets[THERMISTOR_7] = THERMISTOR_7_OFFSET;
-    
-
-
-    ADCSingletonInstance::create(adc0_scales, adc0_offsets, adc1_scales, adc1_offsets);
-
-    return HT_TASK::TaskResponse::YIELD;
-}
-
 float apply_iir_filter(float alpha, float old_value, float new_value)
 {
     return (alpha * new_value) + (1 - alpha) * (old_value);
@@ -69,53 +27,48 @@ float apply_iir_filter(float alpha, float old_value, float new_value)
 
 HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
+    ADCInterfaceInstance::instance().tick_adc0();
 
-    ADCSingletonInstance::instance().adc0.tick();
-
-    vcr_data.interface_data.current_sensor_data.twentyfour_volt_sensor = 
-        ADCSingletonInstance::instance().adc0.data.conversions[GLV_SENSE_CHANNEL].conversion;
-        
-    vcr_data.interface_data.current_sensor_data.current_sensor_unfiltered = 
-        ADCSingletonInstance::instance().adc0.data.conversions[CURRENT_SENSE_CHANNEL].conversion;
-
-    vcr_data.interface_data.current_sensor_data.current_refererence_unfiltered = 
-        ADCSingletonInstance::instance().adc0.data.conversions[REFERENCE_SENSE_CHANNEL].conversion;
+    vcr_data.interface_data.current_sensor_data.twentyfour_volt_sensor = ADCInterfaceInstance::instance().read_glv().conversion;
+    vcr_data.interface_data.current_sensor_data.current_sensor_unfiltered = ADCInterfaceInstance::instance().read_current().conversion;
+    vcr_data.interface_data.current_sensor_data.current_refererence_unfiltered = ADCInterfaceInstance::instance().read_reference().conversion;
 
     vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog,
-        ADCSingletonInstance::instance().adc0.data.conversions[RL_LOADCELL_CHANNEL].conversion);
-    vcr_data.interface_data.rear_loadcell_data.valid_RL_sample = ((ADCSingletonInstance::instance().adc0.data.conversions[RL_LOADCELL_CHANNEL].raw != 4095) 
-                                                                && (ADCSingletonInstance::instance().adc0.data.conversions[RL_LOADCELL_CHANNEL].status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
+        ADCInterfaceInstance::instance().read_rl_loadcell().conversion);
+
+    vcr_data.interface_data.rear_loadcell_data.valid_RL_sample = ((ADCInterfaceInstance::instance().read_rl_loadcell().raw != 4095) 
+                                                                && (ADCInterfaceInstance::instance().read_rl_loadcell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
 
     vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog,
-        ADCSingletonInstance::instance().adc0.data.conversions[RR_LOADCELL_CHANNEL].conversion);
-    vcr_data.interface_data.rear_loadcell_data.valid_RR_sample = ((ADCSingletonInstance::instance().adc0.data.conversions[RR_LOADCELL_CHANNEL].raw != 4095) 
-                                                                && (ADCSingletonInstance::instance().adc0.data.conversions[RR_LOADCELL_CHANNEL].status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
+        ADCInterfaceInstance::instance().read_rr_loadcell().conversion);
+    vcr_data.interface_data.rear_loadcell_data.valid_RR_sample = ((ADCInterfaceInstance::instance().read_rr_loadcell().raw != 4095) 
+                                                                && (ADCInterfaceInstance::instance().read_rr_loadcell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
 
     vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog,
-        ADCSingletonInstance::instance().adc0.data.conversions[RL_SUS_POT_CHANNEL].raw);
+        ADCInterfaceInstance::instance().read_rl_sus_pot().raw);
     
     vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog,
-        ADCSingletonInstance::instance().adc0.data.conversions[RR_SUS_POT_CHANNEL].raw);
+        ADCInterfaceInstance::instance().read_rr_sus_pot().raw);
 
     return HT_TASK::TaskResponse::YIELD;
 }
 
 HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    ADCSingletonInstance::instance().adc1.tick();
+    ADCInterfaceInstance::instance().tick_adc1();  
 
-    vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_0].conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_1].conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_2].conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_3].conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_4].conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_5].conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_6].conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog = ADCSingletonInstance::instance().adc1.data.conversions[THERMISTOR_7].conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_0().conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_1().conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_2().conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_3().conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_4().conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_5().conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_6().conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_7().conversion;
 
     // with a 8.2k resistor for R1 and the sensor as R2, the formula for actual temperature should follow 198 - 31 * ln(analog_value)
     vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog)); // log() is ln

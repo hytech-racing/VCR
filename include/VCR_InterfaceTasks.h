@@ -18,9 +18,7 @@
  * store them in structs defined in shared_firmware_types. This function relies on adc_0 being
  * defined in VCRGlobals.h.
  */
-HT_TASK::TaskResponse init_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
-HT_TASK::TaskResponse init_adc_bundle();
 
 /**
  * NOTE: These channels are UNUSED BY DEFAULT and exist ONLY FOR TESTING. You may edit this
@@ -30,7 +28,6 @@ HT_TASK::TaskResponse init_adc_bundle();
  * store them in a struct defined in shared_firmware_types. This function relies on adc_1 being
  * defined in VCRGlobals.h.
  */
-HT_TASK::TaskResponse init_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
 
 HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo);
