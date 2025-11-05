@@ -15,6 +15,7 @@ constexpr int BRAKELIGHT_CONTROL_PIN = 32;
 /* -------------------------------------------------- */
 
 constexpr int ANALOG_RESOLUTION = 12;
+constexpr unsigned int CHANNELS_WITHIN_MCP_ADC = 8;
 
 /* Channels on adc_0 */
 constexpr int GLV_SENSE_CHANNEL       = 0;
