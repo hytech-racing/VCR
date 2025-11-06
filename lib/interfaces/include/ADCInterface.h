@@ -89,14 +89,26 @@ public:
     pinouts,
     channels,
     scales,
-    offsets } {};
+    offsets },
+    _adc0(
+      _adc_parameters.pinouts.adc0_spi_cs_pin,
+      MCP_ADC_DEFAULT_SPI_SDI,
+      MCP_ADC_DEFAULT_SPI_SDO,
+      MCP_ADC_DEFAULT_SPI_CLK,
+      MCP_ADC_DEFAULT_SPI_SPEED,
+      adc0_scales().data(),
+      adc0_offsets().data()
+    ),
+    _adc1(
+      _adc_parameters.pinouts.adc1_spi_cs_pin,
+      MCP_ADC_DEFAULT_SPI_SDI,
+      MCP_ADC_DEFAULT_SPI_SDO,
+      MCP_ADC_DEFAULT_SPI_CLK,
+      MCP_ADC_DEFAULT_SPI_SPEED,
+      adc1_scales().data(),
+      adc1_offsets().data()
+    ) {};
 
-  /**
-   * @pre constructor called and ADC parameters created
-   * @post _adc0 and _adc1 initialized with correct scales and offsets
-  */
-  void init();
-        
   /**
   * Samples from ADC0
   */
@@ -168,8 +180,14 @@ public:
 private:
   ADCInterfaceParams_s _adc_parameters = {};
 
-  std::optional<MCP_ADC<adc_default_parameters::channels_within_mcp_adc>> _adc0;
-  std::optional<MCP_ADC<adc_default_parameters::channels_within_mcp_adc>> _adc1;
+  MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc0;
+  MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc1;
+
+
+  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_scales();
+  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_offsets();
+  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_scales();
+  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_offsets();
 
 };
 

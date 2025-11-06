@@ -376,9 +376,6 @@ void setup() {
       }
     );
   
-  // Initialize ADC scales and offsets
-  ADCInterfaceInstance::instance().init();
-    
     
     scheduler.schedule(adc_0_sample_task);
     scheduler.schedule(adc_1_sample_task);
