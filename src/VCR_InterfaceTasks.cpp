@@ -122,12 +122,12 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
     vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog)); // log() is ln
 
     // other thermistors computation is not as straight forward, not sure what these are
-    vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_analog));
-    vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_analog));
-    vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog));
-    vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog));
-    vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog));
-    vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog));
+    // vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_analog));
+    // vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_analog));
+    // vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog));
+    // vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog));
+    // vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog));
+    // vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog));
   
     return HT_TASK::TaskResponse::YIELD;
 }
@@ -136,9 +136,7 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
 HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_degrees_C = 0.0183 * pulseCount * 5; // NOLINT
-
     pulseCount = 0;
-
     return HT_TASK::TaskResponse::YIELD;
 }
 
