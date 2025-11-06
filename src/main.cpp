@@ -320,9 +320,66 @@ void setup() {
     handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(VCRCANInterfaceImpl::TELEM_CAN, telem_CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
 
-    // Initialize ADC interface
-    ADCInterfaceInstance::create();
-
+    // Instantiate ADC interface
+    ADCInterfaceInstance::create(
+      ADCPinout_s {ADC0_CS, ADC1_CS},
+      ADCChannels_s {
+        GLV_SENSE_CHANNEL,
+        CURRENT_SENSE_CHANNEL,
+        REFERENCE_SENSE_CHANNEL,
+        RL_LOADCELL_CHANNEL,
+        RR_LOADCELL_CHANNEL,
+        RL_SUS_POT_CHANNEL,
+        RR_SUS_POT_CHANNEL,
+        THERMISTOR_0,
+        THERMISTOR_1,
+        THERMISTOR_2,
+        THERMISTOR_3,
+        THERMISTOR_4,
+        THERMISTOR_5,
+        THERMISTOR_6,
+        THERMISTOR_7
+      },
+      ADCScales_s {
+        GLV_SENSE_SCALE,
+        CURRENT_SENSE_SCALE,
+        REFERENCE_SENSE_SCALE,
+        RL_LOADCELL_SCALE,
+        RR_LOADCELL_SCALE,
+        RL_SUS_POT_SCALE,
+        RR_SUS_POT_SCALE,
+        THERMISTOR_0_SCALE,
+        THERMISTOR_1_SCALE,
+        THERMISTOR_2_SCALE,
+        THERMISTOR_3_SCALE,
+        THERMISTOR_4_SCALE,
+        THERMISTOR_5_SCALE,
+        THERMISTOR_6_SCALE,
+        THERMISTOR_7_SCALE,
+      },
+      ADCOffsets_s {
+        GLV_SENSE_OFFSET,
+        CURRENT_SENSE_OFFSET,
+        REFERENCE_SENSE_OFFSET,
+        RL_LOADCELL_OFFSET,
+        RR_LOADCELL_OFFSET,
+        RL_SUS_POT_OFFSET,
+        RR_SUS_POT_OFFSET,
+        THERMISTOR_0_OFFSET,
+        THERMISTOR_1_OFFSET,
+        THERMISTOR_2_OFFSET,
+        THERMISTOR_3_OFFSET,
+        THERMISTOR_4_OFFSET,
+        THERMISTOR_5_OFFSET,
+        THERMISTOR_6_OFFSET,
+        THERMISTOR_7_OFFSET,
+      }
+    );
+  
+  // Initialize ADC scales and offsets
+  ADCInterfaceInstance::instance().init();
+    
+    
     scheduler.schedule(adc_0_sample_task);
     scheduler.schedule(adc_1_sample_task);
     scheduler.schedule(kick_watchdog_task);
