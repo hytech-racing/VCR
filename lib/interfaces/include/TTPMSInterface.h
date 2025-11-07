@@ -20,7 +20,7 @@ enum InfraredTempFrame {
     FRAME2 = 4, 
     FRAME3 = 8, 
     FRAME4 = 12
-}
+};
 
 struct TTPMSSensorData_s {
     uint16_t battery_voltage;
