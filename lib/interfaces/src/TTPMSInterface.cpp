@@ -12,7 +12,7 @@ void TTPMSInterface::receivePressureAndVoltage(
             Unpack_LF_TTPMS_1_hytech(&data, msg.buf, msg.len);
             _latest_sensor_data.battery_voltage = data.LF_TTPMS_BAT_V;
             _latest_sensor_data.serial_number   = data.LF_TTPMS_SN;
-            _latest_sensor_data.pressure        = data.LF_TTPMS_P;
+            _latest_sensor_data.pressure        = HYTECH_LF_TTPMS_P_ro_fromS(data.LF_TTPMS_P_ro);
             _latest_sensor_data.gauge_pressure  = data.LF_TTPMS_P_GAUGE;
             break;
         }
@@ -21,7 +21,7 @@ void TTPMSInterface::receivePressureAndVoltage(
             Unpack_RF_TTPMS_1_hytech(&data, msg.buf, msg.len);
             _latest_sensor_data.battery_voltage = data.RF_TTPMS_BAT_V;
             _latest_sensor_data.serial_number   = data.RF_TTPMS_SN;
-            _latest_sensor_data.pressure        = data.RF_TTPMS_P;
+            _latest_sensor_data.pressure        = HYTECH_RF_TTPMS_P_ro_fromS(data.RF_TTPMS_P_ro);
             _latest_sensor_data.gauge_pressure  = data.RF_TTPMS_P_GAUGE;
             break;
         }
@@ -30,7 +30,7 @@ void TTPMSInterface::receivePressureAndVoltage(
             Unpack_LR_TTPMS_1_hytech(&data, msg.buf, msg.len);
             _latest_sensor_data.battery_voltage = data.LR_TTPMS_BAT_V;
             _latest_sensor_data.serial_number   = data.LR_TTPMS_SN;
-            _latest_sensor_data.pressure        = data.LR_TTPMS_P;
+            _latest_sensor_data.pressure        = HYTECH_LR_TTPMS_P_ro_fromS(data.LR_TTPMS_P_ro);
             _latest_sensor_data.gauge_pressure  = data.LR_TTPMS_P_GAUGE;
             break;
         }
@@ -39,7 +39,7 @@ void TTPMSInterface::receivePressureAndVoltage(
             Unpack_RR_TTPMS_1_hytech(&data, msg.buf, msg.len);
             _latest_sensor_data.battery_voltage = data.RR_TTPMS_BAT_V;
             _latest_sensor_data.serial_number   = data.RR_TTPMS_SN;
-            _latest_sensor_data.pressure        = data.RR_TTPMS_P;
+            _latest_sensor_data.pressure        = HYTECH_RR_TTPMS_P_ro_fromS(data.RR_TTPMS_P_ro);
             _latest_sensor_data.gauge_pressure  = data.RR_TTPMS_P_GAUGE;
             break;
         }
