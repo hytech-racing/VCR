@@ -51,7 +51,7 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     );
 
     _aux_latency_info.worst_period_millis = std::max(_aux_latency_info.worst_period_millis, aux_latency_millis);
-    _telem_latency_info.worst_period_millis = std::max(_aux_latency_info.worst_period_millis, telem_latency_millis);
+    _telem_latency_info.worst_period_millis = std::max(_telem_latency_info.worst_period_millis, telem_latency_millis);
 
     return output;
 }

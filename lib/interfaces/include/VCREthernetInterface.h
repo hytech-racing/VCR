@@ -19,7 +19,7 @@ namespace VCREthernetInterface
      * Function to take a populated protoc struct from the drivebrain and update the VCR state.
      * 
      * @param msg_in A reference to a populated protoc struct.
-     * @param shared_state A rPeference to the VCR state.
+     * @param shared_state A reference to the VCR state.
      * 
      * @post After this function completes, shared_state will have updated contents of ACUAllData.
      */
