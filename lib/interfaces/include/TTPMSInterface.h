@@ -18,15 +18,15 @@ enum TTPMSWheelLocation {
 struct TTPMSSensorData_s {
     uint16_t battery_voltage;
     uint16_t serial_number;
-    uint16_t pressure;
+    double pressure;
     uint16_t gauge_pressure;
 
     uint16_t rssi;
     uint16_t sensor_node_id;
     uint16_t transmission_count;
-    uint16_t sensor_temperature;
+    double sensor_temperature;
 
-    std::array<uint16_t, 16> infrared_temp{}; // T1-T16
+    std::array<double, 16> infrared_temp{}; // T1-T16
 };
 
 class TTPMSInterface {
@@ -51,7 +51,7 @@ public:
 private:
     TTPMSSensorData_s _latest_sensor_data;
 
-    void _updateInfraredTemp(uint16_t baseIndex, const std::array<uint16_t,4>& values);
+    void _updateInfraredTemp(double baseIndex, const std::array<double,4>& values);
 };
 
 

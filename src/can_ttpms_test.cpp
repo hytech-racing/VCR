@@ -37,6 +37,7 @@ void on_recv(const CAN_message_t &msg)
     Serial.print("  ID: 0x"); Serial.print(msg.id, HEX); Serial.print(" ");
     Serial.print("  EXT: "); Serial.print(msg.flags.extended);
     Serial.print("  LEN: "); Serial.print(msg.len); Serial.print(" ");
+    Serial.print("  DATA: ");    
         for ( uint8_t i = 0; i < 8; i++ ) {
             Serial.print(msg.buf[i], HEX); Serial.print(" ");
         }        
