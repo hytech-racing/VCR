@@ -1,17 +1,14 @@
 #include "controllers/DrivebrainController.h"
 #include "SharedFirmwareTypes.h"
 #include <cstdint>
-#include <Arduino.h>
-// #include <Arduino.h>
 
 DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsigned long curr_millis) {
 
     auto db_telem_input = state.interface_data.latest_drivebrain_telem_command;
     auto db_auxillary_input = state.interface_data.latest_drivebrain_auxillary_command;
 
-    _telem_timing_failure = _check_drivebrain_command_timing_failure(db_telem_input, curr_millis);
-    _aux_timing_failure = _check_drivebrain_command_timing_failure(db_auxillary_input, curr_millis);
-
+    _check_drivebrain_command_timing_failure(db_telem_input, curr_millis, _telem_latency_info);
+    _check_drivebrain_command_timing_failure(db_auxillary_input, curr_millis, _aux_latency_info);
     bool drivebrain_reinit_button_pressed = state.interface_data.dash_input_state.data_btn_is_pressed;
 
     if (drivebrain_reinit_button_pressed && (!_should_run_controller)) {
@@ -20,13 +17,16 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
 
     DrivetrainCommand_s output;
 
-    if (_should_run_controller && !_telem_timing_failure) {
+    if (_should_run_controller && !_telem_latency_info.timing_failure) {
         output = db_telem_input.get_command();
-    } else if (_should_run_controller && !_aux_timing_failure) {
+    } else if (_should_run_controller && !_aux_latency_info.timing_failure) {
         output = db_auxillary_input.get_command();
     } else {
         _should_run_controller = false;
-        output = _emergency_control.evaluate(state, curr_millis);
+        DrivetrainCommand_s coast_to_stop = {
+            .desired_speeds = {0.0f, 0.0f, 0.0f, 0.0f},
+        };
+        output = coast_to_stop;
     }
 
     // Handle worst latency updates
@@ -36,27 +36,27 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
 
     if (curr_millis - _last_reset_worse_latency_clock > 1000) {
         _last_reset_worse_latency_clock = curr_millis; 
-        _worst_latency_aux = 0;
-        _worst_latency_telem = 0;
+        _telem_latency_info.worst_period_millis = 0;
+        _aux_latency_info.worst_period_millis = 0;
     }
 
-    int aux_latency_millis = max(
+    int aux_latency_millis = std::max(
         curr_millis - db_auxillary_input.desired_speeds.last_recv_millis, 
         curr_millis - db_auxillary_input.torque_limits.last_recv_millis
     );
 
-    int telem_latency_millis = max(
+    int telem_latency_millis = std::max(
         curr_millis - db_telem_input.desired_speeds.last_recv_millis, 
         curr_millis - db_telem_input.torque_limits.last_recv_millis
     );
 
-    _worst_latency_aux = max(_worst_latency_aux, aux_latency_millis);
-    _worst_latency_telem = max(_worst_latency_telem, telem_latency_millis);
+    _aux_latency_info.worst_period_millis = std::max(_aux_latency_info.worst_period_millis, aux_latency_millis);
+    _telem_latency_info.worst_period_millis = std::max(_aux_latency_info.worst_period_millis, telem_latency_millis);
 
     return output;
 }
 
-bool DrivebrainController::_check_drivebrain_command_timing_failure(StampedDrivetrainCommand_s command, unsigned long curr_millis) {
+void DrivebrainController::_check_drivebrain_command_timing_failure(StampedDrivetrainCommand_s command, unsigned long curr_millis, MessageLatencyInfo_s& latency_info) {
     // Cases for timing_failure:
 
     // 1. we have not received any messages from the db (timestamped message recvd flag initialized as false in struct def)
@@ -75,34 +75,8 @@ bool DrivebrainController::_check_drivebrain_command_timing_failure(StampedDrive
     // 3. if the relative latency is too high (time between the message members) -> (allowed latency / 2)
     int relative_latency = ::abs((int)(static_cast<int64_t>(last_speed_setpoint_timestamp) - static_cast<int64_t>(last_torque_lim_timestamp)));
     bool latency_diff_too_high = (relative_latency > ((int)_params.allowed_latency / 2));
-        
-    if ((curr_millis - last_speed_setpoint_timestamp) > _worst_message_latencies.worst_speed_setpoint_latency_so_far) {
-        _worst_message_latencies.worst_speed_setpoint_latency_so_far = static_cast<int64_t>(curr_millis - last_speed_setpoint_timestamp);   
-    } else if ((curr_millis - last_torque_lim_timestamp) > _worst_message_latencies.worst_torque_lim_latency_so_far) {
-        _worst_message_latencies.worst_torque_lim_latency_so_far = static_cast<int64_t>(curr_millis - last_torque_lim_timestamp);   
-    }
 
     bool timing_failure = (speed_setpoint_msg_too_latent || torque_limit_message_too_latent || not_all_messages_recvd || latency_diff_too_high);
 
-    return timing_failure;
-}
-
-void DrivebrainController::handle_enqueue_timing_status() {
-    DRIVEBRAIN_LATENCY_STATUSES_t msg; 
-
-    msg.db_aux_timing_fault = _aux_timing_failure;
-    msg.db_telem_timing_fault = _telem_timing_failure;
-
-    CAN_util::enqueue_msg(&msg, &Pack_DRIVEBRAIN_LATENCY_STATUSES_hytech,
-                          VCRCANInterfaceImpl::telem_can_tx_buffer);
-}
-
-void DrivebrainController::handle_enqueue_latencies() {
-    DRIVEBRAIN_LATENCY_TIMES_t msg; 
-
-    msg.aux_latency_millis = _worst_latency_aux;
-    msg.telem_latency_millis = _worst_latency_telem;
-
-    CAN_util::enqueue_msg(&msg, &Pack_DRIVEBRAIN_LATENCY_TIMES_hytech,
-                          VCRCANInterfaceImpl::telem_can_tx_buffer);
+    latency_info.timing_failure = timing_failure;
 }

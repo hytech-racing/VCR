@@ -1,7 +1,9 @@
 #include "controls.h"
 #include "SharedFirmwareTypes.h"
 #include "VCR_Globals.h"
-#include <Arduino.h>
+#include "hytech.h"
+#include "VCRCANInterfaceImpl.h"
+#include "CANInterface.h"
 
 VCRControls::VCRControls(DrivetrainSystem *dt_system, uint32_t max_allowed_db_latency_ms) :
     _mode4(max_allowed_db_latency_ms),
@@ -54,6 +56,24 @@ bool VCRControls::drivebrain_timing_failure()
 }
 
 void VCRControls::send_controls_can_messages() {
-    _mode4.handle_enqueue_latencies();
-    _mode4.handle_enqueue_timing_status();
+    MessageLatencyInfo_s aux_latency_info = _mode4.get_aux_latency_data(); 
+    MessageLatencyInfo_s telem_latency_info = _mode4.get_telem_latency_data(); 
+
+    // Enqueue timing faults
+    DRIVEBRAIN_LATENCY_STATUSES_t status_msg; 
+
+    status_msg.db_aux_timing_fault = aux_latency_info.timing_failure;
+    status_msg.db_telem_timing_fault = telem_latency_info.timing_failure;
+
+    CAN_util::enqueue_msg(&status_msg, &Pack_DRIVEBRAIN_LATENCY_STATUSES_hytech,
+                          VCRCANInterfaceImpl::telem_can_tx_buffer);
+
+    // Enqueue latency periods 
+    DRIVEBRAIN_LATENCY_TIMES_t latency_msg; 
+
+    latency_msg.aux_latency_millis = aux_latency_info.worst_period_millis;
+    latency_msg.telem_latency_millis = telem_latency_info.worst_period_millis;
+
+    CAN_util::enqueue_msg(&latency_msg, &Pack_DRIVEBRAIN_LATENCY_TIMES_hytech,
+                          VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
