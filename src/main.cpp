@@ -331,14 +331,14 @@ void setup() {
         RR_LOADCELL_CHANNEL,
         RL_SUS_POT_CHANNEL,
         RR_SUS_POT_CHANNEL,
-        THERMISTOR_0,
-        THERMISTOR_1,
-        THERMISTOR_2,
-        THERMISTOR_3,
-        THERMISTOR_4,
-        THERMISTOR_5,
-        THERMISTOR_6,
-        THERMISTOR_7
+        THERMISTOR_0_CHANNEL,
+        THERMISTOR_1_CHANNEL,
+        THERMISTOR_2_CHANNEL,
+        THERMISTOR_3_CHANNEL,
+        THERMISTOR_4_CHANNEL,
+        THERMISTOR_5_CHANNEL,
+        THERMISTOR_6_CHANNEL,
+        THERMISTOR_7_CHANNEL
       },
       ADCScales_s {
         GLV_SENSE_SCALE,

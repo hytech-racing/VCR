@@ -28,14 +28,14 @@ constexpr int RR_SUS_POT_CHANNEL      = 6;
 // const int UNUSED_CHANNEL       = 7;
 
 /* Channels on adc_1 */
-constexpr int THERMISTOR_0 = 0;
-constexpr int THERMISTOR_1 = 1;
-constexpr int THERMISTOR_2 = 2;
-constexpr int THERMISTOR_3 = 3;
-constexpr int THERMISTOR_4 = 4;
-constexpr int THERMISTOR_5 = 5;
-constexpr int THERMISTOR_6 = 6;
-constexpr int THERMISTOR_7 = 7;
+constexpr int THERMISTOR_0_CHANNEL = 0;
+constexpr int THERMISTOR_1_CHANNEL = 1;
+constexpr int THERMISTOR_2_CHANNEL = 2;
+constexpr int THERMISTOR_3_CHANNEL = 3;
+constexpr int THERMISTOR_4_CHANNEL = 4;
+constexpr int THERMISTOR_5_CHANNEL = 5;
+constexpr int THERMISTOR_6_CHANNEL = 6;
+constexpr int THERMISTOR_7_CHANNEL = 7;
 
 /* Scaling and offset */
 constexpr float GLV_SENSE_SCALE = (float)(24.0/((2.77149877/3.3)*4096.0)); //unsure about the multiplication by 4.0865
