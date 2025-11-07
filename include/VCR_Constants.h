@@ -14,6 +14,9 @@ constexpr int BRAKELIGHT_CONTROL_PIN = 32;
 /*                 ADC pins and configs               */
 /* -------------------------------------------------- */
 
+constexpr int ANALOG_RESOLUTION = 12;
+constexpr unsigned int CHANNELS_WITHIN_MCP_ADC = 8;
+
 /* Channels on adc_0 */
 constexpr int GLV_SENSE_CHANNEL       = 0;
 constexpr int CURRENT_SENSE_CHANNEL   = 1;
@@ -24,15 +27,15 @@ constexpr int RL_SUS_POT_CHANNEL      = 5;
 constexpr int RR_SUS_POT_CHANNEL      = 6;
 // const int UNUSED_CHANNEL       = 7;
 
-/* Channels on ADC_1 */
-constexpr int THERMISTOR_0 = 0;
-constexpr int THERMISTOR_1 = 1;
-constexpr int THERMISTOR_2 = 2;
-constexpr int THERMISTOR_3 = 3;
-constexpr int THERMISTOR_4 = 4;
-constexpr int THERMISTOR_5 = 5;
-constexpr int THERMISTOR_6 = 6;
-constexpr int THERMISTOR_7 = 7;
+/* Channels on adc_1 */
+constexpr int THERMISTOR_0_CHANNEL = 0;
+constexpr int THERMISTOR_1_CHANNEL = 1;
+constexpr int THERMISTOR_2_CHANNEL = 2;
+constexpr int THERMISTOR_3_CHANNEL = 3;
+constexpr int THERMISTOR_4_CHANNEL = 4;
+constexpr int THERMISTOR_5_CHANNEL = 5;
+constexpr int THERMISTOR_6_CHANNEL = 6;
+constexpr int THERMISTOR_7_CHANNEL = 7;
 
 /* Scaling and offset */
 constexpr float GLV_SENSE_SCALE = (float)(24.0/((2.77149877/3.3)*4096.0)); //unsure about the multiplication by 4.0865
@@ -73,8 +76,10 @@ const float THERMISTOR_7_SCALE = 1;
 const float THERMISTOR_7_OFFSET = 0; 
 
 // Coolant Temperature Sensor scale / offsets
-const float COOLANT_TEMP_SCALE = -31;
-const float COOLANT_TEMP_OFFSET = 242;
+constexpr const float COOLANT_TEMP_SCALE = -31.3;
+constexpr const float COOLANT_TEMP_OFFSET = 242;
+constexpr const float TEST_TEMP_SCALE = -46.8;
+constexpr const float TEST_TEMP_OFFSET = 386;
 
 /* Watchdog constants */
 constexpr int INVERTER_ENABLE_PIN = 2;
