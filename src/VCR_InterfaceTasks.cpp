@@ -63,24 +63,29 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
 
     vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_0().conversion;
     vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_1().conversion;
+    /*
     vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_2().conversion;
     vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_3().conversion;
     vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_4().conversion;
     vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_5().conversion;
     vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_6().conversion;
     vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_7().conversion;
+    */
 
     // with a 8.2k resistor for R1 and the sensor as R2, the formula for actual temperature should follow 198 - 31 * ln(analog_value)
     vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog)); // log() is ln
     vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog)); // log() is ln
+    
 
-    // other thermistors computation is not as straight forward, not sure what these are
+    /*
+    other thermistors computation is not as straight forward, not sure what these are
     vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_analog));
     vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_analog));
     vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog));
     vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog));
     vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog));
     vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog));
+    */
   
     return HT_TASK::TaskResponse::YIELD;
 }
