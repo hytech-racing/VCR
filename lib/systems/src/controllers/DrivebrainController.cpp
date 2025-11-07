@@ -34,18 +34,18 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
         _last_reset_worse_latency_clock = curr_millis;
     }
 
-    if (curr_millis - _last_reset_worse_latency_clock > 1000) {
+    if (curr_millis - _last_reset_worse_latency_clock > WORST_LATENCY_PERIOD_MS) {
         _last_reset_worse_latency_clock = curr_millis; 
         _telem_latency_info.worst_period_millis = 0;
         _aux_latency_info.worst_period_millis = 0;
     }
 
-    int aux_latency_millis = std::max(
+    unsigned long aux_latency_millis = std::max(
         curr_millis - db_auxillary_input.desired_speeds.last_recv_millis, 
         curr_millis - db_auxillary_input.torque_limits.last_recv_millis
     );
 
-    int telem_latency_millis = std::max(
+    unsigned long telem_latency_millis = std::max(
         curr_millis - db_telem_input.desired_speeds.last_recv_millis, 
         curr_millis - db_telem_input.torque_limits.last_recv_millis
     );

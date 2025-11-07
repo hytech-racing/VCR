@@ -71,8 +71,8 @@ void VCRControls::send_controls_can_messages() {
     // Enqueue latency periods 
     DRIVEBRAIN_LATENCY_TIMES_t latency_msg; 
 
-    latency_msg.aux_latency_millis = aux_latency_info.worst_period_millis;
-    latency_msg.telem_latency_millis = telem_latency_info.worst_period_millis;
+    latency_msg.aux_latency_millis = static_cast<int>(aux_latency_info.worst_period_millis);
+    latency_msg.telem_latency_millis = static_cast<int>(telem_latency_info.worst_period_millis);
 
     CAN_util::enqueue_msg(&latency_msg, &Pack_DRIVEBRAIN_LATENCY_TIMES_hytech,
                           VCRCANInterfaceImpl::telem_can_tx_buffer);

@@ -5,9 +5,10 @@
 #include "SharedFirmwareTypes.h"
 #include <cmath>
 
+#define WORST_LATENCY_PERIOD_MS 1000
 struct MessageLatencyInfo_s {
     bool timing_failure; 
-    int worst_period_millis;
+    unsigned long worst_period_millis;
 };
 
 class DrivebrainController {
