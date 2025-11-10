@@ -18,7 +18,7 @@ class NissanModeController
           _front_regen_torque_scale(2.0 - regen_torque_scale),
           _rear_regen_torque_scale(regen_torque_scale), _slip_threshold(slip_threshold) {}
     /// @brief default contructor with balanced default values: rear_torque_scale = 1.0, regen_torque_scale = 1.0
-    NissanModeController() : NissanModeController(1.0, 1.0, 1.2) {}
+    NissanModeController() : NissanModeController(1.8, 0.6, 1.2) {}
 
     DrivetrainCommand_s evaluate(const VCRData_s &vcr_data, unsigned long curr_millis);
 
