@@ -8,7 +8,7 @@ VCRControls::VCRControls(DrivetrainSystem *dt_system, uint32_t max_allowed_db_la
     _tc_mux({
         [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode0.evaluate(state, curr_millis); },
         [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode1.evaluate(state, curr_millis); },
-        [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode0.evaluate(state, curr_millis); },
+        [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode2.evaluate(state, curr_millis); },
         [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode3.evaluate(state, curr_millis); },
         [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode4.evaluate(state, curr_millis); }
     },

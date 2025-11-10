@@ -6,6 +6,7 @@
 #include "TorqueControllerMux.hpp"
 #include "controllers/SimpleController.h"
 #include "controllers/LoadCellVectoringTorqueController.h"
+#include "controllers/NissanModeController.h"
 #include "controllers/SimpleLaunchController.h"
 #include "controllers/DrivebrainController.h"
 #include "etl/singleton.h"
@@ -51,6 +52,7 @@ class VCRControls
     private:
         TorqueControllerSimple _mode0; // this needs to be first for tc_mux to have a valid capture
         LoadCellVectoringTorqueController _mode1;
+        NissanModeController _mode2;
         SimpleLaunchController _mode3;
         DrivebrainController _mode4;
         TCMuxType _tc_mux;
