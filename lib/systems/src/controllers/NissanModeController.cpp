@@ -19,7 +19,7 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
     float rl_rpm = static_cast<float>(rl_inverter_data.speed_rpm);
     float rr_rpm = static_cast<float>(rr_inverter_data.speed_rpm);
     // avg motor rpm
-    float avg_rpm = (fl_rpm + fr_rpm + rl_rpm + rr_rpm) / 4.0f;
+    float avg_rpm = (fl_rpm + fr_rpm + rl_rpm + rr_rpm) / 4.0f; //NOLINT num motors
 
 
     // Both pedals are not pressed and no implausibility has been detected
