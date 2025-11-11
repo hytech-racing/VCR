@@ -1,4 +1,5 @@
 #include "controllers/NissanModeController.h"
+#include <algorithm>
 
 DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, unsigned long curr_millis)
 {
@@ -40,12 +41,13 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
         if (fl_rpm <= avg_rpm) {
             float fl_delta_rpm = (avg_rpm - fl_rpm) / avg_rpm; 
             float fl_compensator = _damping * _last_fl_torque + _rpm_jump_limit * fl_delta_rpm;
-            out.torque_limits.FL = std::min((torque_request * _front_torque_scale) + fl_compensator, PhysicalParameters::AMK_MAX_TORQUE);
+            out.torque_limits.FL = std::clamp((torque_request * _front_torque_scale) + fl_compensator, 0.0f, PhysicalParameters::AMK_MAX_TORQUE);
+
         }
         else if (fl_rpm > avg_rpm * _slip_threshold) {
             float fl_delta_rpm = (fl_rpm - avg_rpm) / avg_rpm;
             float fl_compensator = _damping * _last_fl_torque - _rpm_jump_limit * fl_delta_rpm;
-            out.torque_limits.FL = std::min((torque_request * _front_torque_scale) + fl_compensator, PhysicalParameters::AMK_MAX_TORQUE);
+            out.torque_limits.FL = std::clamp((torque_request * _front_torque_scale) + fl_compensator, 0.0f, PhysicalParameters::AMK_MAX_TORQUE);
         }
         else {
             out.torque_limits.FL = torque_request * _front_torque_scale;
@@ -54,12 +56,12 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
         if (fr_rpm <= avg_rpm) {
             float fr_delta_rpm = (avg_rpm - fr_rpm) / avg_rpm; 
             float fr_compensator = _damping * _last_fr_torque + _rpm_jump_limit * fr_delta_rpm;
-            out.torque_limits.FR = std::min((torque_request * _front_torque_scale) + fr_compensator, PhysicalParameters::AMK_MAX_TORQUE);
+            out.torque_limits.FR = std::clamp((torque_request * _front_torque_scale) + fr_compensator, 0.0f, PhysicalParameters::AMK_MAX_TORQUE);
         }
         else if (fr_rpm > avg_rpm * _slip_threshold) {
             float fr_delta_rpm = (fr_rpm - avg_rpm) / avg_rpm;
             float fr_compensator = _damping * _last_fr_torque - _rpm_jump_limit * fr_delta_rpm;
-            out.torque_limits.FR = std::min((torque_request * _front_torque_scale) + fr_compensator, PhysicalParameters::AMK_MAX_TORQUE);
+            out.torque_limits.FR = std::clamp((torque_request * _front_torque_scale) + fr_compensator, 0.0f, PhysicalParameters::AMK_MAX_TORQUE);
         }
         else {
             out.torque_limits.FR = torque_request * _front_torque_scale;
@@ -68,12 +70,12 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
         if (rl_rpm <= avg_rpm) {
             float rl_delta_rpm = (avg_rpm - rl_rpm) / avg_rpm; 
             float rl_compensator = _damping * _last_rl_torque + _rpm_jump_limit * rl_delta_rpm;
-            out.torque_limits.RL = std::min((torque_request * _rear_torque_scale) + rl_compensator, PhysicalParameters::AMK_MAX_TORQUE);
+            out.torque_limits.RL = std::clamp((torque_request * _rear_torque_scale) + rl_compensator, 0.0f, PhysicalParameters::AMK_MAX_TORQUE);
         }
         else if (rl_rpm > avg_rpm * _slip_threshold) {
             float rl_delta_rpm = (rl_rpm - avg_rpm) / avg_rpm;
             float rl_compensator = _damping * _last_rl_torque - _rpm_jump_limit * rl_delta_rpm;
-            out.torque_limits.RL = std::min((torque_request * _rear_torque_scale) + rl_compensator, PhysicalParameters::AMK_MAX_TORQUE);
+            out.torque_limits.RL = std::clamp((torque_request * _rear_torque_scale) + rl_compensator, 0.0f, PhysicalParameters::AMK_MAX_TORQUE);
         }
         else {
             out.torque_limits.RL = torque_request * _rear_torque_scale;
@@ -82,12 +84,12 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
         if (rr_rpm <= avg_rpm) {
             float rr_delta_rpm = (avg_rpm - rr_rpm) / avg_rpm; 
             float rr_compensator = _damping * _last_rr_torque + _rpm_jump_limit * rr_delta_rpm;
-            out.torque_limits.RR = std::min((torque_request * _rear_torque_scale) + rr_compensator, PhysicalParameters::AMK_MAX_TORQUE);
+            out.torque_limits.RR = std::clamp((torque_request * _rear_torque_scale) + rr_compensator, 0.0f, PhysicalParameters::AMK_MAX_TORQUE);
         }
         else if (rr_rpm > avg_rpm * _slip_threshold) {
             float rr_delta_rpm = (rr_rpm - avg_rpm) / avg_rpm;
             float rr_compensator = _damping * _last_rr_torque - _rpm_jump_limit * rr_delta_rpm;
-            out.torque_limits.RR = std::min((torque_request * _rear_torque_scale) + rr_compensator, PhysicalParameters::AMK_MAX_TORQUE);
+            out.torque_limits.RR = std::clamp((torque_request * _rear_torque_scale) + rr_compensator, 0.0f, PhysicalParameters::AMK_MAX_TORQUE);
         }
         else {
             out.torque_limits.RR = torque_request * _rear_torque_scale;
@@ -112,6 +114,12 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
         out.torque_limits.FR = torque_request * _front_regen_torque_scale;
         out.torque_limits.RL = torque_request * _rear_regen_torque_scale;
         out.torque_limits.RR = torque_request * _rear_regen_torque_scale;
+
+        //reset last torque to zero to be ready for next accel
+        _last_fl_torque = 0;
+        _last_fr_torque = 0;
+        _last_rl_torque = 0;
+        _last_rr_torque = 0;
         return out;
     }
 }
