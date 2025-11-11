@@ -38,6 +38,7 @@
 #include "DrivetrainSystem.h"
 #include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
+#include "FlowmeterInterface.h"
 #include "controls.h"
 
 /* From pio-git-hash */
@@ -239,12 +240,6 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
 HT_TASK::Task debug_state_print_task(HT_TASK::DUMMY_FUNCTION, debug_print, 100, 100000); //NOLINT (priority and loop rate)
 
-void countPulse() // NOLINT
-{
-    pulseCount++;
-    
-}
-
 void setup() {
     // Save firmware version
     vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
@@ -253,17 +248,14 @@ void setup() {
 
     SPI.begin();
     analogReadResolution(ANALOG_RESOLUTION);
-
     pinMode(INVERTER_ENABLE_PIN, OUTPUT);
-    pinMode(FLOWMETER_PIN, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(FLOWMETER_PIN), countPulse, RISING);
-    pulseCount = 0;
-    
+
     // Create all singletons
     // IOExpanderInstance::create(0);
     ProtobufSocketsInstance::create(vcr_data_send_socket, vcf_data_recv_socket);
     EthernetIPDefsInstance::create();
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
+    FlowmeterInterfaceInstance::create(FLOWMETER_PIN);  
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
         vcr_data.interface_data.thermistor_data.thermistor_0,
