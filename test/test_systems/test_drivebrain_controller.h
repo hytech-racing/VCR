@@ -25,7 +25,8 @@ auto runTick(DrivebrainController *controller, float last_speed_recv_millis,
 
     VCRData_s state;
     state.interface_data.dash_input_state.data_btn_is_pressed = reset_button_pressed;
-    state.interface_data.latest_drivebrain_command = data;
+    state.interface_data.latest_drivebrain_telem_command = data;
+    state.interface_data.latest_drivebrain_auxillary_command = data;
     state.interface_data.recvd_pedals_data.pedals_data = pedals_data;
 
     return controller->evaluate(state, curr_millis);

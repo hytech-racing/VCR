@@ -6,20 +6,20 @@
 namespace VCRCANInterfaceImpl {
 
 // global forwards
-CANRXBufferType CAN1_rxBuffer; // can1 = aux can
+CANRXBufferType auxillary_can_rx_buffer;
 CANRXBufferType inverter_can_rx_buffer;
 CANRXBufferType telem_can_rx_buffer;
 
-CANTXBufferType CAN1_txBuffer;
+CANTXBufferType auxillary_can_tx_buffer;
 CANTXBufferType inverter_can_tx_buffer;
 CANTXBufferType telem_can_tx_buffer;
 
 
 
-void on_can1_receive(const CAN_message_t &msg) {
+void on_auxillary_can_receive(const CAN_message_t &msg) {
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
-    CAN1_rxBuffer.push_back(buf, sizeof(CAN_message_t));
+    auxillary_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
 void on_inverter_can_receive(const CAN_message_t &msg) {
@@ -35,7 +35,7 @@ void on_telem_can_receive(const CAN_message_t &msg) {
     telem_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
-void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis) {
+void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis, CANInterfaceType_e interface_type) {
     switch (msg.id) {
 
     case PEDALS_SYSTEM_DATA_CANID: 
@@ -60,11 +60,20 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
     }
     case DRIVEBRAIN_TORQUE_LIM_INPUT_CANID: 
     {
-        interfaces.db_interface.receive_drivebrain_torque_lim_command(msg, millis);
+        if (interface_type == CANInterfaceType_e::AUX) {
+            interfaces.db_interface.receive_drivebrain_torque_lim_command_auxillary(msg, millis);
+        } else if (interface_type == CANInterfaceType_e::TELEM) {
+            interfaces.db_interface.receive_drivebrain_torque_lim_command_telem(msg, millis);
+        }
         break;
     }
     case DRIVEBRAIN_SPEED_SET_INPUT_CANID: {
-        interfaces.db_interface.receive_drivebrain_speed_command(msg, millis);
+        if (interface_type == CANInterfaceType_e::AUX) {
+            interfaces.db_interface.receive_drivebrain_speed_command_auxillary(msg, millis);
+        } else if (interface_type == CANInterfaceType_e::TELEM) {
+            interfaces.db_interface.receive_drivebrain_speed_command_telem(msg, millis);
+        }
+         interfaces.db_interface.receive_drivebrain_speed_command_telem(msg, millis);
         break;
     }
 
