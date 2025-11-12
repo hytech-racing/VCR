@@ -44,6 +44,7 @@
 #include "device_fw_version.h"
 
 /* externed CAN instances */
+FlexCAN_Type<CAN1> VCRCANInterfaceImpl::AUXILLARY_CAN;
 FlexCAN_Type<CAN3> VCRCANInterfaceImpl::TELEM_CAN;
 FlexCAN_Type<CAN2> VCRCANInterfaceImpl::INVERTER_CAN;
 
@@ -106,6 +107,7 @@ HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc
 HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, watchdog_priority, kick_watchdog_period_us);
 HT_TASK::Task ams_system_task(init_acu_heartbeat, update_acu_heartbeat, ams_priority, ams_update_period_us);
 HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, suspension_priority, suspension_can_period_us);
+HT_TASK::Task enqueue_controls_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_controls_CAN_data, controls_priority, controls_can_period_us);
 HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, inverter_send_priority, inv_send_period);
 HT_TASK::Task enqueue_dashboard_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_dashboard_CAN_data, dashboard_send_priority, dashboard_send_period_us);
 HT_TASK::Task enqueue_coolant_temp_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_coolant_temp_CAN_data, coolant_temp_send_priority, coolant_temp_send_period_us);
@@ -314,11 +316,12 @@ void setup() {
 
     // Initialize CAN
     const uint32_t telem_CAN_baudrate = 1000000;
-    const uint32_t can1_baudrate = 1000000;
+    const uint32_t auxillary_CAN_baudrate = 500000;
     const uint32_t inv_CAN_baudrate = 500000;
    
     handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(VCRCANInterfaceImpl::TELEM_CAN, telem_CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
+    handle_CAN_setup(VCRCANInterfaceImpl::AUXILLARY_CAN, auxillary_CAN_baudrate, &VCRCANInterfaceImpl::on_auxillary_can_receive);
 
     // Instantiate ADC interface
     ADCInterfaceInstance::create(
@@ -388,7 +391,8 @@ void setup() {
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(enqueue_coolant_temp_CAN_task);
     scheduler.schedule(async_main_task);
-    scheduler.schedule(debug_state_print_task);
+    scheduler.schedule(enqueue_controls_CAN_task);
+    // scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     scheduler.schedule(update_sample_flowmeter);
     scheduler.schedule(IOExpander_read_task);
