@@ -30,8 +30,8 @@ class NissanModeController
     const float _max_amk_rpm = 20000.0f; // TODO do we want to make this a vcr const?
     const float _max_amk_regen = 15.0f;  // TODO do we want to make this a vcr const?
     const float _slip_threshold = 1.2; // slip threshold multiplier for torque reduction
-    const float _damping = 0.2f; // damping factor for torque compensation
-    const float _rpm_jump_limit = 0.05f; // rpm jump limit factor for torque compensation
+    const float _damping = 0.8f; // damping factor for torque compensation - higher means less damped
+    const float _torque_jump_limit = .5f; // N/M jump limit factor for torque compensation
 
     float _last_fl_torque = 0.0f;
     float _last_fr_torque = 0.0f;
