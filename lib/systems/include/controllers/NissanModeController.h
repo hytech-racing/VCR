@@ -3,6 +3,7 @@
 
 #include "PhysicalParameters.h"
 #include "SharedFirmwareTypes.h"
+#include "VCR_Constants.h"
 #include <algorithm>
 
 class NissanModeController
@@ -28,22 +29,21 @@ class NissanModeController
     const float _rear_torque_scale = 1.0;
     const float _front_regen_torque_scale = 1.0;
     const float _rear_regen_torque_scale = 1.0;
-    const float _max_amk_rpm = 20000.0f; // TODO do we want to make this a vcr const?
-    const float _max_amk_regen = 15.0f;  // TODO do we want to make this a vcr const?
+
     
     
-    float _gtr_def_split = 0.85;
-    float _gtr_alt_split = 0.5;
+    float _default_torque_split = 0.85;
+    float _alternate_torque_split = 0.5;
     
-    float _fr_slip_clamped;
-    float _fr_slip_factor = 2.5; //lower value allows more slip must be a factor of 5
+    float _front_slip_clamped;
+    float _front_slip_factor = 2.5; //lower value allows more slip
     
-    float _f_torque;
-    float _r_torque;
+    float _front_torque_request_nm;
+    float _rear_torque_request_nm;
     
-    float _rear_lr_slip_clamped;
+    float _rear_left_right_slip_clamped;
     float _rear_torque_right_split; //percent of rear torque going to the right side
-    float _rear_slip_factor = 0.5;
+    float _rear_left_right_slip_factor = 0.5;
 
 };
 

@@ -26,10 +26,10 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
         // Positive torque request
         torque_request = accel_request * PhysicalParameters::AMK_MAX_TORQUE;
 
-        out.desired_speeds.FL = _max_amk_rpm;
-        out.desired_speeds.FR = _max_amk_rpm;
-        out.desired_speeds.RL = _max_amk_rpm;
-        out.desired_speeds.RR = _max_amk_rpm;
+        out.desired_speeds.FL = MAX_AMK_RPM;
+        out.desired_speeds.FR = MAX_AMK_RPM;
+        out.desired_speeds.RL = MAX_AMK_RPM;
+        out.desired_speeds.RR = MAX_AMK_RPM;
 
 
         // begin tv logic
@@ -38,33 +38,33 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
         float rl_speed_ms = rl_inverter_data.speed_rpm * RPM_TO_METERS_PER_SECOND; // NOLINT
         float rr_speed_ms = rr_inverter_data.speed_rpm * RPM_TO_METERS_PER_SECOND; // NOLINT
 
-        float fr_slip_unclamped = ((rl_speed_ms + rr_speed_ms + 250.0) / (fl_speed_ms + fr_speed_ms + 250.0)) - 1 * _fr_slip_factor; //NOLINT
-        _fr_slip_clamped = std::clamp(fr_slip_unclamped, 0.0f, 1.0f); // NOLINT
+        float fr_slip_unclamped = ((rl_speed_ms + rr_speed_ms + 250.0) / (fl_speed_ms + fr_speed_ms + 250.0)) - 1 * _front_slip_factor; //NOLINT
+        _front_slip_clamped = std::clamp(fr_slip_unclamped, 0.0f, 1.0f); // NOLINT
 
         //set front torques
-        _f_torque = 2 * ((1 - _gtr_def_split) * (1 - _fr_slip_clamped) + (1 - _gtr_alt_split) * _fr_slip_clamped) * torque_request;
+        _front_torque_request_nm = ((1 - _default_torque_split) * (1 - _front_slip_clamped) + (1 - _alternate_torque_split) * _front_slip_clamped) * torque_request;
 
         //add calculated front torques to the out struct
-        out.torque_limits.FL = _f_torque / 2;
-        out.torque_limits.FR = _f_torque / 2;
+        out.torque_limits.FL = _front_torque_request_nm;
+        out.torque_limits.FR = _front_torque_request_nm;
 
-        _r_torque = 2 * ((_gtr_def_split)  * (1 - _fr_slip_clamped) + (_gtr_alt_split) * _fr_slip_clamped) * (torque_request);
+        _rear_torque_request_nm = 2 * ((_default_torque_split)  * (1 - _front_slip_clamped) + (_alternate_torque_split) * _front_slip_clamped) * (torque_request);
         if (rl_speed_ms > rr_speed_ms)
         {
-            float rear_lr_slip_unclamped = (rl_speed_ms + 250 / rr_speed_ms + 250) - 1 * _rear_slip_factor; //NOLINT 250 is a factor from original Nissan Mode
-            _rear_lr_slip_clamped = std::clamp(rear_lr_slip_unclamped, 0.0f, 0.5f); //NOLINT clamping to ensure our delta is less than for scaling
-            _rear_torque_right_split = 0.5 + _rear_lr_slip_clamped;  //NOLINT right side torque split actual number
+            float rear_lr_slip_unclamped = (rl_speed_ms + 250 / rr_speed_ms + 250) - 1 * _rear_left_right_slip_factor; //NOLINT 250 is a factor from original Nissan Mode
+            _rear_left_right_slip_clamped = std::clamp(rear_lr_slip_unclamped, 0.0f, 0.5f); //NOLINT clamping to ensure our delta is less than for scaling
+            _rear_torque_right_split = 0.5 + _rear_left_right_slip_clamped;  //NOLINT right side torque split actual number
         }
         else
         {
-            float rear_lr_slip_unclamped = (rr_speed_ms + 250 / rl_speed_ms + 250) - 1 * _rear_slip_factor; // NOLINT 250 is a factor from original Nissan Mode
-            _rear_lr_slip_clamped = std::clamp(rear_lr_slip_unclamped, 0.0f, 0.5f); //NOLINT clamping to ensure our delta is less than for scaling
-            _rear_torque_right_split = 0.5 - _rear_lr_slip_clamped; //NOLINT right side torque split actual number
+            float rear_lr_slip_unclamped = (rr_speed_ms + 250 / rl_speed_ms + 250) - 1 * _rear_left_right_slip_factor; // NOLINT 250 is a factor from original Nissan Mode
+            _rear_left_right_slip_clamped = std::clamp(rear_lr_slip_unclamped, 0.0f, 0.5f); //NOLINT clamping to ensure our delta is less than for scaling
+            _rear_torque_right_split = 0.5 - _rear_left_right_slip_clamped; //NOLINT right side torque split actual number
         }
 
         //add calculated front torques to the out struct
-        out.torque_limits.RL = _r_torque * (1 - _rear_torque_right_split);
-        out.torque_limits.RR = _r_torque * (_rear_torque_right_split);
+        out.torque_limits.RL = _rear_torque_request_nm * (1 - _rear_torque_right_split);
+        out.torque_limits.RR = _rear_torque_request_nm * (_rear_torque_right_split);
 
         return out;
     } 
@@ -73,7 +73,7 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
         // Negative torque request
         // RPM_TO_METERS_PER_SECOND
 
-        torque_request = _max_amk_regen * accel_request * -1.0F;
+        torque_request = MAX_AMK_REGEN_NM * accel_request * -1.0F;
 
         out.desired_speeds = {0.0F, 0.0F, 0.0F, 0.0F};
 
@@ -84,4 +84,4 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
 
         return out;
     }
-}
+}1
