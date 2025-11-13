@@ -53,6 +53,9 @@ FlexCAN_Type<CAN2> VCRCANInterfaceImpl::INVERTER_CAN;
 qindesign::network::EthernetUDP vcr_data_send_socket;
 qindesign::network::EthernetUDP vcf_data_recv_socket;
 
+
+constexpr int FLOWMETER_PIN = 7;
+
 /* Drivetrain Initialization */
 
 // Inverter Interfaces
