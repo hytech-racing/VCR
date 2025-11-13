@@ -15,15 +15,14 @@ DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cel
                                          const RearSusPotData_s &rear_suspot_data,
                                          const ThermistorData_s &coolant_temperature_data_0,
                                          const ThermistorData_s &coolant_temperature_data_1,
-                                         const ThermistorData_s &flowmeter_data,
+                                         const FlowmeterData_s &flowmeter_data,
                                          IPAddress drivebrain_ip, uint16_t vcr_data_port,
                                          qindesign::network::EthernetUDP *udp_socket)
     : _suspension_data{.rear_load_cell_data = rear_load_cell_data,
                        .rear_suspot_data = rear_suspot_data},
       _thermistor_data{.coolant_temperature_0_data = coolant_temperature_data_0,
-                       .coolant_temperature_1_data = coolant_temperature_data_1,
-                       .flowmeter_data = flowmeter_data 
-                        },
+                       .coolant_temperature_1_data = coolant_temperature_data_1},
+      _flowmeter_data(flowmeter_data),
       _drivebrain_ip(drivebrain_ip),
       _vcr_data_port(vcr_data_port),
       _udp_socket(udp_socket) { };
@@ -126,8 +125,13 @@ void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
     REAR_THERMISTORS_DATA_t thermistor_msg;
     thermistor_msg.thermistor_0_deg_C_ro = HYTECH_thermistor_0_deg_C_ro_toS(_thermistor_data.coolant_temperature_0_data.thermistor_degrees_C);
     thermistor_msg.thermistor_1_deg_C_ro = HYTECH_thermistor_1_deg_C_ro_toS(_thermistor_data.coolant_temperature_1_data.thermistor_degrees_C);
-    thermistor_msg.thermistor_2_deg_C_ro = HYTECH_thermistor_2_deg_C_ro_toS(_thermistor_data.flowmeter_data.thermistor_degrees_C);
     CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
+void DrivebrainInterface::handle_enqueue_flowmeter_CAN_data() {
+  FLOWMETER_DATA_t flowmeter_msg;
+  flowmeter_msg.flow_rate = _flowmeter_data.flowmeter_gallons_per_min;
+  CAN_util::enqueue_msg(&flowmeter_msg, &Pack_FLOWMETER_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {

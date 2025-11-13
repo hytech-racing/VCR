@@ -119,6 +119,8 @@ constexpr unsigned long inv_send_period = 5000;                      // 5 000 us
 constexpr unsigned long inverter_send_priority = 5;
 constexpr unsigned long coolant_temp_send_period_us = 100000;        // 100 000 us = 10 Hz
 constexpr unsigned long coolant_temp_send_priority = 9;
+constexpr unsigned long flowmeter_send_period_us = 100000;          // 100 000 us = 10 Hz
+constexpr unsigned long flowmeter_send_priority = 10;
 constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
 constexpr unsigned long ioexpander_priority = 100;
 constexpr unsigned long dashboard_send_period_us = 200000;         // 200 000 us = 5 Hz

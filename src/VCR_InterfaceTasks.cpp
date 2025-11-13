@@ -92,7 +92,7 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
 
 HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_degrees_C = FlowmeterInterfaceInstance::instance().get_flow();
+    vcr_data.interface_data.flowmeter_data.flowmeter_gallons_per_min = FlowmeterInterfaceInstance::instance().get_flow();
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -143,6 +143,12 @@ HT_TASK::TaskResponse enqueue_coolant_temp_CAN_data(const unsigned long& sysMicr
 {
     DrivebrainInterfaceInstance::instance().handle_enqueue_coolant_temp_CAN_data();
     return HT_TASK::TaskResponse::YIELD;
+}
+
+HT_TASK::TaskResponse enqueue_flowmeter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+  DrivebrainInterfaceInstance::instance().handle_enqueue_flowmeter_CAN_data();
+  return HT_TASK::TaskResponse::YIELD;
 }
 
 HT_TASK::TaskResponse enqueue_dashboard_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)

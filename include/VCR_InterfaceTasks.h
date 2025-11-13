@@ -56,6 +56,11 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
 HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 
 /**
+ * Handles sending flowmeter CAN message data
+ */
+HT_TASK::TaskResponse enqueue_flowmeter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT
+
+/**
  * Handles sending controls info for drivebrain (latencies and stuff)
  */
 HT_TASK::TaskResponse enqueue_controls_CAN_data(const unsigned long& sysMicro, const HT_TASK::TaskInfo& taskInfo);
