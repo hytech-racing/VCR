@@ -95,10 +95,6 @@ constexpr unsigned long MAX_ALLOWED_DB_LATENCY_MS = 40; // milliseconds
 constexpr int INVERTER_EN_PIN = 2;
 constexpr int INVERTER_MINIMUM_HV_VOLTAGE = 60;
 
-/* Drivetrain constants */
-constexpr float MAX_AMK_RPM = 20000.0f;
-constexpr float MAX_AMK_REGEN_NM = 15.0f; 
-
 /* Filter constants */
 constexpr float LOADCELL_IIR_FILTER_ALPHA = 0.01f;
 

@@ -26,10 +26,10 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
         // Positive torque request
         torque_request = accel_request * PhysicalParameters::AMK_MAX_TORQUE;
 
-        out.desired_speeds.FL = MAX_AMK_RPM;
-        out.desired_speeds.FR = MAX_AMK_RPM;
-        out.desired_speeds.RL = MAX_AMK_RPM;
-        out.desired_speeds.RR = MAX_AMK_RPM;
+        out.desired_speeds.FL = PhysicalParameters::AMK_MAX_RPM;
+        out.desired_speeds.FR = PhysicalParameters::AMK_MAX_RPM;
+        out.desired_speeds.RL = PhysicalParameters::AMK_MAX_RPM;
+        out.desired_speeds.RR = PhysicalParameters::AMK_MAX_RPM;
 
 
         // begin tv logic
@@ -73,7 +73,7 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
         // Negative torque request
         // RPM_TO_METERS_PER_SECOND
 
-        torque_request = MAX_AMK_REGEN_NM * accel_request * -1.0F;
+        torque_request = PhysicalParameters::MAX_REGEN_TORQUE * accel_request * -1.0F;
 
         out.desired_speeds = {0.0F, 0.0F, 0.0F, 0.0F};
 
@@ -84,4 +84,4 @@ DrivetrainCommand_s NissanModeController::evaluate(const VCRData_s &vcr_data, un
 
         return out;
     }
-}1
+}

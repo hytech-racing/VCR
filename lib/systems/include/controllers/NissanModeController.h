@@ -3,7 +3,6 @@
 
 #include "PhysicalParameters.h"
 #include "SharedFirmwareTypes.h"
-#include "VCR_Constants.h"
 #include <algorithm>
 
 class NissanModeController
