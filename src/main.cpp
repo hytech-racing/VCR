@@ -242,10 +242,8 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 }
 
 HT_TASK::Task debug_state_print_task(HT_TASK::DUMMY_FUNCTION, debug_print, 100, 100000); //NOLINT (priority and loop rate)
-unsigned long pulseCount;
 void countPulse() // NOLINT
 {
-    pulseCount++;
 }
 void setup() {
     // Save firmware version
@@ -258,7 +256,6 @@ void setup() {
     pinMode(INVERTER_ENABLE_PIN, OUTPUT);
     pinMode(FLOWMETER_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(FLOWMETER_PIN), countPulse, RISING);
-    pulseCount = 0;
 
     // Create all singletons
     // IOExpanderInstance::create(0);
