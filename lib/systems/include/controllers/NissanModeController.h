@@ -32,22 +32,29 @@ class NissanModeController
     DrivetrainCommand_s evaluate(const VCRData_s &vcr_data, unsigned long curr_millis);
 
   private:
+
+  /// @brief biasing scalar varaiables
     const float _front_torque_scale = 1.0;
     const float _rear_torque_scale = 1.0;
     const float _front_regen_torque_scale = 1.0;
     const float _rear_regen_torque_scale = 1.0;
 
     
-    
+  /// @brief torque biasing variables
+  /// @var _default_torque_split: the torque split before any offsetting
+  /// @var _alternate_torque_split: the maximum percentage of torque that can be sent to the front wheels
     float _default_torque_split = 0.85;
     float _alternate_torque_split = 0.5;
     
+  /// @brief front wheel slip variables
     float _front_slip_clamped;
     float _front_slip_factor = 2.5; //lower value allows more slip
-    
+  
+  /// @brief the torque requests to the front and the real
     float _front_torque_request_nm;
     float _rear_torque_request_nm;
-    
+  
+  /// @brief rear wheel slip variables
     float _rear_left_right_slip_clamped;
     float _rear_torque_right_split; //percent of rear torque going to the right side
     float _rear_left_right_slip_factor = 0.5;
