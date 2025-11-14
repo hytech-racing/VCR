@@ -84,6 +84,7 @@ constexpr const float TEST_TEMP_OFFSET = 386;
 /* Watchdog constants */
 constexpr int INVERTER_ENABLE_PIN = 2;
 constexpr int WATCHDOG_PIN = 36;
+constexpr int FLOWMETER_PIN = 7;
 constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
 constexpr unsigned long WATCHDOG_KICK_INTERVAL_MS = 10UL;
 constexpr unsigned long VCF_PEDALS_MAX_HEARTBEAT_MS = 50UL;         // 20ms at 60mph is about 0.5 meters
