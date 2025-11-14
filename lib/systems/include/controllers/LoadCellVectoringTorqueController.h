@@ -1,6 +1,7 @@
 #ifndef LOADCELLVECTORINGCONTROLLER
 #define LOADCELLVECTORINGCONTROLLER
 
+#include <algorithm>
 #include "PhysicalParameters.h"
 #include "SharedFirmwareTypes.h"
 
