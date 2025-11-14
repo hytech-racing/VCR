@@ -5,6 +5,13 @@
 #include "SharedFirmwareTypes.h"
 #include <algorithm>
 
+/** @brief Torque controller based on Nissan ATTESA ET-S
+* The controller assumes that the rear wheels will begin slipping before the front
+* It then can give at most 50% of the total torque to the front wheels
+* The rear logic also calculates bias based on left - right wheel speed and can
+* create a 2x delta between the two wheel torques.
+*/
+
 class NissanModeController
 {
   public:
@@ -18,8 +25,9 @@ class NissanModeController
         : _front_torque_scale(2.0 - rear_torque_scale), _rear_torque_scale(rear_torque_scale),
           _front_regen_torque_scale(2.0 - regen_torque_scale),
           _rear_regen_torque_scale(regen_torque_scale) {}
-    /// @brief default contructor with balanced default values: rear_torque_scale = 1.0, regen_torque_scale = 1.0
-    NissanModeController() : NissanModeController(1.8, 0.6) {}
+    /// @brief default contructor with un-balanced values: rear_torque_scale = 1.9, regen_torque_scale = 0.6 we send basically most of our accel torque to the rear, 
+    // we send more than half of regen torque to the front
+    NissanModeController() : NissanModeController(1.9, 0.6) {}
 
     DrivetrainCommand_s evaluate(const VCRData_s &vcr_data, unsigned long curr_millis);
 
