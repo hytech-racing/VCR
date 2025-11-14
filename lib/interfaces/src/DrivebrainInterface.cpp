@@ -130,7 +130,7 @@ void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
 
 void DrivebrainInterface::handle_enqueue_flowmeter_CAN_data() {
   FLOWMETER_DATA_t flowmeter_msg;
-  flowmeter_msg.flow_rate = _flowmeter_data.flowmeter_gallons_per_min;
+  flowmeter_msg.flow_rate = static_cast<int>(_flowmeter_data.flowmeter_gallons_per_min);
   CAN_util::enqueue_msg(&flowmeter_msg, &Pack_FLOWMETER_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 

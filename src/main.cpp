@@ -53,9 +53,6 @@ FlexCAN_Type<CAN2> VCRCANInterfaceImpl::INVERTER_CAN;
 qindesign::network::EthernetUDP vcr_data_send_socket;
 qindesign::network::EthernetUDP vcf_data_recv_socket;
 
-
-constexpr int FLOWMETER_PIN = 7;
-
 /* Drivetrain Initialization */
 
 // Inverter Interfaces
@@ -386,6 +383,7 @@ void setup() {
     scheduler.schedule(vcr_data_ethernet_send);
     scheduler.schedule(enqueue_inverter_CAN_task);
     scheduler.schedule(enqueue_coolant_temp_CAN_task);
+    scheduler.schedule(enqueue_flowmeter_CAN_task);
     scheduler.schedule(async_main_task);
     scheduler.schedule(enqueue_controls_CAN_task);
     // scheduler.schedule(debug_state_print_task);
