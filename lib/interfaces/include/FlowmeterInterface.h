@@ -6,9 +6,9 @@
 
 class FlowmeterInterface {
 public:
-  FlowmeterInterface(int flowmeter_pin) {
-    pinMode(flowmeter_pin, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(flowmeter_pin), count_pulse, RISING);
+  FlowmeterInterface(int flowmeter_pin) : _pin(flowmeter_pin) {
+    pinMode(_pin, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(_pin), count_pulse, RISING);
   };
 
   static void count_pulse() { etl::singleton<FlowmeterInterface>::instance()._pulse_count++; };
@@ -21,6 +21,7 @@ public:
 
 private:
   unsigned long _pulse_count = 0;
+  int _pin;
 };
 
 using FlowmeterInterfaceInstance = etl::singleton<FlowmeterInterface>;

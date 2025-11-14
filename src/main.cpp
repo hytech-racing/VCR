@@ -258,7 +258,6 @@ void setup() {
     ProtobufSocketsInstance::create(vcr_data_send_socket, vcf_data_recv_socket);
     EthernetIPDefsInstance::create();
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
-    FlowmeterInterfaceInstance::create(FLOWMETER_PIN);  
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
         vcr_data.interface_data.thermistor_data.thermistor_0,
@@ -371,6 +370,7 @@ void setup() {
         THERMISTOR_7_OFFSET,
       }
     );
+    FlowmeterInterfaceInstance::create(FLOWMETER_PIN);  
   
     
     scheduler.schedule(adc_0_sample_task);
