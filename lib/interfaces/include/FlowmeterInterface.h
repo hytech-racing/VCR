@@ -6,7 +6,7 @@
 
 class FlowmeterInterface {
 public:
-  FlowmeterInterface(int flowmeter_pin) : _pin(flowmeter_pin) {
+  FlowmeterInterface(const int flowmeter_pin) : _pin(flowmeter_pin) {
     pinMode(_pin, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(_pin), count_pulse, RISING);
   };
