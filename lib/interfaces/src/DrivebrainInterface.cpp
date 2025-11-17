@@ -1,5 +1,4 @@
 #include "DrivebrainInterface.h"
-
 #include "FlexCAN_T4.h"
 
 #include "CANInterface.h"
@@ -63,6 +62,43 @@ void DrivebrainInterface::receive_drivebrain_torque_lim_command(const CAN_messag
         static_cast<float>(
             HYTECH_drivebrain_torque_rr_ro_fromS(drivebrain_msg.drivebrain_torque_rr_ro))};
 }
+
+void DrivebrainInterface::receive_drivebrain_aero11_CAN_data(const CAN_message_t &msg,
+                                                            unsigned long curr_millis) {
+    AERO_PRESSURE_SENSOR_11_t drivebrain_msg;
+
+    Unpack_AERO_PRESSURE_SENSOR_11_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+
+    
+    }
+void DrivebrainInterface::receive_drivebrain_aero12_CAN_data(const CAN_message_t &msg,
+                                                            unsigned long curr_millis) {
+    ;
+    }
+void DrivebrainInterface::receive_drivebrain_aero21_CAN_data(const CAN_message_t &msg,
+                                                            unsigned long curr_millis) {
+    ;
+    }
+void DrivebrainInterface::receive_drivebrain_aero22_CAN_data(const CAN_message_t &msg,
+                                                            unsigned long curr_millis) {
+    ;
+    }
+void DrivebrainInterface::receive_drivebrain_aero31_CAN_data(const CAN_message_t &msg,
+                                                            unsigned long curr_millis) {
+    ;
+    }
+void DrivebrainInterface::receive_drivebrain_aero32_CAN_data(const CAN_message_t &msg,
+                                                            unsigned long curr_millis) {
+    ;
+    }
+void DrivebrainInterface::receive_drivebrain_aero41_CAN_data(const CAN_message_t &msg,
+                                                            unsigned long curr_millis) {
+    ;
+    }
+void DrivebrainInterface::receive_drivebrain_aero42_CAN_data(const CAN_message_t &msg,
+                                                            unsigned long curr_millis) {
+    ;
+    }
 
 void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
     REAR_SUSPENSION_t rear_sus_msg;

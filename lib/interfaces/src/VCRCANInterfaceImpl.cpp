@@ -68,6 +68,38 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
         interfaces.db_interface.receive_drivebrain_speed_command(msg, millis);
         break;
     }
+    case AERO_PRESSURE_SENSOR_11_CANID: {
+        interfaces.db_interface.receive_drivebrain_aero11_CAN_data(msg, millis);
+        break;
+    }
+    case AERO_PRESSURE_SENSOR_12_CANID: {
+        interfaces.db_interface.receive_drivebrain_aero12_CAN_data(msg, millis);
+        break;
+    }
+    case AERO_PRESSURE_SENSOR_21_CANID: {
+        interfaces.db_interface.receive_drivebrain_aero21_CAN_data(msg, millis);
+        break;
+    }
+    case AERO_PRESSURE_SENSOR_22_CANID: {
+        interfaces.db_interface.receive_drivebrain_aero22_CAN_data(msg, millis);
+        break;
+    }
+    case AERO_PRESSURE_SENSOR_31_CANID: {
+        interfaces.db_interface.receive_drivebrain_aero31_CAN_data(msg, millis);
+        break;
+    }
+    case AERO_PRESSURE_SENSOR_32_CANID: {
+        interfaces.db_interface.receive_drivebrain_aero32_CAN_data(msg, millis);
+        break;
+    }
+    case AERO_PRESSURE_SENSOR_41_CANID: {
+        interfaces.db_interface.receive_drivebrain_aero41_CAN_data(msg, millis);
+        break;
+    }
+    case AERO_PRESSURE_SENSOR_42_CANID: {
+        interfaces.db_interface.receive_drivebrain_aero42_CAN_data(msg, millis);
+        break;
+    }
 
     // Front Left Inverter
     {

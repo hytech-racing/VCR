@@ -25,10 +25,23 @@ class DrivebrainInterface {
                         uint16_t vcr_data_port, qindesign::network::EthernetUDP *udp_socket);
     void receive_drivebrain_speed_command(const CAN_message_t &msg, unsigned long curr_millis);
     void receive_drivebrain_torque_lim_command(const CAN_message_t &msg, unsigned long curr_millis);
+    
+    void receive_drivebrain_aero11_CAN_data(const CAN_message_t &msg, unsigned long curr_millis);
+    void receive_drivebrain_aero12_CAN_data(const CAN_message_t &msg, unsigned long curr_millis);
+    void receive_drivebrain_aero21_CAN_data(const CAN_message_t &msg, unsigned long curr_millis);
+    void receive_drivebrain_aero22_CAN_data(const CAN_message_t &msg, unsigned long curr_millis);
+    void receive_drivebrain_aero31_CAN_data(const CAN_message_t &msg, unsigned long curr_millis);
+    void receive_drivebrain_aero32_CAN_data(const CAN_message_t &msg, unsigned long curr_millis);
+    void receive_drivebrain_aero41_CAN_data(const CAN_message_t &msg, unsigned long curr_millis);
+    void receive_drivebrain_aero42_CAN_data(const CAN_message_t &msg, unsigned long curr_millis);
 
     void handle_enqueue_suspension_CAN_data();
 
     void handle_enqueue_coolant_temp_CAN_data();
+
+    void handle_enqueue_aero_CAN_data();
+
+
 
     void handle_send_ethernet_data(const hytech_msgs_VCRData_s &data);
     StampedDrivetrainCommand_s get_latest_data();
@@ -43,6 +56,11 @@ class DrivebrainInterface {
         const ThermistorData_s &coolant_temperature_0_data;
         const ThermistorData_s &coolant_temperature_1_data;
     } _thermistor_data;
+
+
+    struct AeroData_s {
+        
+    }
 
     IPAddress _drivebrain_ip;
     uint16_t _vcr_data_port;
