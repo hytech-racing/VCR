@@ -172,6 +172,7 @@ void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
     CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
+//aero enqueue functions
 void DrivebrainInterface::handle_enqueue_aero11_CAN_data() {
     AERO_PRESSURE_SENSOR_11_t aero11_msg;
 
@@ -195,6 +196,78 @@ void DrivebrainInterface::handle_enqueue_aero12_CAN_data() {
     CAN_util::enqueue_msg(&aero12_msg, &Pack_AERO_PRESSURE_SENSOR_12_hytech, VCRCANInterfaceImpl::CAN1_txBuffer);
  
 }
+
+void DrivebrainInterface::handle_enqueue_aero21_CAN_data() {
+    AERO_PRESSURE_SENSOR_21_t aero21_msg;
+
+    aero21_msg.aero_channel_0_ro = HYTECH_aero_channel_0_ro_toS(_aero_data.aero_pressure_sensor_2.aero_channel_0);
+    aero21_msg.aero_channel_1_ro = HYTECH_aero_channel_1_ro_toS(_aero_data.aero_pressure_sensor_2.aero_channel_1);
+    aero21_msg.aero_channel_2_ro = HYTECH_aero_channel_2_ro_toS(_aero_data.aero_pressure_sensor_2.aero_channel_2);
+    aero21_msg.aero_channel_3_ro = HYTECH_aero_channel_3_ro_toS(_aero_data.aero_pressure_sensor_2.aero_channel_3);
+
+    CAN_util::enqueue_msg(&aero21_msg, &Pack_AERO_PRESSURE_SENSOR_21_hytech, VCRCANInterfaceImpl::CAN1_txBuffer);
+ 
+}
+
+void DrivebrainInterface::handle_enqueue_aero22_CAN_data() {
+    AERO_PRESSURE_SENSOR_22_t aero22_msg;
+
+    aero22_msg.aero_channel_4_ro = HYTECH_aero_channel_4_ro_toS(_aero_data.aero_pressure_sensor_2.aero_channel_4);
+    aero22_msg.aero_channel_5_ro = HYTECH_aero_channel_5_ro_toS(_aero_data.aero_pressure_sensor_2.aero_channel_5);
+    aero22_msg.aero_channel_6_ro = HYTECH_aero_channel_6_ro_toS(_aero_data.aero_pressure_sensor_2.aero_channel_6);
+    aero22_msg.aero_channel_7_ro = HYTECH_aero_channel_7_ro_toS(_aero_data.aero_pressure_sensor_2.aero_channel_7);
+
+    CAN_util::enqueue_msg(&aero22_msg, &Pack_AERO_PRESSURE_SENSOR_22_hytech, VCRCANInterfaceImpl::CAN1_txBuffer);
+ 
+}
+
+void DrivebrainInterface::handle_enqueue_aero31_CAN_data() {
+    AERO_PRESSURE_SENSOR_31_t aero31_msg;
+
+    aero31_msg.aero_channel_0_ro = HYTECH_aero_channel_0_ro_toS(_aero_data.aero_pressure_sensor_3.aero_channel_0);
+    aero31_msg.aero_channel_1_ro = HYTECH_aero_channel_1_ro_toS(_aero_data.aero_pressure_sensor_3.aero_channel_1);
+    aero31_msg.aero_channel_2_ro = HYTECH_aero_channel_2_ro_toS(_aero_data.aero_pressure_sensor_3.aero_channel_2);
+    aero31_msg.aero_channel_3_ro = HYTECH_aero_channel_3_ro_toS(_aero_data.aero_pressure_sensor_3.aero_channel_3);
+
+    CAN_util::enqueue_msg(&aero31_msg, &Pack_AERO_PRESSURE_SENSOR_31_hytech, VCRCANInterfaceImpl::CAN1_txBuffer);
+ 
+}
+
+void DrivebrainInterface::handle_enqueue_aero32_CAN_data() {
+    AERO_PRESSURE_SENSOR_32_t aero32_msg;
+
+    aero32_msg.aero_channel_4_ro = HYTECH_aero_channel_4_ro_toS(_aero_data.aero_pressure_sensor_3.aero_channel_4);
+    aero32_msg.aero_channel_5_ro = HYTECH_aero_channel_5_ro_toS(_aero_data.aero_pressure_sensor_3.aero_channel_5);
+    aero32_msg.aero_channel_6_ro = HYTECH_aero_channel_6_ro_toS(_aero_data.aero_pressure_sensor_3.aero_channel_6);
+    aero32_msg.aero_channel_7_ro = HYTECH_aero_channel_7_ro_toS(_aero_data.aero_pressure_sensor_3.aero_channel_7);
+
+    CAN_util::enqueue_msg(&aero32_msg, &Pack_AERO_PRESSURE_SENSOR_32_hytech, VCRCANInterfaceImpl::CAN1_txBuffer);
+ 
+}
+
+void DrivebrainInterface::handle_enqueue_aero41_CAN_data() {
+    AERO_PRESSURE_SENSOR_41_t aero41_msg;
+
+    aero41_msg.aero_channel_0_ro = HYTECH_aero_channel_0_ro_toS(_aero_data.aero_pressure_sensor_4.aero_channel_0);
+    aero41_msg.aero_channel_1_ro = HYTECH_aero_channel_1_ro_toS(_aero_data.aero_pressure_sensor_4.aero_channel_1);
+    aero41_msg.aero_channel_2_ro = HYTECH_aero_channel_2_ro_toS(_aero_data.aero_pressure_sensor_4.aero_channel_2);
+    aero41_msg.aero_channel_3_ro = HYTECH_aero_channel_3_ro_toS(_aero_data.aero_pressure_sensor_4.aero_channel_3);
+    CAN_util::enqueue_msg(&aero41_msg, &Pack_AERO_PRESSURE_SENSOR_41_hytech, VCRCANInterfaceImpl::CAN1_txBuffer);
+ 
+}
+
+void DrivebrainInterface::handle_enqueue_aero42_CAN_data() {
+    AERO_PRESSURE_SENSOR_42_t aero42_msg;
+
+    aero42_msg.aero_channel_4_ro = HYTECH_aero_channel_4_ro_toS(_aero_data.aero_pressure_sensor_4.aero_channel_4);
+    aero42_msg.aero_channel_5_ro = HYTECH_aero_channel_5_ro_toS(_aero_data.aero_pressure_sensor_4.aero_channel_5);
+    aero42_msg.aero_channel_6_ro = HYTECH_aero_channel_6_ro_toS(_aero_data.aero_pressure_sensor_4.aero_channel_6);
+    aero42_msg.aero_channel_7_ro = HYTECH_aero_channel_7_ro_toS(_aero_data.aero_pressure_sensor_4.aero_channel_7);
+
+    CAN_util::enqueue_msg(&aero42_msg, &Pack_AERO_PRESSURE_SENSOR_42_hytech, VCRCANInterfaceImpl::CAN1_txBuffer);
+ 
+}
+
 
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {
     handle_ethernet_socket_send_pb<hytech_msgs_VCRData_s_size>(_drivebrain_ip, _vcr_data_port, _udp_socket, data,
