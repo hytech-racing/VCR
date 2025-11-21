@@ -40,7 +40,15 @@ class DrivebrainInterface {
 
     void handle_enqueue_coolant_temp_CAN_data();
 
-    void handle_enqueue_aero_CAN_data();
+    void handle_enqueue_aero11_CAN_data();
+    void handle_enqueue_aero12_CAN_data();
+    void handle_enqueue_aero21_CAN_data();
+    void handle_enqueue_aero22_CAN_data();
+    void handle_enqueue_aero31_CAN_data();
+    void handle_enqueue_aero32_CAN_data();
+    void handle_enqueue_aero41_CAN_data();
+    void handle_enqueue_aero42_CAN_data();
+
 
 
 
