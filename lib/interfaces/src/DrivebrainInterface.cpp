@@ -13,6 +13,7 @@ DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cel
                                          const RearSusPotData_s &rear_suspot_data,
                                          const ThermistorData_s &coolant_temperature_data_0,
                                          const ThermistorData_s &coolant_temperature_data_1,
+                                         // add aero data?
                                          IPAddress drivebrain_ip, uint16_t vcr_data_port,
                                          qindesign::network::EthernetUDP *udp_socket)
     : _suspension_data{.rear_load_cell_data = rear_load_cell_data,
@@ -68,36 +69,88 @@ void DrivebrainInterface::receive_drivebrain_aero11_CAN_data(const CAN_message_t
     AERO_PRESSURE_SENSOR_11_t drivebrain_msg;
 
     Unpack_AERO_PRESSURE_SENSOR_11_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
-
     
+    _aero_data.aero_pressure_sensor_1.aero_channel_0 = static_cast<float>(HYTECH_aero_channel_0_ro_fromS(drivebrain_msg.aero_channel_0_ro));
+    _aero_data.aero_pressure_sensor_1.aero_channel_1 = static_cast<float>(HYTECH_aero_channel_1_ro_fromS(drivebrain_msg.aero_channel_1_ro));
+    _aero_data.aero_pressure_sensor_1.aero_channel_2 = static_cast<float>(HYTECH_aero_channel_2_ro_fromS(drivebrain_msg.aero_channel_2_ro));
+    _aero_data.aero_pressure_sensor_1.aero_channel_3 = static_cast<float>(HYTECH_aero_channel_3_ro_fromS(drivebrain_msg.aero_channel_3_ro));
     }
 void DrivebrainInterface::receive_drivebrain_aero12_CAN_data(const CAN_message_t &msg,
                                                             unsigned long curr_millis) {
-    ;
+    AERO_PRESSURE_SENSOR_12_t drivebrain_msg;
+
+    Unpack_AERO_PRESSURE_SENSOR_12_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+    
+    _aero_data.aero_pressure_sensor_1.aero_channel_4 = static_cast<float>(HYTECH_aero_channel_4_ro_fromS(drivebrain_msg.aero_channel_4_ro));
+    _aero_data.aero_pressure_sensor_1.aero_channel_5 = static_cast<float>(HYTECH_aero_channel_5_ro_fromS(drivebrain_msg.aero_channel_5_ro));
+    _aero_data.aero_pressure_sensor_1.aero_channel_6 = static_cast<float>(HYTECH_aero_channel_6_ro_fromS(drivebrain_msg.aero_channel_6_ro));
+    _aero_data.aero_pressure_sensor_1.aero_channel_7 = static_cast<float>(HYTECH_aero_channel_7_ro_fromS(drivebrain_msg.aero_channel_7_ro));
     }
 void DrivebrainInterface::receive_drivebrain_aero21_CAN_data(const CAN_message_t &msg,
                                                             unsigned long curr_millis) {
-    ;
+    AERO_PRESSURE_SENSOR_21_t drivebrain_msg;
+
+    Unpack_AERO_PRESSURE_SENSOR_21_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+    
+    _aero_data.aero_pressure_sensor_2.aero_channel_0 = static_cast<float>(HYTECH_aero_channel_0_ro_fromS(drivebrain_msg.aero_channel_0_ro));
+    _aero_data.aero_pressure_sensor_2.aero_channel_1 = static_cast<float>(HYTECH_aero_channel_1_ro_fromS(drivebrain_msg.aero_channel_1_ro));
+    _aero_data.aero_pressure_sensor_2.aero_channel_2 = static_cast<float>(HYTECH_aero_channel_2_ro_fromS(drivebrain_msg.aero_channel_2_ro));
+    _aero_data.aero_pressure_sensor_2.aero_channel_3 = static_cast<float>(HYTECH_aero_channel_3_ro_fromS(drivebrain_msg.aero_channel_3_ro));
     }
 void DrivebrainInterface::receive_drivebrain_aero22_CAN_data(const CAN_message_t &msg,
                                                             unsigned long curr_millis) {
-    ;
+    AERO_PRESSURE_SENSOR_22_t drivebrain_msg;
+
+    Unpack_AERO_PRESSURE_SENSOR_22_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+    
+    _aero_data.aero_pressure_sensor_2.aero_channel_4 = static_cast<float>(HYTECH_aero_channel_4_ro_fromS(drivebrain_msg.aero_channel_4_ro));
+    _aero_data.aero_pressure_sensor_2.aero_channel_5 = static_cast<float>(HYTECH_aero_channel_5_ro_fromS(drivebrain_msg.aero_channel_5_ro));
+    _aero_data.aero_pressure_sensor_2.aero_channel_6 = static_cast<float>(HYTECH_aero_channel_6_ro_fromS(drivebrain_msg.aero_channel_6_ro));
+    _aero_data.aero_pressure_sensor_2.aero_channel_7 = static_cast<float>(HYTECH_aero_channel_7_ro_fromS(drivebrain_msg.aero_channel_7_ro));
     }
 void DrivebrainInterface::receive_drivebrain_aero31_CAN_data(const CAN_message_t &msg,
                                                             unsigned long curr_millis) {
-    ;
+    AERO_PRESSURE_SENSOR_31_t drivebrain_msg;
+
+    Unpack_AERO_PRESSURE_SENSOR_31_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+    
+    _aero_data.aero_pressure_sensor_3.aero_channel_0 = static_cast<float>(HYTECH_aero_channel_0_ro_fromS(drivebrain_msg.aero_channel_0_ro));
+    _aero_data.aero_pressure_sensor_3.aero_channel_1 = static_cast<float>(HYTECH_aero_channel_1_ro_fromS(drivebrain_msg.aero_channel_1_ro));
+    _aero_data.aero_pressure_sensor_3.aero_channel_2 = static_cast<float>(HYTECH_aero_channel_2_ro_fromS(drivebrain_msg.aero_channel_2_ro));
+    _aero_data.aero_pressure_sensor_3.aero_channel_3 = static_cast<float>(HYTECH_aero_channel_3_ro_fromS(drivebrain_msg.aero_channel_3_ro));
     }
 void DrivebrainInterface::receive_drivebrain_aero32_CAN_data(const CAN_message_t &msg,
                                                             unsigned long curr_millis) {
-    ;
+    AERO_PRESSURE_SENSOR_32_t drivebrain_msg;
+
+    Unpack_AERO_PRESSURE_SENSOR_32_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+    
+    _aero_data.aero_pressure_sensor_3.aero_channel_4 = static_cast<float>(HYTECH_aero_channel_4_ro_fromS(drivebrain_msg.aero_channel_4_ro));
+    _aero_data.aero_pressure_sensor_3.aero_channel_5 = static_cast<float>(HYTECH_aero_channel_5_ro_fromS(drivebrain_msg.aero_channel_5_ro));
+    _aero_data.aero_pressure_sensor_3.aero_channel_6 = static_cast<float>(HYTECH_aero_channel_6_ro_fromS(drivebrain_msg.aero_channel_6_ro));
+    _aero_data.aero_pressure_sensor_3.aero_channel_7 = static_cast<float>(HYTECH_aero_channel_7_ro_fromS(drivebrain_msg.aero_channel_7_ro));
     }
 void DrivebrainInterface::receive_drivebrain_aero41_CAN_data(const CAN_message_t &msg,
                                                             unsigned long curr_millis) {
-    ;
+    AERO_PRESSURE_SENSOR_41_t drivebrain_msg;
+
+    Unpack_AERO_PRESSURE_SENSOR_41_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+    
+    _aero_data.aero_pressure_sensor_4.aero_channel_0 = static_cast<float>(HYTECH_aero_channel_0_ro_fromS(drivebrain_msg.aero_channel_0_ro));
+    _aero_data.aero_pressure_sensor_4.aero_channel_1 = static_cast<float>(HYTECH_aero_channel_1_ro_fromS(drivebrain_msg.aero_channel_1_ro));
+    _aero_data.aero_pressure_sensor_4.aero_channel_2 = static_cast<float>(HYTECH_aero_channel_2_ro_fromS(drivebrain_msg.aero_channel_2_ro));
+    _aero_data.aero_pressure_sensor_4.aero_channel_3 = static_cast<float>(HYTECH_aero_channel_3_ro_fromS(drivebrain_msg.aero_channel_3_ro));
     }
 void DrivebrainInterface::receive_drivebrain_aero42_CAN_data(const CAN_message_t &msg,
                                                             unsigned long curr_millis) {
-    ;
+    AERO_PRESSURE_SENSOR_42_t drivebrain_msg;
+
+    Unpack_AERO_PRESSURE_SENSOR_42_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+    
+    _aero_data.aero_pressure_sensor_4.aero_channel_4 = static_cast<float>(HYTECH_aero_channel_4_ro_fromS(drivebrain_msg.aero_channel_4_ro));
+    _aero_data.aero_pressure_sensor_4.aero_channel_5 = static_cast<float>(HYTECH_aero_channel_5_ro_fromS(drivebrain_msg.aero_channel_5_ro));
+    _aero_data.aero_pressure_sensor_4.aero_channel_6 = static_cast<float>(HYTECH_aero_channel_6_ro_fromS(drivebrain_msg.aero_channel_6_ro));
+    _aero_data.aero_pressure_sensor_4.aero_channel_7 = static_cast<float>(HYTECH_aero_channel_7_ro_fromS(drivebrain_msg.aero_channel_7_ro));
     }
 
 void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
@@ -117,6 +170,10 @@ void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
     thermistor_msg.thermistor_1_deg_C_ro = HYTECH_thermistor_1_deg_C_ro_toS(_thermistor_data.coolant_temperature_1_data.thermistor_degrees_C);
 
     CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
+void DrivebrainInterface::handle_enqueue_aero_CAN_data() {
+    ;
 }
 
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {
