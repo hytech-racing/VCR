@@ -173,7 +173,10 @@ void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
 }
 
 void DrivebrainInterface::handle_enqueue_aero_CAN_data() {
-    ;
+    AERO_PRESSURE_SENSOR_11_t aero11_msg;
+    aero11_msg.aero_channel_0_ro = HYTECH_aero_channel_0_ro_toS(_aero_data.aero_pressure_sensor_1.aero_channel_0);
+    CAN_util::enqueue_msg(&aero11_msg, &Pack_AERO_PRESSURE_SENSOR_11_hytech, VCRCANInterfaceImpl::CAN1_txBuffer);
+
 }
 
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {
