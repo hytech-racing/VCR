@@ -5,9 +5,9 @@
 /* -------------------------------------------------- */
 /*                 Teensy 4.1 GPIO pins               */
 /* -------------------------------------------------- */
-constexpr int ADC0_CS = 40; // MCP3208. ADC0 in VCR schematic. Used for valuable telem data.
-constexpr int ADC1_CS = 39; // MCP3208. ADC1 in VCR schematic. Used for extra thermistors or extra sensors while testing.
-constexpr int BRAKELIGHT_CONTROL_PIN = 32;
+constexpr int ADC0_CS = 10; // MCP3208. ADC0 in VCR schematic. Used for valuable telem data.
+constexpr int ADC1_CS = 36; // MCP3208. ADC1 in VCR schematic. Used for extra thermistors or extra sensors while testing.
+constexpr int BRAKELIGHT_CONTROL_PIN = 9;
 
 
 /* -------------------------------------------------- */
@@ -84,15 +84,15 @@ constexpr const float TEST_TEMP_OFFSET = 386;
 /* Watchdog constants */
 constexpr int INVERTER_ENABLE_PIN = 2;
 constexpr int FLOWMETER_PIN = 7;
-constexpr int WATCHDOG_PIN = 36;
-constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
+constexpr int WATCHDOG_PIN = 26;
+constexpr int SOFTWARE_OK_PIN = 27; // Watchdog's !RESET pin
 constexpr unsigned long WATCHDOG_KICK_INTERVAL_MS = 10UL;
 constexpr unsigned long VCF_PEDALS_MAX_HEARTBEAT_MS = 50UL;         // 20ms at 60mph is about 0.5 meters
 constexpr uint64_t ACU_ACU_OK_MAX_HEARTBEAT_MS = 500;
 constexpr unsigned long MAX_ALLOWED_DB_LATENCY_MS = 40; // milliseconds
 
 /* Inverter constants */
-constexpr int INVERTER_EN_PIN = 2;
+constexpr int INVERTER_EN_PIN = 5;
 constexpr int INVERTER_MINIMUM_HV_VOLTAGE = 60;
 
 /* Filter constants */

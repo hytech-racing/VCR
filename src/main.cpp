@@ -234,6 +234,9 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.print(" Thermistor 7 degrees C: ");
     // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C);
 
+    Serial.print("SW OK: ");
+    Serial.println(digitalRead(SOFTWARE_OK_PIN));
+
     Serial.println();
  
     return HT_TASK::TaskResponse::YIELD;
@@ -258,7 +261,9 @@ void setup() {
 
     pinMode(INVERTER_ENABLE_PIN, OUTPUT);
     pinMode(FLOWMETER_PIN, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(FLOWMETER_PIN), countPulse, RISING);
+    pinMode(27, OUTPUT);
+    digitalWrite(27, HIGH);
+    //attachInterrupt(digitalPinToInterrupt(FLOWMETER_PIN), countPulse, RISING);
     pulseCount = 0;
     
     // Create all singletons

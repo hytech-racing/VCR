@@ -113,6 +113,7 @@ HT_TASK::TaskResponse update_acu_heartbeat(const unsigned long& sysMicros, const
 HT_TASK::TaskResponse init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     WatchdogInstance::create(WATCHDOG_KICK_INTERVAL_MS); // NOLINT
+     pinMode(SOFTWARE_OK_PIN, OUTPUT);
     pinMode(WATCHDOG_PIN, OUTPUT);
     return HT_TASK::TaskResponse::YIELD;
 }
@@ -120,6 +121,7 @@ HT_TASK::TaskResponse init_kick_watchdog(const unsigned long& sysMicros, const H
 HT_TASK::TaskResponse run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
+    digitalWrite(SOFTWARE_OK_PIN, HIGH);
 
     return HT_TASK::TaskResponse::YIELD;
 }
