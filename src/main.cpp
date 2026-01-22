@@ -44,9 +44,9 @@
 #include "device_fw_version.h"
 
 /* externed CAN instances */
-FlexCAN_Type<CAN1> VCRCANInterfaceImpl::AUXILLARY_CAN;
-FlexCAN_Type<CAN3> VCRCANInterfaceImpl::TELEM_CAN;
-FlexCAN_Type<CAN2> VCRCANInterfaceImpl::INVERTER_CAN;
+FlexCAN_Type<CAN2> VCRCANInterfaceImpl::AUXILLARY_CAN;
+FlexCAN_Type<CAN1> VCRCANInterfaceImpl::TELEM_CAN;
+FlexCAN_Type<CAN3> VCRCANInterfaceImpl::INVERTER_CAN;
 
 /* Ethernet message sockets */
 qindesign::network::EthernetUDP vcr_data_send_socket;
@@ -172,22 +172,22 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.print("torque mode cycle button pressed: ");
     // Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
 
-    // Serial.println("IOExpander testing");
-    // Serial.println("Shutdown Data");
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok);
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay);
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok);
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.l_bms_relay);
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.m_imd_relay);
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.imd_is_ok);
-    // Serial.println("Linked Data");
-    // Serial.println(vcr_data.interface_data.ethernet_is_linked.acu_link);
-    // Serial.println(vcr_data.interface_data.ethernet_is_linked.drivebrain_link);
-    // Serial.println(vcr_data.interface_data.ethernet_is_linked.vcf_link);
-    // Serial.println(vcr_data.interface_data.ethernet_is_linked.teensy_link);
-    // Serial.println(vcr_data.interface_data.ethernet_is_linked.debug_link);
-    // Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
+    Serial.println("IOExpander testing");
+    Serial.println("Shutdown Data");
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.l_bms_relay);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.m_imd_relay);
+    Serial.println(vcr_data.interface_data.shutdown_sensing_data.imd_is_ok);
+    Serial.println("Linked Data");
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.acu_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.drivebrain_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.vcf_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.teensy_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.debug_link);
+    Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
 
 
     // Serial.print("Load Cell RR: ");
@@ -233,9 +233,6 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog);
     // Serial.print(" Thermistor 7 degrees C: ");
     // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C);
-
-    Serial.print("SW OK: ");
-    Serial.println(digitalRead(SOFTWARE_OK_PIN));
 
     Serial.println();
  
@@ -388,7 +385,7 @@ void setup() {
     scheduler.schedule(adc_0_sample_task);
     scheduler.schedule(adc_1_sample_task);
     scheduler.schedule(kick_watchdog_task);
-    scheduler.schedule(ams_system_task);
+    //scheduler.schedule(ams_system_task); // Commented out to test VCR without ACU otherwise SOFTWARE_OK never goes high
     scheduler.schedule(enqueue_suspension_CAN_task);
     scheduler.schedule(enqueue_dashboard_CAN_task);
     scheduler.schedule(send_CAN_task);
@@ -397,7 +394,7 @@ void setup() {
     scheduler.schedule(enqueue_coolant_temp_CAN_task);
     scheduler.schedule(async_main_task);
     scheduler.schedule(enqueue_controls_CAN_task);
-    // scheduler.schedule(debug_state_print_task);
+     scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     scheduler.schedule(update_sample_flowmeter);
     scheduler.schedule(IOExpander_read_task);

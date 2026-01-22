@@ -86,7 +86,7 @@ template <std::size_t num_controllers> class TorqueControllerMux {
     explicit TorqueControllerMux(
         std::array<
             std::function<DrivetrainCommand_s(const VCRData_s &state, unsigned long curr_millis)>,
-            num_controllers>
+            num_controllers>    
             controller_evals,
         std::array<bool, num_controllers> mux_bypass_limits,
         float max_change_speed = TC_MUX_DEFAULT_PARAMS::MAX_SPEED_FOR_MODE_CHANGE,

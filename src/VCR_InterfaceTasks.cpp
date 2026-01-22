@@ -99,7 +99,6 @@ HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const
 HT_TASK::TaskResponse init_acu_heartbeat(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     ACUInterfaceInstance::create(sys_time::hal_millis(), ACU_ACU_OK_MAX_HEARTBEAT_MS); // NOLINT 
-    pinMode(SOFTWARE_OK_PIN, OUTPUT);
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -113,7 +112,7 @@ HT_TASK::TaskResponse update_acu_heartbeat(const unsigned long& sysMicros, const
 HT_TASK::TaskResponse init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     WatchdogInstance::create(WATCHDOG_KICK_INTERVAL_MS); // NOLINT
-     pinMode(SOFTWARE_OK_PIN, OUTPUT);
+    pinMode(SOFTWARE_OK_PIN, OUTPUT);
     pinMode(WATCHDOG_PIN, OUTPUT);
     return HT_TASK::TaskResponse::YIELD;
 }
@@ -176,6 +175,7 @@ HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, c
 {
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &VCRCANInterfaceImpl::INVERTER_CAN);
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
+    //Serial.println("sending telem can data");
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::auxillary_can_tx_buffer, &VCRCANInterfaceImpl::AUXILLARY_CAN);
     return HT_TASK::TaskResponse::YIELD;
 }

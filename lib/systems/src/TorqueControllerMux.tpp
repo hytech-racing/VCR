@@ -6,7 +6,6 @@
 
 #include "SystemTimeInterface.h"
 
-
 template <std::size_t num_controllers>
 DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command(ControllerMode_e requested_controller_type,
                                                                                TorqueLimit_e requested_torque_limit,
@@ -17,6 +16,8 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
 
     DrivetrainCommand_s current_output = empty_command;
 
+    // why not use enums instead? won't need to cast to an int. 
+    // could be keeping enum classes to make sure only values of the same enum class can be directly compared without a cast
     int req_controller_mode_index = static_cast<int>(requested_controller_type);
     int active_controller_mode_index = static_cast<int>(_active_status.active_controller_mode);
 
@@ -35,31 +36,35 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
     current_output = _controller_evals[active_controller_mode_index](input_state, sys_time::hal_millis());
 
     // std::cout << "output torques " << current_output.inverter_torque_limit[0] << " " << current_output.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
-    bool requesting_controller_change = requested_controller_type != _active_status.active_controller_mode;
+    
+    bool requesting_controller_change = requested_controller_type != _active_status.active_controller_mode; // if the requested mode is different than the current mode then go through the change logic
 
     if (requesting_controller_change)
     {
         DrivetrainCommand_s proposed_output = _controller_evals[req_controller_mode_index](input_state, sys_time::hal_millis());
         TorqueControllerMuxError_e error_state = can_switch_controller(input_state.system_data.drivetrain_data, current_output, proposed_output);
+        
+        //successful change
         if (error_state == TorqueControllerMuxError_e::NO_ERROR)
         {
-            _active_status.active_controller_mode = requested_controller_type;
+            _active_status.active_controller_mode = requested_controller_type; //active = current; requested = future
             active_controller_mode_index = req_controller_mode_index;
             current_output = proposed_output;
         }
         _active_status.active_error = error_state;
     }
-    if (!_mux_bypass_limits[active_controller_mode_index])
+    if (!_mux_bypass_limits[active_controller_mode_index]) //only mode 0?
     {
         _active_status.active_torque_limit_enum = requested_torque_limit;
 
+        // why this?
         if (current_output.desired_speeds.FL == 0.0f && current_output.desired_speeds.FR == 0.0f && current_output.desired_speeds.RL == 0.0f && current_output.desired_speeds.RR == 0.0f)
         {
             current_output = apply_regen_limit(current_output, input_state.system_data.drivetrain_data);
         }
 
         current_output = apply_torque_limit(current_output, _torque_limit_map[requested_torque_limit]);
-        // std::cout << "output torques after " << current_output.inverter_torque_limit[0] << " " <<current_output.inverter_torque_limit[1] << " " <<current_output.command.inverter_torque_limit[2] << " " <<current_output.command.inverter_torque_limit[3] << std::endl;
+        // std::cout << "output torques after " << current_output.inverter_torque_limit[0] << " " <<current_output.inverter_torque_limit[1] << " " <<current_output.command.inverter_torque_limit[2] << " " <<current_output.command.inverter_torque_limit[3] << std::endl; // holy long line
         _active_status.active_torque_limit_value = _torque_limit_map[requested_torque_limit];
         // std::cout << "output torques before pw " << current_output.inverter_torque_limit[0] << " " << current_output.inverter_torque_limit[1] << " " << current_output.command.inverter_torque_limit[2] << " " << current_output.command.inverter_torque_limit[3] << std::endl;
 
@@ -72,7 +77,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
         current_output = apply_positive_speed_limit(current_output);
         _active_status.output_is_bypassing_limits = false;
     }
-    else{
+    else{ // any mode other than mode 0 = no torque, regen, or power limiting
         _active_status.active_torque_limit_enum = TorqueLimit_e::TCMUX_FULL_TORQUE;
         _active_status.active_torque_limit_value= PhysicalParameters::AMK_MAX_TORQUE;
         _active_status.output_is_bypassing_limits = true;
@@ -88,15 +93,21 @@ TorqueControllerMuxError_e TorqueControllerMux<num_controllers>::can_switch_cont
                                                                                       DrivetrainCommand_s desired_controller_out)
 {
     bool speedPreventsModeChange = false;
+
     // Check if torque delta permits mode change
     bool torqueDeltaPreventsModeChange = false;
 
     auto speeds = active_drivetrain_data.measuredSpeeds.as_array();
     auto desired_torq_lims = desired_controller_out.torque_limits.as_array();
     auto prev_torq_lims = previous_controller_command.torque_limits.as_array();
+
+
+    // is there a specific reason why we want to switch under speed and torque differences? would it not be safer to keep it to switching under near-stationary conditions instead?
     for (size_t i = 0; i < _num_motors; i++)
     {
-        speedPreventsModeChange = (fabs(speeds[i] * RPM_TO_METERS_PER_SECOND) >= _max_change_speed);
+        // if a motor's speed >= 5 m/s, don't switch to new controller
+        speedPreventsModeChange = (fabs(speeds[i] * RPM_TO_METERS_PER_SECOND) >= _max_change_speed); 
+
         // only if the torque delta is positive do we not want to switch to the new one
         torqueDeltaPreventsModeChange = (desired_torq_lims[i] - prev_torq_lims[i]) > _max_torque_pos_change_delta;
         if (speedPreventsModeChange)
@@ -108,7 +119,7 @@ TorqueControllerMuxError_e TorqueControllerMux<num_controllers>::can_switch_cont
             return TorqueControllerMuxError_e::ERROR_TORQUE_DIFF_TOO_HIGH;
         }
     }
-    return TorqueControllerMuxError_e::NO_ERROR;
+    return TorqueControllerMuxError_e::NO_ERROR; //successful change to new controller
 }
 
 /* Apply limit such that wheelspeed never goes negative */
@@ -132,7 +143,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_torque_limit(con
     DrivetrainCommand_s out = command;
     float avg_torque = 0;
     // get the average torque accross all 4 wheels
-    auto torq_lims = out.torque_limits.as_array();
+    auto torq_lims = out.torque_limits.as_array(); 
     for (size_t i = 0; i < torq_lims.size(); i++)
     {
         avg_torque += abs(torq_lims[i]);
@@ -167,7 +178,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_power_limit(cons
     float net_torque_mag = 0;
     float net_power = 0;
 
-
+    // uhh why not just put these all on one line? readability?
     net_torque_mag += out.torque_limits.FL;
     net_torque_mag += out.torque_limits.FR;
     net_torque_mag += out.torque_limits.RL;
@@ -212,7 +223,7 @@ template <std::size_t num_controllers>
 DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(const DrivetrainCommand_s &command, const DrivetrainDynamicReport_s &drivetrain_data)
 {
     DrivetrainCommand_s out = command;
-    const float noRegenLimitKPH = 10.0;
+    const float noRegenLimitKPH = 10.0;  // how were noRegenLimit and fullRegenLimit determined?
     const float fullRegenLimitKPH = 5.0;
     float maxWheelSpeed = 0.0;
     float torqueScaleDown = 0.0;
@@ -229,6 +240,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
 
     // begin limiting regen at noRegenLimitKPH and completely limit regen at fullRegenLimitKPH
     // linearly interpolate the scale factor between noRegenLimitKPH and fullRegenLimitKPH
+    // is linear the best way to do this?
     torqueScaleDown = std::min(1.0f, std::max(0.0f, (maxWheelSpeed - fullRegenLimitKPH) / (noRegenLimitKPH - fullRegenLimitKPH)));
 
     if (allWheelsRegen)
