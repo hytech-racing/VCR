@@ -17,7 +17,6 @@
 #include "controls.h"
 
 #include "DrivebrainInterface.h"
-#include "IOExpander.h"
 #include "IOExpanderUtils.h"
 
 float apply_iir_filter(float alpha, float old_value, float new_value)
@@ -189,32 +188,49 @@ HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicr
 
 HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    IOExpanderInstance::create(0x20);
+    Wire2.begin(); // copied from VCF but why Wire 2?
+    IOExpanderInstance::create(0x20, Wire2);
+    IOExpanderInstance::instance().init();
+
+    // setting GPB7 as an output (required by datasheet) and the rest as inputs for both ports
+    IOExpanderInstance::instance().portMode(MCP23017Port::A, 0b01111111); 
+    IOExpanderInstance::instance().portMode(MCP23017Port::B, 0b01111111); 
+
+    // configure internal pull-ups (required by datasheet)
+    IOExpanderInstance::instance().writeRegister(MCP23017Register::GPPU_A, 0xFF); 
+    IOExpanderInstance::instance().writeRegister(MCP23017Register::GPPU_B, 0xFF);
+
+    IOExpanderInstance::instance().writeRegister(MCP23017Register::IPOL_B, 0xFF);
+
     return HT_TASK::TaskResponse::YIELD;
 }
 
+
+// need to double check pin assigments
 HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     // NOLINTBEGIN
 
-    // TODO: Make this consistent with VCF implementation (make sure internal pullups are configured)
+    uint16_t data = IOExpanderInstance::instance().read();
 
-    uint16_t data = 0;
-    data = IOExpanderInstance::instance().read();
-    vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 0);
-    vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay = IOExpanderUtils::getBit(data, 0, 1);
-    vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok = IOExpanderUtils::getBit(data, 0, 2);
-    vcr_data.interface_data.shutdown_sensing_data.l_bms_relay = IOExpanderUtils::getBit(data, 0, 3);
-    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0, 4);
-    vcr_data.interface_data.shutdown_sensing_data.m_imd_relay = IOExpanderUtils::getBit(data, 0, 5);
-    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 0, 6);
+    Serial.print(IOExpanderUtils::getBit(data, 0, 1));
 
-    vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 0);
-    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 1, 1);
-    vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 2);
-    vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 3);
-    vcr_data.interface_data.ethernet_is_linked.debug_link = IOExpanderUtils::getBit(data, 1, 4);
-    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 1, 5);
+    // inputs on port a (0)
+    vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 1);
+    //vcr_data.interface_data.shutdown_sensing_data.bspd_fault = IOExpanderUtils::getBit(data, 0, 2); //need to add bspd fault to shdn sensing data in shared firmware types
+    //vcr_data.interface_data.ethernet_is_linked.vn_link = IOExpanderUtils::getBit(data, 0, 3); //need to add vn_link to ethernet is linked in shared firmware types
+    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 0, 4);
+    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 0, 5);
+    //vcr_data.interface_data.shutdown_sensing_data.bspd_missing = IOExpanderUtils::getBit(data, 0, 6); //need to add to shared firmware types
+
+    // inputs on port b (1)
+    //vcr_data.interface_data.shutdown_sensing_data.lv_present = IOExpanderUtils::getBit(data, 1, 0); //need to add
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 1, 1); // i also need to update the shutdown sensing struct
+    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 1, 2);
+    //vcr_data.interface_data.shutdown_sensing_data.vcr_is_ok = IOExpanderUtils::getBit(data, 1, 3); //need to add
+    vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 4);
+    vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 5);
+    vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 6);
 
     return HT_TASK::TaskResponse::YIELD;
     // NOLINTEND
