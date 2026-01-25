@@ -117,6 +117,8 @@ HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_
 HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
 HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
+HT_TASK::Task run_enable_fans(HT_TASK::DUMMY_FUNCTION, enable_fans, dashboard_send_priority, dashboard_send_period_us);
+HT_TASK::Task run_enable_pumps(HT_TASK::DUMMY_FUNCTION, enable_pumps, dashboard_send_priority, dashboard_send_period_us);
 
 
 
@@ -178,12 +180,12 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
     //Serial.println(vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay);
     // Serial.println(vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok);
     // Serial.println(vcr_data.interface_data.shutdown_sensing_data.l_bms_relay);
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
+     // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
     // Serial.println(vcr_data.interface_data.shutdown_sensing_data.m_imd_relay);
     // Serial.println(vcr_data.interface_data.shutdown_sensing_data.imd_is_ok);
     // Serial.println("Linked Data");
     // Serial.println(vcr_data.interface_data.ethernet_is_linked.acu_link);
-     Serial.println(vcr_data.interface_data.ethernet_is_linked.drivebrain_link);
+  // Serial.println(vcr_data.interface_data.ethernet_is_linked.drivebrain_link);
     // Serial.println(vcr_data.interface_data.ethernet_is_linked.vcf_link);
     // Serial.println(vcr_data.interface_data.ethernet_is_linked.teensy_link);
     // Serial.println(vcr_data.interface_data.ethernet_is_linked.debug_link);
@@ -260,6 +262,10 @@ void setup() {
     pinMode(FLOWMETER_PIN, INPUT_PULLUP);
     pinMode(27, OUTPUT);
     digitalWrite(27, HIGH);
+
+    pinMode(18, INPUT_PULLUP);
+    pinMode(19, INPUT_PULLUP);
+    Wire2.setClock(10000);
     //attachInterrupt(digitalPinToInterrupt(FLOWMETER_PIN), countPulse, RISING);
     pulseCount = 0;
     
@@ -394,10 +400,13 @@ void setup() {
     scheduler.schedule(enqueue_coolant_temp_CAN_task);
     scheduler.schedule(async_main_task);
     scheduler.schedule(enqueue_controls_CAN_task);
-     scheduler.schedule(debug_state_print_task);
+    // scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     scheduler.schedule(update_sample_flowmeter);
     scheduler.schedule(IOExpander_read_task);
+
+    scheduler.schedule(run_enable_fans);
+    scheduler.schedule(run_enable_pumps);
 
 }
 

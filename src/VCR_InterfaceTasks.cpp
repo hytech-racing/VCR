@@ -193,14 +193,17 @@ HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_T
     IOExpanderInstance::instance().init();
 
     // setting GPB7 as an output (required by datasheet) and the rest as inputs for both ports
-    IOExpanderInstance::instance().portMode(MCP23017Port::A, 0b01111111); 
-    IOExpanderInstance::instance().portMode(MCP23017Port::B, 0b01111111); 
+    IOExpanderInstance::instance().portMode(MCP23017Port::A, 0b11111111);
+    IOExpanderInstance::instance().portMode(MCP23017Port::B, 0b11111111); 
 
-    // configure internal pull-ups (required by datasheet)
-    IOExpanderInstance::instance().writeRegister(MCP23017Register::GPPU_A, 0xFF); 
+    // internal pullups
     IOExpanderInstance::instance().writeRegister(MCP23017Register::GPPU_B, 0xFF);
+    IOExpanderInstance::instance().writeRegister(MCP23017Register::GPPU_A, 0xFF);
+    
 
-    IOExpanderInstance::instance().writeRegister(MCP23017Register::IPOL_B, 0xFF);
+    // invert
+    IOExpanderInstance::instance().writeRegister(MCP23017Register::IPOL_A, 0xFF);
+
 
     return HT_TASK::TaskResponse::YIELD;
 }
@@ -213,8 +216,6 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
 
     uint16_t data = IOExpanderInstance::instance().read();
 
-    Serial.print(IOExpanderUtils::getBit(data, 0, 1));
-
     // inputs on port a (0)
     vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 1);
     //vcr_data.interface_data.shutdown_sensing_data.bspd_fault = IOExpanderUtils::getBit(data, 0, 2); //need to add bspd fault to shdn sensing data in shared firmware types
@@ -225,13 +226,17 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
 
     // inputs on port b (1)
     //vcr_data.interface_data.shutdown_sensing_data.lv_present = IOExpanderUtils::getBit(data, 1, 0); //need to add
-    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 1, 1); // i also need to update the shutdown sensing struct
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0, 1); // i also need to update the shutdown sensing struct
     vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 1, 2);
     //vcr_data.interface_data.shutdown_sensing_data.vcr_is_ok = IOExpanderUtils::getBit(data, 1, 3); //need to add
     vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 4);
     vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 5);
     vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 6);
 
+    //Serial.println( vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
+
+    Wire2.requestFrom(0x20, 1);
+    Serial.println(Wire2.available());
     return HT_TASK::TaskResponse::YIELD;
     // NOLINTEND
 }
@@ -246,4 +251,16 @@ HT_TASK::TaskResponse run_update_brakelight_task(const unsigned long& sysMicros,
 {
     digitalWrite(BRAKELIGHT_CONTROL_PIN, vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_is_pressed);
     return HT_TASK::TaskResponse::YIELD;
+}
+
+
+HT_TASK::TaskResponse enable_fans(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
+{
+    digitalWrite(MOTOR_FAN_CNTRL, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? 1 : 0);
+    digitalWrite(INV_FAN_CNTRL, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? 1 : 0);
+}
+
+HT_TASK::TaskResponse enable_pumps(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
+{
+    digitalWrite(PUMP_CNTRL, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? 1 : 0);
 }

@@ -81,6 +81,11 @@ constexpr const float COOLANT_TEMP_OFFSET = 242;
 constexpr const float TEST_TEMP_SCALE = -46.8;
 constexpr const float TEST_TEMP_OFFSET = 386;
 
+// Fan/Pump Control
+constexpr int PUMP_CNTRL = 33;
+constexpr int INV_FAN_CNTRL = 34;
+constexpr int MOTOR_FAN_CNTRL = 35;
+
 /* Watchdog constants */
 constexpr int INVERTER_ENABLE_PIN = 2;
 constexpr int FLOWMETER_PIN = 7;
