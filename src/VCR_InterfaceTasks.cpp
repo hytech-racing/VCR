@@ -258,9 +258,11 @@ HT_TASK::TaskResponse enable_fans(const unsigned long& sysMicros, const HT_TASK:
 {
     digitalWrite(MOTOR_FAN_CNTRL, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? 1 : 0);
     digitalWrite(INV_FAN_CNTRL, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? 1 : 0);
+    return HT_TASK::TaskResponse::YIELD;
 }
 
 HT_TASK::TaskResponse enable_pumps(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
 {
     digitalWrite(PUMP_CNTRL, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? 1 : 0);
+    return HT_TASK::TaskResponse::YIELD;
 }
