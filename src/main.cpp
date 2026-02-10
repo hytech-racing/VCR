@@ -263,9 +263,9 @@ void setup() {
     pinMode(27, OUTPUT);
     digitalWrite(27, HIGH);
 
-    pinMode(18, INPUT_PULLUP);
-    pinMode(19, INPUT_PULLUP);
-    Wire2.setClock(10000);
+    // pinMode(18, INPUT_PULLUP);
+    // pinMode(19, INPUT_PULLUP);
+
     //attachInterrupt(digitalPinToInterrupt(FLOWMETER_PIN), countPulse, RISING);
     pulseCount = 0;
     
@@ -405,11 +405,12 @@ void setup() {
     scheduler.schedule(update_sample_flowmeter);
     scheduler.schedule(IOExpander_read_task);
 
-    scheduler.schedule(run_enable_fans);
-    scheduler.schedule(run_enable_pumps);
+    // scheduler.schedule(run_enable_fans);
+    // scheduler.schedule(run_enable_pumps);
 
 }
 
 void loop() {
+    
     scheduler.run();
 }

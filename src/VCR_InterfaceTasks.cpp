@@ -188,11 +188,11 @@ HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicr
 
 HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    Wire2.begin(); // copied from VCF but why Wire 2?
-    IOExpanderInstance::create(0x20, Wire2);
+    Wire.begin(); // copied from VCF but why Wire 2?
+    IOExpanderInstance::create(0x20, Wire);
     IOExpanderInstance::instance().init();
 
-    // setting GPB7 as an output (required by datasheet) and the rest as inputs for both ports
+    // set all pins as inputs
     IOExpanderInstance::instance().portMode(MCP23017Port::A, 0b11111111);
     IOExpanderInstance::instance().portMode(MCP23017Port::B, 0b11111111); 
 
@@ -201,9 +201,9 @@ HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_T
     IOExpanderInstance::instance().writeRegister(MCP23017Register::GPPU_A, 0xFF);
     
 
-    // invert
-    IOExpanderInstance::instance().writeRegister(MCP23017Register::IPOL_A, 0xFF);
-
+    // invert - double check when you need to do this or not... retest
+    //  IOExpanderInstance::instance().writeRegister(MCP23017Register::IPOL_A, 0xFF);
+    //  IOExpanderInstance::instance().writeRegister(MCP23017Register::IPOL_B, 0xFF);
 
     return HT_TASK::TaskResponse::YIELD;
 }
@@ -213,30 +213,35 @@ HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_T
 HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     // NOLINTBEGIN
-
     uint16_t data = IOExpanderInstance::instance().read();
 
     // inputs on port a (0)
     vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 1);
-    //vcr_data.interface_data.shutdown_sensing_data.bspd_fault = IOExpanderUtils::getBit(data, 0, 2); //need to add bspd fault to shdn sensing data in shared firmware types
-    //vcr_data.interface_data.ethernet_is_linked.vn_link = IOExpanderUtils::getBit(data, 0, 3); //need to add vn_link to ethernet is linked in shared firmware types
+    vcr_data.interface_data.shutdown_sensing_data.bspd_fault = IOExpanderUtils::getBit(data, 0, 2); 
+    vcr_data.interface_data.ethernet_is_linked.vn_link = IOExpanderUtils::getBit(data, 0, 3); 
     vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 0, 4);
     vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 0, 5);
-    //vcr_data.interface_data.shutdown_sensing_data.bspd_missing = IOExpanderUtils::getBit(data, 0, 6); //need to add to shared firmware types
+    vcr_data.interface_data.shutdown_sensing_data.bspd_missing = IOExpanderUtils::getBit(data, 0, 6); 
 
     // inputs on port b (1)
-    //vcr_data.interface_data.shutdown_sensing_data.lv_present = IOExpanderUtils::getBit(data, 1, 0); //need to add
-    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0, 1); // i also need to update the shutdown sensing struct
+    vcr_data.interface_data.shutdown_sensing_data.lv_present = IOExpanderUtils::getBit(data, 1, 0); 
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0, 1); 
     vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 1, 2);
-    //vcr_data.interface_data.shutdown_sensing_data.vcr_is_ok = IOExpanderUtils::getBit(data, 1, 3); //need to add
+    vcr_data.interface_data.shutdown_sensing_data.vcr_sw_is_ok = IOExpanderUtils::getBit(data, 1, 3);
     vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 4);
     vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 5);
     vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 6);
 
-    //Serial.println( vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
+    uint8_t portA = IOExpanderInstance::instance().readPort(MCP23017Port::A);
+    // Serial.println(portA);
+    
+    // uint8_t portB = IOExpanderInstance::instance().readPort(MCP23017Port::B);
+    // digitalWrite(11, 1);
+    uint8_t vcr_ok = IOExpanderInstance::instance().digitalRead(10);
+    Serial.println(vcr_ok);
+    //Serial.println(portB);
 
-    Wire2.requestFrom(0x20, 1);
-    Serial.println(Wire2.available());
+
     return HT_TASK::TaskResponse::YIELD;
     // NOLINTEND
 }
