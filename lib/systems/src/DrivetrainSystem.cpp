@@ -207,7 +207,8 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             bool valid_drivetrain_command = etl::holds_alternative<DrivetrainCommand_s>(cmd);
 
             if (valid_drivetrain_command) {
-                DrivetrainCommand_s drivetrain_command = etl::get<DrivetrainCommand_s>(cmd);
+                // DrivetrainCommand_s drivetrain_command = etl::get<DrivetrainCommand_s>(cmd);
+                DrivetrainCommand_s drivetrain_command = {{1, 0, 0, 0}, {1.0f, 0.0f, 0.0f, 0.0f}};
                 _set_drivetrain_command(drivetrain_command);
             }
             _set_ef_active_pin(true);
