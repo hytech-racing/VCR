@@ -42,5 +42,5 @@ void loop()
     test_msg.len = 1;
     test_msg.buf[0] = MSG_DATA;
     MAIN_CAN.write(test_msg);
-   //  Serial.println("testing");
+    Serial.println("testing");
 }

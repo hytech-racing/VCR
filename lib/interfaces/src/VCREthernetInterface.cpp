@@ -36,15 +36,15 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.rear_suspot_data.RR_sus_pot_analog = shared_state.interface_data.rear_suspot_data.RR_sus_pot_analog;
 
     //ShutdownSensingData_s
-    out.shutdown_sensing_data.i_shutdown_in = shared_state.interface_data.shutdown_sensing_data.i_shutdown_in;
-    out.shutdown_sensing_data.j_bspd_relay = shared_state.interface_data.shutdown_sensing_data.j_bspd_relay;
-    out.shutdown_sensing_data.k_watchdog_relay = shared_state.interface_data.shutdown_sensing_data.k_watchdog_relay;
-    out.shutdown_sensing_data.l_bms_relay = shared_state.interface_data.shutdown_sensing_data.l_bms_relay;
-    out.shutdown_sensing_data.m_imd_relay = shared_state.interface_data.shutdown_sensing_data.m_imd_relay;
-    out.shutdown_sensing_data.bspd_is_ok = shared_state.interface_data.shutdown_sensing_data.bspd_is_ok;
-    out.shutdown_sensing_data.watchdog_is_ok = shared_state.interface_data.shutdown_sensing_data.watchdog_is_ok;
-    out.shutdown_sensing_data.bms_is_ok = shared_state.interface_data.shutdown_sensing_data.bms_is_ok;
-    out.shutdown_sensing_data.imd_is_ok = shared_state.interface_data.shutdown_sensing_data.imd_is_ok;
+    // out.shutdown_sensing_data.i_shutdown_in = shared_state.interface_data.shutdown_sensing_data.i_shutdown_in;
+    // out.shutdown_sensing_data.j_bspd_relay = shared_state.interface_data.shutdown_sensing_data.j_bspd_relay;
+    // out.shutdown_sensing_data.k_watchdog_relay = shared_state.interface_data.shutdown_sensing_data.k_watchdog_relay;
+    // out.shutdown_sensing_data.l_bms_relay = shared_state.interface_data.shutdown_sensing_data.l_bms_relay;
+    // out.shutdown_sensing_data.m_imd_relay = shared_state.interface_data.shutdown_sensing_data.m_imd_relay;
+    // out.shutdown_sensing_data.bspd_is_ok = shared_state.interface_data.shutdown_sensing_data.bspd_is_ok;
+    // out.shutdown_sensing_data.watchdog_is_ok = shared_state.interface_data.shutdown_sensing_data.watchdog_is_ok;
+    // out.shutdown_sensing_data.bms_is_ok = shared_state.interface_data.shutdown_sensing_data.bms_is_ok;
+    // out.shutdown_sensing_data.imd_is_ok = shared_state.interface_data.shutdown_sensing_data.imd_is_ok;
 
     //VCREthernetLinkData_s
     out.ethernet_is_linked.acu_link = shared_state.interface_data.ethernet_is_linked.acu_link;

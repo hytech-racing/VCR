@@ -237,8 +237,8 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
     
     // uint8_t portB = IOExpanderInstance::instance().readPort(MCP23017Port::B);
     // digitalWrite(11, 1);
-    uint8_t vcr_ok = IOExpanderInstance::instance().digitalRead(10);
-    Serial.println(vcr_ok);
+    // uint8_t vcr_ok = IOExpanderInstance::instance().digitalRead(10);
+    // Serial.println(vcr_ok);
     //Serial.println(portB);
 
 
