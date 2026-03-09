@@ -2,7 +2,7 @@
 
 #include "CANInterface.h"
 
-FlexCAN_T4<CAN1> MAIN_CAN;
+FlexCAN_T4<CAN3> MAIN_CAN;
 
 const uint32_t CAN_BAUDRATE = 500000;
 

@@ -124,117 +124,117 @@ HT_TASK::Task run_enable_pumps(HT_TASK::DUMMY_FUNCTION, enable_pumps, dashboard_
 
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    // Serial.println("timestamp\t:\taccel\t:\tbrake");
-    // Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
-    // Serial.print("\t:\t");
-    // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
-    // Serial.print("\t:\t");
-    // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
-    // Serial.println();
-    // Serial.println("pedals heartbeat good:");
-    // Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
-    // Serial.println();
-    // Serial.println();
-    // Serial.println();
-    // Serial.println();
+        // Serial.println("timestamp\t:\taccel\t:\tbrake");
+        // Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
+        // Serial.print("\t:\t");
+        // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
+        // Serial.print("\t:\t");
+        // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
+        // Serial.println();
+        // Serial.println("pedals heartbeat good:");
+        // Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
+        // Serial.println();
+        // Serial.println();
+        // Serial.println();
+        // Serial.println();
 
-    // Serial.println("state machine state");
+        // Serial.println("state machine state");
 
-    // Serial.println(vcr_data.system_data.vehicle_state_machine_state);
-    // Serial.println("desired speeds, torq lim");
-    // Serial.println(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FL);
-    // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
+        // Serial.println(vcr_data.system_data.vehicle_state_machine_state);
+        // Serial.println("desired speeds, torq lim");
+        // Serial.println(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FL);
+        // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
 
-    // Serial.print("Drivetrain system state: ");
-    // Serial.println(static_cast<int>(DrivetrainInstance::instance().get_state()));
-    // Serial.print("Diagnostic FL #: ");
-    // Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FL.diagnostic_number);
-    // Serial.print(" FR #: ");
-    // Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FR.diagnostic_number);
-    // Serial.print(" RL #: ");
-    // Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.RL.diagnostic_number);
-    // Serial.print(" RR #: ");
-    // Serial.println(DrivetrainInstance::instance().get_status().inverter_statuses.RR.diagnostic_number);
+        Serial.print("Drivetrain system state: ");
+        Serial.println(static_cast<int>(DrivetrainInstance::instance().get_state()));
+        Serial.print("Diagnostic FL #: ");
+        Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FL.diagnostic_number);
+        Serial.print(" FR #: ");
+        Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.FR.diagnostic_number);
+        Serial.print(" RL #: ");
+        Serial.print(DrivetrainInstance::instance().get_status().inverter_statuses.RL.diagnostic_number);
+        Serial.print(" RR #: ");
+        Serial.println(DrivetrainInstance::instance().get_status().inverter_statuses.RR.diagnostic_number);
 
-    // Serial.print("Vehicle statemachine state: ");
-    // Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
+        // Serial.print("Vehicle statemachine state: ");
+        // Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
 
-    // Serial.print("launch controller state: ");
-    // Serial.println(static_cast<int>(VCRControlsInstance::instance().get_launch_controller().get_launch_state()));
+        // Serial.print("launch controller state: ");
+        // Serial.println(static_cast<int>(VCRControlsInstance::instance().get_launch_controller().get_launch_state()));
 
-    // Serial.print("Start button pressed: ");
-    // Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
+        // Serial.print("Start button pressed: ");
+        // Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
 
-    // Serial.print("pedal recalibrate button pressed: ");
-    // Serial.println(vcr_data.interface_data.dash_input_state.preset_btn_is_pressed);
-    
-    // Serial.print("mc reset button pressed: ");
-    // Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
-    
-    // Serial.print("torque mode cycle button pressed: ");
-    // Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
+        // Serial.print("pedal recalibrate button pressed: ");
+        // Serial.println(vcr_data.interface_data.dash_input_state.preset_btn_is_pressed);
+        
+        // Serial.print("mc reset button pressed: ");
+        // Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
+        
+        // Serial.print("torque mode cycle button pressed: ");
+        // Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
 
-    // Serial.println("IOExpander testing");
-    // Serial.println("Shutdown Data");
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok);
-    //Serial.println(vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay);
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok);
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.l_bms_relay);
-     // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.m_imd_relay);
-    // Serial.println(vcr_data.interface_data.shutdown_sensing_data.imd_is_ok);
-    // Serial.println("Linked Data");
-    // Serial.println(vcr_data.interface_data.ethernet_is_linked.acu_link);
-  // Serial.println(vcr_data.interface_data.ethernet_is_linked.drivebrain_link);
-    // Serial.println(vcr_data.interface_data.ethernet_is_linked.vcf_link);
-    // Serial.println(vcr_data.interface_data.ethernet_is_linked.teensy_link);
-    // Serial.println(vcr_data.interface_data.ethernet_is_linked.debug_link);
-    // Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
+        // Serial.println("IOExpander testing");
+        // Serial.println("Shutdown Data");
+        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok);
+        //Serial.println(vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay);
+        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok);
+        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.l_bms_relay);
+        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
+        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.m_imd_relay);
+        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.imd_is_ok);
+        // Serial.println("Linked Data");
+        // Serial.println(vcr_data.interface_data.ethernet_is_linked.acu_link);
+    // Serial.println(vcr_data.interface_data.ethernet_is_linked.drivebrain_link);
+        // Serial.println(vcr_data.interface_data.ethernet_is_linked.vcf_link);
+        // Serial.println(vcr_data.interface_data.ethernet_is_linked.teensy_link);
+        // Serial.println(vcr_data.interface_data.ethernet_is_linked.debug_link);
+        // Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
 
 
-    // Serial.print("Load Cell RR: ");
-    // Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
+        // Serial.print("Load Cell RR: ");
+        // Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
 
-    // Serial.print("Load Cell RL: ");
-    // Serial.println(vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog);
+        // Serial.print("Load Cell RL: ");
+        // Serial.println(vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog);
 
-    // Serial.print("SusPot RR: ");
-    // Serial.println(vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog);
+        // Serial.print("SusPot RR: ");
+        // Serial.println(vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog);
 
-    // Serial.print("SusPot RL: ");
-    // Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
+        // Serial.print("SusPot RL: ");
+        // Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
 
-    /* Drivebrain data */
-    // Serial.print("Latest Drivebrain data: ");
-    // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
-    // Serial.print(" ");
-    // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FR);
-    // Serial.print(" ");
-    // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
-    // Serial.print(" ");
-    // Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
-    
-    /* Thermistor Data */
-    // Serial.print("Thermistor 0 Analog: ");
-    // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog);
-    // Serial.print(" Thermistor 0 degrees C: ");
-    // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C);
-    // Serial.print("Thermistor 4 Analog: ");
-    // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog);
-    // Serial.print(" Thermistor 4 degrees C: ");
-    // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_degrees_C);
-    // Serial.print("Thermistor 5 Analog: ");
-    // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog);
-    // Serial.print(" Thermistor 5 degrees C: ");
-    // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_degrees_C);
-    // Serial.print("Thermistor 6 Analog: ");
-    // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog);
-    // Serial.print(" Thermistor 6 degrees C: ");
-    // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_degrees_C);
-    // Serial.print("Thermistor 7 Analog: ");
-    // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog);
-    // Serial.print(" Thermistor 7 degrees C: ");
-    // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C);
+        /* Drivebrain data */
+        // Serial.print("Latest Drivebrain data: ");
+        // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+        // Serial.print(" ");
+        // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FR);
+        // Serial.print(" ");
+        // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
+        // Serial.print(" ");
+        // Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+        
+        /* Thermistor Data */
+        // Serial.print("Thermistor 0 Analog: ");
+        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog);
+        // Serial.print(" Thermistor 0 degrees C: ");
+        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C);
+        // Serial.print("Thermistor 4 Analog: ");
+        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog);
+        // Serial.print(" Thermistor 4 degrees C: ");
+        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_degrees_C);
+        // Serial.print("Thermistor 5 Analog: ");
+        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog);
+        // Serial.print(" Thermistor 5 degrees C: ");
+        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_degrees_C);
+        // Serial.print("Thermistor 6 Analog: ");
+        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog);
+        // Serial.print(" Thermistor 6 degrees C: ");
+        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_degrees_C);
+        // Serial.print("Thermistor 7 Analog: ");
+        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog);
+        // Serial.print(" Thermistor 7 degrees C: ");
+        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C);
 
     Serial.println();
  
@@ -400,7 +400,7 @@ void setup() {
     scheduler.schedule(enqueue_coolant_temp_CAN_task);
     scheduler.schedule(async_main_task);
     scheduler.schedule(enqueue_controls_CAN_task);
-    // scheduler.schedule(debug_state_print_task);
+    scheduler.schedule(debug_state_print_task);
     scheduler.schedule(update_brakelight_task);
     scheduler.schedule(update_sample_flowmeter);
     scheduler.schedule(IOExpander_read_task);

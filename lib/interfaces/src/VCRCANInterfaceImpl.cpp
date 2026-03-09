@@ -23,10 +23,23 @@ void on_auxillary_can_receive(const CAN_message_t &msg) {
 }
 
 void on_inverter_can_receive(const CAN_message_t &msg) {
+
     TELEM_CAN.write(msg); // send immediately onto the telem CAN line
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
     inverter_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
+
+    Serial.println("msg recvd");
+    Serial.print("MB: "); Serial.print(msg.mb);
+    Serial.print("  ID: 0x"); Serial.print(msg.id, HEX);
+    Serial.print("  EXT: "); Serial.print(msg.flags.extended);
+    Serial.print("  LEN: "); Serial.print(msg.len);
+    Serial.print(" DATA: ");
+    for ( uint8_t i = 0; i < 8; i++ ) {
+      Serial.print(msg.buf[i]); Serial.print(" ");
+    }
+    Serial.print("  TS: "); Serial.println(msg.timestamp);
+  
 }
 
 void on_telem_can_receive(const CAN_message_t &msg) {
