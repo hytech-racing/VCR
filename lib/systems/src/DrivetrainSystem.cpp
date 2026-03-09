@@ -87,7 +87,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
             bool connected_hv_present = false;
             connected_hv_present = (_check_inverter_flags(_check_inverter_connected_flag) && _check_inverter_flags(_check_inverter_hv_present_flag)); 
-            
+
             if (connected_no_hv_present) {
                 _set_state(DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT);
             } else if (connected_hv_present) {
@@ -137,9 +137,11 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             // State Transitions
             bool inverter_error_present = false;
             inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
-            
+
             bool requesting_init = false;
             requesting_init = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED);
+
+            requesting_init = true; 
 
             bool inverters_ready = false;
             inverters_ready = _check_inverter_flags(_check_inverter_ready_flag);

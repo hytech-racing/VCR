@@ -95,7 +95,7 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     _feedback_data.motor_mechanics.new_data = true;
     _feedback_data.motor_mechanics.last_recv_millis = curr_millis;
 
-    Serial.println(unpacked_msg.actual_power_w);
+    // Serial.println(unpacked_msg.actual_power_w);
 }
 
 void InverterInterface::receive_INV_POWER(const CAN_message_t &can_msg, unsigned long curr_millis) 
