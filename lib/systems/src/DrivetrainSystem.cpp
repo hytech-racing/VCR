@@ -77,7 +77,6 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         // TODO need to ensure that the inverter outputs CAN messages on idle even not when being sent msgs
         case DrivetrainState_e::NOT_CONNECTED:
         {
-
             // State Outputs
             _set_drivetrain_disabled(); 
             _set_ef_active_pin(false);
@@ -267,9 +266,10 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             break;
 
         }
-
         default:
+        {
             break;
+        }
     }
 
     return get_state();

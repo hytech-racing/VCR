@@ -240,7 +240,7 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
     // uint8_t vcr_ok = IOExpanderInstance::instance().digitalRead(10);
     // Serial.println(vcr_ok);
     //Serial.println(portB);
-
+ 
 
     return HT_TASK::TaskResponse::YIELD;
     // NOLINTEND

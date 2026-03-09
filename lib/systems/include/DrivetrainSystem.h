@@ -14,9 +14,6 @@
 #include <shared_types.h>
 #include "SystemTimeInterface.h"
 
-
-
-
 /**
  * When user calls evaluate_drivetrain(), this is part of the returned status to
  * indicate if the command was successful or invalid

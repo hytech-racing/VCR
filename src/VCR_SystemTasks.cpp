@@ -72,7 +72,7 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
     auto tc_mux_status = VCRControlsInstance::instance().get_tc_mux_status();
     vcr_data.system_data.tc_mux_status = tc_mux_status;
 
-    vcr_data.system_data.vehicle_state_machine_state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
+    // vcr_data.system_data.vehicle_state_machine_state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
     
     vcr_data.system_data.drivetrain_state_machine_state = DrivetrainInstance::instance().get_state();
 
@@ -81,5 +81,9 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
     vcr_data.system_data.db_cntrl_status.drivebrain_is_in_control = VCRControlsInstance::instance().drivebrain_is_in_control();
     vcr_data.system_data.db_cntrl_status.drivebrain_controller_timing_failure = VCRControlsInstance::instance().drivebrain_timing_failure();
     
+    VCRControlsInstance::instance().handle_drivetrain_command(true, true);
+
     return HT_TASK::TaskResponse::YIELD;
 }
+
+

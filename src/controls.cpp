@@ -25,21 +25,23 @@ void VCRControls::handle_drivetrain_command(bool wanting_ready_to_drive, bool re
     if(_dt_system != nullptr)
     {
         ControllerMode_e mode = vcr_data.interface_data.dash_input_state.dial_state;
+        DrivetrainStatus_s drivetrain_status;
 
         if (ready_to_drive) {
-            auto dt_command = _tc_mux.get_drivetrain_command(mode, _torque_limit, vcr_data);
-            _debug_dt_command = dt_command;
-            _dt_system->evaluate_drivetrain(dt_command);
+            DrivetrainCommand_s def = {.desired_speeds = {500.0f, 500.0f, 500.0f, 500.0f}, .torque_limits = {6.0f, 6.0f, 6.0f, 6.0f}};
+            auto dt_command = def; // _tc_mux.get_drivetrain_command(mode, _torque_limit, vcr_data);
+            // _debug_dt_command = dt_command;
+            drivetrain_status = _dt_system->evaluate_drivetrain(dt_command);
         } else if (wanting_ready_to_drive) {
             DrivetrainInit_s dt_command = {
                 .init_drivetrain = INIT_DRIVE_MODE
             };
-            _dt_system->evaluate_drivetrain(dt_command);
+            drivetrain_status = _dt_system->evaluate_drivetrain(dt_command);
         } else {
             DrivetrainInit_s dt_command = {
                 .init_drivetrain = UNINITIALIZED
             };
-            _dt_system->evaluate_drivetrain(dt_command);
+            drivetrain_status = _dt_system->evaluate_drivetrain(dt_command);
         }
     }
 }

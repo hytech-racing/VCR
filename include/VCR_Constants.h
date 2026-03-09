@@ -87,7 +87,7 @@ constexpr int INV_FAN_CNTRL = 34;
 constexpr int MOTOR_FAN_CNTRL = 35;
 
 /* Watchdog constants */
-constexpr int INVERTER_ENABLE_PIN = 2;
+constexpr int INVERTER_ENABLE_PIN = 5;
 constexpr int FLOWMETER_PIN = 7;
 constexpr int WATCHDOG_PIN = 26;
 constexpr int SOFTWARE_OK_PIN = 27; // Watchdog's !RESET pin
