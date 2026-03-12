@@ -123,7 +123,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
                 _set_state(DrivetrainState_e::ERROR);
             } else if (_check_inverter_flags(_check_inverter_ready_flag)) {
                 _set_state(DrivetrainState_e::INVERTERS_READY);
-                _adish_delay_ms = sys_time::hal_millis();
+                _precharge_wait_start = sys_time::hal_millis();
             }
             break;
         }
@@ -157,7 +157,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
                 _set_state(DrivetrainState_e::ERROR);
             } else if (!hv_present) {
                 _set_state(DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT);
-            } else if (requesting_init && inverters_ready && quit_dc_on && sys_time::hal_millis() - _adish_delay_ms > 5000) {
+            } else if (requesting_init && inverters_ready && quit_dc_on && sys_time::hal_millis() - _precharge_wait_start > 5000) {
                 _last_toggled_ef_active = sys_time::hal_millis();
                 _set_ef_active_pin(true);
                 _set_state(DrivetrainState_e::INVERTERS_HV_ENABLED);
@@ -195,7 +195,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             if (inverter_error_present) {
                 _set_state(DrivetrainState_e::ERROR);
             } else if (hv_enabled && inverters_ready && inverters_enabled) {
-                _adish_delay_ms = sys_time::hal_millis();
+                _precharge_wait_start = sys_time::hal_millis();
                 _set_state(DrivetrainState_e::ENABLED_DRIVE_MODE);
             } else if (!hv_enabled && inverters_ready) {        
                 _set_state(DrivetrainState_e::INVERTERS_READY);
