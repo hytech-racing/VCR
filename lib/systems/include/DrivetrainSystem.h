@@ -139,6 +139,7 @@ private:
     etl::delegate<void(bool)> _set_ef_active_pin;
     unsigned long _last_toggled_ef_active = 0; 
     unsigned long _ef_pin_enable_delay_ms;
+    unsigned long _adish_delay_ms = 0;
 };
 
 using DrivetrainInstance = etl::singleton<DrivetrainSystem>;

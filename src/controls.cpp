@@ -28,7 +28,7 @@ void VCRControls::handle_drivetrain_command(bool wanting_ready_to_drive, bool re
         DrivetrainStatus_s drivetrain_status;
 
         if (ready_to_drive) {
-            DrivetrainCommand_s def = {.desired_speeds = {500.0f, 500.0f, 500.0f, 500.0f}, .torque_limits = {6.0f, 6.0f, 6.0f, 6.0f}};
+            DrivetrainCommand_s def = {.desired_speeds = {1000.0f, 1000.0f, 1000.0f, 1000.0f}, .torque_limits = {1.0f, 1.0f, 1.0f, 1.0f}};
             auto dt_command = def; // _tc_mux.get_drivetrain_command(mode, _torque_limit, vcr_data);
             // _debug_dt_command = dt_command;
             drivetrain_status = _dt_system->evaluate_drivetrain(dt_command);

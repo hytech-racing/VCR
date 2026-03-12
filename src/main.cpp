@@ -93,7 +93,7 @@ DrivetrainSystem::InverterFuncts rr_inverter_functs = {
     .get_motor_mechanics = []() { return rr_inverter_int.get_motor_mechanics(); }
 };
 
-veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr_inverter_functs, fr_inverter_functs, rr_inverter_functs);
+veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(rl_inverter_functs, rl_inverter_functs, rl_inverter_functs, rl_inverter_functs);
 
 etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create([](bool set_active) { digitalWrite(INVERTER_ENABLE_PIN, static_cast<int>(set_active)); });
 

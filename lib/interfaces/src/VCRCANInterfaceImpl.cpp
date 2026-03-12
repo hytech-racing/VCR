@@ -23,7 +23,7 @@ void on_auxillary_can_receive(const CAN_message_t &msg) {
 }
 
 void on_inverter_can_receive(const CAN_message_t &msg) {
-
+    AUXILLARY_CAN.write(msg);
     TELEM_CAN.write(msg); // send immediately onto the telem CAN line
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
