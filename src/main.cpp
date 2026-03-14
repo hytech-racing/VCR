@@ -93,7 +93,7 @@ DrivetrainSystem::InverterFuncts rr_inverter_functs = {
     .get_motor_mechanics = []() { return rr_inverter_int.get_motor_mechanics(); }
 };
 
-veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(rl_inverter_functs, rl_inverter_functs, rl_inverter_functs, rl_inverter_functs);
+veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr_inverter_functs, rl_inverter_functs, rr_inverter_functs);
 
 etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create([](bool set_active) { digitalWrite(INVERTER_ENABLE_PIN, static_cast<int>(set_active)); });
 
@@ -124,19 +124,23 @@ HT_TASK::Task run_enable_pumps(HT_TASK::DUMMY_FUNCTION, enable_pumps, dashboard_
 
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-        // Serial.println("timestamp\t:\taccel\t:\tbrake");
-        // Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
-        // Serial.print("\t:\t");
-        // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
-        // Serial.print("\t:\t");
-        // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
-        // Serial.println();
-        // Serial.println("pedals heartbeat good:");
-        // Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
-        // Serial.println();
-        // Serial.println();
-        // Serial.println();
-        // Serial.println();
+        Serial.println("timestamp\t:\taccel\t:\tbrake");
+        Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
+        Serial.print("\t:\t");
+        Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
+        Serial.print("\t:\t");
+        Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
+        Serial.println();
+        Serial.print("pedals heartbeat good: "); Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
+        Serial.println();
+        Serial.print("Pedals Brake Is Active: "); Serial.print(VCFInterfaceInstance::instance().is_brake_pressed() ? "YES" : "NO");
+        Serial.println();
+        Serial.print("Is Start Button Active: "); Serial.print(VCFInterfaceInstance::instance().is_start_button_pressed() ? "YES" : "NO");
+        Serial.println();
+        
+
+        Serial.println();
+        Serial.println();
 
         // Serial.println("state machine state");
 
@@ -156,23 +160,23 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         Serial.print(" RR #: ");
         Serial.println(DrivetrainInstance::instance().get_status().inverter_statuses.RR.diagnostic_number);
 
-        // Serial.print("Vehicle statemachine state: ");
-        // Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
-
+        Serial.print("Vehicle state machine state: ");
+        Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
+        Serial.println();
         // Serial.print("launch controller state: ");
         // Serial.println(static_cast<int>(VCRControlsInstance::instance().get_launch_controller().get_launch_state()));
 
-        // Serial.print("Start button pressed: ");
-        // Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
+        Serial.print("Start button pressed: ");
+        Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
 
-        // Serial.print("pedal recalibrate button pressed: ");
-        // Serial.println(vcr_data.interface_data.dash_input_state.preset_btn_is_pressed);
+        Serial.print("pedal recalibrate button pressed: ");
+        Serial.println(vcr_data.interface_data.dash_input_state.preset_btn_is_pressed);
         
-        // Serial.print("mc reset button pressed: ");
-        // Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
+        Serial.print("mc reset button pressed: ");
+        Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
         
-        // Serial.print("torque mode cycle button pressed: ");
-        // Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
+        Serial.print("torque mode cycle button pressed: ");
+        Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
 
         // Serial.println("IOExpander testing");
         // Serial.println("Shutdown Data");
@@ -192,11 +196,11 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
 
 
-        // Serial.print("Load Cell RR: ");
-        // Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
+        Serial.print("Load Cell RR: ");
+        Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
 
-        // Serial.print("Load Cell RL: ");
-        // Serial.println(vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog);
+        Serial.print("Load Cell RL: ");
+        Serial.println(vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog);
 
         // Serial.print("SusPot RR: ");
         // Serial.println(vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog);
@@ -204,15 +208,15 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.print("SusPot RL: ");
         // Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
 
-        /* Drivebrain data */
-        // Serial.print("Latest Drivebrain data: ");
-        // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
-        // Serial.print(" ");
-        // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FR);
-        // Serial.print(" ");
-        // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
-        // Serial.print(" ");
-        // Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+        // /* Drivebrain data */
+        // // Serial.print("Latest Drivebrain data: ");
+        // // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+        // // Serial.print(" ");
+        // // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FR);
+        // // Serial.print(" ");
+        // // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
+        // // Serial.print(" ");
+        // // Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
         
         /* Thermistor Data */
         // Serial.print("Thermistor 0 Analog: ");
@@ -388,14 +392,14 @@ void setup() {
     );
   
     
-    // scheduler.schedule(adc_0_sample_task);
-    // scheduler.schedule(adc_1_sample_task);
+    scheduler.schedule(adc_0_sample_task);
+    scheduler.schedule(adc_1_sample_task);
 
     scheduler.schedule(kick_watchdog_task);
 
-    //scheduler.schedule(ams_system_task); // Commented out to test VCR without ACU otherwise SOFTWARE_OK never goes high
-    // scheduler.schedule(enqueue_suspension_CAN_task);
-    // scheduler.schedule(enqueue_dashboard_CAN_task); 
+    scheduler.schedule(ams_system_task); // Commented out to test VCR without ACU otherwise SOFTWARE_OK never goes high
+    scheduler.schedule(enqueue_suspension_CAN_task);
+    scheduler.schedule(enqueue_dashboard_CAN_task); 
 
     scheduler.schedule(send_CAN_task);
 
@@ -407,17 +411,16 @@ void setup() {
 
     scheduler.schedule(async_main_task);
 
-    // scheduler.schedule(enqueue_controls_CAN_task);
+    scheduler.schedule(enqueue_controls_CAN_task);
 
     scheduler.schedule(debug_state_print_task);
     
-    // scheduler.schedule(update_brakelight_task);
+    scheduler.schedule(update_brakelight_task);
     // scheduler.schedule(update_sample_flowmeter);
     // scheduler.schedule(IOExpander_read_task);
 
     // scheduler.schedule(run_enable_fans);
     // scheduler.schedule(run_enable_pumps);
-
 }
 
 void loop() {

@@ -18,13 +18,13 @@ constexpr int ANALOG_RESOLUTION = 12;
 constexpr unsigned int CHANNELS_WITHIN_MCP_ADC = 8;
 
 /* Channels on adc_0 */
-constexpr int GLV_SENSE_CHANNEL       = 0;
-constexpr int CURRENT_SENSE_CHANNEL   = 1;
-constexpr int REFERENCE_SENSE_CHANNEL = 2;
-constexpr int RL_LOADCELL_CHANNEL     = 3;
-constexpr int RR_LOADCELL_CHANNEL     = 4;
-constexpr int RL_SUS_POT_CHANNEL      = 5;
-constexpr int RR_SUS_POT_CHANNEL      = 6;
+constexpr int RL_LOADCELL_CHANNEL     = 0;
+constexpr int RR_LOADCELL_CHANNEL     = 1;
+constexpr int RL_SUS_POT_CHANNEL      = 2;
+constexpr int RR_SUS_POT_CHANNEL      = 3;
+constexpr int GLV_SENSE_CHANNEL       = 4;
+constexpr int CURRENT_SENSE_CHANNEL   = 5;
+constexpr int REFERENCE_SENSE_CHANNEL = 6;
 // const int UNUSED_CHANNEL       = 7;
 
 /* Channels on adc_1 */

@@ -42,6 +42,7 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
     vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog,
         ADCInterfaceInstance::instance().read_rr_loadcell().conversion);
+    
     vcr_data.interface_data.rear_loadcell_data.valid_RR_sample = ((ADCInterfaceInstance::instance().read_rr_loadcell().raw != 4095) 
                                                                 && (ADCInterfaceInstance::instance().read_rr_loadcell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
 
@@ -120,14 +121,13 @@ HT_TASK::TaskResponse run_kick_watchdog(const unsigned long& sysMicros, const HT
 {
     digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
     digitalWrite(SOFTWARE_OK_PIN, HIGH);
-
     return HT_TASK::TaskResponse::YIELD;
 }
 
 // CAN send tasks
 
 // adds rear suspension and vcr status CAN messages to the sent on next mega loop run 
-HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo )
 {
     DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
     return HT_TASK::TaskResponse::YIELD;
@@ -174,7 +174,6 @@ HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, c
 {
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &VCRCANInterfaceImpl::INVERTER_CAN);
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
-    //Serial.println("sending telem can data");
     VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::auxillary_can_tx_buffer, &VCRCANInterfaceImpl::AUXILLARY_CAN);
     return HT_TASK::TaskResponse::YIELD;
 }
