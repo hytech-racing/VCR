@@ -142,8 +142,6 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             bool requesting_init = false;
             requesting_init = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED);
 
-            requesting_init = true; 
-
             bool inverters_ready = false;
             inverters_ready = _check_inverter_flags(_check_inverter_ready_flag);
 
