@@ -29,7 +29,7 @@ void VCRControls::handle_drivetrain_command(bool wanting_ready_to_drive, bool re
 
         if (ready_to_drive) {
             auto dt_command = _tc_mux.get_drivetrain_command(mode, _torque_limit, vcr_data);
-            // _debug_dt_command = dt_command;
+            _debug_dt_command = dt_command;
             drivetrain_status = _dt_system->evaluate_drivetrain(dt_command);
         } else if (wanting_ready_to_drive) {
             DrivetrainInit_s dt_command = {

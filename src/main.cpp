@@ -140,14 +140,7 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         
 
         Serial.println();
-        Serial.println();
-
-        // Serial.println("state machine state");
-
-        // Serial.println(vcr_data.system_data.vehicle_state_machine_state);
-        // Serial.println("desired speeds, torq lim");
-        // Serial.println(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FL);
-        // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
+        Serial.println();       
 
         Serial.print("Drivetrain system state: ");
         Serial.println(static_cast<int>(DrivetrainInstance::instance().get_state()));
@@ -209,14 +202,35 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
 
         // /* Drivebrain data */
-        // // Serial.print("Latest Drivebrain data: ");
-        // // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
-        // // Serial.print(" ");
-        // // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FR);
-        // // Serial.print(" ");
-        // // Serial.print(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.RL);
-        // // Serial.print(" ");
-        // // Serial.println(vcr_data.interface_data.latest_drivebrain_command.torque_limits.veh_vec_data.FL);
+        // Serial.print("Latest Drivebrain data: ");
+        // Serial.print(vcr_data.interface_data.inverter_data.FL.commanded_torque);
+        // Serial.print(" ");
+        // Serial.print(vcr_data.interface_data.inverter_data.FR.commanded_torque);
+        // Serial.print(" ");
+        // Serial.print(vcr_data.interface_data.inverter_data.RL.commanded_torque);
+        // Serial.print(" ");
+        // Serial.println(vcr_data.interface_data.inverter_data.RR.commanded_torque);
+
+        Serial.println("desired speeds, torq lim");
+        Serial.print("FL:   ");
+        Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FL); Serial.print(" ");
+        Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
+
+        Serial.print("FR:   ");
+        Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FR); Serial.print(" ");
+        Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FR);
+
+        Serial.print("RL:   ");
+        Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.RL); Serial.print(" ");
+        Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.RL);
+
+        Serial.print("RR:   ");
+        Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.RR); Serial.print(" ");
+        Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.RR);
+
+
+        Serial.print("Current Controller Mode: ");
+        Serial.println(static_cast<uint8_t>(vcr_data.interface_data.dash_input_state.dial_state));
         
         /* Thermistor Data */
         // Serial.print("Thermistor 0 Analog: ");
