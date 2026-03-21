@@ -187,7 +187,7 @@ HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicr
 
 HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    Wire.begin(); // copied from VCF but why Wire 2?
+    Wire.begin();
     IOExpanderInstance::create(0x20, Wire);
     IOExpanderInstance::instance().init();
 
@@ -267,6 +267,11 @@ HT_TASK::TaskResponse enable_fans(const unsigned long& sysMicros, const HT_TASK:
 
 HT_TASK::TaskResponse enable_pumps(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
 {
-    digitalWrite(PUMP_CNTRL, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? 1 : 0);
+    VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state();
+    if (vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE || vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE || vehicle_state == VehicleState_e::READY_TO_DRIVE) {
+        digitalWrite(PUMP_CNTRL, HIGH);
+    }
+    //digitalWrite(PUMP_CNTRL, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? 1 : 0);
+    // digitalWrite(PUMP_CNTRL, HIGH);
     return HT_TASK::TaskResponse::YIELD;
 }
