@@ -443,7 +443,7 @@ void setup() {
 
     // scheduler.schedule(run_enable_fans);
     
-    scheduler.schedule(run_enable_pumps);
+    // scheduler.schedule(run_enable_pumps);
 }
 
 void loop() {
