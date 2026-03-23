@@ -23,8 +23,8 @@ public:
     torque_nm amk_max_torque = {};
     torque_nm amk_max_regen_torque = {};
     TorqueControllerSimpleParams_s()
-    : rear_torque_scale(0.7f), // temp fix for flipped front/rear
-    rear_regen_torque_scale(1.8f), // temp fix for flipped front/rear
+    : rear_torque_scale(1.3f), // temp fix for flipped front/rear
+    rear_regen_torque_scale(0.2f), // temp fix for flipped front/rear
     amk_max_rpm(_amk_max_rpm_default),
     amk_max_torque(_amk_max_torque),
     amk_max_regen_torque(_amk_max_regen_torque) {}
