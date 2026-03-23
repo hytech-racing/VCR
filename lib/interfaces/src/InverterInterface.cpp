@@ -140,6 +140,7 @@ void InverterInterface::send_INV_SETPOINT_COMMAND()
     msg_out.negative_torque_limit_ro = HYTECH_negative_torque_limit_ro_toS(_inverter_control_inputs.negative_torque_limit);
 
     CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_input_id);
+    CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_INPUT_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, inverter_ids.inv_control_input_id);
 }
 
 void InverterInterface::send_INV_CONTROL_WORD() 
