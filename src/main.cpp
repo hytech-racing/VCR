@@ -124,7 +124,7 @@ HT_TASK::Task run_enable_pumps(HT_TASK::DUMMY_FUNCTION, enable_pumps, dashboard_
 
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-        Serial.println("timestamp\t:\taccel\t:\tbrake");
+        Serial.println("time\t:\taccel\t:\tbrake");
         Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
         Serial.print("\t:\t");
         Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
@@ -171,23 +171,38 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.print("torque mode cycle button pressed: ");
         // Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
 
-        // Serial.println("IOExpander testing");
-        // Serial.println("Shutdown Data");
-        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok);
-        //Serial.println(vcr_data.interface_data.shutdown_sensing_data.k_watchdog_relay);
-        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.watchdog_is_ok);
-        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.l_bms_relay);
-        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.bms_is_ok);
-        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.m_imd_relay);
-        // Serial.println(vcr_data.interface_data.shutdown_sensing_data.imd_is_ok);
-        // Serial.println("Linked Data");
-        // Serial.println(vcr_data.interface_data.ethernet_is_linked.acu_link);
-        // Serial.println(vcr_data.interface_data.ethernet_is_linked.drivebrain_link);
-        // Serial.println(vcr_data.interface_data.ethernet_is_linked.vcf_link);
-        // Serial.println(vcr_data.interface_data.ethernet_is_linked.teensy_link);
-        // Serial.println(vcr_data.interface_data.ethernet_is_linked.debug_link);
-        // Serial.println(vcr_data.interface_data.ethernet_is_linked.ubiquiti_link);
+        Serial.println("IOExpander testing");
+        auto& s = vcr_data.interface_data.shutdown_sensing_data;
+        char buf[128];
+        snprintf(buf, sizeof(buf),
+            "%-10s %-14s %-13s %-10s %-8s %-6s",
+            "BSPD OK", "BSPD MISSING", "BSPD FAULTED", "VCR SW OK", "BMS OK", "IMD OK"
+        );
+        Serial.println(buf);
 
+        snprintf(buf, sizeof(buf),
+            "%-10d %-14d %-13d %-10d %-8d %-6d",
+            s.bspd_is_ok, s.bspd_missing, s.bspd_fault,
+            s.watchdog_is_ok, s.bms_is_ok, s.imd_is_ok
+        );
+        Serial.println(buf);
+        Serial.println();
+        
+        auto& e = vcr_data.interface_data.ethernet_is_linked;
+
+        snprintf(buf, sizeof(buf),
+            "%-14s %-10s %-10s %-14s %-12s %-6s",
+            "ACU LINK", "DB LINK", "VCF LINK", "TEENSY LINK", "DEBUG LINK", "UBIQUITI LINK"
+        );
+        Serial.println(buf);
+
+        snprintf(buf, sizeof(buf),
+            "%-14d %-10d %-10d %-14d %-12d %-6d",
+            e.acu_link, e.drivebrain_link, e.vcf_link,
+            e.teensy_link, e.debug_link, e.ubiquiti_link
+        );
+        Serial.println(buf);
+        Serial.println();
 
         Serial.print("Load Cell RR: ");
         Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
