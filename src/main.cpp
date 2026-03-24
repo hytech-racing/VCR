@@ -173,7 +173,7 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
         Serial.println("IOExpander testing");
         auto& s = vcr_data.interface_data.shutdown_sensing_data;
-        char buf[128];
+        char buf[128]; //NOLINT is debug
         snprintf(buf, sizeof(buf),
             "%-10s %-14s %-13s %-10s %-8s %-6s",
             "BSPD OK", "BSPD MISSING", "BSPD FAULTED", "VCR SW OK", "BMS OK", "IMD OK"

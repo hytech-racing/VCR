@@ -267,7 +267,7 @@ HT_TASK::TaskResponse enable_fans(const unsigned long& sysMicros, const HT_TASK:
 
 HT_TASK::TaskResponse enable_pumps(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
 {
-    VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state();
+    VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state(); //NOLINT will alway be populated so is ok
     if (vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE || vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE || vehicle_state == VehicleState_e::READY_TO_DRIVE) {
         digitalWrite(PUMP_CNTRL, HIGH);
     }
