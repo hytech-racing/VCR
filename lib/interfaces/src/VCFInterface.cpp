@@ -90,6 +90,7 @@ void VCFInterface::send_buzzer_start_message()
     ctrl.in_pedal_calibration_state = false;
     ctrl.torque_limit_enum_value = 0xFF; // MAX_VALUE indicates "ignore this value" //NOLINT
     CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+    Serial.println("BUZZER START MESSAGE SENT");
 }
 
 void VCFInterface::send_recalibrate_pedals_message()

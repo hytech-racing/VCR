@@ -77,7 +77,6 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
         // TODO need to ensure that the inverter outputs CAN messages on idle even not when being sent msgs
         case DrivetrainState_e::NOT_CONNECTED:
         {
-
             // State Outputs
             _set_drivetrain_disabled(); 
             _set_ef_active_pin(false);
@@ -88,7 +87,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
 
             bool connected_hv_present = false;
             connected_hv_present = (_check_inverter_flags(_check_inverter_connected_flag) && _check_inverter_flags(_check_inverter_hv_present_flag)); 
-            
+
             if (connected_no_hv_present) {
                 _set_state(DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT);
             } else if (connected_hv_present) {
@@ -124,6 +123,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
                 _set_state(DrivetrainState_e::ERROR);
             } else if (_check_inverter_flags(_check_inverter_ready_flag)) {
                 _set_state(DrivetrainState_e::INVERTERS_READY);
+                _precharge_wait_start = sys_time::hal_millis();
             }
             break;
         }
@@ -138,7 +138,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             // State Transitions
             bool inverter_error_present = false;
             inverter_error_present = !_check_inverter_flags(_check_inverter_no_errors_present);
-            
+
             bool requesting_init = false;
             requesting_init = etl::holds_alternative<DrivetrainInit_s>(cmd) && (etl::get<DrivetrainInit_s>(cmd).init_drivetrain != DrivetrainModeRequest_e::UNINITIALIZED);
 
@@ -155,7 +155,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
                 _set_state(DrivetrainState_e::ERROR);
             } else if (!hv_present) {
                 _set_state(DrivetrainState_e::NOT_ENABLED_NO_HV_PRESENT);
-            } else if (requesting_init && inverters_ready && quit_dc_on) {
+            } else if (requesting_init && inverters_ready && quit_dc_on && sys_time::hal_millis() - _precharge_wait_start > 2000) { //NOLINT 2000 corresponds to 2 seconds
                 _last_toggled_ef_active = sys_time::hal_millis();
                 _set_ef_active_pin(true);
                 _set_state(DrivetrainState_e::INVERTERS_HV_ENABLED);
@@ -193,6 +193,7 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             if (inverter_error_present) {
                 _set_state(DrivetrainState_e::ERROR);
             } else if (hv_enabled && inverters_ready && inverters_enabled) {
+                _precharge_wait_start = sys_time::hal_millis();
                 _set_state(DrivetrainState_e::ENABLED_DRIVE_MODE);
             } else if (!hv_enabled && inverters_ready) {        
                 _set_state(DrivetrainState_e::INVERTERS_READY);
@@ -267,9 +268,10 @@ DrivetrainState_e DrivetrainSystem::_evaluate_state_machine(DrivetrainSystem::Cm
             break;
 
         }
-
         default:
+        {
             break;
+        }
     }
 
     return get_state();

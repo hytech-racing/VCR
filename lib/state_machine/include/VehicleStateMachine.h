@@ -4,7 +4,6 @@
 #include <etl/delegate.h>
 #include <etl/singleton.h>
 #include "SharedFirmwareTypes.h"
-
 class VehicleStateMachine
 {
     public: 

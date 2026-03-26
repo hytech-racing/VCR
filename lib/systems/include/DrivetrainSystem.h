@@ -14,11 +14,9 @@
 #include <shared_types.h>
 #include "SystemTimeInterface.h"
 
-
-
 /**
  * When user calls evaluate_drivetrain(), this is part of the returned status to
- * indicate if the command was successful, invalid, or 
+ * indicate if the command was successful or invalid
  */
 enum class DrivetrainCmdResponse_e
 {
@@ -101,7 +99,7 @@ public:
         std::function<MotorMechanics_s()> get_motor_mechanics; 
     };
     
-    DrivetrainSystem(veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay_ms = 50);
+    DrivetrainSystem(veh_vec<DrivetrainSystem::InverterFuncts> inverter_interfaces, etl::delegate<void(bool)> set_ef_active_pin, unsigned long ef_pin_enable_delay_ms = 50); //why not make delay a constant that can easily be changed elsewhere where other constants are changed
     
 private:
     /**
@@ -141,6 +139,7 @@ private:
     etl::delegate<void(bool)> _set_ef_active_pin;
     unsigned long _last_toggled_ef_active = 0; 
     unsigned long _ef_pin_enable_delay_ms;
+    unsigned long _precharge_wait_start = 0;
 };
 
 using DrivetrainInstance = etl::singleton<DrivetrainSystem>;
