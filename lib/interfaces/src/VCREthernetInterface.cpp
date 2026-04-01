@@ -43,7 +43,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.vcr_shutdown_data.m_imd_relay = false; //shared_state.interface_data.shutdown_sensing_data.m_imd_relay;
 
     out.vcr_shutdown_data.bspd_is_ok = shared_state.interface_data.shutdown_sensing_data.bspd_is_ok;
-    out.vcr_shutdown_data.watchdog_is_ok = shared_state.interface_data.shutdown_sensing_data.watchdog_is_ok;
+    out.vcr_shutdown_data.watchdog_is_ok = shared_state.interface_data.shutdown_sensing_data.vcr_sw_is_ok;
     out.vcr_shutdown_data.bms_is_ok = shared_state.interface_data.shutdown_sensing_data.bms_is_ok;
     out.vcr_shutdown_data.imd_is_ok = shared_state.interface_data.shutdown_sensing_data.imd_is_ok;
 
