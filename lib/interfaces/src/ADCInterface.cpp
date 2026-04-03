@@ -1,5 +1,12 @@
 #include "ADCInterface.h"
 
+
+void ADCInterface::init() 
+{
+  pinMode(_adc_parameters.pinouts.brake_high_sense_pin, INPUT);
+  pinMode(_adc_parameters.pinouts.current_high_sense_pin, INPUT);
+}
+
 void ADCInterface::tick_adc0() { _adc0.tick(); }
 void ADCInterface::tick_adc1() { _adc1.tick(); }
 
@@ -123,4 +130,14 @@ AnalogConversion_s ADCInterface::read_thermistor_6() {
 
 AnalogConversion_s ADCInterface::read_thermistor_7() {
   return _adc1.data.conversions.at(_adc_parameters.channels.thermistor7_channel);
+}
+
+bool ADCInterface::is_brake_sense_high()
+{
+  return analogRead(_adc_parameters.pinouts.brake_high_sense_pin) > digital_high_threshold; 
+}
+
+bool ADCInterface::is_current_sense_high()
+{
+  return analogRead(_adc_parameters.pinouts.brake_high_sense_pin) > digital_high_threshold;
 }

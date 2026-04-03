@@ -14,6 +14,9 @@ namespace adc_default_parameters {
 struct ADCPinout_s {
   int adc0_spi_cs_pin;
   int adc1_spi_cs_pin;
+
+  int brake_high_sense_pin;
+  int current_high_sense_pin;
 };
 
 struct ADCChannels_s {
@@ -85,110 +88,119 @@ struct ADCInterfaceParams_s {
 class ADCInterface
 {
 public:
-  ADCInterface(ADCPinout_s pinouts, ADCChannels_s channels, ADCScales_s scales, ADCOffsets_s offsets) : _adc_parameters { 
-    pinouts,
-    channels,
-    scales,
-    offsets },
-    _adc0(
-      _adc_parameters.pinouts.adc0_spi_cs_pin,
-      MCP_ADC_DEFAULT_SPI_SDI,
-      MCP_ADC_DEFAULT_SPI_SDO,
-      MCP_ADC_DEFAULT_SPI_CLK,
-      MCP_ADC_DEFAULT_SPI_SPEED,
-      adc0_scales().data(),
-      adc0_offsets().data()
-    ),
-    _adc1(
-      _adc_parameters.pinouts.adc1_spi_cs_pin,
-      MCP_ADC_DEFAULT_SPI_SDI,
-      MCP_ADC_DEFAULT_SPI_SDO,
-      MCP_ADC_DEFAULT_SPI_CLK,
-      MCP_ADC_DEFAULT_SPI_SPEED,
-      adc1_scales().data(),
-      adc1_offsets().data()
-    ) {};
+    ADCInterface(ADCPinout_s pinouts, ADCChannels_s channels, ADCScales_s scales, ADCOffsets_s offsets) : _adc_parameters { 
+        pinouts,
+        channels,
+        scales,
+        offsets },
+        _adc0(
+        _adc_parameters.pinouts.adc0_spi_cs_pin,
+        MCP_ADC_DEFAULT_SPI_SDI,
+        MCP_ADC_DEFAULT_SPI_SDO,
+        MCP_ADC_DEFAULT_SPI_CLK,
+        MCP_ADC_DEFAULT_SPI_SPEED,
+        adc0_scales().data(),
+        adc0_offsets().data()
+        ),
+        _adc1(
+        _adc_parameters.pinouts.adc1_spi_cs_pin,
+        MCP_ADC_DEFAULT_SPI_SDI,
+        MCP_ADC_DEFAULT_SPI_SDO,
+        MCP_ADC_DEFAULT_SPI_CLK,
+        MCP_ADC_DEFAULT_SPI_SPEED,
+        adc1_scales().data(),
+        adc1_offsets().data()
+        ) {};
 
-  /**
-  * Samples from ADC0
-  */
-  void tick_adc0();
-  
-  /**
-  * Samples from ADC1
-  */
-  void tick_adc1();
+    void init();
 
-  const ADCInterfaceParams_s& get_adc_params() const;
+    
+    /**
+     *
+     * Samples from ADC0
+     */
+    void tick_adc0();
+    
+    /**
+     * Samples from ADC1
+     */
+    void tick_adc1();
 
-  /* -------------------- ADC0 -------------------- */
+    const ADCInterfaceParams_s& get_adc_params() const;
 
-  /**
-   * @return The reading of the 24V sensor analog channel
-  */
-  AnalogConversion_s read_glv();
-  
-  /**
-   * @return The reading of the BSPD current analog channel
-  */
-  AnalogConversion_s read_bspd_current();
+    /* -------------------- ADC0 -------------------- */
 
-  /**
-   * @return The reading of the BSPD reference current analog channel
-  */
-  AnalogConversion_s read_bspd_reference_current();
-  
-  /**
-   * @return The reading of the rear left load cell analog channel
-  */
-  AnalogConversion_s read_rl_loadcell();
-  
-  /**
-   * @return The reading of the rear right load cell analog channel
-  */
-  AnalogConversion_s read_rr_loadcell();
-  
-  /**
-   * @return The reading of the rear left suspension potentiometer analog channel
-  */
-  AnalogConversion_s read_rl_sus_pot();
-  
-  /**
-   * @return The reading of the rear right suspension potentiometer analog channel
-  */ 
-  AnalogConversion_s read_rr_sus_pot();
+    /**
+     * @return The reading of the 24V sensor analog channel
+     */
+    AnalogConversion_s read_glv();
+    
+    /**
+     * @return The reading of the BSPD current analog channel
+     */
+    AnalogConversion_s read_bspd_current();
 
-  /* -------------------- ADC1 -------------------- */
-  
-  AnalogConversion_s read_thermistor_0();
+    /**
+     * @return The reading of the BSPD reference current analog channel
+     */
+    AnalogConversion_s read_bspd_reference_current();
+    
+    /**
+     * @return The reading of the rear left load cell analog channel
+     */
+    AnalogConversion_s read_rl_loadcell();
+    
+    /**
+     * @return The reading of the rear right load cell analog channel
+     */
+    AnalogConversion_s read_rr_loadcell();
+    
+    /**
+     * @return The reading of the rear left suspension potentiometer analog channel
+     */
+    AnalogConversion_s read_rl_sus_pot();
+    
+    /**
+     * @return The reading of the rear right suspension potentiometer analog channel
+     */ 
+    AnalogConversion_s read_rr_sus_pot();
 
-  AnalogConversion_s read_thermistor_1();
-  
-  AnalogConversion_s read_thermistor_2(); 
+    /* -------------------- ADC1 -------------------- */
+    
+    AnalogConversion_s read_thermistor_0();
 
-  AnalogConversion_s read_thermistor_3();
+    AnalogConversion_s read_thermistor_1();
+    
+    AnalogConversion_s read_thermistor_2(); 
 
-  AnalogConversion_s read_thermistor_4();
-  
-  AnalogConversion_s read_thermistor_5();
+    AnalogConversion_s read_thermistor_3();
 
-  AnalogConversion_s read_thermistor_6();
+    AnalogConversion_s read_thermistor_4();
+    
+    AnalogConversion_s read_thermistor_5();
 
-  AnalogConversion_s read_thermistor_7();
-  
+    AnalogConversion_s read_thermistor_6();
+
+    AnalogConversion_s read_thermistor_7();
+    
+    bool is_brake_sense_high();
+
+    bool is_current_sense_high();
 
 private:
-  ADCInterfaceParams_s _adc_parameters = {};
+    ADCInterfaceParams_s _adc_parameters = {};
 
-  MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc0;
-  MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc1;
+    MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc0;
+    MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc1;
 
 
-  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_scales();
-  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_offsets();
-  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_scales();
-  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_offsets();
+    std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_scales();
+    std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_offsets();
+    std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_scales();
+    std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_offsets();
 
+
+    const size_t digital_high_threshold = 2048;
 };
 
 using ADCInterfaceInstance = etl::singleton<ADCInterface>; // Singleton for ADCs. Used to pass ADCs to other systems that need them, such as the TelemetrySystem.
