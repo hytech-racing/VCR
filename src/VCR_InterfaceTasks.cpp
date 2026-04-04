@@ -48,11 +48,11 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
 
     vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog,
-        ADCInterfaceInstance::instance().read_rl_sus_pot().raw);
+        ADCInterfaceInstance::instance().read_rl_sus_pot().conversion);
     
     vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
         vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog,
-        ADCInterfaceInstance::instance().read_rr_sus_pot().raw);
+        ADCInterfaceInstance::instance().read_rr_sus_pot().conversion);
 
     return HT_TASK::TaskResponse::YIELD;
 }
