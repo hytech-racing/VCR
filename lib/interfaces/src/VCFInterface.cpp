@@ -64,6 +64,14 @@ void VCFInterface::receive_front_suspension_message(const CAN_message_t &msg, un
     _curr_data.front_loadcell_data.valid_FR_sample = true; // or send validities over CAN
 }
 
+void VCFInterface::receive_steering_message(const CAN_message_t &msg, unsigned long curr_millis)
+{
+    STEERING_DATA_t steering_msg;
+    Unpack_STEERING_DATA_hytech(&steering_msg, &msg.buf[0], msg.len);
+    _curr_data.steering_data.analog_steering_degrees = (steering_msg.steering_analog_raw - _steering_center_value_raw) * 0.0439f; // conversion factor to degrees, hardcoded assuming 180 degree sensor
+    _curr_data.steering_data.digital_steering_analog = 0; // doesnt work set to zero so we cant use it
+}
+
 void VCFInterface::reset_pedals_heartbeat()
 {
     _curr_data.stamped_pedals.heartbeat_ok = true;
