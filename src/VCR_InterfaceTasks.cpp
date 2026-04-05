@@ -19,40 +19,28 @@
 #include "DrivebrainInterface.h"
 #include "IOExpanderUtils.h"
 
-float apply_iir_filter(float alpha, float old_value, float new_value)
-{
-    return (alpha * new_value) + (1 - alpha) * (old_value);
-}
-
 HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     ADCInterfaceInstance::instance().tick_adc0();
+    ADCInterfaceInstance::instance().update_filtered_values(LOADCELL_IIR_FILTER_ALPHA);
 
-    vcr_data.interface_data.current_sensor_data.twentyfour_volt_sensor = ADCInterfaceInstance::instance().read_glv().conversion;
-    vcr_data.interface_data.current_sensor_data.current_sensor_unfiltered = ADCInterfaceInstance::instance().read_bspd_current().conversion;
-    vcr_data.interface_data.current_sensor_data.current_refererence_unfiltered = ADCInterfaceInstance::instance().read_bspd_reference_current().conversion;
+    vcr_data.interface_data.current_sensor_data.twentyfour_volt_sensor = ADCInterfaceInstance::instance().get_glv().conversion;
+    vcr_data.interface_data.current_sensor_data.current_sensor_unfiltered = ADCInterfaceInstance::instance().get_bspd_current().conversion;
+    vcr_data.interface_data.current_sensor_data.current_refererence_unfiltered = ADCInterfaceInstance::instance().get_bspd_reference_current().conversion;
 
-    vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
-        vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog,
-        ADCInterfaceInstance::instance().read_rl_loadcell().conversion);
+    vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog = ADCInterfaceInstance::instance().get_filtered_RL_load_cell();
 
-    vcr_data.interface_data.rear_loadcell_data.valid_RL_sample = ((ADCInterfaceInstance::instance().read_rl_loadcell().raw != 4095) 
-                                                                && (ADCInterfaceInstance::instance().read_rl_loadcell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
+    vcr_data.interface_data.rear_loadcell_data.valid_RL_sample = ((ADCInterfaceInstance::instance().get_RL_load_cell().raw != 4095) 
+                                                                && (ADCInterfaceInstance::instance().get_RL_load_cell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
 
-    vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
-        vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog,
-        ADCInterfaceInstance::instance().read_rr_loadcell().conversion);
+    vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = ADCInterfaceInstance::instance().get_filtered_RR_load_cell();
     
-    vcr_data.interface_data.rear_loadcell_data.valid_RR_sample = ((ADCInterfaceInstance::instance().read_rr_loadcell().raw != 4095) 
-                                                                && (ADCInterfaceInstance::instance().read_rr_loadcell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
+    vcr_data.interface_data.rear_loadcell_data.valid_RR_sample = ((ADCInterfaceInstance::instance().get_RR_load_cell().raw != 4095) 
+                                                                && (ADCInterfaceInstance::instance().get_RR_load_cell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
 
-    vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
-        vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog,
-        ADCInterfaceInstance::instance().read_rl_sus_pot().conversion);
+    vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = ADCInterfaceInstance::instance().get_filtered_RL_sus_pot();
     
-    vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = apply_iir_filter(LOADCELL_IIR_FILTER_ALPHA,
-        vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog,
-        ADCInterfaceInstance::instance().read_rr_sus_pot().conversion);
+    vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = ADCInterfaceInstance::instance().get_filtered_RR_sus_pot();
 
     return HT_TASK::TaskResponse::YIELD;
 }
@@ -61,8 +49,8 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
 {
     ADCInterfaceInstance::instance().tick_adc1();  
 
-    vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_0().conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_1().conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog = ADCInterfaceInstance::instance().get_thermistor_0().conversion;
+    vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog = ADCInterfaceInstance::instance().get_thermistor_1().conversion;
     /*
     vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_2().conversion;
     vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_3().conversion;

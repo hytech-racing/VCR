@@ -21,10 +21,10 @@ struct ADCChannels_s {
   int glv_sense_channel;
   int current_sense_channel;
   int reference_sense_channel;
-  int rl_loadcell_channel;
-  int rr_loadcell_channel;
-  int rl_suspot_channel;
-  int rr_suspot_channel;
+  int RL_load_cell_channel;
+  int RR_load_cell_channel;
+  int RL_sus_pot_channel;
+  int RR_sus_pot_channel;
 
   /* ADC 1 */
   int thermistor0_channel;
@@ -41,10 +41,10 @@ struct ADCScales_s {
   float glv_sense_scale;
   float current_sense_scale;
   float reference_sense_scale;
-  float rl_loadcell_scale;
-  float rr_loadcell_scale;
-  float rl_suspot_scale;
-  float rr_suspot_scale;
+  float RL_load_cell_scale;
+  float RR_load_cell_scale;
+  float RL_sus_pot_scale;
+  float RR_sus_pot_scale;
 
   float thermistor0_scale;
   float thermistor1_scale;
@@ -60,10 +60,10 @@ struct ADCOffsets_s {
   float glv_sense_offset;
   float current_sense_offset;
   float reference_sense_offset;
-  float rl_loadcell_offset;
-  float rr_loadcell_offset;
-  float rl_suspot_offset;
-  float rr_suspot_offset;
+  float RL_load_cell_offset;
+  float RR_load_cell_offset;
+  float RL_sus_pot_offset;
+  float RR_sus_pot_offset;
 
   float thermistor0_offset;
   float thermistor1_offset;
@@ -126,55 +126,80 @@ public:
   /**
    * @return The reading of the 24V sensor analog channel
   */
-  AnalogConversion_s read_glv();
+  AnalogConversion_s get_glv();
   
   /**
    * @return The reading of the BSPD current analog channel
   */
-  AnalogConversion_s read_bspd_current();
+  AnalogConversion_s get_bspd_current();
 
   /**
    * @return The reading of the BSPD reference current analog channel
   */
-  AnalogConversion_s read_bspd_reference_current();
+  AnalogConversion_s get_bspd_reference_current();
   
   /**
    * @return The reading of the rear left load cell analog channel
   */
-  AnalogConversion_s read_rl_loadcell();
+  AnalogConversion_s get_RL_load_cell();
   
   /**
    * @return The reading of the rear right load cell analog channel
   */
-  AnalogConversion_s read_rr_loadcell();
+  AnalogConversion_s get_RR_load_cell();
   
   /**
    * @return The reading of the rear left suspension potentiometer analog channel
   */
-  AnalogConversion_s read_rl_sus_pot();
+  AnalogConversion_s get_RL_sus_pot();
   
   /**
    * @return The reading of the rear right suspension potentiometer analog channel
   */ 
-  AnalogConversion_s read_rr_sus_pot();
+  AnalogConversion_s get_RR_sus_pot();
+
+  /**
+   * Update filtered signals based on given alpha
+   */
+  void update_filtered_values(float alpha);
+
+  /**
+   * @return The filtered value of the RL load cell
+   */
+  float get_filtered_RL_load_cell();
+
+  /**
+   * @return The filtered value of the RL sus pot
+   */
+  float get_filtered_RL_sus_pot();
+
+  /**
+   * @return The filtered value of the RR load cell
+   */
+  float get_filtered_RR_load_cell();
+
+  /**
+   * @return The filtered value of the RR sus pot
+   */
+  float get_filtered_RR_sus_pot();
 
   /* -------------------- ADC1 -------------------- */
   
-  AnalogConversion_s read_thermistor_0();
+  AnalogConversion_s get_thermistor_0();
 
-  AnalogConversion_s read_thermistor_1();
+  AnalogConversion_s get_thermistor_1();
   
-  AnalogConversion_s read_thermistor_2(); 
+  AnalogConversion_s get_thermistor_2(); 
 
-  AnalogConversion_s read_thermistor_3();
+  AnalogConversion_s get_thermistor_3();
 
-  AnalogConversion_s read_thermistor_4();
+  AnalogConversion_s get_thermistor_4();
   
-  AnalogConversion_s read_thermistor_5();
+  AnalogConversion_s get_thermistor_5();
 
-  AnalogConversion_s read_thermistor_6();
+  AnalogConversion_s get_thermistor_6();
 
-  AnalogConversion_s read_thermistor_7();
+  AnalogConversion_s get_thermistor_7();
   
 
 private:
@@ -183,11 +208,20 @@ private:
   MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc0;
   MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc1;
 
+  float _RL_load_cell_filtered;
+  float _RL_sus_pot_filtered;
+  float _RR_load_cell_filtered;
+  float _RR_sus_pot_filtered;
 
   std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_scales();
   std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_offsets();
   std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_scales();
   std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_offsets();
+
+  /**
+   * @return updated filtered value based on given alpha, previous value, and new value
+   */
+  static float apply_iir_filter(float alpha, float old_value, float new_value);
 
 };
 
