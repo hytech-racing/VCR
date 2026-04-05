@@ -22,7 +22,7 @@ DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cel
                        .rear_suspot_data = rear_suspot_data},
       _thermistor_data{.coolant_temperature_0_data = coolant_temperature_data_0,
                        .coolant_temperature_1_data = coolant_temperature_data_1,
-                       .flowmeter_data = flowmeter_data 
+                       .flowmeter_data = flowmeter_data
                         },
       _drivebrain_ip(drivebrain_ip),
       _vcr_data_port(vcr_data_port),
@@ -112,14 +112,14 @@ void DrivebrainInterface::receive_drivebrain_torque_lim_command_auxillary(const 
 
 void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
     REAR_SUSPENSION_t rear_sus_msg;
-    
+
     rear_sus_msg.rl_load_cell = _suspension_data.rear_load_cell_data.RL_loadcell_analog;
     rear_sus_msg.rr_load_cell = _suspension_data.rear_load_cell_data.RR_loadcell_analog;
     rear_sus_msg.rl_shock_pot = _suspension_data.rear_suspot_data.RL_sus_pot_analog;
     rear_sus_msg.rr_shock_pot = _suspension_data.rear_suspot_data.RR_sus_pot_analog;
-    
+
     CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_hytech,
-                          VCRCANInterfaceImpl::telem_can_tx_buffer); 
+                          VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
 void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {

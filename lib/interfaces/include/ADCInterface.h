@@ -84,110 +84,150 @@ struct ADCInterfaceParams_s {
 
 class ADCInterface
 {
-public:
-  ADCInterface(ADCPinout_s pinouts, ADCChannels_s channels, ADCScales_s scales, ADCOffsets_s offsets) : _adc_parameters { 
-    pinouts,
-    channels,
-    scales,
-    offsets },
-    _adc0(
-      _adc_parameters.pinouts.adc0_spi_cs_pin,
-      MCP_ADC_DEFAULT_SPI_SDI,
-      MCP_ADC_DEFAULT_SPI_SDO,
-      MCP_ADC_DEFAULT_SPI_CLK,
-      MCP_ADC_DEFAULT_SPI_SPEED,
-      adc0_scales().data(),
-      adc0_offsets().data()
-    ),
-    _adc1(
-      _adc_parameters.pinouts.adc1_spi_cs_pin,
-      MCP_ADC_DEFAULT_SPI_SDI,
-      MCP_ADC_DEFAULT_SPI_SDO,
-      MCP_ADC_DEFAULT_SPI_CLK,
-      MCP_ADC_DEFAULT_SPI_SPEED,
-      adc1_scales().data(),
-      adc1_offsets().data()
-    ) {};
+    public:
+        ADCInterface(ADCPinout_s pinouts, ADCChannels_s channels, ADCScales_s scales, ADCOffsets_s offsets) :
+        _adc_parameters {
+            pinouts,
+            channels,
+            scales,
+            offsets
+        },
+        _adc0(
+            _adc_parameters.pinouts.adc0_spi_cs_pin,
+            MCP_ADC_DEFAULT_SPI_SDI,
+            MCP_ADC_DEFAULT_SPI_SDO,
+            MCP_ADC_DEFAULT_SPI_CLK,
+            MCP_ADC_DEFAULT_SPI_SPEED,
+            adc0_scales().data(),
+            adc0_offsets().data()
+        ),
+        _adc1(
+            _adc_parameters.pinouts.adc1_spi_cs_pin,
+            MCP_ADC_DEFAULT_SPI_SDI,
+            MCP_ADC_DEFAULT_SPI_SDO,
+            MCP_ADC_DEFAULT_SPI_CLK,
+            MCP_ADC_DEFAULT_SPI_SPEED,
+            adc1_scales().data(),
+            adc1_offsets().data()
+        ) {};
 
-  /**
-  * Samples from ADC0
-  */
-  void tick_adc0();
-  
-  /**
-  * Samples from ADC1
-  */
-  void tick_adc1();
+        /**
+         * Samples from ADC0
+         */
+        void tick_adc0();
 
-  const ADCInterfaceParams_s& get_adc_params() const;
+        /**
+         * Samples from ADC1
+         */
+        void tick_adc1();
 
-  /* -------------------- ADC0 -------------------- */
+        const ADCInterfaceParams_s& get_adc_params() const;
 
-  /**
-   * @return The reading of the 24V sensor analog channel
-  */
-  AnalogConversion_s read_glv();
-  
-  /**
-   * @return The reading of the BSPD current analog channel
-  */
-  AnalogConversion_s read_bspd_current();
+        /* -------------------- ADC0 -------------------- */
 
-  /**
-   * @return The reading of the BSPD reference current analog channel
-  */
-  AnalogConversion_s read_bspd_reference_current();
-  
-  /**
-   * @return The reading of the rear left load cell analog channel
-  */
-  AnalogConversion_s read_rl_loadcell();
-  
-  /**
-   * @return The reading of the rear right load cell analog channel
-  */
-  AnalogConversion_s read_rr_loadcell();
-  
-  /**
-   * @return The reading of the rear left suspension potentiometer analog channel
-  */
-  AnalogConversion_s read_rl_sus_pot();
-  
-  /**
-   * @return The reading of the rear right suspension potentiometer analog channel
-  */ 
-  AnalogConversion_s read_rr_sus_pot();
+        /**
+         * @return The reading of the 24V sensor analog channel
+         */
+        AnalogConversion_s read_glv();
 
-  /* -------------------- ADC1 -------------------- */
-  
-  AnalogConversion_s read_thermistor_0();
+        /**
+         * @return The reading of the BSPD current analog channel
+         */
+        AnalogConversion_s read_bspd_current();
 
-  AnalogConversion_s read_thermistor_1();
-  
-  AnalogConversion_s read_thermistor_2(); 
+        /**
+         * @return The reading of the BSPD reference current analog channel
+         */
+        AnalogConversion_s read_bspd_reference_current();
 
-  AnalogConversion_s read_thermistor_3();
+        /**
+         * @return The reading of the rear left load cell analog channel
+         */
+        AnalogConversion_s get_RL_load_cell();
 
-  AnalogConversion_s read_thermistor_4();
-  
-  AnalogConversion_s read_thermistor_5();
+        /**
+         * @return The reading of the rear right load cell analog channel
+         */
+        AnalogConversion_s get_RR_load_cell();
 
-  AnalogConversion_s read_thermistor_6();
+        /**
+         * @return The reading of the rear left suspension potentiometer analog channel
+         */
+        AnalogConversion_s get_RL_sus_pot();
 
-  AnalogConversion_s read_thermistor_7();
-  
+        /**
+         * @return The reading of the rear right suspension potentiometer analog channel
+         */
+        AnalogConversion_s get_RR_sus_pot();
 
-private:
-  ADCInterfaceParams_s _adc_parameters = {};
+        /**
+         * @return Filtered Front Left Load Cell
+         */
+        float get_filtered_RL_load_cell();
 
-  MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc0;
-  MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc1;
+        /**
+         * @return Filtered Front Right Load Cell
+         */
+        float get_filtered_RR_load_cell();
+
+        /**
+         * @return Filtered Front Left Sus Pot
+         */
+        float get_filtered_RL_sus_pot();
+
+        /**
+         * @return Filtered Front Right Sus Pot
+         */
+        float get_filtered_RR_sus_pot();
 
 
-  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_scales();
-  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_offsets();
-  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_scales();
-  std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_offsets();
+        /**
+         * Update the filtered values for the load cells and sus pots.
+         * Uses the iir_filter method to do so.
+         */
+        void update_filtered_values(float alpha);
+
+        /**
+         * @return updated filtered value based on given alpha, previous filtered value, and new measured value
+         */
+        static float apply_iir_filter(float alpha, float prev_value, float new_value);
+
+        /* -------------------- ADC1 -------------------- */
+
+        AnalogConversion_s read_thermistor_0();
+
+        AnalogConversion_s read_thermistor_1();
+
+        AnalogConversion_s read_thermistor_2();
+
+        AnalogConversion_s read_thermistor_3();
+
+        AnalogConversion_s read_thermistor_4();
+
+        AnalogConversion_s read_thermistor_5();
+
+        AnalogConversion_s read_thermistor_6();
+
+        AnalogConversion_s read_thermistor_7();
+
+    private:
+        MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc0;
+        MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc1;
+
+
+        std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_scales();
+        std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_offsets();
+        std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_scales();
+        std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_offsets();
+
+        /* ------ Private Data Members ------ */
+    private:
+        ADCInterfaceParams_s _adc_parameters = {};
+        // Filtered Load Cell and Sus Pot data
+        float _RL_load_cell_filtered;
+        float _RR_load_cell_filtered;
+        float _RL_sus_pot_filtered;
+        float _RR_sus_pot_filtered;
 
 };
 

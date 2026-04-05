@@ -4,7 +4,7 @@
 #include <etl/singleton.h>
 
 /* C++ library includes */
-#include <array> 
+#include <array>
 
 /* IO Expander MCP23017 Library */
 #include "MCP23017.h"
@@ -19,8 +19,6 @@ extern VCRData_s vcr_data; // NOLINT
 /* IO Expander Setup */
 using IOExpanderInstance = etl::singleton<MCP23017>;
 
-/* ADC setup */
-constexpr unsigned int channels_within_mcp_adc = 8;
 
 extern unsigned long pulseCount; // NOLINT
 

@@ -11,7 +11,7 @@
 #include "VCR_Globals.h"
 #include <ht_task.hpp>
 
-
+// maybe move using IOExpanderInstance = etl::singleton<MCP23017>; here
 
 /**
  * The read_adc0 task will command adc0 to sample all eight channels, convert the outputs, and
@@ -23,7 +23,7 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
 /**
  * NOTE: These channels are UNUSED BY DEFAULT and exist ONLY FOR TESTING. You may edit this
  * manually to add sensors.
- * 
+ *
  * The read_adc1 task will command adc1 to sample all eight channels, convert the outputs, and
  * store them in a struct defined in shared_firmware_types. This function relies on adc_1 being
  * defined in VCRGlobals.h.
@@ -72,7 +72,7 @@ HT_TASK::TaskResponse enqueue_coolant_temp_CAN_data(const unsigned long& sysMicr
 HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 
 /**
- * Enqueues all data needed for dashboard. 
+ * Enqueues all data needed for dashboard.
  */
 HT_TASK::TaskResponse enqueue_dashboard_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo); // NOLINT (capitalized CAN)
 

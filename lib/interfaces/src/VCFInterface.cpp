@@ -26,12 +26,12 @@ void VCFInterface::receive_pedals_message(const CAN_message_t &msg, unsigned lon
     _curr_data.stamped_pedals.last_recv_millis = curr_millis;
 
     // As long as we're using millis() function, loop overrun not a concern
-    
+
     if(_curr_data.stamped_pedals.last_recv_millis == 0)
     {
         _first_received_message_heartbeat_init = true;
     }
-    
+
     _curr_data.stamped_pedals.last_recv_millis = curr_millis;
 }
 
@@ -48,7 +48,7 @@ void VCFInterface::receive_dashboard_message(const CAN_message_t &msg, unsigned 
     _curr_data.dash_input_state.right_paddle_is_pressed = dash_msg.right_shifter_button;
     _curr_data.dash_input_state.mode_btn_is_pressed = dash_msg.mode_button; // change torque limit
     _curr_data.dash_input_state.dial_state = static_cast<ControllerMode_e>(dash_msg.dash_dial_mode);
-    
+
 }
 
 void VCFInterface::receive_front_suspension_message(const CAN_message_t &msg, unsigned long curr_millis)
@@ -59,7 +59,7 @@ void VCFInterface::receive_front_suspension_message(const CAN_message_t &msg, un
     _curr_data.front_suspot_data.FL_sus_pot_analog = front_suspension_msg.fl_shock_pot;
     _curr_data.front_loadcell_data.FR_loadcell_analog = front_suspension_msg.fr_load_cell;
     _curr_data.front_suspot_data.FR_sus_pot_analog = front_suspension_msg.fr_shock_pot;
-    
+
     _curr_data.front_loadcell_data.valid_FL_sample = true; // only sent over CAN if valid from VCF
     _curr_data.front_loadcell_data.valid_FR_sample = true; // or send validities over CAN
 }

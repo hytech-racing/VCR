@@ -6,18 +6,18 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
         {0.0f, 0.0f, 0.0f, 0.0f}, // speed rpms
         {0.0f, 0.0f, 0.0f, 0.0f}  // torques
     };
-    
+
     const PedalsSystemData_s &pedals_data = vcr_data.interface_data.recvd_pedals_data.pedals_data;
     const FrontLoadCellData_s &front_lc_data = vcr_data.interface_data.front_loadcell_data;
     const RearLoadCellData_s &rear_lc_data = vcr_data.interface_data.rear_loadcell_data;
 
     // auto average_rpm = (vcr_data.interface_data.inverter_data.RL.speed_rpm +vcr_data.interface_data.inverter_data.RL.speed_rpm)
 
-    veh_vec<float> load_cell_data(static_cast<float>(front_lc_data.FL_loadcell_analog), 
+    veh_vec<float> load_cell_data(static_cast<float>(front_lc_data.FL_loadcell_analog),
                                   static_cast<float>(front_lc_data.FR_loadcell_analog),
-                                  static_cast<float>(rear_lc_data.RL_loadcell_analog), 
+                                  static_cast<float>(rear_lc_data.RL_loadcell_analog),
                                   static_cast<float>(rear_lc_data.RR_loadcell_analog));
-    
+
     // Do sanity checks on raw data - FIX
     _load_cell_error_counts.FL = front_lc_data.valid_FL_sample ? 0 : _load_cell_error_counts.FL + 1;
     _load_cell_error_counts.FR = front_lc_data.valid_FR_sample ? 0 : _load_cell_error_counts.FR + 1;
@@ -38,12 +38,12 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
         {
             // Positive torque request
             torque_request = accel_request * PhysicalParameters::AMK_MAX_TORQUE * 4;
-            
+
             out.desired_speeds.FL = PhysicalParameters::AMK_MAX_RPM;
             out.desired_speeds.FR = PhysicalParameters::AMK_MAX_RPM;
             out.desired_speeds.RL = PhysicalParameters::AMK_MAX_RPM;
             out.desired_speeds.RR = PhysicalParameters::AMK_MAX_RPM;
-            
+
             out.torque_limits.FL = torque_request * _front_torque_scale * load_cell_data.FL / sum_normal_force;
             out.torque_limits.FR = torque_request * _front_torque_scale * load_cell_data.FR / sum_normal_force;
             out.torque_limits.RL = torque_request * _rear_torque_scale * load_cell_data.RL / sum_normal_force;
