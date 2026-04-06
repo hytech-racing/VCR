@@ -131,7 +131,7 @@ private:
     std::function<bool(const InverterStatus_s &)> _check_inverter_no_errors_present;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_present_flag;
     std::function<bool(const InverterStatus_s &)> _check_inverter_hv_not_present_flag;
-    std::function<bool(const InverterStatus_s &)> _check_inverter_enabled;  
+    std::function<bool(const InverterStatus_s &)> _check_inverter_enabled;
 
     /**
      * Delegate function for setting ef active
