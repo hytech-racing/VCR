@@ -51,11 +51,11 @@ constexpr float RL_LOADCELL_OFFSET = 0.0;
 constexpr float RR_LOADCELL_SCALE = 1.0;
 constexpr float RR_LOADCELL_OFFSET = 0;
 
-
-constexpr float RL_SUS_POT_SCALE = 1;
-constexpr int RL_SUS_POT_OFFSET = 0;
-constexpr float RR_SUS_POT_SCALE = 1;
-constexpr int RR_SUS_POT_OFFSET = 0;
+// Calibrated values measured from bolt to bolt
+constexpr float RL_SUS_POT_SCALE = 0.01459;
+constexpr float RL_SUS_POT_OFFSET = 148.5;
+constexpr float RR_SUS_POT_SCALE = 0.01337;
+constexpr float RR_SUS_POT_OFFSET = 152.5;
 
 //figure out values
 const float THERMISTOR_0_SCALE = 1;
