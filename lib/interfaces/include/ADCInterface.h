@@ -113,6 +113,11 @@ public:
       ) {};
 
     /**
+     * Init function for pin modes
+    */
+    void init();
+
+    /**
     * Samples from ADC0
     */
     void tick_adc0();
@@ -204,6 +209,9 @@ public:
 
     AnalogConversion_s get_thermistor_7();
   
+    bool is_brake_sense_high();
+
+    bool is_current_sense_high();
 
 private:
     ADCInterfaceParams_s _adc_parameters = {};
@@ -215,7 +223,12 @@ private:
     float _RL_load_cell_filtered;
     float _RL_sus_pot_filtered;
     float _RR_load_cell_filtered;
-     float _RR_sus_pot_filtered;
+    float _RR_sus_pot_filtered;
+
+    std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_scales();
+    std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_offsets();
+    std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_scales();
+    std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_offsets();
 
 
     const size_t digital_high_threshold = 2048;
