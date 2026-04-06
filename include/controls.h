@@ -2,6 +2,7 @@
 #define CONTROLS_IMPL
 
 #include "DrivetrainSystem.h"
+#include "PhysicalParameters.h"
 #include "SharedFirmwareTypes.h"
 #include "TorqueControllerMux.hpp"
 #include "controllers/SimpleController.h"

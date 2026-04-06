@@ -64,7 +64,7 @@ void VCFInterface::receive_steering_message(const CAN_message_t &msg, unsigned l
 {
     STEERING_DATA_t steering_msg;
     Unpack_STEERING_DATA_hytech(&steering_msg, &msg.buf[0], msg.len);
-    _curr_data.steering_data.analog_steering_degrees = (steering_msg.steering_analog_raw - _steering_center_value_raw) * 0.0439f; // conversion factor to degrees, hardcoded assuming 180 degree sensor
+    _curr_data.steering_data.analog_steering_degrees = static_cast<float>((steering_msg.steering_analog_raw - _steering_center_value_raw) * _steering_conversion_factor); //NOLINT
     _curr_data.steering_data.digital_steering_analog = 0; // doesnt work set to zero so we cant use it
 }
 

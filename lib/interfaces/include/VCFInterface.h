@@ -51,6 +51,7 @@ private:
     VCFCANInterfaceData_s _curr_data;
     
     const int _steering_center_value_raw = 1672; //hardcoded for now, this should be removed once steering system is working
+    const float _steering_conversion_factor = 0.0439f; // conversion factor to degrees, hardcoded assuming 180 degree sensor
 
     unsigned long _max_heartbeat_interval_ms;
     bool _first_received_message_heartbeat_init = false;

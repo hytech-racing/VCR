@@ -8,6 +8,12 @@ namespace PhysicalParameters
     const float MAX_REGEN_TORQUE = 10.0f;
 }
 
+namespace DefaultDriveBias
+{
+    const float REAR_TORQUE_SCALE = 1.3f; // scales how much of the torque goes to the rears, 0-2
+    const float REAR_REGEN_TORQUE_SCALE = 0.2f; //scales how much regen torque goes to rears, 0-2
+}
+
 constexpr const float GEARBOX_RATIO               = 11.83f;
 constexpr const float WHEEL_DIAMETER              = 0.4064f; // meters
 constexpr const float RPM_TO_METERS_PER_SECOND    = WHEEL_DIAMETER * 3.1415f / GEARBOX_RATIO / 60.0f;

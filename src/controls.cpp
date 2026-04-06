@@ -6,8 +6,8 @@
 #include "CANInterface.h"
 
 VCRControls::VCRControls(DrivetrainSystem *dt_system, uint32_t max_allowed_db_latency_ms) :
-    _mode1(1.3, 0.2),
-    _mode2(1.3, 0.2),
+    _mode1(DefaultDriveBias::REAR_TORQUE_SCALE, DefaultDriveBias::REAR_REGEN_TORQUE_SCALE),
+    _mode2(DefaultDriveBias::REAR_TORQUE_SCALE, DefaultDriveBias::REAR_REGEN_TORQUE_SCALE),
     _mode4(max_allowed_db_latency_ms),
     _tc_mux({
         [this](const VCRData_s &state, unsigned long curr_millis) -> DrivetrainCommand_s { return _mode0.evaluate(state, curr_millis); },
