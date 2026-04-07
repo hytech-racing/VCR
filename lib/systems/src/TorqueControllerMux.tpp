@@ -256,5 +256,6 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
         out.torque_limits.RL *= torqueScaleDown; 
         out.torque_limits.RR *= torqueScaleDown; 
     }
+    
     return out;
 }
