@@ -102,7 +102,7 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 break;
             }
 
-            if (_reset_steering_timeout())
+            if (_check_steering_timeout())
             {
                 _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
             }
