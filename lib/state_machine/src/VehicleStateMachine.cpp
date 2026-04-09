@@ -26,6 +26,12 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 _set_state(VehicleState_e::WANTING_RECALIBRATE_PEDALS, current_millis);
             }
             
+            if (_is_calibrate_steering_button_pressed())
+            {
+                _set_state(VehicleState_e::WANTING_RECALIBRATE_STEERING, current_millis);
+            }
+    
+            
             _command_drivetrain(false, false);
             
             break;
@@ -112,6 +118,39 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
             }
 
             break;
+
+        case VehicleState_e::WANTING_RECALIBRATE_STEERING:
+         {
+            _command_drivetrain(false, false);
+            
+            if (!_is_calibrate_steering_button_pressed())
+            {
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
+            }
+
+            if (_is_calibrate_steering_button_pressed() && (current_millis - _last_entered_waiting_state_ms > 3000))
+            {
+                _set_state(VehicleState_e::RECALIBRATING_STEERING, current_millis);
+            }
+
+            break;
+
+        case VehicleState_e::RECALIBRATING_STEERING:
+         {
+            _command_drivetrain(false, false);
+            
+            if (!_is_calibrate_steering_button_pressed())
+            {
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE, current_millis);
+            }
+            
+            if (_is_calibrate_steering_button_pressed())
+            {
+                _send_recalibrate_steering_message();
+            }
+
+            break;
+        
         }
         case VehicleState_e::RECALIBRATING_PEDALS:
         {
@@ -162,6 +201,12 @@ void VehicleStateMachine::_handle_exit_logic(VehicleState_e prev_state, unsigned
         case VehicleState_e::RECALIBRATING_PEDALS:
             _last_entered_waiting_state_ms = 0;
             break;
+        case VehicleState_e::WANTING_RECALIBRATE_STEERING:
+            _last_entered_waiting_state_ms = 0;
+            break;
+        case VehicleState_e::RECALIBRATING_STEERING:
+            _last_entered_waiting_state_ms = 0;
+            break;
         default:
             break;
     }
@@ -187,6 +232,11 @@ void VehicleStateMachine::_handle_entry_logic(VehicleState_e new_state, unsigned
             _last_entered_waiting_state_ms = curr_millis;
             break;
         case VehicleState_e::RECALIBRATING_PEDALS:
+            break;
+        case VehicleState_e::WANTING_RECALIBRATE_STEERING:
+            _last_entered_waiting_state_ms = curr_millis;
+            break;
+        case VehicleState_e::RECALIBRATING_STEERING:
             break;
         default:
             break;

@@ -83,11 +83,16 @@ VCFCANInterfaceData_s VCFInterface::get_latest_data() {
     return _curr_data;
 }
 
+void VCFInterface::reset_steering_heartbeat(){
+    _curr_data.stamped_steering.heartbeak_ok = true;
+}
+
 void VCFInterface::send_buzzer_start_message()
 {
     DASHBOARD_BUZZER_CONTROL_t ctrl = {};
     ctrl.dash_buzzer_flag = true;
     ctrl.in_pedal_calibration_state = false;
+    ctrl.in_steering_calibration_state = false; //wait for this on CAN
     ctrl.torque_limit_enum_value = 0xFF; // MAX_VALUE indicates "ignore this value" //NOLINT
     CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
     Serial.println("BUZZER START MESSAGE SENT");

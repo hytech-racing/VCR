@@ -20,7 +20,8 @@ class VehicleStateMachine
             etl::delegate<void()> reset_pedals_timeout,
             etl::delegate<bool()> is_inverter_reset_button_pressed,
             etl::delegate<bool()> is_calibrate_pedals_button_pressed,
-            etl::delegate<void()> reset_inverter_error
+            etl::delegate<void()> reset_inverter_error,
+            etl::delegate<bool()> is_calibrate_steering_button_pressed
         ) :  
         _check_hv_over_threshold(check_hv_over_threshold),
         _is_start_button_pressed(is_start_button_pressed), 
@@ -34,7 +35,8 @@ class VehicleStateMachine
         _reset_pedals_timeout(reset_pedals_timeout),
         _is_inverter_reset_button_pressed(is_inverter_reset_button_pressed),
         _is_calibrate_pedals_button_pressed(is_calibrate_pedals_button_pressed),
-        _reset_inverter_error(reset_inverter_error)
+        _reset_inverter_error(reset_inverter_error),
+        _is_calibrate_steering_button_pressed(is_calibrate_steering_button_pressed)
         {   
             _current_state = VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE;
         }
@@ -75,6 +77,7 @@ class VehicleStateMachine
         etl::delegate<bool()> _is_inverter_reset_button_pressed;
         etl::delegate<bool()> _is_calibrate_pedals_button_pressed;
         etl::delegate<void()> _reset_inverter_error;
+        etl::delegate<bool()> _is_calibrate_steering_button_pressed;
 };
 
 using VehicleStateMachineInstance = etl::singleton<VehicleStateMachine>;
