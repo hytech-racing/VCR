@@ -36,10 +36,20 @@ VCRInterfaceData_s sample_async_data(
     auto rl_inv_mechanics = interface_ref_container.can_interfaces.rl_inverter_interface.get_motor_mechanics();
     auto rr_inv_mechanics = interface_ref_container.can_interfaces.rr_inverter_interface.get_motor_mechanics();
 
+    auto fl_inv_status = interface_ref_container.can_interfaces.fl_inverter_interface.get_status();
+    auto fr_inv_status = interface_ref_container.can_interfaces.fr_inverter_interface.get_status();
+    auto rl_inv_status = interface_ref_container.can_interfaces.rl_inverter_interface.get_status();
+    auto rr_inv_status = interface_ref_container.can_interfaces.rr_inverter_interface.get_status();
+
     ret.inverter_data.FL.speed_rpm = fl_inv_mechanics.actual_speed;
     ret.inverter_data.FR.speed_rpm = fr_inv_mechanics.actual_speed;
     ret.inverter_data.RL.speed_rpm = rl_inv_mechanics.actual_speed;
     ret.inverter_data.RR.speed_rpm = rr_inv_mechanics.actual_speed;
+
+    ret.inverter_data.FL.dc_bus_voltage = fl_inv_status.dc_bus_voltage;
+    ret.inverter_data.FR.dc_bus_voltage = fr_inv_status.dc_bus_voltage;
+    ret.inverter_data.RL.dc_bus_voltage = rl_inv_status.dc_bus_voltage;
+    ret.inverter_data.RR.dc_bus_voltage = rr_inv_status.dc_bus_voltage;
 
     ret.recvd_pedals_data = vcf_data.stamped_pedals;
     ret.front_loadcell_data = vcf_data.front_loadcell_data;
@@ -56,14 +66,15 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
 
     etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 
-    bool torque_mode_cycle_button_was_pressed = vcr_data.interface_data.dash_input_state.mode_btn_is_pressed;
+    bool torque_mode_cycle_button_was_pressed = vcr_data.interface_data.dash_input_state.BUTTON_2;
 
     VCRInterfaceData_s new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data);
     
     vcr_data.system_data.drivetrain_data.measuredSpeeds = {new_interface_data.inverter_data.FL.speed_rpm, new_interface_data.inverter_data.FR.speed_rpm, new_interface_data.inverter_data.RL.speed_rpm, new_interface_data.inverter_data.RR.speed_rpm};
-    
+    vcr_data.system_data.drivetrain_data.measuredInverterFLPackVoltage = new_interface_data.inverter_data.FL.dc_bus_voltage;
+
     // If torque button was released (it was pressed before updating and now it's not)
-    if (torque_mode_cycle_button_was_pressed && !new_interface_data.dash_input_state.mode_btn_is_pressed)
+    if (torque_mode_cycle_button_was_pressed && !new_interface_data.dash_input_state.BUTTON_2)
     {
         VCRControlsInstance::instance().cycle_torque_limit();
         VCFInterfaceInstance::instance().enqueue_torque_mode_LED_message(VCRControlsInstance::instance().get_current_torque_limit());

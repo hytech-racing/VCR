@@ -70,6 +70,8 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.current_sensor_data.twentyfour_volt_sensor = shared_state.interface_data.current_sensor_data.twentyfour_volt_sensor;
     out.current_sensor_data.current_sensor_unfiltered = shared_state.interface_data.current_sensor_data.current_sensor_unfiltered;
     out.current_sensor_data.current_refererence_unfiltered = shared_state.interface_data.current_sensor_data.current_refererence_unfiltered;
+    out.current_sensor_data.bpsd_brake_high_sense = shared_state.interface_data.current_sensor_data.bspd_brake_high_sense;
+    out.current_sensor_data.bspd_current_high_sense = shared_state.interface_data.current_sensor_data.bspd_current_high_sense;
 
     //DrivetrainDynamicReport_s
     out.drivetrain_data.measuredInverterFLPackVoltage = shared_state.system_data.drivetrain_data.measuredInverterFLPackVoltage;

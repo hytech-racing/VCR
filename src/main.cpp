@@ -375,7 +375,7 @@ void setup() {
 
     // Instantiate ADC interface
     ADCInterfaceInstance::create(
-      ADCPinout_s {ADC0_CS, ADC1_CS},
+      ADCPinout_s {ADC0_CS, ADC1_CS, BRAKE_HIGH_SENSE_PIN, CURRENT_HIGH_SENSE_PIN},
       ADCChannels_s {
         GLV_SENSE_CHANNEL,
         CURRENT_SENSE_CHANNEL,
@@ -429,7 +429,8 @@ void setup() {
       }
     );
   
-    
+    ADCInterfaceInstance::instance().init();
+
     // Schedule scheduler tasks
     scheduler.schedule(adc_0_sample_task);
     scheduler.schedule(adc_1_sample_task);

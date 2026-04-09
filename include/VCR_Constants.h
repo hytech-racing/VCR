@@ -86,6 +86,10 @@ constexpr int PUMP_CNTRL = 33;
 constexpr int INV_FAN_CNTRL = 34;
 constexpr int MOTOR_FAN_CNTRL = 35;
 
+// BSPD
+constexpr int BRAKE_HIGH_SENSE_PIN = 38;
+constexpr int CURRENT_HIGH_SENSE_PIN = 39;
+
 /* Watchdog constants */
 constexpr int INVERTER_ENABLE_PIN = 5;
 constexpr int FLOWMETER_PIN = 7;
@@ -124,7 +128,7 @@ constexpr unsigned long inv_send_period = 5000;                      // 5 000 us
 constexpr unsigned long inverter_send_priority = 5;
 constexpr unsigned long coolant_temp_send_period_us = 100000;        // 100 000 us = 10 Hz
 constexpr unsigned long coolant_temp_send_priority = 9;
-constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
+constexpr unsigned long ioexpander_sample_period_us = 5000;         // 5 000 us = 200 Hz
 constexpr unsigned long ioexpander_priority = 100;
 constexpr unsigned long dashboard_send_period_us = 200000;         // 200 000 us = 5 Hz
 constexpr unsigned long dashboard_send_priority = 5;
