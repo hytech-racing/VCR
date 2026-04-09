@@ -24,17 +24,6 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
 {
     ADCInterfaceInstance::instance().tick_adc0();
     ADCInterfaceInstance::instance().update_filtered_values(LOADCELL_IIR_FILTER_ALPHA);
-
-    vcr_data.interface_data.current_sensor_data.twentyfour_volt_sensor = ADCInterfaceInstance::instance().read_glv().conversion;
-    vcr_data.interface_data.current_sensor_data.current_sensor_unfiltered = ADCInterfaceInstance::instance().read_bspd_current().conversion;
-    vcr_data.interface_data.current_sensor_data.current_refererence_unfiltered = ADCInterfaceInstance::instance().read_bspd_reference_current().conversion;
-
-    vcr_data.interface_data.rear_loadcell_data.valid_RL_sample = ((ADCInterfaceInstance::instance().get_RL_load_cell().raw != 4095)
-                                                                && (ADCInterfaceInstance::instance().get_RL_load_cell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
-
-    vcr_data.interface_data.rear_loadcell_data.valid_RR_sample = ((ADCInterfaceInstance::instance().get_RR_load_cell().raw != 4095)
-                                                                && (ADCInterfaceInstance::instance().get_RR_load_cell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
-
     return HT_TASK::TaskResponse::YIELD;
 }
 
