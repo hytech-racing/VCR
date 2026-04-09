@@ -39,7 +39,7 @@ void VCFInterface::receive_dashboard_message(const CAN_message_t &msg, unsigned 
 {
     DASH_INPUT_t dash_msg;
     Unpack_DASH_INPUT_hytech(&dash_msg, &msg.buf[0], msg.len);
-    _curr_data.dash_input_state.dim_btn_is_pressed = dash_msg.led_dimmer_button;
+    _curr_data.dash_input_state.btn_dim_read_is_pressed = dash_msg.dim_button;
     _curr_data.dash_input_state.preset_btn_is_pressed = dash_msg.preset_button; // pedal recalibration button
     _curr_data.dash_input_state.mc_reset_btn_is_pressed = dash_msg.motor_controller_cycle_button;
     _curr_data.dash_input_state.start_btn_is_pressed = dash_msg.start_button;
@@ -69,22 +69,24 @@ void VCFInterface::reset_pedals_heartbeat()
     _curr_data.stamped_pedals.heartbeat_ok = true;
 }
 
+void VCFInterface::reset_steering_heartbeat(){
+    _curr_data.stamped_steering.heartbeat_ok = true;
+}
+
 VCFCANInterfaceData_s VCFInterface::get_latest_data() {
 
     // only in the situation where the hearbeat has yet to be established or the heartbeat is ok do we re-evaluate the heartbeat.
     // if hearbeat is is not ok, the only thing that should be able to reset it is the state machine via the reset_pedals_heartbeat function
-    if(_first_received_message_heartbeat_init || _curr_data.stamped_pedals.heartbeat_ok)
+    if(_first_received_message_heartbeat_init || _curr_data.stamped_pedals.heartbeat_ok || _curr_data.stamped_steering.heartbeat_ok)
     {
         _first_received_message_heartbeat_init = false;
         _curr_data.stamped_pedals.heartbeat_ok = ((sys_time::hal_millis() - _curr_data.stamped_pedals.last_recv_millis) < _max_heartbeat_interval_ms);
+        _curr_data.stamped_steering.heartbeat_ok = ((sys_time::hal_millis() - _curr_data.stamped_steering.last_recv_millis) < _max_heartbeat_interval_ms);
     } else {
         _curr_data.stamped_pedals.heartbeat_ok = false;
+        _curr_data.stamped_steering.heartbeat_ok = false;
     }
     return _curr_data;
-}
-
-void VCFInterface::reset_steering_heartbeat(){
-    _curr_data.stamped_steering.heartbeak_ok = true;
 }
 
 void VCFInterface::send_buzzer_start_message()
@@ -92,7 +94,7 @@ void VCFInterface::send_buzzer_start_message()
     DASHBOARD_BUZZER_CONTROL_t ctrl = {};
     ctrl.dash_buzzer_flag = true;
     ctrl.in_pedal_calibration_state = false;
-    ctrl.in_steering_calibration_state = false; //wait for this on CAN
+    ctrl.in_steering_calibration_state = false;
     ctrl.torque_limit_enum_value = 0xFF; // MAX_VALUE indicates "ignore this value" //NOLINT
     CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
     Serial.println("BUZZER START MESSAGE SENT");
@@ -103,6 +105,17 @@ void VCFInterface::send_recalibrate_pedals_message()
     DASHBOARD_BUZZER_CONTROL_t ctrl = {};
     ctrl.dash_buzzer_flag = false;
     ctrl.in_pedal_calibration_state = true;
+    ctrl.in_steering_calibration_state = false;
+    ctrl.torque_limit_enum_value = 0xFF; // MAX_VALUE indicates "ignore this value" //NOLINT
+    CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
+void VCFInterface::send_recalibrate_steering_message()
+{
+    DASHBOARD_BUZZER_CONTROL_t ctrl = {};
+    ctrl.dash_buzzer_flag = false;
+    ctrl.in_pedal_calibration_state = false;
+    ctrl.in_steering_calibration_state = true;
     ctrl.torque_limit_enum_value = 0xFF; // MAX_VALUE indicates "ignore this value" //NOLINT
     CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
@@ -112,6 +125,7 @@ void VCFInterface::enqueue_torque_mode_LED_message(TorqueLimit_e torque_limit)
     DASHBOARD_BUZZER_CONTROL_t ctrl = {};
     ctrl.dash_buzzer_flag = false;
     ctrl.in_pedal_calibration_state = false;
+    ctrl.in_steering_calibration_state = false;
     ctrl.torque_limit_enum_value = (uint8_t) torque_limit;
     CAN_util::enqueue_msg(&ctrl, &Pack_DASHBOARD_BUZZER_CONTROL_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }

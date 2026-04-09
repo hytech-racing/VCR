@@ -354,7 +354,11 @@ void setup() {
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_drivetrain_reset_pressed>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_recalibrate_pedals_button_pressed>(VCFInterfaceInstance::instance()),
-        etl::delegate<void()>::create<DrivetrainSystem, &DrivetrainSystem::reset_dt_error>(DrivetrainInstance::instance())
+        etl::delegate<void()>::create<DrivetrainSystem, &DrivetrainSystem::reset_dt_error>(DrivetrainInstance::instance()),
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_recalibrate_steering_message>(VCFInterfaceInstance::instance()),
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_recalibrate_steering_button_pressed>(VCFInterfaceInstance::instance()),
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_steering_heartbeat_not_ok>(VCFInterfaceInstance::instance()),
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_steering_heartbeat>(VCFInterfaceInstance::instance())
     );
 
     // Scheduler timing function

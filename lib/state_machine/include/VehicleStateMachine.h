@@ -21,7 +21,10 @@ class VehicleStateMachine
             etl::delegate<bool()> is_inverter_reset_button_pressed,
             etl::delegate<bool()> is_calibrate_pedals_button_pressed,
             etl::delegate<void()> reset_inverter_error,
-            etl::delegate<bool()> is_calibrate_steering_button_pressed
+            etl::delegate<void()> recalibrate_steering,
+            etl::delegate<bool()> is_calibrate_steering_button_pressed,
+            etl::delegate<bool()> check_steering_timeout,
+            etl::delegate<void()> reset_steering_timeout,
         ) :  
         _check_hv_over_threshold(check_hv_over_threshold),
         _is_start_button_pressed(is_start_button_pressed), 
@@ -36,7 +39,10 @@ class VehicleStateMachine
         _is_inverter_reset_button_pressed(is_inverter_reset_button_pressed),
         _is_calibrate_pedals_button_pressed(is_calibrate_pedals_button_pressed),
         _reset_inverter_error(reset_inverter_error),
-        _is_calibrate_steering_button_pressed(is_calibrate_steering_button_pressed)
+        _send_recalibrate_steering_message(recalibrate_steering),
+        _is_calibrate_steering_button_pressed(is_calibrate_steering_button_pressed),
+        _check_steering_timeout(check_steering_timeout),
+        _reset_steering_timeout(reset_steering_timeout)
         {   
             _current_state = VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE;
         }
@@ -59,7 +65,11 @@ class VehicleStateMachine
          * Timestamp when entering WANTING_RECALIBRATE_PEDALS to ensure we stay there
          * for 1000ms before actually sending the recalibration command.
          */
-        uint32_t _last_entered_waiting_state_ms = 0;
+        uint32_t _last_entered_pedals_waiting_state_ms = 0;
+        /**
+         * Timestamp when entering WANTING_RECALIBRATE_STEERING to ensure 3000ms pass before calibrating.
+         */
+        uint32_t _last_entered_steering_waiting_state_ms = 0;
 
         /**
          * Lambdas necessary for state machine to work.
@@ -77,7 +87,10 @@ class VehicleStateMachine
         etl::delegate<bool()> _is_inverter_reset_button_pressed;
         etl::delegate<bool()> _is_calibrate_pedals_button_pressed;
         etl::delegate<void()> _reset_inverter_error;
+        etl::delegate<void()> _send_recalibrate_steering_message;
         etl::delegate<bool()> _is_calibrate_steering_button_pressed;
+        etl::delegate<bool()> _check_steering_timeout;
+        etl::delegate<void()> _reset_steering_timeout;
 };
 
 using VehicleStateMachineInstance = etl::singleton<VehicleStateMachine>;
