@@ -39,11 +39,7 @@ void VCFInterface::receive_dashboard_message(const CAN_message_t &msg, unsigned 
 {
     DASH_INPUT_t dash_msg;
     Unpack_DASH_INPUT_hytech(&dash_msg, &msg.buf[0], msg.len);
-<<<<<<< HEAD
     _curr_data.dash_input_state.btn_dim_read_is_pressed = dash_msg.dim_button;
-=======
-    // _curr_data.dash_input_state.dim_btn_is_pressed = dash_msg.led_dimmer_button;
->>>>>>> main
     _curr_data.dash_input_state.preset_btn_is_pressed = dash_msg.preset_button; // pedal recalibration button
     _curr_data.dash_input_state.mc_reset_btn_is_pressed = dash_msg.motor_controller_cycle_button;
     _curr_data.dash_input_state.start_btn_is_pressed = dash_msg.start_button;

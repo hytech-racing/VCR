@@ -24,7 +24,7 @@ class VehicleStateMachine
             etl::delegate<void()> recalibrate_steering,
             etl::delegate<bool()> is_calibrate_steering_button_pressed,
             etl::delegate<bool()> check_steering_timeout,
-            etl::delegate<void()> reset_steering_timeout,
+            etl::delegate<void()> reset_steering_timeout
         ) :  
         _check_hv_over_threshold(check_hv_over_threshold),
         _is_start_button_pressed(is_start_button_pressed), 
