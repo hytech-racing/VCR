@@ -15,8 +15,8 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
 
     veh_vec<float> load_cell_data(static_cast<float>(front_lc_data.FL_loadcell_analog), 
                                   static_cast<float>(front_lc_data.FR_loadcell_analog),
-                                  static_cast<float>(rear_lc_data.RR_loadcell_analog),  // change later
-                                  static_cast<float>(rear_lc_data.RL_loadcell_analog)); // change later
+                                  static_cast<float>(rear_lc_data.RL_loadcell_analog),
+                                  static_cast<float>(rear_lc_data.RR_loadcell_analog));
     
     // Do sanity checks on raw data - FIX
     _load_cell_error_counts.FL = front_lc_data.valid_FL_sample ? 0 : _load_cell_error_counts.FL + 1;
