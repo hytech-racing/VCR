@@ -9,8 +9,8 @@
 #include "MCP23017.h"
 #include <algorithm>
 
-hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(
-    ADCInterface &ADCInterfaceInstance,
+hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
+    const ADCInterface &adc_interface_instance,
     DrivetrainDynamicReport_s &DrivetrainData,
     VCFHeartbeatData_s &VCF_Heartbeat_Data,
     VehicleState_e &vehicle_state_machine_state,
@@ -41,12 +41,12 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(
     out.has_status = true;
 
     //RearLoadCellData_s
-    out.rear_loadcell_data.RL_loadcell_analog = static_cast<uint32_t>(ADCInterfaceInstance.get_filtered_RL_load_cell());
-    out.rear_loadcell_data.RR_loadcell_analog = static_cast<uint32_t>(ADCInterfaceInstance.get_filtered_RR_load_cell());
+    out.rear_loadcell_data.RL_loadcell_analog = static_cast<uint32_t>(adc_interface_instance.get_filtered_RL_load_cell());
+    out.rear_loadcell_data.RR_loadcell_analog = static_cast<uint32_t>(adc_interface_instance.get_filtered_RR_load_cell());
 
     //RearSusPotData_s
-    out.rear_suspot_data.RL_sus_pot_analog = static_cast<uint32_t>(ADCInterfaceInstance.get_RL_sus_pot().conversion);
-    out.rear_suspot_data.RR_sus_pot_analog = static_cast<uint32_t>(ADCInterfaceInstance.get_RR_sus_pot().conversion);
+    out.rear_suspot_data.RL_sus_pot_analog = static_cast<uint32_t>(adc_interface_instance.get_RL_sus_pot().conversion);
+    out.rear_suspot_data.RR_sus_pot_analog = static_cast<uint32_t>(adc_interface_instance.get_RR_sus_pot().conversion);
 
     // ShutdownSensingData_s
     out.vcr_shutdown_data.i_shutdown_in = false; //shared_state.interface_data.shutdown_sensing_data.i_shutdown_in;
@@ -57,7 +57,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(
 
     uint16_t data = IOExpanderInstance::instance().read();
 
-    out.vcr_shutdown_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 1);
+    out.vcr_shutdown_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 1); //TODO: change numbers here to constants for readability
     out.vcr_shutdown_data.watchdog_is_ok = IOExpanderUtils::getBit(data, 1, 3);
     out.vcr_shutdown_data.bms_is_ok = IOExpanderUtils::getBit(data, 1, 1);
     out.vcr_shutdown_data.imd_is_ok = IOExpanderUtils::getBit(data, 1, 2);
@@ -71,19 +71,19 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(
     out.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 6);
 
     // veh_vec<InverterData>
-    copy_inverter_data(InverterData.FL, out.inverter_data.FL);
+    copyInverterData(InverterData.FL, out.inverter_data.FL);
     out.inverter_data.has_FL = true;
-    copy_inverter_data(InverterData.FR, out.inverter_data.FR);
+    copyInverterData(InverterData.FR, out.inverter_data.FR);
     out.inverter_data.has_FR = true;
-    copy_inverter_data(InverterData.RL, out.inverter_data.RL);
+    copyInverterData(InverterData.RL, out.inverter_data.RL);
     out.inverter_data.has_RL = true;
-    copy_inverter_data(InverterData.RR, out.inverter_data.RR);
+    copyInverterData(InverterData.RR, out.inverter_data.RR);
     out.inverter_data.has_RR = true;
 
     //CurrentSensorData_s
-    out.current_sensor_data.twentyfour_volt_sensor = ADCInterfaceInstance.read_glv().conversion;
-    out.current_sensor_data.current_sensor_unfiltered = ADCInterfaceInstance.read_bspd_current().conversion;
-    out.current_sensor_data.current_refererence_unfiltered = ADCInterfaceInstance.read_bspd_reference_current().conversion;
+    out.current_sensor_data.twentyfour_volt_sensor = adc_interface_instance.read_glv().conversion;
+    out.current_sensor_data.current_sensor_unfiltered = adc_interface_instance.read_bspd_current().conversion;
+    out.current_sensor_data.current_refererence_unfiltered = adc_interface_instance.read_bspd_reference_current().conversion;
 
     //DrivetrainDynamicReport_s
     out.drivetrain_data.measuredInverterFLPackVoltage = DrivetrainData.measuredInverterFLPackVoltage;
@@ -101,7 +101,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(
     out.tcmux_status.output_is_bypassing_limits = tc_mux_status.output_is_bypassing_limits;
 
     // Buzzer
-    out.buzzer_is_active = ADCInterfaceInstance.read_glv().conversion;
+    out.buzzer_is_active = adc_interface_instance.read_glv().conversion;
 
     // GLV Measurement
     out.measured_glv = current_sensor_data.twentyfour_volt_sensor;
@@ -153,7 +153,7 @@ void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_i
     // shared_state.interface_data.dash_input_state.start_btn_is_pressed = msg_in.dash_input_state.start_btn_is_pressed;
 }
 
-void VCREthernetInterface::copy_inverter_data(const InverterData_s &original, hytech_msgs_InverterData_s &destination)
+void VCREthernetInterface::copyInverterData(const InverterData_s &original, hytech_msgs_InverterData_s &destination)
 {
     destination.actual_motor_torque = original.actual_motor_torque;
     destination.actual_power = original.actual_power;

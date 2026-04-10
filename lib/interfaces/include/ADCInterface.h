@@ -128,57 +128,57 @@ class ADCInterface
         /**
          * @return The reading of the 24V sensor analog channel
          */
-        AnalogConversion_s read_glv();
+        AnalogConversion_s read_glv() const;
 
         /**
          * @return The reading of the BSPD current analog channel
          */
-        AnalogConversion_s read_bspd_current();
+        AnalogConversion_s read_bspd_current() const;
 
         /**
          * @return The reading of the BSPD reference current analog channel
          */
-        AnalogConversion_s read_bspd_reference_current();
+        AnalogConversion_s read_bspd_reference_current() const;
 
         /**
          * @return The reading of the rear left load cell analog channel
          */
-        AnalogConversion_s get_RL_load_cell();
+        AnalogConversion_s get_RL_load_cell() const;
 
         /**
          * @return The reading of the rear right load cell analog channel
          */
-        AnalogConversion_s get_RR_load_cell();
+        AnalogConversion_s get_RR_load_cell() const;
 
         /**
          * @return The reading of the rear left suspension potentiometer analog channel
          */
-        AnalogConversion_s get_RL_sus_pot();
+        AnalogConversion_s get_RL_sus_pot() const;
 
         /**
          * @return The reading of the rear right suspension potentiometer analog channel
          */
-        AnalogConversion_s get_RR_sus_pot();
+        AnalogConversion_s get_RR_sus_pot() const;
 
         /**
          * @return Filtered Front Left Load Cell
          */
-        float get_filtered_RL_load_cell();
+        float get_filtered_RL_load_cell() const;
 
         /**
          * @return Filtered Front Right Load Cell
          */
-        float get_filtered_RR_load_cell();
+        float get_filtered_RR_load_cell() const;
 
         /**
          * @return Filtered Front Left Sus Pot
          */
-        float get_filtered_RL_sus_pot();
+        float get_filtered_RL_sus_pot() const;
 
         /**
          * @return Filtered Front Right Sus Pot
          */
-        float get_filtered_RR_sus_pot();
+        float get_filtered_RR_sus_pot() const;
 
 
         /**
@@ -194,21 +194,21 @@ class ADCInterface
 
         /* -------------------- ADC1 -------------------- */
 
-        AnalogConversion_s read_thermistor_0();
+        AnalogConversion_s read_thermistor_0() const;
 
-        AnalogConversion_s read_thermistor_1();
+        AnalogConversion_s read_thermistor_1() const;
 
-        AnalogConversion_s read_thermistor_2();
+        AnalogConversion_s read_thermistor_2() const;
 
-        AnalogConversion_s read_thermistor_3();
+        AnalogConversion_s read_thermistor_3() const;
 
-        AnalogConversion_s read_thermistor_4();
+        AnalogConversion_s read_thermistor_4() const;
 
-        AnalogConversion_s read_thermistor_5();
+        AnalogConversion_s read_thermistor_5() const;
 
-        AnalogConversion_s read_thermistor_6();
+        AnalogConversion_s read_thermistor_6() const;
 
-        AnalogConversion_s read_thermistor_7();
+        AnalogConversion_s read_thermistor_7() const;
 
     private:
         MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc0;

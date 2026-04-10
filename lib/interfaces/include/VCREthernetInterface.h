@@ -14,8 +14,8 @@ namespace VCREthernetInterface
      * @param
      * @return A populated instance of the outgoing protoc struct.
      */
-    hytech_msgs_VCRData_s make_vcr_data_msg(
-        ADCInterface &ADCInterfaceInstance,
+    hytech_msgs_VCRData_s makeVCRDataMsg(
+        const ADCInterface &ADCInterfaceInstance,
         DrivetrainDynamicReport_s &DrivetrainData,
         VCFHeartbeatData_s &VCF_Heartbeat_Data,
         VehicleState_e &vehicle_state_machine_state,
@@ -33,7 +33,7 @@ namespace VCREthernetInterface
      *
      * @post After this function completes, shared_state will have updated contents of ACUAllData.
      */
-    void receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in, VCRData_s &shared_state, unsigned long curr_millis);
+    void receivePbMsgDB(const hytech_msgs_MCUCommandData &msg_in, VCRData_s &shared_state, unsigned long curr_millis);
 
     /**
      * Function to take a populated protoc struct from VCF and update the VCR state.
@@ -43,7 +43,7 @@ namespace VCREthernetInterface
      *
      * @post After this function completes, shared_state will have updated contents of ACUAllData.
      */
-    void receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis);
+    void receivePbMsgVCF(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis);
 
     /**
      * Helper function to copy an instance of InverterData_s to the protoc struct hytech_msgs_InverterData_s.
@@ -51,7 +51,7 @@ namespace VCREthernetInterface
      * @param destination The destination protoc struct.
      * @post The destination struct will be populated with the data from original.
      */
-    void copy_inverter_data(const InverterData_s &original, hytech_msgs_InverterData_s &destination);
+    void copyInverterData(const InverterData_s &original, hytech_msgs_InverterData_s &destination);
 
     /**
      * Helper function to copy veh_vec data.
@@ -61,7 +61,7 @@ namespace VCREthernetInterface
      * @post The destination veh_vec will be populated with the data from the original.
      */
     template <typename from_T, typename to_T>
-    void copy_veh_vec_members(const from_T& from, to_T& to)
+    void copyVehVecMembers(const from_T& from, to_T& to)
     {
       to.FL = from.FL;
       to.FR = from.FR;

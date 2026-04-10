@@ -95,39 +95,39 @@ void ADCInterface::tick_adc0() {
     _adc0.tick();
 }
 
-AnalogConversion_s ADCInterface::read_glv() {
+AnalogConversion_s ADCInterface::read_glv() const {
   return _adc0.data.conversions.at(_adc_parameters.channels.glv_sense_channel);
 }
 
-AnalogConversion_s ADCInterface::read_bspd_current() {
+AnalogConversion_s ADCInterface::read_bspd_current() const {
   return _adc0.data.conversions.at(_adc_parameters.channels.current_sense_channel);
 }
 
-AnalogConversion_s ADCInterface::read_bspd_reference_current() {
+AnalogConversion_s ADCInterface::read_bspd_reference_current() const {
   return _adc0.data.conversions.at(_adc_parameters.channels.reference_sense_channel);
 }
 
-AnalogConversion_s ADCInterface::get_RL_load_cell() {
+AnalogConversion_s ADCInterface::get_RL_load_cell() const {
     return _adc1.data.conversions[_adc_parameters.channels.rl_loadcell_channel];
 }
 
-float ADCInterface::get_filtered_RL_load_cell() {
+float ADCInterface::get_filtered_RL_load_cell() const {
     return _RL_load_cell_filtered;
 }
 
-AnalogConversion_s ADCInterface::get_RR_load_cell() {
+AnalogConversion_s ADCInterface::get_RR_load_cell() const {
     return _adc1.data.conversions[_adc_parameters.channels.rr_loadcell_channel];
 }
 
-float ADCInterface::get_filtered_RR_load_cell() {
+float ADCInterface::get_filtered_RR_load_cell() const {
     return _RR_load_cell_filtered;
 }
 
-AnalogConversion_s ADCInterface::get_RL_sus_pot() {
+AnalogConversion_s ADCInterface::get_RL_sus_pot() const {
   return _adc0.data.conversions.at(_adc_parameters.channels.rl_suspot_channel);
 }
 
-AnalogConversion_s ADCInterface::get_RR_sus_pot() {
+AnalogConversion_s ADCInterface::get_RR_sus_pot() const {
   return _adc0.data.conversions.at(_adc_parameters.channels.rr_suspot_channel);
 }
 
@@ -136,34 +136,34 @@ void ADCInterface::tick_adc1() {
     _adc1.tick();
 }
 
-AnalogConversion_s ADCInterface::read_thermistor_0() {
+AnalogConversion_s ADCInterface::read_thermistor_0() const {
   return _adc1.data.conversions.at(_adc_parameters.channels.thermistor0_channel);
 }
 
-AnalogConversion_s ADCInterface::read_thermistor_1() {
+AnalogConversion_s ADCInterface::read_thermistor_1() const {
   return _adc1.data.conversions.at(_adc_parameters.channels.thermistor1_channel);
 }
 
-AnalogConversion_s ADCInterface::read_thermistor_2() {
+AnalogConversion_s ADCInterface::read_thermistor_2() const {
   return _adc1.data.conversions.at(_adc_parameters.channels.thermistor2_channel);
 }
 
-AnalogConversion_s ADCInterface::read_thermistor_3() {
+AnalogConversion_s ADCInterface::read_thermistor_3() const {
   return _adc1.data.conversions.at(_adc_parameters.channels.thermistor3_channel);
 }
 
-AnalogConversion_s ADCInterface::read_thermistor_4() {
+AnalogConversion_s ADCInterface::read_thermistor_4() const {
   return _adc1.data.conversions.at(_adc_parameters.channels.thermistor4_channel);
 }
 
-AnalogConversion_s ADCInterface::read_thermistor_5() {
+AnalogConversion_s ADCInterface::read_thermistor_5() const {
   return _adc1.data.conversions.at(_adc_parameters.channels.thermistor5_channel);
 }
 
-AnalogConversion_s ADCInterface::read_thermistor_6() {
+AnalogConversion_s ADCInterface::read_thermistor_6() const {
   return _adc1.data.conversions.at(_adc_parameters.channels.thermistor6_channel);
 }
 
-AnalogConversion_s ADCInterface::read_thermistor_7() {
+AnalogConversion_s ADCInterface::read_thermistor_7() const {
   return _adc1.data.conversions.at(_adc_parameters.channels.thermistor7_channel);
 }
