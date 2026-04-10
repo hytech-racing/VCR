@@ -120,7 +120,7 @@ HT_TASK::TaskResponse run_kick_watchdog(const unsigned long& sysMicros, const HT
 // adds rear suspension and vcr status CAN messages to the sent on next mega loop run 
 HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo )
 {
-    DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
+    DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data(ADCInterfaceInstance::instance());
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -249,20 +249,22 @@ HT_TASK::TaskResponse run_update_brakelight_task(const unsigned long& sysMicros,
 }
 
 
-HT_TASK::TaskResponse enable_fans(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
+HT_TASK::TaskResponse enable_motor_cooling(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
 {
-    digitalWrite(MOTOR_FAN_CNTRL, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? 1 : 0);
-    digitalWrite(INV_FAN_CNTRL, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? 1 : 0);
+    digitalWrite(MOTOR_COOLING_CONTROL_PIN, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? HIGH : LOW);
     return HT_TASK::TaskResponse::YIELD;
 }
 
-HT_TASK::TaskResponse enable_pumps(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
+HT_TASK::TaskResponse enable_inverter_cooling(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
 {
     VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state(); //NOLINT will alway be populated so is ok
-    if (vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE || vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE || vehicle_state == VehicleState_e::READY_TO_DRIVE) {
-        digitalWrite(PUMP_CNTRL, HIGH);
+    if (vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE || vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE || vehicle_state == VehicleState_e::READY_TO_DRIVE) 
+    {
+        digitalWrite(INVERTER_COOLING_CONTROL_PIN, HIGH);
     }
-    //digitalWrite(PUMP_CNTRL, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? 1 : 0);
-    // digitalWrite(PUMP_CNTRL, HIGH);
+    else
+    {
+        digitalWrite(INVERTER_COOLING_CONTROL_PIN, LOW);
+    }
     return HT_TASK::TaskResponse::YIELD;
 }

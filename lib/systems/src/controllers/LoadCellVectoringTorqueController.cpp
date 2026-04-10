@@ -70,6 +70,8 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
             out.torque_limits.FR = torque_request * _front_regen_torque_scale;
             out.torque_limits.RL = torque_request * _rear_regen_torque_scale;
             out.torque_limits.RR = torque_request * _rear_regen_torque_scale;
+
+            // Regen Limit
         }
     }
 

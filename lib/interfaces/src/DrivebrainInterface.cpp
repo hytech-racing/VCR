@@ -110,13 +110,13 @@ void DrivebrainInterface::receive_drivebrain_torque_lim_command_auxillary(const 
             HYTECH_drivebrain_torque_rr_ro_fromS(drivebrain_msg.drivebrain_torque_rr_ro))};
 }
 
-void DrivebrainInterface::handle_enqueue_suspension_CAN_data() {
+void DrivebrainInterface::handle_enqueue_suspension_CAN_data(ADCInterface &instance) {
     REAR_SUSPENSION_t rear_sus_msg;
     
     rear_sus_msg.rl_load_cell = _suspension_data.rear_load_cell_data.RL_loadcell_analog;
     rear_sus_msg.rr_load_cell = _suspension_data.rear_load_cell_data.RR_loadcell_analog;
-    rear_sus_msg.rl_shock_pot = _suspension_data.rear_suspot_data.RL_sus_pot_analog;
-    rear_sus_msg.rr_shock_pot = _suspension_data.rear_suspot_data.RR_sus_pot_analog;
+    rear_sus_msg.rl_shock_pot_ro = HYTECH_rl_shock_pot_ro_toS(instance.get_filtered_RL_sus_pot());
+    rear_sus_msg.rr_shock_pot_ro = HYTECH_rr_shock_pot_ro_toS(instance.get_filtered_RR_sus_pot());
     
     CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_hytech,
                           VCRCANInterfaceImpl::telem_can_tx_buffer); 

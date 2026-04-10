@@ -13,6 +13,8 @@
 #include "ProtobufMsgInterface.h"
 #include <QNEthernet.h>
 
+#include "ADCInterface.h"
+
 
 class DrivebrainInterface {
   public:
@@ -32,7 +34,7 @@ class DrivebrainInterface {
 
     void receive_drivebrain_torque_lim_command_auxillary(const CAN_message_t &msg, unsigned long curr_millis);
 
-    void handle_enqueue_suspension_CAN_data();
+    void handle_enqueue_suspension_CAN_data(ADCInterface &instance);
 
     void handle_enqueue_coolant_temp_CAN_data();
 
