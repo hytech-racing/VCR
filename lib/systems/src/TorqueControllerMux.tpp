@@ -60,7 +60,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
         // Occurs when the desired speed is 0 (braking) and we want to allow regen -- need to apply limits so that the pack voltage doesn't spike too high
         if (current_output.desired_speeds.FL == 0.0f && current_output.desired_speeds.FR == 0.0f && current_output.desired_speeds.RL == 0.0f && current_output.desired_speeds.RR == 0.0f)
         {
-            current_output = apply_regen_limit(current_output, input_state.system_data.drivetrain_data);
+            current_output = apply_regen_limit(current_output, input_state.system_data.drivetrain_data, input_state.interface_data.stamped_acu_core_data.acu_data);
         }
 
         current_output = apply_torque_limit(current_output, _torque_limit_map[requested_torque_limit]);
