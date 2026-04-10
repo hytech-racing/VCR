@@ -40,7 +40,7 @@ private:
     const float _rl_load_cell_scale = 0.143619f;
     const float _rr_load_cell_scale = 0.137349f;
 
-    const float _brake_percent_scale = 1.2f;
+    const float _brake_percent_scale = 1.5f;
 
     const size_t _max_error_count = 25;
     veh_vec<size_t> _load_cell_error_counts = {};
