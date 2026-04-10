@@ -120,7 +120,7 @@ HT_TASK::TaskResponse run_kick_watchdog(const unsigned long& sysMicros, const HT
 // adds rear suspension and vcr status CAN messages to the sent on next mega loop run 
 HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo )
 {
-    DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data();
+    DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data(ADCInterfaceInstance::instance());
     return HT_TASK::TaskResponse::YIELD;
 }
 
