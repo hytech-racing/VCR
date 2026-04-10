@@ -11,6 +11,7 @@
 #include "VehicleStateMachine.h"
 #include "DrivetrainSystem.h"
 #include "controllers/DrivebrainController.h"
+#include "controls.h"
 #include <algorithm>
 
 hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
@@ -21,7 +22,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     const DrivetrainSystem &drivetrain_system_instance,
     veh_vec<InverterData_s> &InverterData,
     const DrivebrainController &db_controller_instance,
-    TorqueControllerMuxStatus_s &tc_mux_status,
+    const VCRControls &vcr_controls_instance,
     CurrentSensorData_s &current_sensor_data)
 {
 	hytech_msgs_VCRData_s out;
@@ -92,17 +93,17 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     //DrivetrainDynamicReport_s
     out.drivetrain_data.measuredInverterFLPackVoltage = DrivetrainData.measuredInverterFLPackVoltage;
 
-    copy_veh_vec_members(DrivetrainData.measuredSpeeds, out.drivetrain_data.measuredSpeeds);
-    copy_veh_vec_members(DrivetrainData.measuredTorques, out.drivetrain_data.measuredTorques);
-    copy_veh_vec_members(DrivetrainData.measuredTorqueCurrents, out.drivetrain_data.measuredTorqueCurrents);
-    copy_veh_vec_members(DrivetrainData.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
+    copyVehVecMembers(DrivetrainData.measuredSpeeds, out.drivetrain_data.measuredSpeeds);
+    copyVehVecMembers(DrivetrainData.measuredTorques, out.drivetrain_data.measuredTorques);
+    copyVehVecMembers(DrivetrainData.measuredTorqueCurrents, out.drivetrain_data.measuredTorqueCurrents);
+    copyVehVecMembers(DrivetrainData.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
 
     //TorqueControllerMuxStatus
-    out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) tc_mux_status.active _error; // ??
-    out.tcmux_status.active_controller_mode = (hytech_msgs_ControllerMode_e) tc_mux_status.active_controller_mode;
-    out.tcmux_status.active_torque_limit_enum = (hytech_msgs_TorqueLimit_e) tc_mux_status.active_torque_limit_enum;
-    out.tcmux_status.active_torque_limit_value = tc_mux_status.active_torque_limit_value;
-    out.tcmux_status.output_is_bypassing_limits = tc_mux_status.output_is_bypassing_limits;
+    out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) vcr_controls_instance.get_tc_mux_status().active_error;
+    out.tcmux_status.active_controller_mode = (hytech_msgs_ControllerMode_e) vcr_controls_instance.get_tc_mux_status().active_controller_mode;
+    out.tcmux_status.active_torque_limit_enum = (hytech_msgs_TorqueLimit_e) vcr_controls_instance.get_tc_mux_status().active_torque_limit_enum;
+    out.tcmux_status.active_torque_limit_value = vcr_controls_instance.get_tc_mux_status().active_torque_limit_value;
+    out.tcmux_status.output_is_bypassing_limits = vcr_controls_instance.get_tc_mux_status().output_is_bypassing_limits;
 
     // Buzzer
     out.buzzer_is_active = adc_interface_instance.read_glv().conversion;

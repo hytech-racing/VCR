@@ -4,6 +4,11 @@
 #include "hytech_msgs.pb.h"
 #include "SharedFirmwareTypes.h"
 #include "ADCInterface.h"
+#include "VCFInterface.h"
+#include "VehicleStateMachine.h"
+#include "DrivetrainSystem.h"
+#include "controllers/DrivebrainController.h"
+#include "controls.h"
 #include "ProtobufMsgInterface.h"
 
 namespace VCREthernetInterface
@@ -15,14 +20,14 @@ namespace VCREthernetInterface
      * @return A populated instance of the outgoing protoc struct.
      */
     hytech_msgs_VCRData_s makeVCRDataMsg(
-        const ADCInterface &ADCInterfaceInstance,
+        const ADCInterface &adc_interface_instance,
         DrivetrainDynamicReport_s &DrivetrainData,
-        VCFHeartbeatData_s &VCF_Heartbeat_Data,
-        VehicleState_e &vehicle_state_machine_state,
-        DrivetrainState_e drivetrain_state_machine_state,
+        const VCFInterface &vcf_interface_instance,
+        const VehicleStateMachine &vehicle_state_machine_instance,
+        const DrivetrainSystem &drivetrain_system_instance,
         veh_vec<InverterData_s> &InverterData,
-        DrivebrainControllerStatus_s &DB_Controller_Status,
-        TorqueControllerMuxStatus_s &tc_mux_status,
+        const DrivebrainController &db_controller_instance,
+        const VCRControls &vcr_controls_instance,
         CurrentSensorData_s &current_sensor_data);
 
     /**
