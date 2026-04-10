@@ -4,6 +4,8 @@
 #include "PhysicalParameters.h"
 #include "SharedFirmwareTypes.h"
 
+#include <algorithm>
+
 class LoadCellVectoringTorqueController
 {
 public:
@@ -25,8 +27,8 @@ public:
 private:
     const float _front_torque_scale = 1.0;
     const float _rear_torque_scale = 1.0;
-    const float _front_regen_torque_scale = 1.0;
-    const float _rear_regen_torque_scale = 1.0;
+    const float _front_regen_torque_scale = 1.7f;
+    const float _rear_regen_torque_scale = 0.3f;
 
     const float _fl_load_cell_offset = -33.7501f;
     const float _fr_load_cell_offset = -29.665f;
@@ -37,6 +39,8 @@ private:
     const float _fr_load_cell_scale = 0.135748f;
     const float _rl_load_cell_scale = 0.143619f;
     const float _rr_load_cell_scale = 0.137349f;
+
+    const float _brake_percent_scale = 1.2f;
 
     const size_t _max_error_count = 25;
     veh_vec<size_t> _load_cell_error_counts = {};
