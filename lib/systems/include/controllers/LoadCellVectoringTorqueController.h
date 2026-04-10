@@ -28,15 +28,15 @@ private:
     const float _front_regen_torque_scale = 1.0;
     const float _rear_regen_torque_scale = 1.0;
 
-    const float _fl_load_cell_offset = 1.0f;
-    const float _fr_load_cell_offset = 1.0f;
-    const float _rl_load_cell_offset = 1.0f;
-    const float _rr_load_cell_offset = 1.0f;
+    const float _fl_load_cell_offset = -33.7501f;
+    const float _fr_load_cell_offset = -29.665f;
+    const float _rl_load_cell_offset = -33.9947f;
+    const float _rr_load_cell_offset = -25.7212f;
 
-    const float _fl_load_cell_scale = 1.0f;
-    const float _fr_load_cell_scale = 1.0f;
-    const float _rl_load_cell_scale = 1.0f;
-    const float _rr_load_cell_scale = 1.0f;
+    const float _fl_load_cell_scale = 0.138796f;
+    const float _fr_load_cell_scale = 0.135748f;
+    const float _rl_load_cell_scale = 0.143619f;
+    const float _rr_load_cell_scale = 0.137349f;
 
     const size_t _max_error_count = 25;
     veh_vec<size_t> _load_cell_error_counts = {};
