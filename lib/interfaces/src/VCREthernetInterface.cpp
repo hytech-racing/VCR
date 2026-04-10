@@ -7,16 +7,20 @@
 #include "IOExpanderUtils.h"
 #include "InverterInterface.h"
 #include "MCP23017.h"
+#include "VCFInterface.h"
+#include "VehicleStateMachine.h"
+#include "DrivetrainSystem.h"
+#include "controllers/DrivebrainController.h"
 #include <algorithm>
 
 hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     const ADCInterface &adc_interface_instance,
     DrivetrainDynamicReport_s &DrivetrainData,
-    VCFHeartbeatData_s &VCF_Heartbeat_Data,
-    VehicleState_e &vehicle_state_machine_state,
-    DrivetrainState_e drivetrain_state_machine_state,
+    const VCFInterface &vcf_interface_instance,
+    const VehicleStateMachine &vehicle_state_machine_instance,
+    const DrivetrainSystem &drivetrain_system_instance,
     veh_vec<InverterData_s> &InverterData,
-    DrivebrainControllerStatus_s &DB_Controller_Status,
+    const DrivebrainController &db_controller_instance,
     TorqueControllerMuxStatus_s &tc_mux_status,
     CurrentSensorData_s &current_sensor_data)
 {
@@ -103,9 +107,6 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     // Buzzer
     out.buzzer_is_active = adc_interface_instance.read_glv().conversion;
 
-    // GLV Measurement
-    out.measured_glv = current_sensor_data.twentyfour_volt_sensor;
-
     out.firmware_version_info.project_is_dirty = shared_state.fw_version_info.project_is_dirty;
     out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;
     std::copy(shared_state.fw_version_info.fw_version_hash.begin(), shared_state.fw_version_info.fw_version_hash.end(), out.firmware_version_info.git_hash);
@@ -121,13 +122,13 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
 
     // // VCR Status
     // const char* state_label = "UNKNOWN";
-    out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(vehicle_state_machine_state);
-    out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(drivetrain_state_machine_state);
+    out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(vehicle_state_machine_instance.get_state());
+    out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(drivetrain_system_instance.get_state());
 
-    out.status.drivebrain_controller_timing_failure = DB_Controller_Status.drivebrain_controller_timing_failure;
-    out.status.drivebrain_is_in_control = DB_Controller_Status.drivebrain_is_in_control;
+    out.status.drivebrain_controller_timing_failure = db_controller_instance.get_timing_failure_status();
+    out.status.drivebrain_is_in_control = db_controller_instance.drivebrain_is_in_control();
 
-    out.status.pedals_heartbeat_ok = VCF_Heartbeat_Data.heartbeat_ok;
+    out.status.pedals_heartbeat_ok = vcf_interface_instance.get_latest_data().stamped_pedals.heartbeat_ok;
 
     return out;
 }
