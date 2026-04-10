@@ -11,6 +11,14 @@ void ACUInterface::receive_acu_ok_message(const CAN_message_t &msg, unsigned lon
     _curr_data.last_recv_millis = curr_millis;
 }
 
+void ACUInterface::receive_em_measurement(const CAN_message_t &msg, unsigned long curr_millis)
+{
+    EM_MEASUREMENT_t em_msg = {};
+    Unpack_EM_MEASUREMENT_hytech(&em_msg, &msg.buf[0], msg.len);
+    _curr_data.em_current = em_msg.em_current_ro;
+    _curr_data.em_voltage = em_msg.em_voltage_ro;
+}
+
 ACUCANInterfaceData_s ACUInterface::get_latest_data(uint64_t curr_millis) {
     if(_received_first_acu_heartbeat || _curr_data.heartbeat_ok)
     {

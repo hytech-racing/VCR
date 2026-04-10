@@ -27,8 +27,8 @@ public:
 private:
     const float _front_torque_scale = 1.0;
     const float _rear_torque_scale = 1.0;
-    const float _front_regen_torque_scale = 1.7f;
-    const float _rear_regen_torque_scale = 0.3f;
+    const float _front_regen_torque_scale = 1.8f;
+    const float _rear_regen_torque_scale = 0.2f;
 
     const float _fl_load_cell_offset = -33.7501f;
     const float _fr_load_cell_offset = -29.665f;

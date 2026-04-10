@@ -97,6 +97,10 @@ HT_TASK::TaskResponse update_acu_heartbeat(const unsigned long& sysMicros, const
 {
     ACUCANInterfaceData_s data = ACUInterfaceInstance::instance().get_latest_data(sys_time::hal_millis());
     digitalWrite(SOFTWARE_OK_PIN, data.heartbeat_ok);
+
+    vcr_data.interface_data.stamped_acu_core_data.acu_data.tractive_system_current = data.em_current;
+    vcr_data.interface_data.stamped_acu_core_data.acu_data.max_measured_ts_out_voltage = data.em_voltage;
+
     return HT_TASK::TaskResponse::YIELD;
 }
 
