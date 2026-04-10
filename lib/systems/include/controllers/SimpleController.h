@@ -24,7 +24,7 @@ public:
     torque_nm amk_max_regen_torque = {};
     TorqueControllerSimpleParams_s()
     : rear_torque_scale(1.3f), //more torque to rears
-    rear_regen_torque_scale(0.2f), //more regen to fronts
+    rear_regen_torque_scale(0.3f), //more regen to fronts
     amk_max_rpm(_amk_max_rpm_default),
     amk_max_torque(_amk_max_torque),
     amk_max_regen_torque(_amk_max_regen_torque) {}
