@@ -7,6 +7,7 @@
 #include "VCFInterface.h"
 #include "VehicleStateMachine.h"
 #include "DrivetrainSystem.h"
+#include "InverterInterface.h"
 #include "controllers/DrivebrainController.h"
 #include "controls.h"
 #include "ProtobufMsgInterface.h"
@@ -20,18 +21,16 @@ namespace VCREthernetInterface
      * @return A populated instance of the outgoing protoc struct.
      */
     hytech_msgs_VCRData_s makeVCRDataMsg(
-        const ADCInterface &adc_interface_instance,
+        const ADCInterface &adc_interface,
         DrivetrainDynamicReport_s &DrivetrainData,
-        const VCFInterface &vcf_interface_instance,
-        const VehicleStateMachine &vehicle_state_machine_instance,
-        const DrivetrainSystem &drivetrain_system_instance,
+        const VCFInterface &vcf_interface,
+        const VehicleStateMachine &vehicle_state_machine,
+        const DrivetrainSystem &drivetrain_system,
         const InverterInterface &fl_inverter,
         const InverterInterface &fr_inverter,
         const InverterInterface &rl_inverter,
         const InverterInterface &rr_inverter,
-        const DrivebrainController &db_controller_instance,
-        const VCRControls &vcr_controls_instance,
-        CurrentSensorData_s &current_sensor_data);
+        const VCRControls &vcr_controls);
 
     /**
      * Function to take a populated protoc struct from the drivebrain and update the VCR state.

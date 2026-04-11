@@ -1,12 +1,11 @@
 #include "VCREthernetInterface.h"
+#include "MCP23017.h"
 #include "SharedFirmwareTypes.h"
 #include "base_msgs.pb.h"
 #include "ht_can_version.h"
 #include "hytech_msgs_version.h"
 #include "VCR_Globals.h"
 #include "IOExpanderUtils.h"
-#include "InverterInterface.h"
-#include "MCP23017.h"
 #include "VCFInterface.h"
 #include "VehicleStateMachine.h"
 #include "DrivetrainSystem.h"
@@ -15,18 +14,16 @@
 #include <algorithm>
 
 hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
-    const ADCInterface &adc_interface_instance,
+    const ADCInterface &adc_interface,
     DrivetrainDynamicReport_s &DrivetrainData,
-    const VCFInterface &vcf_interface_instance,
-    const VehicleStateMachine &vehicle_state_machine_instance,
-    const DrivetrainSystem &drivetrain_system_instance,
+    const VCFInterface &vcf_interface,
+    const VehicleStateMachine &vehicle_state_machine,
+    const DrivetrainSystem &drivetrain_system,
     const InverterInterface &fl_inverter,
     const InverterInterface &fr_inverter,
     const InverterInterface &rl_inverter,
     const InverterInterface &rr_inverter,
-    const DrivebrainController &db_controller_instance,
-    const VCRControls &vcr_controls_instance,
-    CurrentSensorData_s &current_sensor_data)
+    const VCRControls &vcr_controls)
 {
 	hytech_msgs_VCRData_s out;
 
@@ -49,12 +46,12 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     out.has_status = true;
 
     //RearLoadCellData_s
-    out.rear_loadcell_data.RL_loadcell_analog = static_cast<uint32_t>(adc.get_filtered_RL_load_cell());
-    out.rear_loadcell_data.RR_loadcell_analog = static_cast<uint32_t>(adc.get_filtered_RR_load_cell());
+    out.rear_loadcell_data.RL_loadcell_analog = static_cast<uint32_t>(adc_interface.get_filtered_RL_load_cell());
+    out.rear_loadcell_data.RR_loadcell_analog = static_cast<uint32_t>(adc_interface.get_filtered_RR_load_cell());
 
     //RearSusPotData_s
-    out.rear_suspot_data.RL_sus_pot_analog = static_cast<uint32_t>(adc.get_RL_sus_pot().conversion);
-    out.rear_suspot_data.RR_sus_pot_analog = static_cast<uint32_t>(adc.get_RR_sus_pot().conversion);
+    out.rear_suspot_data.RL_sus_pot_analog = static_cast<uint32_t>(adc_interface.get_RL_sus_pot().conversion);
+    out.rear_suspot_data.RR_sus_pot_analog = static_cast<uint32_t>(adc_interface.get_RR_sus_pot().conversion);
 
     // ShutdownSensingData_s
     out.vcr_shutdown_data.i_shutdown_in = false; //shared_state.interface_data.shutdown_sensing_data.i_shutdown_in;
@@ -89,9 +86,9 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     out.inverter_data.has_RR = true;
 
     //CurrentSensorData_s
-    out.current_sensor_data.twentyfour_volt_sensor = adc.read_glv().conversion;
-    out.current_sensor_data.current_sensor_unfiltered = adc.read_bspd_current().conversion;
-    out.current_sensor_data.current_refererence_unfiltered = adc.read_bspd_reference_current().conversion;
+    out.current_sensor_data.twentyfour_volt_sensor = adc_interface.read_glv().conversion;
+    out.current_sensor_data.current_sensor_unfiltered = adc_interface.read_bspd_current().conversion;
+    out.current_sensor_data.current_refererence_unfiltered = adc_interface.read_bspd_reference_current().conversion;
 
     //DrivetrainDynamicReport_s
     out.drivetrain_data.measuredInverterFLPackVoltage = DrivetrainData.measuredInverterFLPackVoltage;
@@ -102,18 +99,18 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     copyVehVecMembers(DrivetrainData.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
 
     //TorqueControllerMuxStatus
-    out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) vcr_controls_instance.get_tc_mux_status().active_error;
-    out.tcmux_status.active_controller_mode = (hytech_msgs_ControllerMode_e) vcr_controls_instance.get_tc_mux_status().active_controller_mode;
-    out.tcmux_status.active_torque_limit_enum = (hytech_msgs_TorqueLimit_e) vcr_controls_instance.get_tc_mux_status().active_torque_limit_enum;
-    out.tcmux_status.active_torque_limit_value = vcr_controls_instance.get_tc_mux_status().active_torque_limit_value;
-    out.tcmux_status.output_is_bypassing_limits = vcr_controls_instance.get_tc_mux_status().output_is_bypassing_limits;
+    out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) vcr_controls.get_tc_mux_status().active_error;
+    out.tcmux_status.active_controller_mode = (hytech_msgs_ControllerMode_e) vcr_controls.get_tc_mux_status().active_controller_mode;
+    out.tcmux_status.active_torque_limit_enum = (hytech_msgs_TorqueLimit_e) vcr_controls.get_tc_mux_status().active_torque_limit_enum;
+    out.tcmux_status.active_torque_limit_value = vcr_controls.get_tc_mux_status().active_torque_limit_value;
+    out.tcmux_status.output_is_bypassing_limits = vcr_controls.get_tc_mux_status().output_is_bypassing_limits;
 
     // Buzzer
-    out.buzzer_is_active = adc.read_glv().conversion;
+    out.buzzer_is_active = adc_interface.read_glv().conversion;
 
-    out.firmware_version_info.project_is_dirty = shared_state.fw_version_info.project_is_dirty;
-    out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;
-    std::copy(shared_state.fw_version_info.fw_version_hash.begin(), shared_state.fw_version_info.fw_version_hash.end(), out.firmware_version_info.git_hash);
+    // out.firmware_version_info.project_is_dirty = shared_state.fw_version_info.project_is_dirty;
+    // out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;
+    // std::copy(shared_state.fw_version_info.fw_version_hash.begin(), shared_state.fw_version_info.fw_version_hash.end(), out.firmware_version_info.git_hash);
     out.msg_versions.ht_can_version = HT_CAN_LIB_VERSION;
 
     // working with bytes in nanopb
@@ -126,13 +123,13 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
 
     // // VCR Status
     // const char* state_label = "UNKNOWN";
-    out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(vehicle_state_machine_instance.get_state());
-    out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(drivetrain_system_instance.get_state());
+    out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(vehicle_state_machine.get_state());
+    out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(drivetrain_system.get_state());
 
-    out.status.drivebrain_controller_timing_failure = db_controller_instance.get_timing_failure_status();
-    out.status.drivebrain_is_in_control = db_controller_instance.drivebrain_is_in_control();
+    out.status.drivebrain_controller_timing_failure = vcr_controls.drivebrain_timing_failure();
+    out.status.drivebrain_is_in_control = vcr_controls.drivebrain_is_in_control();
 
-    out.status.pedals_heartbeat_ok = vcf_interface_instance.get_latest_data().stamped_pedals.heartbeat_ok;
+    out.status.pedals_heartbeat_ok = vcf_interface.get_latest_data().stamped_pedals.heartbeat_ok;
 
     return out;
 }
