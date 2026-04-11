@@ -45,13 +45,13 @@ void VCRControls::handle_drivetrain_command(bool wanting_ready_to_drive, bool re
     }
 }
 
-bool VCRControls::drivebrain_is_in_control()
+bool VCRControls::drivebrain_is_in_control() const
 {
     auto status = _tc_mux.get_tc_mux_status();
     return (!_mode4.get_timing_failure_status()) && (status.active_controller_mode==ControllerMode_e::MODE_4);
 }
 
-bool VCRControls::drivebrain_timing_failure()
+bool VCRControls::drivebrain_timing_failure() const
 {
     return _mode4.get_timing_failure_status();
 }

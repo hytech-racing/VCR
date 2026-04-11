@@ -46,8 +46,8 @@ class VCRControls
 
         DrivetrainCommand_s _debug_dt_command = {};
 
-        bool drivebrain_is_in_control();
-        bool drivebrain_timing_failure();
+        bool drivebrain_is_in_control() const;
+        bool drivebrain_timing_failure() const;
 
         void send_controls_can_messages();
 
