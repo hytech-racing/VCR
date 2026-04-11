@@ -14,12 +14,12 @@ DrivetrainSystem::DrivetrainSystem(
     _ef_pin_enable_delay_ms(ef_pin_enable_delay_ms) { };
 
 
-DrivetrainState_e DrivetrainSystem::get_state()
+DrivetrainState_e DrivetrainSystem::get_state() const
 {
     return _state;
 }
 
-DrivetrainStatus_s DrivetrainSystem::get_status()
+DrivetrainStatus_s DrivetrainSystem::get_status() const
 {
     return _status; 
 }

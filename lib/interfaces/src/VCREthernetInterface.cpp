@@ -7,20 +7,25 @@
 #include "IOExpanderUtils.h"
 #include "InverterInterface.h"
 #include "MCP23017.h"
+#include "VCFInterface.h"
+#include "VehicleStateMachine.h"
+#include "DrivetrainSystem.h"
+#include "controllers/DrivebrainController.h"
+#include "controls.h"
 #include <algorithm>
 
 hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
-    const ADCInterface &adc,
+    const ADCInterface &adc_interface_instance,
     DrivetrainDynamicReport_s &DrivetrainData,
-    VCFHeartbeatData_s &VCF_Heartbeat_Data,
-    VehicleState_e &vehicle_state_machine_state,
-    DrivetrainState_e drivetrain_state_machine_state,
-    const InverterInterface fl_inverter,
-    const InverterInterface fr_inverter,
-    const InverterInterface rl_inverter,
-    const InverterInterface rr_inverter,
-    DrivebrainControllerStatus_s &DB_Controller_Status,
-    TorqueControllerMuxStatus_s &tc_mux_status,
+    const VCFInterface &vcf_interface_instance,
+    const VehicleStateMachine &vehicle_state_machine_instance,
+    const DrivetrainSystem &drivetrain_system_instance,
+    const InverterInterface &fl_inverter,
+    const InverterInterface &fr_inverter,
+    const InverterInterface &rl_inverter,
+    const InverterInterface &rr_inverter,
+    const DrivebrainController &db_controller_instance,
+    const VCRControls &vcr_controls_instance,
     CurrentSensorData_s &current_sensor_data)
 {
 	hytech_msgs_VCRData_s out;
@@ -97,17 +102,14 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     copyVehVecMembers(DrivetrainData.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
 
     //TorqueControllerMuxStatus
-    out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) tc_mux_status.active_error; // ??
-    out.tcmux_status.active_controller_mode = (hytech_msgs_ControllerMode_e) tc_mux_status.active_controller_mode;
-    out.tcmux_status.active_torque_limit_enum = (hytech_msgs_TorqueLimit_e) tc_mux_status.active_torque_limit_enum;
-    out.tcmux_status.active_torque_limit_value = tc_mux_status.active_torque_limit_value;
-    out.tcmux_status.output_is_bypassing_limits = tc_mux_status.output_is_bypassing_limits;
+    out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) vcr_controls_instance.get_tc_mux_status().active_error;
+    out.tcmux_status.active_controller_mode = (hytech_msgs_ControllerMode_e) vcr_controls_instance.get_tc_mux_status().active_controller_mode;
+    out.tcmux_status.active_torque_limit_enum = (hytech_msgs_TorqueLimit_e) vcr_controls_instance.get_tc_mux_status().active_torque_limit_enum;
+    out.tcmux_status.active_torque_limit_value = vcr_controls_instance.get_tc_mux_status().active_torque_limit_value;
+    out.tcmux_status.output_is_bypassing_limits = vcr_controls_instance.get_tc_mux_status().output_is_bypassing_limits;
 
     // Buzzer
     out.buzzer_is_active = adc.read_glv().conversion;
-
-    // GLV Measurement
-    out.measured_glv = current_sensor_data.twentyfour_volt_sensor;
 
     out.firmware_version_info.project_is_dirty = shared_state.fw_version_info.project_is_dirty;
     out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;
@@ -124,13 +126,13 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
 
     // // VCR Status
     // const char* state_label = "UNKNOWN";
-    out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(vehicle_state_machine_state);
-    out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(drivetrain_state_machine_state);
+    out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(vehicle_state_machine_instance.get_state());
+    out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(drivetrain_system_instance.get_state());
 
-    out.status.drivebrain_controller_timing_failure = DB_Controller_Status.drivebrain_controller_timing_failure;
-    out.status.drivebrain_is_in_control = DB_Controller_Status.drivebrain_is_in_control;
+    out.status.drivebrain_controller_timing_failure = db_controller_instance.get_timing_failure_status();
+    out.status.drivebrain_is_in_control = db_controller_instance.drivebrain_is_in_control();
 
-    out.status.pedals_heartbeat_ok = VCF_Heartbeat_Data.heartbeat_ok;
+    out.status.pedals_heartbeat_ok = vcf_interface_instance.get_latest_data().stamped_pedals.heartbeat_ok;
 
     return out;
 }

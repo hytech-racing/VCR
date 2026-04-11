@@ -6,12 +6,12 @@
 #include "SharedFirmwareTypes.h"
 class VehicleStateMachine
 {
-    public: 
+    public:
         VehicleStateMachine(
-            etl::delegate<bool()> check_hv_over_threshold, 
-            etl::delegate<bool()> is_start_button_pressed, 
-            etl::delegate<bool()> is_brake_pressed, 
-            etl::delegate<bool()> check_drivetrain_error_ocurred, 
+            etl::delegate<bool()> check_hv_over_threshold,
+            etl::delegate<bool()> is_start_button_pressed,
+            etl::delegate<bool()> is_brake_pressed,
+            etl::delegate<bool()> check_drivetrain_error_ocurred,
             etl::delegate<bool()> check_drivetrain_ready,
             etl::delegate<void()> start_buzzer,
             etl::delegate<void()> recalibrate_pedals,
@@ -21,9 +21,9 @@ class VehicleStateMachine
             etl::delegate<bool()> is_inverter_reset_button_pressed,
             etl::delegate<bool()> is_calibrate_pedals_button_pressed,
             etl::delegate<void()> reset_inverter_error
-        ) :  
+        ) :
         _check_hv_over_threshold(check_hv_over_threshold),
-        _is_start_button_pressed(is_start_button_pressed), 
+        _is_start_button_pressed(is_start_button_pressed),
         _is_brake_pressed(is_brake_pressed),
         _check_drivetrain_error_ocurred(check_drivetrain_error_ocurred),
         _check_drivetrain_ready(check_drivetrain_ready),
@@ -35,17 +35,17 @@ class VehicleStateMachine
         _is_inverter_reset_button_pressed(is_inverter_reset_button_pressed),
         _is_calibrate_pedals_button_pressed(is_calibrate_pedals_button_pressed),
         _reset_inverter_error(reset_inverter_error)
-        {   
+        {
             _current_state = VehicleState_e::TRACTIVE_SYSTEM_NOT_ACTIVE;
         }
 
         VehicleState_e tick_state_machine(unsigned long curr_time_millis);
 
-        VehicleState_e get_state() { return _current_state; }
-    
-    private: 
+        VehicleState_e get_state() const { return _current_state; }
 
-        void _set_state(VehicleState_e new_state, unsigned long current_time_millis); 
+    private:
+
+        void _set_state(VehicleState_e new_state, unsigned long current_time_millis);
 
         void _handle_entry_logic(VehicleState_e prev_state, unsigned long current_time_millis);
 
@@ -62,11 +62,11 @@ class VehicleStateMachine
         /**
          * Lambdas necessary for state machine to work.
          */
-        etl::delegate<bool()> _check_hv_over_threshold; 
-        etl::delegate<bool()> _is_start_button_pressed; 
-        etl::delegate<bool()> _is_brake_pressed; 
-        etl::delegate<bool()> _check_drivetrain_error_ocurred; 
-        etl::delegate<bool()> _check_drivetrain_ready; 
+        etl::delegate<bool()> _check_hv_over_threshold;
+        etl::delegate<bool()> _is_start_button_pressed;
+        etl::delegate<bool()> _is_brake_pressed;
+        etl::delegate<bool()> _check_drivetrain_error_ocurred;
+        etl::delegate<bool()> _check_drivetrain_ready;
         etl::delegate<void()> _start_buzzer;
         etl::delegate<void()> _send_recalibrate_pedals_message;
         etl::delegate<void(bool, bool)> _command_drivetrain; // Passes in true/false depending on whether we're in RTD or not.

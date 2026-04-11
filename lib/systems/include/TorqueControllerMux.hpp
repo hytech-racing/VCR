@@ -86,7 +86,7 @@ template <std::size_t num_controllers> class TorqueControllerMux {
     explicit TorqueControllerMux(
         std::array<
             std::function<DrivetrainCommand_s(const VCRData_s &state, unsigned long curr_millis)>,
-            num_controllers>    
+            num_controllers>
             controller_evals,
         std::array<bool, num_controllers> mux_bypass_limits,
         float max_change_speed = TC_MUX_DEFAULT_PARAMS::MAX_SPEED_FOR_MODE_CHANGE,
@@ -97,7 +97,7 @@ template <std::size_t num_controllers> class TorqueControllerMux {
           _max_torque_pos_change_delta(max_torque_pos_change_delta),
           _max_power_limit(max_power_limit), _num_motors(num_motors) {}
 
-    const TorqueControllerMuxStatus_s &get_tc_mux_status() { return _active_status; }
+    const TorqueControllerMuxStatus_s &get_tc_mux_status() const { return _active_status; }
 
     /// @brief function that evaluates the mux, controllers and gets the active command
     /// @param requested_controller_type the requested controller type from the dial state
@@ -121,12 +121,12 @@ template <std::size_t num_controllers> class TorqueControllerMux {
         {TorqueLimit_e::TCMUX_FULL_TORQUE, PhysicalParameters::AMK_MAX_TORQUE},
         {TorqueLimit_e::TCMUX_MID_TORQUE, 15.0f},
         {TorqueLimit_e::TCMUX_LOW_TORQUE, 10.0f}};
-    
-    
-    
+
+
+
     float _max_change_speed;
     float _max_torque_pos_change_delta;
-    float _max_power_limit; 
+    float _max_power_limit;
     size_t _num_motors;
     DrivetrainCommand_s _prev_command = {};
     TorqueControllerMuxStatus_s _active_status = {};

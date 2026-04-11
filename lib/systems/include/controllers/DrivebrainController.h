@@ -7,7 +7,7 @@
 
 #define WORST_LATENCY_PERIOD_MS 1000
 struct MessageLatencyInfo_s {
-    bool timing_failure; 
+    bool timing_failure;
     unsigned long worst_period_millis;
 };
 
@@ -35,7 +35,9 @@ class DrivebrainController {
 
         /// @brief getter for the current status of whether or not the controller has had a timing failure during operation
         /// @return bool of status
-        bool get_timing_failure_status() { return !_should_run_controller; }
+        bool get_timing_failure_status() const { return !_should_run_controller; }
+
+        bool drivebrain_is_in_control() const { return _should_run_controller; }
 
     private:
         struct
@@ -45,8 +47,8 @@ class DrivebrainController {
         } _params;
 
         bool _should_run_controller = true;
-        bool _last_reset_worse_latency_clock = 0; 
-        MessageLatencyInfo_s _aux_latency_info = { false, 0 }; 
+        bool _last_reset_worse_latency_clock = 0;
+        MessageLatencyInfo_s _aux_latency_info = { false, 0 };
         MessageLatencyInfo_s _telem_latency_info = {false, 0 };
 
 
