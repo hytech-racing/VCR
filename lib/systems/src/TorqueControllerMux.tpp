@@ -53,11 +53,11 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::get_drivetrain_command
         }
         _active_status.active_error = error_state;
     }
-    if (!_mux_bypass_limits[active_controller_mode_index]) //only mode 0?
+    if (!_mux_bypass_limits[active_controller_mode_index])
     {
         _active_status.active_torque_limit_enum = requested_torque_limit;
 
-        // why this?
+        // Occurs when the desired speed is 0 (braking) and we want to allow regen -- need to apply limits so that the pack voltage doesn't spike too high
         if (current_output.desired_speeds.FL == 0.0f && current_output.desired_speeds.FR == 0.0f && current_output.desired_speeds.RL == 0.0f && current_output.desired_speeds.RR == 0.0f)
         {
             current_output = apply_regen_limit(current_output, input_state.system_data.drivetrain_data);
@@ -223,8 +223,11 @@ template <std::size_t num_controllers>
 DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(const DrivetrainCommand_s &command, const DrivetrainDynamicReport_s &drivetrain_data)
 {
     DrivetrainCommand_s out = command;
-    const float noRegenLimitKPH = 10.0;  // how were noRegenLimit and fullRegenLimit determined?
-    const float fullRegenLimitKPH = 5.0;
+    const float noRegenLimitKPH = 10.0; 
+    const float fullRegenLimitKPH = 5.0; // per rules EV.3.3.3
+    const float start_voltage_regen_limit = 500.0;
+    const float max_voltage_regen_limit = 530.0;
+
     float maxWheelSpeed = 0.0;
     float torqueScaleDown = 0.0;
     bool allWheelsRegen = true; // true when all wheels are targeting speeds below the current wheel speed
@@ -240,8 +243,11 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
 
     // begin limiting regen at noRegenLimitKPH and completely limit regen at fullRegenLimitKPH
     // linearly interpolate the scale factor between noRegenLimitKPH and fullRegenLimitKPH
-    // is linear the best way to do this?
     torqueScaleDown = std::min(1.0f, std::max(0.0f, (maxWheelSpeed - fullRegenLimitKPH) / (noRegenLimitKPH - fullRegenLimitKPH)));
+
+    // limit torque based on overvoltage so that cells do not
+    float over_voltage_protection_scale = std::min(1.0f, std::max(0.0f, (dt_data.measuredInverterFLPackVoltage - start_voltage_regen_limit) / (max_voltage_regen_limit - start_voltage_regen_limit)));
+    torqueScaleDown *= (1.0f - over_voltage_protection_scale);
 
     if (allWheelsRegen)
     {
@@ -250,5 +256,6 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
         out.torque_limits.RL *= torqueScaleDown; 
         out.torque_limits.RR *= torqueScaleDown; 
     }
+    
     return out;
 }

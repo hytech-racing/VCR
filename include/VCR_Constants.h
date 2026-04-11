@@ -51,11 +51,11 @@ constexpr float RL_LOADCELL_OFFSET = 0.0;
 constexpr float RR_LOADCELL_SCALE = 1.0;
 constexpr float RR_LOADCELL_OFFSET = 0;
 
-
-constexpr float RL_SUS_POT_SCALE = 1;
-constexpr int RL_SUS_POT_OFFSET = 0;
-constexpr float RR_SUS_POT_SCALE = 1;
-constexpr int RR_SUS_POT_OFFSET = 0;
+// Calibrated values measured from bolt to bolt
+constexpr float RL_SUS_POT_SCALE = 0.01459;
+constexpr float RL_SUS_POT_OFFSET = 148.5;
+constexpr float RR_SUS_POT_SCALE = 0.01337;
+constexpr float RR_SUS_POT_OFFSET = 152.5;
 
 //figure out values
 const float THERMISTOR_0_SCALE = 1;
@@ -82,9 +82,12 @@ constexpr const float TEST_TEMP_SCALE = -46.8;
 constexpr const float TEST_TEMP_OFFSET = 386;
 
 // Fan/Pump Control
-constexpr int PUMP_CNTRL = 33;
-constexpr int INV_FAN_CNTRL = 34;
-constexpr int MOTOR_FAN_CNTRL = 35;
+constexpr int MOTOR_COOLING_CONTROL_PIN = 33;
+constexpr int INVERTER_COOLING_CONTROL_PIN = 37;
+
+// BSPD
+constexpr int BRAKE_HIGH_SENSE_PIN = 38;
+constexpr int CURRENT_HIGH_SENSE_PIN = 39;
 
 /* Watchdog constants */
 constexpr int INVERTER_ENABLE_PIN = 5;
@@ -124,7 +127,7 @@ constexpr unsigned long inv_send_period = 5000;                      // 5 000 us
 constexpr unsigned long inverter_send_priority = 5;
 constexpr unsigned long coolant_temp_send_period_us = 100000;        // 100 000 us = 10 Hz
 constexpr unsigned long coolant_temp_send_priority = 9;
-constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
+constexpr unsigned long ioexpander_sample_period_us = 5000;         // 5 000 us = 200 Hz
 constexpr unsigned long ioexpander_priority = 100;
 constexpr unsigned long dashboard_send_period_us = 200000;         // 200 000 us = 5 Hz
 constexpr unsigned long dashboard_send_priority = 5;

@@ -117,8 +117,8 @@ HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_
 HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
 HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
-HT_TASK::Task run_enable_fans(HT_TASK::DUMMY_FUNCTION, enable_fans, dashboard_send_priority, dashboard_send_period_us);
-HT_TASK::Task run_enable_pumps(HT_TASK::DUMMY_FUNCTION, enable_pumps, dashboard_send_priority, dashboard_send_period_us);
+HT_TASK::Task run_enable_motor_cooling(HT_TASK::DUMMY_FUNCTION, enable_motor_cooling, dashboard_send_priority, dashboard_send_period_us);
+HT_TASK::Task run_enable_inverter_cooling(HT_TASK::DUMMY_FUNCTION, enable_inverter_cooling, dashboard_send_priority, dashboard_send_period_us);
 
 
 
@@ -288,9 +288,9 @@ void setup() {
 
 
     // Configure pins
-    pinMode(PUMP_CNTRL, OUTPUT);
+    pinMode(MOTOR_COOLING_CONTROL_PIN, OUTPUT);
+    pinMode(INVERTER_COOLING_CONTROL_PIN, OUTPUT);
     pinMode(INVERTER_ENABLE_PIN, OUTPUT);
-
 
     // Save firmware version
     vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
@@ -371,7 +371,7 @@ void setup() {
 
     // Instantiate ADC interface
     ADCInterfaceInstance::create(
-      ADCPinout_s {ADC0_CS, ADC1_CS},
+      ADCPinout_s {ADC0_CS, ADC1_CS, BRAKE_HIGH_SENSE_PIN, CURRENT_HIGH_SENSE_PIN},
       ADCChannels_s {
         GLV_SENSE_CHANNEL,
         CURRENT_SENSE_CHANNEL,
@@ -424,7 +424,8 @@ void setup() {
         THERMISTOR_7_OFFSET,
       }
     );
-
+  
+    ADCInterfaceInstance::instance().init();
 
     // Schedule scheduler tasks
     scheduler.schedule(adc_0_sample_task);
@@ -456,9 +457,8 @@ void setup() {
 
     scheduler.schedule(IOExpander_read_task);
 
-    // scheduler.schedule(run_enable_fans);
-
-    // scheduler.schedule(run_enable_pumps);
+    // scheduler.schedule(run_enable_motor_cooling);
+    // scheduler.schedule(run_enable_inverter_cooling);
 }
 
 void loop() {

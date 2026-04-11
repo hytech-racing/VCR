@@ -86,9 +86,11 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     out.inverter_data.has_RR = true;
 
     //CurrentSensorData_s
-    out.current_sensor_data.twentyfour_volt_sensor = adc_interface.read_glv().conversion;
-    out.current_sensor_data.current_sensor_unfiltered = adc_interface.read_bspd_current().conversion;
-    out.current_sensor_data.current_refererence_unfiltered = adc_interface.read_bspd_reference_current().conversion;
+    out.current_sensor_data.twentyfour_volt_sensor = adc_interface.get_glv().conversion;
+    out.current_sensor_data.current_sensor_unfiltered = adc_interface.get_bspd_current().conversion;
+    out.current_sensor_data.current_refererence_unfiltered = adc_interface.get_bspd_reference_current().conversion;
+    out.current_sensor_data.bpsd_brake_high_sense = adc_interface.is_brake_sense_high();
+    out.current_sensor_data.bspd_current_high_sense = adc_interface.is_current_sense_high();
 
     //DrivetrainDynamicReport_s
     out.drivetrain_data.measuredInverterFLPackVoltage = DrivetrainData.measuredInverterFLPackVoltage;
@@ -106,7 +108,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     out.tcmux_status.output_is_bypassing_limits = vcr_controls.get_tc_mux_status().output_is_bypassing_limits;
 
     // Buzzer
-    out.buzzer_is_active = adc_interface.read_glv().conversion;
+    out.buzzer_is_active = adc_interface.get_glv().conversion;
 
     // out.firmware_version_info.project_is_dirty = shared_state.fw_version_info.project_is_dirty;
     // out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;

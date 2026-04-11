@@ -39,14 +39,14 @@ void VCFInterface::receive_dashboard_message(const CAN_message_t &msg, unsigned 
 {
     DASH_INPUT_t dash_msg;
     Unpack_DASH_INPUT_hytech(&dash_msg, &msg.buf[0], msg.len);
-    _curr_data.dash_input_state.dim_btn_is_pressed = dash_msg.led_dimmer_button;
+    // _curr_data.dash_input_state.dim_btn_is_pressed = dash_msg.led_dimmer_button;
     _curr_data.dash_input_state.preset_btn_is_pressed = dash_msg.preset_button; // pedal recalibration button
     _curr_data.dash_input_state.mc_reset_btn_is_pressed = dash_msg.motor_controller_cycle_button;
     _curr_data.dash_input_state.start_btn_is_pressed = dash_msg.start_button;
     _curr_data.dash_input_state.data_btn_is_pressed = dash_msg.data_button_is_pressed;
-    _curr_data.dash_input_state.left_paddle_is_pressed = dash_msg.left_shifter_button;
-    _curr_data.dash_input_state.right_paddle_is_pressed = dash_msg.right_shifter_button;
-    _curr_data.dash_input_state.mode_btn_is_pressed = dash_msg.mode_button; // change torque limit
+    // _curr_data.dash_input_state.left_paddle_is_pressed = dash_msg.left_shifter_button;
+    // _curr_data.dash_input_state.right_paddle_is_pressed = dash_msg.right_shifter_button;
+    // _curr_data.dash_input_state.mode_btn_is_pressed = dash_msg.mode_button; // change torque limit
     _curr_data.dash_input_state.dial_state = static_cast<ControllerMode_e>(dash_msg.dash_dial_mode);
 
 }
@@ -56,10 +56,10 @@ void VCFInterface::receive_front_suspension_message(const CAN_message_t &msg, un
     FRONT_SUSPENSION_t front_suspension_msg;
     Unpack_FRONT_SUSPENSION_hytech(&front_suspension_msg, &msg.buf[0], msg.len);
     _curr_data.front_loadcell_data.FL_loadcell_analog = front_suspension_msg.fl_load_cell;
-    _curr_data.front_suspot_data.FL_sus_pot_analog = front_suspension_msg.fl_shock_pot;
+    _curr_data.front_suspot_data.FL_sus_pot_analog = HYTECH_fl_shock_pot_ro_fromS(front_suspension_msg.fl_shock_pot_ro);
     _curr_data.front_loadcell_data.FR_loadcell_analog = front_suspension_msg.fr_load_cell;
-    _curr_data.front_suspot_data.FR_sus_pot_analog = front_suspension_msg.fr_shock_pot;
-
+    _curr_data.front_suspot_data.FR_sus_pot_analog = HYTECH_fr_shock_pot_ro_fromS(front_suspension_msg.fr_shock_pot_ro);
+    
     _curr_data.front_loadcell_data.valid_FL_sample = true; // only sent over CAN if valid from VCF
     _curr_data.front_loadcell_data.valid_FR_sample = true; // or send validities over CAN
 }
