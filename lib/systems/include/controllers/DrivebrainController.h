@@ -37,8 +37,6 @@ class DrivebrainController {
         /// @return bool of status
         bool get_timing_failure_status() const { return !_should_run_controller; }
 
-        bool drivebrain_is_in_control() const { return _should_run_controller; }
-
     private:
         struct
         {
