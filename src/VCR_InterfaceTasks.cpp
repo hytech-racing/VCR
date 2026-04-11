@@ -150,7 +150,12 @@ HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, c
 
 HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(VCREthernetInterface::makeVCRDataMsg(ADCInterfaceInstance::instance())); // TODO: add in the rest of the necessary parameters
+    DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(
+        VCREthernetInterface::makeVCRDataMsg(ADCInterfaceInstance::instance(),
+        vcr_data.system_data.drivetrain_data, VCFInterfaceInstance::instance(),
+        VehicleStateMachineInstance::instance(), DrivetrainInstance::instance(),
+        fl_inverter_int, fr_inverter_int, rl_inverter_int, rr_inverter_int,
+        VCRControlsInstance::instance()));
     return HT_TASK::TaskResponse::YIELD;
 }
 
