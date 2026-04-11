@@ -124,19 +124,19 @@ HT_TASK::Task run_enable_pumps(HT_TASK::DUMMY_FUNCTION, enable_pumps, dashboard_
 
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-        Serial.println("time\t:\taccel\t:\tbrake");
-        Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
-        Serial.print("\t:\t");
-        Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
-        Serial.print("\t:\t");
-        Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
-        Serial.println();
-        Serial.print("pedals heartbeat good: "); Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
-        Serial.println();
-        Serial.print("Pedals Brake Is Active: "); Serial.print(VCFInterfaceInstance::instance().is_brake_pressed() ? "YES" : "NO");
-        Serial.println();
-        Serial.print("Is Start Button Active: "); Serial.print(VCFInterfaceInstance::instance().is_start_button_pressed() ? "YES" : "NO");
-        Serial.println();
+        // Serial.println("time\t:\taccel\t:\tbrake");
+        // Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
+        // Serial.print("\t:\t");
+        // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
+        // Serial.print("\t:\t");
+        // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
+        // Serial.println();
+        // Serial.print("pedals heartbeat good: "); Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
+        // Serial.println();
+        // Serial.print("Pedals Brake Is Active: "); Serial.print(VCFInterfaceInstance::instance().is_brake_pressed() ? "YES" : "NO");
+        // Serial.println();
+        // Serial.print("Is Start Button Active: "); Serial.print(VCFInterfaceInstance::instance().is_start_button_pressed() ? "YES" : "NO");
+        // Serial.println();
 
 
         // Serial.println();
@@ -153,11 +153,11 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.print(" RR #: ");
         // Serial.println(DrivetrainInstance::instance().get_status().inverter_statuses.RR.diagnostic_number);
 
-        Serial.print("Vehicle state machine state: ");
-        Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
-        Serial.println();
-        Serial.print("launch controller state: ");
-        Serial.println(static_cast<int>(VCRControlsInstance::instance().get_launch_controller().get_launch_state()));
+        // Serial.print("Vehicle state machine state: ");
+        // Serial.println(static_cast<int>(VehicleStateMachineInstance::instance().get_state()));
+        // Serial.println();
+        // Serial.print("launch controller state: ");
+        // Serial.println(static_cast<int>(VCRControlsInstance::instance().get_launch_controller().get_launch_state()));
 
         // Serial.print("Start button pressed: ");
         // Serial.println(vcr_data.interface_data.dash_input_state.start_btn_is_pressed);
@@ -171,50 +171,50 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.print("torque mode cycle button pressed: ");
         // Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
 
-        Serial.println("IOExpander testing");
-        auto& s = vcr_data.interface_data.shutdown_sensing_data;
-        char buf[128]; //NOLINT is debug
-        snprintf(buf, sizeof(buf),
-            "%-10s %-14s %-13s %-10s %-8s %-6s",
-            "BSPD OK", "BSPD MISSING", "BSPD FAULTED", "VCR SW OK", "BMS OK", "IMD OK"
-        );
-        Serial.println(buf);
+        // Serial.println("IOExpander testing");
+        // auto& s = vcr_data.interface_data.shutdown_sensing_data;
+        // char buf[128]; //NOLINT is debug
+        // snprintf(buf, sizeof(buf),
+        //     "%-10s %-14s %-13s %-10s %-8s %-6s",
+        //     "BSPD OK", "BSPD MISSING", "BSPD FAULTED", "VCR SW OK", "BMS OK", "IMD OK"
+        // );
+        // Serial.println(buf);
 
-        snprintf(buf, sizeof(buf),
-            "%-10d %-14d %-13d %-10d %-8d %-6d",
-            s.bspd_is_ok, s.bspd_missing, s.bspd_fault,
-            s.watchdog_is_ok, s.bms_is_ok, s.imd_is_ok
-        );
-        Serial.println(buf);
-        Serial.println();
+        // snprintf(buf, sizeof(buf),
+        //     "%-10d %-14d %-13d %-10d %-8d %-6d",
+        //     s.bspd_is_ok, s.bspd_missing, s.bspd_fault,
+        //     s.watchdog_is_ok, s.bms_is_ok, s.imd_is_ok
+        // );
+        // Serial.println(buf);
+        // Serial.println();
 
-        auto& e = vcr_data.interface_data.ethernet_is_linked;
+        // auto& e = vcr_data.interface_data.ethernet_is_linked;
 
-        snprintf(buf, sizeof(buf),
-            "%-14s %-10s %-10s %-14s %-12s %-6s",
-            "ACU LINK", "DB LINK", "VCF LINK", "TEENSY LINK", "DEBUG LINK", "UBIQUITI LINK"
-        );
-        Serial.println(buf);
+        // snprintf(buf, sizeof(buf),
+        //     "%-14s %-10s %-10s %-14s %-12s %-6s",
+        //     "ACU LINK", "DB LINK", "VCF LINK", "TEENSY LINK", "DEBUG LINK", "UBIQUITI LINK"
+        // );
+        // Serial.println(buf);
 
-        snprintf(buf, sizeof(buf),
-            "%-14d %-10d %-10d %-14d %-12d %-6d",
-            e.acu_link, e.drivebrain_link, e.vcf_link,
-            e.teensy_link, e.debug_link, e.ubiquiti_link
-        );
-        Serial.println(buf);
-        Serial.println();
+        // snprintf(buf, sizeof(buf),
+        //     "%-14d %-10d %-10d %-14d %-12d %-6d",
+        //     e.acu_link, e.drivebrain_link, e.vcf_link,
+        //     e.teensy_link, e.debug_link, e.ubiquiti_link
+        // );
+        // Serial.println(buf);
+        // Serial.println();
 
-        Serial.print("Load Cell RR: ");
-        Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
+        // Serial.print("Load Cell RR: ");
+        // Serial.println(vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog);
 
-        Serial.print("Load Cell RL: ");
-        Serial.println(vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog);
+        // Serial.print("Load Cell RL: ");
+        // Serial.println(vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog);
 
-        Serial.print("SusPot RR: ");
-        Serial.println(vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog);
+        // Serial.print("SusPot RR: ");
+        // Serial.println(vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog);
 
-        Serial.print("SusPot RL: ");
-        Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
+        // Serial.print("SusPot RL: ");
+        // Serial.println(vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog);
 
         // /* Drivebrain data */
         // Serial.print("Latest Drivebrain data: ");
@@ -226,26 +226,26 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.print(" ");
         // Serial.println(vcr_data.interface_data.inverter_data.RR.commanded_torque);
 
-        Serial.println("desired speeds, torq lim");
-        Serial.print("FL:   ");
-        Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FL); Serial.print(" ");
-        Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
+        // Serial.println("desired speeds, torq lim");
+        // Serial.print("FL:   ");
+        // Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FL); Serial.print(" ");
+        // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FL);
 
-        Serial.print("FR:   ");
-        Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FR); Serial.print(" ");
-        Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FR);
+        // Serial.print("FR:   ");
+        // Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.FR); Serial.print(" ");
+        // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.FR);
 
-        Serial.print("RL:   ");
-        Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.RL); Serial.print(" ");
-        Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.RL);
+        // Serial.print("RL:   ");
+        // Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.RL); Serial.print(" ");
+        // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.RL);
 
-        Serial.print("RR:   ");
-        Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.RR); Serial.print(" ");
-        Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.RR);
+        // Serial.print("RR:   ");
+        // Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.RR); Serial.print(" ");
+        // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.RR);
 
 
-        Serial.print("Current Controller Mode: ");
-        Serial.println(static_cast<uint8_t>(vcr_data.interface_data.dash_input_state.dial_state));
+        // Serial.print("Current Controller Mode: ");
+        // Serial.println(static_cast<uint8_t>(vcr_data.interface_data.dash_input_state.dial_state));
 
         /* Thermistor Data */
         // Serial.print("Thermistor 0 Analog: ");

@@ -6,35 +6,39 @@
  * Getters for the data
  */
 
-InverterStatus_s InverterInterface::get_status() {
+InverterStatus_s InverterInterface::get_status() const {
     InverterStatus_s status_struct = _feedback_data.status;
     _feedback_data.status.new_data = false;
     return status_struct;
 }
 
-InverterTemps_s InverterInterface::get_temps() {
+InverterTemps_s InverterInterface::get_temps() const {
     InverterTemps_s temps_struct = _feedback_data.temps;
     _feedback_data.temps.new_data = false;
     return temps_struct;
 }
 
-InverterPower_s InverterInterface::get_power() {
+InverterPower_s InverterInterface::get_power() const {
     InverterPower_s power_struct = _feedback_data.power;
     _feedback_data.power.new_data = false;
     return power_struct;
 }
 
-MotorMechanics_s InverterInterface::get_motor_mechanics() {
+MotorMechanics_s InverterInterface::get_motor_mechanics() const {
     MotorMechanics_s mm_struct = _feedback_data.motor_mechanics;
     _feedback_data.motor_mechanics.new_data = false;
     return mm_struct;
 }
 
 
-InverterControlFeedback_s InverterInterface::get_control_params() {
+InverterControlFeedback_s InverterInterface::get_control_params() const {
     InverterControlFeedback_s cf_struct = _feedback_data.control_feedback;
     _feedback_data.control_feedback.new_data = false;
     return cf_struct;
+}
+
+InverterFeedbackData_s InverterInterface::get_all_inverter_data() const {
+    return _feedback_data;
 }
 
 

@@ -10,12 +10,15 @@
 #include <algorithm>
 
 hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
-    const ADCInterface &adc_interface_instance,
+    const ADCInterface &adc,
     DrivetrainDynamicReport_s &DrivetrainData,
     VCFHeartbeatData_s &VCF_Heartbeat_Data,
     VehicleState_e &vehicle_state_machine_state,
     DrivetrainState_e drivetrain_state_machine_state,
-    veh_vec<InverterData_s> &InverterData,
+    const InverterInterface fl_inverter,
+    const InverterInterface fr_inverter,
+    const InverterInterface rl_inverter,
+    const InverterInterface rr_inverter,
     DrivebrainControllerStatus_s &DB_Controller_Status,
     TorqueControllerMuxStatus_s &tc_mux_status,
     CurrentSensorData_s &current_sensor_data)
@@ -41,12 +44,12 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     out.has_status = true;
 
     //RearLoadCellData_s
-    out.rear_loadcell_data.RL_loadcell_analog = static_cast<uint32_t>(adc_interface_instance.get_filtered_RL_load_cell());
-    out.rear_loadcell_data.RR_loadcell_analog = static_cast<uint32_t>(adc_interface_instance.get_filtered_RR_load_cell());
+    out.rear_loadcell_data.RL_loadcell_analog = static_cast<uint32_t>(adc.get_filtered_RL_load_cell());
+    out.rear_loadcell_data.RR_loadcell_analog = static_cast<uint32_t>(adc.get_filtered_RR_load_cell());
 
     //RearSusPotData_s
-    out.rear_suspot_data.RL_sus_pot_analog = static_cast<uint32_t>(adc_interface_instance.get_RL_sus_pot().conversion);
-    out.rear_suspot_data.RR_sus_pot_analog = static_cast<uint32_t>(adc_interface_instance.get_RR_sus_pot().conversion);
+    out.rear_suspot_data.RL_sus_pot_analog = static_cast<uint32_t>(adc.get_RL_sus_pot().conversion);
+    out.rear_suspot_data.RR_sus_pot_analog = static_cast<uint32_t>(adc.get_RR_sus_pot().conversion);
 
     // ShutdownSensingData_s
     out.vcr_shutdown_data.i_shutdown_in = false; //shared_state.interface_data.shutdown_sensing_data.i_shutdown_in;
@@ -64,44 +67,44 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
 
     // VCREthernetLinkData_s
     out.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 4);
-    out.ethernet_is_linked.debug_link = shared_state.interface_data.ethernet_is_linked.debug_link; // fix this still
+    // out.ethernet_is_linked.debug_link = shared_state.interface_data.ethernet_is_linked.debug_link; // TODO: fix this still
     out.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 0, 4);
     out.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 5);
     out.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 0, 5);
     out.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 6);
 
     // veh_vec<InverterData>
-    copyInverterData(InverterData.FL, out.inverter_data.FL);
+    copyInverterData(fl_inverter.get_all_inverter_data(), out.inverter_data.FL);
     out.inverter_data.has_FL = true;
-    copyInverterData(InverterData.FR, out.inverter_data.FR);
+    copyInverterData(fr_inverter.get_all_inverter_data(), out.inverter_data.FR);
     out.inverter_data.has_FR = true;
-    copyInverterData(InverterData.RL, out.inverter_data.RL);
+    copyInverterData(rl_inverter.get_all_inverter_data(), out.inverter_data.RL);
     out.inverter_data.has_RL = true;
-    copyInverterData(InverterData.RR, out.inverter_data.RR);
+    copyInverterData(rr_inverter.get_all_inverter_data(), out.inverter_data.RR);
     out.inverter_data.has_RR = true;
 
     //CurrentSensorData_s
-    out.current_sensor_data.twentyfour_volt_sensor = adc_interface_instance.read_glv().conversion;
-    out.current_sensor_data.current_sensor_unfiltered = adc_interface_instance.read_bspd_current().conversion;
-    out.current_sensor_data.current_refererence_unfiltered = adc_interface_instance.read_bspd_reference_current().conversion;
+    out.current_sensor_data.twentyfour_volt_sensor = adc.read_glv().conversion;
+    out.current_sensor_data.current_sensor_unfiltered = adc.read_bspd_current().conversion;
+    out.current_sensor_data.current_refererence_unfiltered = adc.read_bspd_reference_current().conversion;
 
     //DrivetrainDynamicReport_s
     out.drivetrain_data.measuredInverterFLPackVoltage = DrivetrainData.measuredInverterFLPackVoltage;
 
-    copy_veh_vec_members(DrivetrainData.measuredSpeeds, out.drivetrain_data.measuredSpeeds);
-    copy_veh_vec_members(DrivetrainData.measuredTorques, out.drivetrain_data.measuredTorques);
-    copy_veh_vec_members(DrivetrainData.measuredTorqueCurrents, out.drivetrain_data.measuredTorqueCurrents);
-    copy_veh_vec_members(DrivetrainData.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
+    copyVehVecMembers(DrivetrainData.measuredSpeeds, out.drivetrain_data.measuredSpeeds);
+    copyVehVecMembers(DrivetrainData.measuredTorques, out.drivetrain_data.measuredTorques);
+    copyVehVecMembers(DrivetrainData.measuredTorqueCurrents, out.drivetrain_data.measuredTorqueCurrents);
+    copyVehVecMembers(DrivetrainData.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
 
     //TorqueControllerMuxStatus
-    out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) tc_mux_status.active _error; // ??
+    out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) tc_mux_status.active_error; // ??
     out.tcmux_status.active_controller_mode = (hytech_msgs_ControllerMode_e) tc_mux_status.active_controller_mode;
     out.tcmux_status.active_torque_limit_enum = (hytech_msgs_TorqueLimit_e) tc_mux_status.active_torque_limit_enum;
     out.tcmux_status.active_torque_limit_value = tc_mux_status.active_torque_limit_value;
     out.tcmux_status.output_is_bypassing_limits = tc_mux_status.output_is_bypassing_limits;
 
     // Buzzer
-    out.buzzer_is_active = adc_interface_instance.read_glv().conversion;
+    out.buzzer_is_active = adc.read_glv().conversion;
 
     // GLV Measurement
     out.measured_glv = current_sensor_data.twentyfour_volt_sensor;
@@ -132,14 +135,14 @@ hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     return out;
 }
 
-void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
+void VCREthernetInterface::receivePbMsgDB(const hytech_msgs_MCUCommandData &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
 {
     //TODO: Finish this function. This function could parse the message and put it into shared_state, but depending
     //      on where things are defined, it might be cleaner for this function to simply return the new data. I do
     //      not know yet. Definitely worth asking Ben.
 }
 
-void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
+void VCREthernetInterface::receivePbMsgVCF(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
 {
     // //DashInputState_s
     // shared_state.interface_data.dash_input_state.data_btn_is_pressed = msg_in.dash_input_state.data_btn_is_pressed;
@@ -153,24 +156,33 @@ void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_i
     // shared_state.interface_data.dash_input_state.start_btn_is_pressed = msg_in.dash_input_state.start_btn_is_pressed;
 }
 
-void VCREthernetInterface::copyInverterData(const InverterData_s &original, hytech_msgs_InverterData_s &destination)
+void VCREthernetInterface::copyInverterData(const InverterFeedbackData_s &original, hytech_msgs_InverterData_s &destination)
 {
-    destination.actual_motor_torque = original.actual_motor_torque;
-    destination.actual_power = original.actual_power;
-    destination.commanded_torque = original.commanded_torque;
-    destination.dc_bus_voltage = original.dc_bus_voltage;
-    destination.dc_on = original.dc_on;
-    destination.derating_on = original.derating_on;
-    destination.diagnostic_number = original.diagnostic_number;
-    destination.error = original.error;
-    destination.feedback_torque = original.feedback_torque;
-    destination.igbt_temp = original.igbt_temp;
-    destination.inverter_on = original.inverter_on;
-    destination.inverter_temp = original.inverter_temp;
-    destination.motor_temp = original.motor_temp;
-    destination.quit_dc_on = original.quit_dc_on;
-    destination.quit_inverter_on = original.quit_inverter_on;
-    destination.speed_rpm = original.speed_rpm;
-    destination.system_ready = original.system_ready;
-    destination.warning = original.warning;
+    // Status
+    destination.system_ready = original.status.system_ready;
+    destination.error = original.status.error;
+    destination.warning = original.status.warning;
+    destination.quit_dc_on = original.status.quit_dc_on;
+    destination.dc_on = original.status.dc_on;
+    destination.quit_inverter_on = original.status.quit_inverter_on;
+    destination.inverter_on = original.status.inverter_on;
+    destination.derating_on = original.status.derating_on;
+    destination.dc_bus_voltage = original.status.dc_bus_voltage;
+    destination.diagnostic_number = original.status.diagnostic_number;
+
+    // Temps
+    destination.igbt_temp = original.temps.igbt_temp;
+    destination.inverter_temp = original.temps.inverter_temp;
+    destination.motor_temp = original.temps.motor_temp;
+
+    // Power
+
+    // Motor Mechanics
+    destination.actual_power = original.motor_mechanics.actual_power;
+    destination.actual_motor_torque = original.motor_mechanics.actual_torque;
+    destination.speed_rpm = original.motor_mechanics.actual_speed;
+
+    // Control Feedback
+    destination.commanded_torque = 0; //TODO: figure out if this is actually used / updated
+    destination.feedback_torque = 0; //TODO: figure out if this is actually used / updated
 }

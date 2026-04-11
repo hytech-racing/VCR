@@ -74,11 +74,12 @@ class InverterInterface
         void set_inverter_control_word(InverterControlWord_s control_word);
 
         /* Getters */
-        InverterStatus_s get_status(); 
-        InverterTemps_s get_temps();
-        InverterPower_s get_power();
-        MotorMechanics_s get_motor_mechanics();
-        InverterControlFeedback_s get_control_params();
+        InverterStatus_s get_status() const;
+        InverterTemps_s get_temps() const;
+        InverterPower_s get_power() const;
+        MotorMechanics_s get_motor_mechanics() const;
+        InverterControlFeedback_s get_control_params() const;
+        InverterFeedbackData_s get_all_inverter_data() const;
 
     private: 
 

@@ -15,12 +15,15 @@ namespace VCREthernetInterface
      * @return A populated instance of the outgoing protoc struct.
      */
     hytech_msgs_VCRData_s makeVCRDataMsg(
-        const ADCInterface &ADCInterfaceInstance,
+        const ADCInterface &adc,
         DrivetrainDynamicReport_s &DrivetrainData,
         VCFHeartbeatData_s &VCF_Heartbeat_Data,
         VehicleState_e &vehicle_state_machine_state,
         DrivetrainState_e drivetrain_state_machine_state,
-        veh_vec<InverterData_s> &InverterData,
+        const InverterInterface fl_inverter,
+        const InverterInterface fr_inverter,
+        const InverterInterface rl_inverter,
+        const InverterInterface rr_inverter,
         DrivebrainControllerStatus_s &DB_Controller_Status,
         TorqueControllerMuxStatus_s &tc_mux_status,
         CurrentSensorData_s &current_sensor_data);
@@ -51,7 +54,7 @@ namespace VCREthernetInterface
      * @param destination The destination protoc struct.
      * @post The destination struct will be populated with the data from original.
      */
-    void copyInverterData(const InverterData_s &original, hytech_msgs_InverterData_s &destination);
+    void copyInverterData(const InverterFeedbackData_s &original, hytech_msgs_InverterData_s &destination);
 
     /**
      * Helper function to copy veh_vec data.
