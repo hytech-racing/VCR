@@ -20,15 +20,15 @@ public:
           _rear_regen_torque_scale(regen_torque_scale)
     { }
     /// @brief default contructor with balanced default values: rear_torque_scale = 1.0, regen_torque_scale = 1.0
-    LoadCellVectoringTorqueController() : LoadCellVectoringTorqueController(1.0, 1.0) {}
+    LoadCellVectoringTorqueController() : LoadCellVectoringTorqueController(1.0, 0.3) {}
 
     DrivetrainCommand_s evaluate(const VCRData_s &vcr_data, unsigned long curr_millis);
 
 private:
     const float _front_torque_scale = 1.0;
     const float _rear_torque_scale = 1.0;
-    const float _front_regen_torque_scale = 1.8f;
-    const float _rear_regen_torque_scale = 0.2f;
+    const float _front_regen_torque_scale = 1.0f;
+    const float _rear_regen_torque_scale = 1.0f;
 
     const float _fl_load_cell_offset = -33.7501f;
     const float _fr_load_cell_offset = -29.665f;

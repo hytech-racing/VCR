@@ -39,7 +39,6 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
                                                                 && (ADCInterfaceInstance::instance().get_RR_load_cell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
 
     vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = ADCInterfaceInstance::instance().get_filtered_RL_sus_pot();
-    
     vcr_data.interface_data.rear_suspot_data.RR_sus_pot_analog = ADCInterfaceInstance::instance().get_filtered_RR_sus_pot();
 
     vcr_data.interface_data.current_sensor_data.bspd_brake_high_sense = ADCInterfaceInstance::instance().is_brake_sense_high();
