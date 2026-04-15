@@ -65,10 +65,10 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
 
             out.desired_speeds = {0.0F, 0.0F, 0.0F, 0.0F};
 
-            out.torque_limits.FL = torque_request * _front_regen_torque_scale;
-            out.torque_limits.FR = torque_request * _front_regen_torque_scale;
-            out.torque_limits.RL = torque_request * _rear_regen_torque_scale;
-            out.torque_limits.RR = torque_request * _rear_regen_torque_scale;
+            out.torque_limits.FL = std::min(_front_regen_limit, std::max(0.0f, torque_request * _front_regen_torque_scale));
+            out.torque_limits.FR = std::min(_front_regen_limit, std::max(0.0f, torque_request * _front_regen_torque_scale));
+            out.torque_limits.RL = std::min(_rear_regen_limit, std::max(0.0f, torque_request * _rear_regen_torque_scale));
+            out.torque_limits.RR = std::min(_rear_regen_limit, std::max(0.0f, torque_request * _rear_regen_torque_scale));
         }
     }
 

@@ -226,8 +226,8 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
     const float start_regen_voltage_limit = 520.0;
     const float max_regen_voltage_limit = 530.0;
 
-    const float start_regen_power_limit = 15000.0f;
-    const float max_regen_power_limit = 30000.0f;
+    const float start_regen_power_limit = 30000.0f;
+    const float max_regen_power_limit = 50000.0f;
 
     float max_wheel_speed = 0.0;
     float torque_scale_down = 0.0;
@@ -251,12 +251,12 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
     torque_scale_down *= (1.0f - over_voltage_protection_scale);
 
     // regen power limit
-    if (acu_data.tractive_system_current < 0) // we don't want to apply the regen power limit until we observe a negative 
-    {
-        float electrical_power = acu_data.max_measured_ts_out_voltage * (-1.0f * acu_data.tractive_system_current);
-        float electrical_over_power_scale = std::min(1.0f, std::max(0.0f, (electrical_power - start_regen_power_limit) / (max_regen_power_limit - start_regen_power_limit)));
-        torque_scale_down *= electrical_over_power_scale;
-    }
+    // if (acu_data.tractive_system_current < 0) // we don't want to apply the regen power limit until we observe a negative 
+    // {
+    //     float electrical_power = acu_data.max_measured_ts_out_voltage * (-1.0f * acu_data.tractive_system_current);
+    //     float wheelspeed_to_power_scale = std::min(1.0f, std::max(0.0f, 1 - (max_wheel_rpm / 20000.0f)));
+    //     torque_scale_down *= (1.0f - wheelspeed_to_power_scale);
+    // }
 
     // over voltage, rules regen limit
     if (all_wheels_regen_flag)
