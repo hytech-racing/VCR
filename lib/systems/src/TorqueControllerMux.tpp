@@ -251,7 +251,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
     torque_scale_down *= (1.0f - over_voltage_protection_scale);
 
     // regen power limit
-    if (dt_data.. < 0) // we don't want to apply the regen power limit until we observe a negative 
+    if (acu_data.tractive_system_current < 0) // we don't want to apply the regen power limit until we observe a negative 
     {
         float electrical_power = acu_data.max_measured_ts_out_voltage * (-1.0f * acu_data.tractive_system_current);
         float electrical_over_power_scale = std::min(1.0f, std::max(0.0f, (electrical_power - start_regen_power_limit) / (max_regen_power_limit - start_regen_power_limit)));
