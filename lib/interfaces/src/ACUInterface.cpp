@@ -15,8 +15,8 @@ void ACUInterface::receive_em_measurement(const CAN_message_t &msg, unsigned lon
 {
     EM_MEASUREMENT_t em_msg = {};
     Unpack_EM_MEASUREMENT_hytech(&em_msg, &msg.buf[0], msg.len);
-    _curr_data.em_current = em_msg.em_current_ro;
-    _curr_data.em_voltage = em_msg.em_voltage_ro;
+    _curr_data.em_current = HYTECH_em_current_ro_fromS(em_msg.em_current_ro);
+    _curr_data.em_voltage = HYTECH_em_voltage_ro_fromS(em_msg.em_voltage_ro);
 }
 
 ACUCANInterfaceData_s ACUInterface::get_latest_data(uint64_t curr_millis) {
