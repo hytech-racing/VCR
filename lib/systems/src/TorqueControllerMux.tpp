@@ -223,7 +223,7 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
     const float noRegenLimitKPH = 10.0; 
     const float fullRegenLimitKPH = 5.0; // per rules EV.3.3.3
 
-    const float start_regen_voltage_limit = 500.0;
+    const float start_regen_voltage_limit = 520.0;
     const float max_regen_voltage_limit = 530.0;
 
     const float start_regen_power_limit = 15000.0f;
@@ -247,17 +247,16 @@ DrivetrainCommand_s TorqueControllerMux<num_controllers>::apply_regen_limit(cons
     torqueScaleDown = std::min(1.0f, std::max(0.0f, (maxWheelSpeed - fullRegenLimitKPH) / (noRegenLimitKPH - fullRegenLimitKPH)));
 
     // limit torque based on overvoltage so that cells do not
-    float over_voltage_protection_scale = std::min(1.0f, std::max(0.0f, (dt_data.measuredInverterFLPackVoltage - start_regen_voltage_limit) / (max_regen_voltage_limit - start_regen_voltage_limit)));
+    float over_voltage_protection_scale = std::min(1.0f, std::max(0.1f, (dt_data.measuredInverterFLPackVoltage - start_regen_voltage_limit) / (max_regen_voltage_limit - start_regen_voltage_limit)));
     torqueScaleDown *= (1.0f - over_voltage_protection_scale);
 
     // regen power limit
-    // if (acu_data.tractive_system_current < 0) // we don't want to apply the regen power limit until we observe a negative 
-    // {
-    //     float electrical_power = acu_data.max_measured_ts_out_voltage * (-1.0f * acu_data.tractive_system_current);
-    //     float electrical_over_power_scale = std::min(1.0f, std::max(0.0f, (electrical_power - start_regen_power_limit) / (max_regen_power_limit - start_regen_power_limit)));
-    //     torqueScaleDown *= electrical_over_power_scale;
-    // }
-    
+    if (dt_data.. < 0) // we don't want to apply the regen power limit until we observe a negative 
+    {
+        float electrical_power = acu_data.max_measured_ts_out_voltage * (-1.0f * acu_data.tractive_system_current);
+        float electrical_over_power_scale = std::min(1.0f, std::max(0.0f, (electrical_power - start_regen_power_limit) / (max_regen_power_limit - start_regen_power_limit)));
+        torqueScaleDown *= electrical_over_power_scale;
+    }
 
     // over voltage, rules regen limit
     if (allWheelsRegen)
