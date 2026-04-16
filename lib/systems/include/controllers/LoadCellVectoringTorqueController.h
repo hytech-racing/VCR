@@ -11,24 +11,24 @@ class LoadCellVectoringTorqueController
 public:
     /// @brief load cell TC with tunable F/R torque balance. Accel torque balance can be tuned independently of regen torque balance
     /// @param writeout the reference to the torque controller output being sent that contains the drivetrain command
-    /// @param rear_torque_scale 0 to 2 scale on forward torque to rear wheels. 0 = FWD, 1 = Balanced, 2 = RWD
-    /// @param regen_torque_scale same as rear_torque_scale but applies to regen torque split. 0 = All regen torque on the front, 1 = 50/50, 2 = all regen torque on the rear
-    LoadCellVectoringTorqueController(float rear_torque_scale, float regen_torque_scale)
-        : _front_torque_scale(2.0 - rear_torque_scale),
-          _rear_torque_scale(rear_torque_scale),
-          _front_regen_torque_scale(2.0 - regen_torque_scale),
-          _rear_regen_torque_scale(regen_torque_scale)
+    /// @param rear_torque_bias 0 to 2 bias on forward torque to rear wheels. 0 = FWD, 1 = Balanced, 2 = RWD
+    /// @param regen_torque_bias same as rear_torque_bias but applies to regen torque split. 0 = All regen torque on the front, 1 = 50/50, 2 = all regen torque on the rear
+    LoadCellVectoringTorqueController(float rear_torque_bias, float regen_torque_bias)
+        : _front_torque_bias(2.0 - rear_torque_bias),
+          _rear_torque_bias(rear_torque_bias),
+          _front_regen_torque_bias(2.0 - regen_torque_bias),
+          _rear_regen_torque_bias(regen_torque_bias)
     { }
-    /// @brief default contructor with balanced default values: rear_torque_scale = 1.0, regen_torque_scale = 1.0
+    /// @brief default contructor with balanced default values: rear_torque_bias = 1.0, regen_torque_bias = 1.0
     LoadCellVectoringTorqueController() : LoadCellVectoringTorqueController(1.0, 0.3) {}
 
     DrivetrainCommand_s evaluate(const VCRData_s &vcr_data, unsigned long curr_millis);
 
 private:
-    const float _front_torque_scale = 1.0;
-    const float _rear_torque_scale = 1.0;
-    const float _front_regen_torque_scale = 1.0f;
-    const float _rear_regen_torque_scale = 1.0f;
+    const float _front_torque_bias = 1.0;
+    const float _rear_torque_bias = 1.0;
+    const float _front_regen_torque_bias = 1.0f;
+    const float _rear_regen_torque_bias = 1.0f;
 
     const float _fl_load_cell_offset = -33.7501f;
     const float _fr_load_cell_offset = -29.665f;
