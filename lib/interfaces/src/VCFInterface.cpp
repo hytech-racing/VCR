@@ -56,9 +56,9 @@ void VCFInterface::receive_front_suspension_message(const CAN_message_t &msg, un
     FRONT_SUSPENSION_t front_suspension_msg;
     Unpack_FRONT_SUSPENSION_hytech(&front_suspension_msg, &msg.buf[0], msg.len);
     _curr_data.front_loadcell_data.FL_loadcell_analog = front_suspension_msg.fl_load_cell;
-    _curr_data.front_suspot_data.FL_sus_pot_analog = front_suspension_msg.fl_shock_pot;
+    _curr_data.front_suspot_data.FL_sus_pot_analog = HYTECH_fl_shock_pot_ro_fromS(front_suspension_msg.fl_shock_pot_ro);
     _curr_data.front_loadcell_data.FR_loadcell_analog = front_suspension_msg.fr_load_cell;
-    _curr_data.front_suspot_data.FR_sus_pot_analog = front_suspension_msg.fr_shock_pot;
+    _curr_data.front_suspot_data.FR_sus_pot_analog = HYTECH_fr_shock_pot_ro_fromS(front_suspension_msg.fr_shock_pot_ro);
     
     _curr_data.front_loadcell_data.valid_FL_sample = true; // only sent over CAN if valid from VCF
     _curr_data.front_loadcell_data.valid_FR_sample = true; // or send validities over CAN
