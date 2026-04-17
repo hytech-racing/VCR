@@ -40,6 +40,7 @@ public:
     
     
     void receive_pedals_message(const CAN_message_t& msg, unsigned long curr_millis);
+    void receive_steering_message(const CAN_message_t& msg, unsigned long curr_millis);
     void receive_dashboard_message(const CAN_message_t& msg, unsigned long curr_millis);
     void receive_front_suspension_message(const CAN_message_t &msg, unsigned long curr_millis);
     

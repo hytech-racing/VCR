@@ -35,6 +35,27 @@ void VCFInterface::receive_pedals_message(const CAN_message_t &msg, unsigned lon
     _curr_data.stamped_pedals.last_recv_millis = curr_millis;
 }
 
+void VCFInterface::receive_steering_message(const CAN_message_t &msg, unsigned long curr_millis) {
+    STEERING_DATA_t steering_msg;
+    Unpack_STEERING_DATA_hytech(&steering_msg, &msg.buf[0], msg.len);
+    _curr_data.stamped_steering.steering_data.analog_oor_implausibility = steering_msg.steering_analog_oor;
+    _curr_data.stamped_steering.steering_data.both_sensors_fail = steering_msg.steering_both_sensors_fail;
+    _curr_data.stamped_steering.steering_data.digital_oor_implausibility = steering_msg.steering_digital_oor;
+    _curr_data.stamped_steering.steering_data.dtheta_exceeded_analog = steering_msg.steering_dtheta_exceeded_analog;
+    _curr_data.stamped_steering.steering_data.dtheta_exceeded_digital = steering_msg.steering_dtheta_exceeded_digital;
+    _curr_data.stamped_steering.steering_data.interface_sensor_error = steering_msg.steering_interface_sensor_error;
+    _curr_data.stamped_steering.steering_data.output_steering_angle = steering_msg.steering_output_steering_angle_ro;
+    _curr_data.stamped_steering.steering_data.analog_raw = steering_msg.steering_analog_raw;
+    _curr_data.stamped_steering.steering_data.digital_raw = steering_msg.steering_digital_raw;
+
+    if(_curr_data.stamped_steering.last_recv_millis == 0)
+    {
+        _first_received_message_heartbeat_init = true; // TODO: can this be the same as pedals?
+    }
+
+    _curr_data.stamped_steering.last_recv_millis = curr_millis;
+}
+
 void VCFInterface::receive_dashboard_message(const CAN_message_t &msg, unsigned long curr_millis)
 {
     DASH_INPUT_t dash_msg;
