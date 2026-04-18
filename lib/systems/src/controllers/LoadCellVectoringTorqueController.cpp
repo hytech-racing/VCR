@@ -49,10 +49,10 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
             out.desired_speeds.RL = PhysicalParameters::AMK_MAX_RPM;
             out.desired_speeds.RR = PhysicalParameters::AMK_MAX_RPM;
             
-            out.torque_limits.FL = torque_request * _front_torque_scale * load_cell_data.FL / sum_normal_force;
-            out.torque_limits.FR = torque_request * _front_torque_scale * load_cell_data.FR / sum_normal_force;
-            out.torque_limits.RL = torque_request * _rear_torque_scale * load_cell_data.RL / sum_normal_force;
-            out.torque_limits.RR = torque_request * _rear_torque_scale * load_cell_data.RR / sum_normal_force;
+            out.torque_limits.FL = torque_request * _front_torque_bias * load_cell_data.FL / sum_normal_force;
+            out.torque_limits.FR = torque_request * _front_torque_bias * load_cell_data.FR / sum_normal_force;
+            out.torque_limits.RL = torque_request * _rear_torque_bias * load_cell_data.RL / sum_normal_force;
+            out.torque_limits.RR = torque_request * _rear_torque_bias * load_cell_data.RR / sum_normal_force;
         }
         else
         {
@@ -61,14 +61,14 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
 
             // RPM_TO_METERS_PER_SECOND
 
-            torque_request = PhysicalParameters::MAX_REGEN_TORQUE * accel_request * -1.0F;
+            torque_request = PhysicalParameters::REGEN_TORQUE_DEFAULT_SCALAR * accel_request * -1.0F;
 
             out.desired_speeds = {0.0F, 0.0F, 0.0F, 0.0F};
 
-            out.torque_limits.FL = std::min(_front_regen_limit, std::max(0.0f, torque_request * _front_regen_torque_scale));
-            out.torque_limits.FR = std::min(_front_regen_limit, std::max(0.0f, torque_request * _front_regen_torque_scale));
-            out.torque_limits.RL = std::min(_rear_regen_limit, std::max(0.0f, torque_request * _rear_regen_torque_scale));
-            out.torque_limits.RR = std::min(_rear_regen_limit, std::max(0.0f, torque_request * _rear_regen_torque_scale));
+            out.torque_limits.FR = std::min(PhysicalParameters::FRONT_MAX_REGEN_TORQUE, std::max(0.0f, torque_request * _front_regen_torque_bias));
+            out.torque_limits.RL = std::min(PhysicalParameters::REAR_MAX_REGEN_TORQUE, std::max(0.0f, torque_request * _rear_regen_torque_bias));
+            out.torque_limits.RR = std::min(PhysicalParameters::REAR_MAX_REGEN_TORQUE, std::max(0.0f, torque_request * _rear_regen_torque_bias));
+            out.torque_limits.FL = std::min(PhysicalParameters::FRONT_MAX_REGEN_TORQUE, std::max(0.0f, torque_request * _front_regen_torque_bias));
         }
     }
 
