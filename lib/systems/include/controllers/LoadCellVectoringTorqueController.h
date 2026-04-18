@@ -41,10 +41,7 @@ private:
     const float _rr_load_cell_scale = 0.137349f;
 
     const float _brake_percent_scale = 1.0f;
-
-    const float _rear_regen_limit = 3.5f;
-    const float _front_regen_limit = 13.0f;
-
+    
     const size_t _max_error_count = 25;
     veh_vec<size_t> _load_cell_error_counts = {};
 };
