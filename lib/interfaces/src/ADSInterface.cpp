@@ -46,6 +46,11 @@ void ADSInterface::read_current_data() {
 
 }
 
+void ADSInterface::power_up() {
+    delay(0.6);
+    Serial1.write(010101010);
+}
+
 void ADSInterface::power_down() {
     Serial1.write(10101010);
     Serial1.write(00000010); //  shutdown
