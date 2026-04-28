@@ -2,7 +2,7 @@
 
 #include "CANInterface.h"
 
-FlexCAN_T4<CAN3> MAIN_CAN;
+FlexCAN_T4<CAN1> MAIN_CAN;
 
 const uint32_t CAN_BAUDRATE = 500000;
 
@@ -42,5 +42,5 @@ void loop()
     test_msg.len = 1;
     test_msg.buf[0] = MSG_DATA;
     MAIN_CAN.write(test_msg);
-    Serial.println("testing");
+    // Serial.println("testing");
 }
