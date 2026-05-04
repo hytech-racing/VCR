@@ -29,31 +29,6 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
 HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     ADCInterfaceInstance::instance().tick_adc1();
-
-    vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog = ADCInterfaceInstance::instance().get_thermistor_0().conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog = ADCInterfaceInstance::instance().get_thermistor_1().conversion;
-    /*
-    vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_2().conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_3().conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_4().conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_5().conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_6().conversion;
-    vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog = ADCInterfaceInstance::instance().read_thermistor_7().conversion;
-    */
-
-    // with a 8.2k resistor for R1 and the sensor as R2, the formula for actual temperature should follow 198 - 31 * ln(analog_value)
-    vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog)); // log() is ln
-    vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog)); // log() is ln
-
-
-    // other thermistors computation is not as straight forward, not sure what these are
-    // vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_analog));
-    // vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_3.thermistor_analog));
-    // vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog));
-    // vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog));
-    // vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog));
-    // vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog));
-
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -75,10 +50,6 @@ HT_TASK::TaskResponse update_acu_heartbeat(const unsigned long& sysMicros, const
 {
     ACUCANInterfaceData_s data = ACUInterfaceInstance::instance().get_latest_data(sys_time::hal_millis());
     digitalWrite(SOFTWARE_OK_PIN, data.heartbeat_ok);
-
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.tractive_system_current = data.em_current;
-    vcr_data.interface_data.stamped_acu_core_data.acu_data.max_measured_ts_out_voltage = data.em_voltage;
-
     return HT_TASK::TaskResponse::YIELD;
 }
 

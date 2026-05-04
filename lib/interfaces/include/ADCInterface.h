@@ -208,6 +208,16 @@ public:
     AnalogConversion_s get_thermistor_6() const;
 
     AnalogConversion_s get_thermistor_7() const;
+
+    /**
+     * Converts the output of the ADC to a temperature in degrees following the function:
+     * deg C = offset + (scale * ln(raw analog value))
+     * @param n which thermistor to convert into degrees
+     * @param scale scale to convert ln(analog value) to degrees
+     * @param offset offset in degrees
+     * @return defaults to -1 if incorrect thermistor number is given
+     */
+    float get_thermistor_n_degrees_C(int n, float scale, float offset) const;
   
     bool is_brake_sense_high() const;
 

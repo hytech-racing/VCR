@@ -171,6 +171,29 @@ AnalogConversion_s ADCInterface::get_thermistor_7() const {
     return _adc1.data.conversions.at(_adc_parameters.channels.thermistor7_channel);
 }
 
+float ADCInterface::get_thermistor_n_degrees_C(int n, float scale, float offset) const {
+    switch (n) {
+        case 0:
+            return offset + (scale * log(ADCInterface::get_thermistor_0().raw));
+        case 1:
+            return offset + (scale * log(ADCInterface::get_thermistor_1().raw));
+        case 2:
+            return offset + (scale * log(ADCInterface::get_thermistor_2().raw));
+        case 3:
+            return offset + (scale * log(ADCInterface::get_thermistor_3().raw));
+        case 4:
+            return offset + (scale * log(ADCInterface::get_thermistor_4().raw));
+        case 5:
+            return offset + (scale * log(ADCInterface::get_thermistor_5().raw));
+        case 6:
+            return offset + (scale * log(ADCInterface::get_thermistor_6().raw));
+        case 7:
+            return offset + (scale * log(ADCInterface::get_thermistor_7().raw));
+        default:
+            return -1.0; // default to -1 to denote incorrect thermistor number
+    }
+}
+
 bool ADCInterface::is_brake_sense_high() const
 {
     return analogRead(_adc_parameters.pinouts.brake_high_sense_pin) > digital_high_threshold; 
