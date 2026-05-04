@@ -19,13 +19,9 @@
 class DrivebrainInterface {
   public:
 
-    DrivebrainInterface(const RearLoadCellData_s &rear_load_cell_data,
-                        const RearSusPotData_s &rear_suspot_data,
-                        const ThermistorData_s &coolant_temperature_data_0,
-                        const ThermistorData_s &coolant_temperature_data_1,
-                        const ThermistorData_s &flowmeter_data,
-                        IPAddress drivebrain_ip,
-                        uint16_t vcr_data_port, qindesign::network::EthernetUDP *udp_socket);
+    DrivebrainInterface(IPAddress drivebrain_ip,
+                        uint16_t vcr_data_port, 
+                        qindesign::network::EthernetUDP *udp_socket);
     void receive_drivebrain_speed_command_telem(const CAN_message_t &msg, unsigned long curr_millis);
 
     void receive_drivebrain_torque_lim_command_telem(const CAN_message_t &msg, unsigned long curr_millis);
@@ -34,9 +30,9 @@ class DrivebrainInterface {
 
     void receive_drivebrain_torque_lim_command_auxillary(const CAN_message_t &msg, unsigned long curr_millis);
 
-    void handle_enqueue_suspension_CAN_data(ADCInterface &instance);
+    void handle_enqueue_suspension_CAN_data(const ADCInterface &adc_instance);
 
-    void handle_enqueue_coolant_temp_CAN_data();
+    void handle_enqueue_coolant_temp_CAN_data(const ADCInterface &adc_instance);
 
     void handle_send_ethernet_data(const hytech_msgs_VCRData_s &data);
 
@@ -44,17 +40,6 @@ class DrivebrainInterface {
     StampedDrivetrainCommand_s get_latest_auxillary_drivebrain_command(); 
 
   private:
-    struct {
-        const RearLoadCellData_s &rear_load_cell_data;
-        const RearSusPotData_s &rear_suspot_data;
-    } _suspension_data;
-
-    struct {
-        const ThermistorData_s &coolant_temperature_0_data;
-        const ThermistorData_s &coolant_temperature_1_data;
-        const ThermistorData_s &flowmeter_data;
-    } _thermistor_data;
-
     IPAddress _drivebrain_ip;
     uint16_t _vcr_data_port;
     qindesign::network::EthernetUDP *_udp_socket;

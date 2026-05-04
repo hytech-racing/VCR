@@ -11,20 +11,9 @@
 #include <cstdint>
 
 
-DrivebrainInterface::DrivebrainInterface(const RearLoadCellData_s &rear_load_cell_data,
-                                         const RearSusPotData_s &rear_suspot_data,
-                                         const ThermistorData_s &coolant_temperature_data_0,
-                                         const ThermistorData_s &coolant_temperature_data_1,
-                                         const ThermistorData_s &flowmeter_data,
-                                         IPAddress drivebrain_ip, uint16_t vcr_data_port,
+DrivebrainInterface::DrivebrainInterface(IPAddress drivebrain_ip, uint16_t vcr_data_port,
                                          qindesign::network::EthernetUDP *udp_socket)
-    : _suspension_data{.rear_load_cell_data = rear_load_cell_data,
-                       .rear_suspot_data = rear_suspot_data},
-      _thermistor_data{.coolant_temperature_0_data = coolant_temperature_data_0,
-                       .coolant_temperature_1_data = coolant_temperature_data_1,
-                       .flowmeter_data = flowmeter_data
-                        },
-      _drivebrain_ip(drivebrain_ip),
+    : _drivebrain_ip(drivebrain_ip),
       _vcr_data_port(vcr_data_port),
       _udp_socket(udp_socket) { };
 
@@ -110,23 +99,23 @@ void DrivebrainInterface::receive_drivebrain_torque_lim_command_auxillary(const 
             HYTECH_drivebrain_torque_rr_ro_fromS(drivebrain_msg.drivebrain_torque_rr_ro))};
 }
 
-void DrivebrainInterface::handle_enqueue_suspension_CAN_data(ADCInterface &instance) {
+void DrivebrainInterface::handle_enqueue_suspension_CAN_data(const ADCInterface &adc_instance) {
     REAR_SUSPENSION_t rear_sus_msg;
 
-    rear_sus_msg.rl_load_cell = _suspension_data.rear_load_cell_data.RL_loadcell_analog;
-    rear_sus_msg.rr_load_cell = _suspension_data.rear_load_cell_data.RR_loadcell_analog;
-    rear_sus_msg.rl_shock_pot_ro = HYTECH_rl_shock_pot_ro_toS(instance.get_filtered_RL_sus_pot());
-    rear_sus_msg.rr_shock_pot_ro = HYTECH_rr_shock_pot_ro_toS(instance.get_filtered_RR_sus_pot());
+    rear_sus_msg.rl_load_cell = adc_instance.get_filtered_RL_load_cell(); // TOOD: probably want to make the CAN msg preserve some decimal points like the sus pots
+    rear_sus_msg.rr_load_cell = adc_instance.get_filtered_RR_load_cell();
+    rear_sus_msg.rl_shock_pot_ro = HYTECH_rl_shock_pot_ro_toS(adc_instance.get_filtered_RL_sus_pot());
+    rear_sus_msg.rr_shock_pot_ro = HYTECH_rr_shock_pot_ro_toS(adc_instance.get_filtered_RR_sus_pot());
     
     CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_hytech,
                           VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
-void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
+void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data(const ADCInterface &adc_instance) {
     REAR_THERMISTORS_DATA_t thermistor_msg;
-    thermistor_msg.thermistor_0_deg_C_ro = HYTECH_thermistor_0_deg_C_ro_toS(_thermistor_data.coolant_temperature_0_data.thermistor_degrees_C);
-    thermistor_msg.thermistor_1_deg_C_ro = HYTECH_thermistor_1_deg_C_ro_toS(_thermistor_data.coolant_temperature_1_data.thermistor_degrees_C);
-    thermistor_msg.thermistor_2_deg_C_ro = HYTECH_thermistor_2_deg_C_ro_toS(_thermistor_data.flowmeter_data.thermistor_degrees_C);
+    thermistor_msg.thermistor_0_deg_C_ro = HYTECH_thermistor_0_deg_C_ro_toS(adc_instance.get_thermistor_n_degrees_C(0));
+    thermistor_msg.thermistor_1_deg_C_ro = HYTECH_thermistor_1_deg_C_ro_toS(adc_instance.get_thermistor_n_degrees_C(1));
+    thermistor_msg.thermistor_2_deg_C_ro = HYTECH_thermistor_2_deg_C_ro_toS(adc_instance.get_thermistor_n_degrees_C(2));
     CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
