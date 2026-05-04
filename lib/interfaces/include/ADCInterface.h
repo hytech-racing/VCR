@@ -57,6 +57,8 @@ struct ADCScales_s {
     float thermistor5_scale;
     float thermistor6_scale;
     float thermistor7_scale;
+
+    float coolant_temp_scale;
 };
 
 struct ADCOffsets_s {
@@ -76,6 +78,8 @@ struct ADCOffsets_s {
     float thermistor5_offset;
     float thermistor6_offset;
     float thermistor7_offset;
+
+    float coolant_temp_offset;
 };
 
 struct ADCInterfaceParams_s {
@@ -213,11 +217,9 @@ public:
      * Converts the output of the ADC to a temperature in degrees following the function:
      * deg C = offset + (scale * ln(raw analog value))
      * @param n which thermistor to convert into degrees
-     * @param scale scale to convert ln(analog value) to degrees
-     * @param offset offset in degrees
      * @return defaults to -1 if incorrect thermistor number is given
      */
-    float get_thermistor_n_degrees_C(int n, float scale, float offset) const;
+    float get_thermistor_n_degrees_C(int n) const;
   
     bool is_brake_sense_high() const;
 
@@ -228,7 +230,6 @@ private:
 
     MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc0;
     MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc1;
-
 
     float _RL_load_cell_filtered;
     float _RL_sus_pot_filtered;

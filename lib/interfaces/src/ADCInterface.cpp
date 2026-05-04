@@ -171,27 +171,38 @@ AnalogConversion_s ADCInterface::get_thermistor_7() const {
     return _adc1.data.conversions.at(_adc_parameters.channels.thermistor7_channel);
 }
 
-float ADCInterface::get_thermistor_n_degrees_C(int n, float scale, float offset) const {
+float ADCInterface::get_thermistor_n_degrees_C(int n) const {
+    int thermistor_reading;
     switch (n) {
         case 0:
-            return offset + (scale * log(ADCInterface::get_thermistor_0().raw));
+            thermistor_reading = ADCInterface::get_thermistor_0().raw;
+            break;
         case 1:
-            return offset + (scale * log(ADCInterface::get_thermistor_1().raw));
+            thermistor_reading = ADCInterface::get_thermistor_1().raw;
+            break;
         case 2:
-            return offset + (scale * log(ADCInterface::get_thermistor_2().raw));
+            thermistor_reading = ADCInterface::get_thermistor_2().raw;
+            break;
         case 3:
-            return offset + (scale * log(ADCInterface::get_thermistor_3().raw));
+            thermistor_reading = ADCInterface::get_thermistor_3().raw;
+            break;
         case 4:
-            return offset + (scale * log(ADCInterface::get_thermistor_4().raw));
+            thermistor_reading = ADCInterface::get_thermistor_4().raw;
+            break;
         case 5:
-            return offset + (scale * log(ADCInterface::get_thermistor_5().raw));
+            thermistor_reading = ADCInterface::get_thermistor_5().raw;
+            break;
         case 6:
-            return offset + (scale * log(ADCInterface::get_thermistor_6().raw));
+            thermistor_reading = ADCInterface::get_thermistor_6().raw;
+            break;
         case 7:
-            return offset + (scale * log(ADCInterface::get_thermistor_7().raw));
+            thermistor_reading = ADCInterface::get_thermistor_7().raw;
+            break;
         default:
             return -1.0; // default to -1 to denote incorrect thermistor number
     }
+
+    return _adc_parameters.offsets.coolant_temp_offset + (_adc_parameters.scales.coolant_temp_scale * log(thermistor_reading));
 }
 
 bool ADCInterface::is_brake_sense_high() const

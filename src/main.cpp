@@ -312,11 +312,7 @@ void setup() {
     ProtobufSocketsInstance::create(vcr_data_send_socket, vcf_data_recv_socket);
     EthernetIPDefsInstance::create();
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
-    DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
-        vcr_data.interface_data.rear_suspot_data,
-        vcr_data.interface_data.thermistor_data.thermistor_0,
-        vcr_data.interface_data.thermistor_data.thermistor_1,
-        vcr_data.interface_data.thermistor_data.thermistor_2,
+    DrivebrainInterfaceInstance::create(
         EthernetIPDefsInstance::instance().drivebrain_ip,
         EthernetIPDefsInstance::instance().VCRData_port,
         &vcr_data_send_socket);
@@ -405,6 +401,7 @@ void setup() {
         THERMISTOR_5_SCALE,
         THERMISTOR_6_SCALE,
         THERMISTOR_7_SCALE,
+        COOLANT_TEMP_SCALE
       },
       ADCOffsets_s {
         GLV_SENSE_OFFSET,
@@ -422,6 +419,7 @@ void setup() {
         THERMISTOR_5_OFFSET,
         THERMISTOR_6_OFFSET,
         THERMISTOR_7_OFFSET,
+        COOLANT_TEMP_OFFSET
       }
     );
   
