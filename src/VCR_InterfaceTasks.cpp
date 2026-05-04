@@ -158,7 +158,7 @@ HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_T
 
 
 // need to double check pin assigments
-HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) // TODO: make all of this in a separate IO Expander Interface
 {
     // NOLINTBEGIN
     uint16_t data = IOExpanderInstance::instance().read();
@@ -202,7 +202,7 @@ HT_TASK::TaskResponse init_update_brakelight_task(const unsigned long& sysMicros
 
 HT_TASK::TaskResponse run_update_brakelight_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    digitalWrite(BRAKELIGHT_CONTROL_PIN, vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_is_pressed);
+    digitalWrite(BRAKELIGHT_CONTROL_PIN, VCFInterfaceInstance::instance().is_brake_pressed());
     return HT_TASK::TaskResponse::YIELD;
 }
 
