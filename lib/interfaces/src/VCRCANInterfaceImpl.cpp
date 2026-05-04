@@ -5,29 +5,18 @@
 
 namespace VCRCANInterfaceImpl {
 
-// global forwards
-CANRXBufferType auxillary_can_rx_buffer;
-CANRXBufferType inverter_can_rx_buffer;
-CANRXBufferType telem_can_rx_buffer;
-
-CANTXBufferType auxillary_can_tx_buffer;
-CANTXBufferType inverter_can_tx_buffer;
-CANTXBufferType telem_can_tx_buffer;
-
-
-
 void on_auxillary_can_receive(const CAN_message_t &msg) {
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
-    auxillary_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
+    VCRCANInterfaceInstace::instance().rear_aux_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
 void on_inverter_can_receive(const CAN_message_t &msg) {
-    AUXILLARY_CAN.write(msg);
-    TELEM_CAN.write(msg); // send immediately onto the telem CAN line
+    VCRCANInterfaceInstace::instance().REAR_AUX_CAN.write(msg);
+    VCRCANInterfaceInstace::instance().TELEM_CAN.write(msg); // send immediately onto the telem CAN line
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
-    inverter_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
+    VCRCANInterfaceInstace::instance().inverter_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
 
     // Serial.println("msg recvd");
     // Serial.print("MB: "); Serial.print(msg.mb);
@@ -45,10 +34,10 @@ void on_inverter_can_receive(const CAN_message_t &msg) {
 void on_telem_can_receive(const CAN_message_t &msg) {
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
-    telem_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
+    VCRCANInterfaceInstace::instance().telem_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
-void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis, CANInterfaceType_e interface_type) {
+void vcr_CAN_recv_switch(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis, CANInterfaceType_e interface_type) {
     switch (msg.id) {
 
     case PEDALS_SYSTEM_DATA_CANID: 

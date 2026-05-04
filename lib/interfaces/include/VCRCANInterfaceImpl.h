@@ -24,12 +24,13 @@
 
 #include "InverterInterface.h"
 
+/* Type aliases to improve readability, and provide one place to change parameters */
 using CANRXBufferType = Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)>;
 using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_message_t)>;
 
-/* RX buffers for CAN extern declarations*/
-
-template <CAN_DEV_TABLE CAN_DEV> using FlexCAN_Type = FlexCAN_T4<CAN_DEV, RX_SIZE_256, TX_SIZE_16>;
+using TelemCAN_t = FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16>;
+using RearAuxCAN_t = FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16>;
+using InverterCAN_t = FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16>;
 
 // this is being done to send immediately from the inverter CAN line to the TELEM CAN every inverter
 
@@ -60,36 +61,39 @@ struct CANInterfaces {
     InverterInterface &rr_inverter_interface;
 
 };
-
 using CANInterfacesInstance = etl::singleton<CANInterfaces>;
 
+struct VCRCANInterface {
+    VCRCANInterface(etl::delegate<void (CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> recv_switch_func)
+        : can_recv_switch(recv_switch_func)
+        {}
+    
+    TelemCAN_t TELEM_CAN;
+
+    CANTXBufferType telem_can_tx_buffer;
+    CANRXBufferType telem_can_rx_buffer;
+
+    RearAuxCAN_t REAR_AUX_CAN;
+
+    CANTXBufferType rear_aux_can_tx_buffer;
+    CANRXBufferType rear_aux_can_rx_buffer;
+
+    InverterCAN_t INVERTER_CAN;
+
+    CANTXBufferType inverter_can_tx_buffer;
+    CANRXBufferType inverter_can_rx_buffer;
+
+    etl::delegate<void (CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis, CANInterfaceType_e interface_type)> can_recv_switch;
+};
+using VCRCANInterfaceInstace = etl::singleton<VCRCANInterface>;
 
 namespace VCRCANInterfaceImpl {
-
-    extern CANRXBufferType auxillary_can_rx_buffer;
-    extern CANRXBufferType inverter_can_rx_buffer;
-    extern CANRXBufferType telem_can_rx_buffer;
-
-    /* TX buffer for CAN1 */
-    extern CANTXBufferType auxillary_can_tx_buffer;
-    /* TX buffer for CAN2 */
-    extern CANTXBufferType inverter_can_tx_buffer;
-    /* TX buffer for CAN3 */
-    extern CANTXBufferType telem_can_tx_buffer;
-
-    extern FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> AUXILLARY_CAN;
-    extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> TELEM_CAN; // gets defined in main as of right now
-    extern FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> INVERTER_CAN; // gets defined in main as of right now
-    //extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> CAN_1; 
-
-
     void on_auxillary_can_receive(const CAN_message_t &msg);
     void on_inverter_can_receive(const CAN_message_t &msg);
     void on_telem_can_receive(const CAN_message_t &msg);
-    void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis, CANInterfaceType_e interface_type);
+    void vcr_CAN_recv_switch(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis, CANInterfaceType_e interface_type);
 
     void send_all_CAN_msgs(CANTXBufferType &buffer, FlexCAN_T4_Base *can_interface);
-    
 }; // namespace VCRCANInterfaceImpl
 
 #endif // VCRCANINTERFACEIMPL_H
