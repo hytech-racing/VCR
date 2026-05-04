@@ -92,10 +92,13 @@ template <std::size_t num_controllers> class TorqueControllerMux {
         float max_change_speed = TC_MUX_DEFAULT_PARAMS::MAX_SPEED_FOR_MODE_CHANGE,
         float max_torque_pos_change_delta = TC_MUX_DEFAULT_PARAMS::MAX_TORQUE_DELTA_FOR_MODE_CHANGE,
         float max_power_limit = TC_MUX_DEFAULT_PARAMS::MAX_POWER_LIMIT, size_t num_motors = 4)
-        : _controller_evals(controller_evals), _mux_bypass_limits(mux_bypass_limits),
+        : _controller_evals(controller_evals), 
+          _mux_bypass_limits(mux_bypass_limits),
           _max_change_speed(max_change_speed),
           _max_torque_pos_change_delta(max_torque_pos_change_delta),
-          _max_power_limit(max_power_limit), _num_motors(num_motors) {}
+          _max_power_limit(max_power_limit), 
+          _num_motors(num_motors) 
+          {}
 
     const TorqueControllerMuxStatus_s &get_tc_mux_status() const { return _active_status; }
 
@@ -172,7 +175,8 @@ template <std::size_t num_controllers> class TorqueControllerMux {
     /// @return DrivetrainCommand_s to update the drivetrain command in the getDrivetrainCommand
     /// method
     DrivetrainCommand_s apply_regen_limit(const DrivetrainCommand_s &command,
-                                          const DrivetrainDynamicReport_s &drivetrain_data);
+                                          const DrivetrainDynamicReport_s &drivetrain_data,
+                                          const ACUCoreData_s acu_data);
 };
 // }
 

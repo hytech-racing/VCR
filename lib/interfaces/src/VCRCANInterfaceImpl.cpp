@@ -71,6 +71,12 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
         interfaces.acu_interface.receive_acu_ok_message(msg, millis);
         break;
     }
+    case EM_MEASUREMENT_CANID:
+    {
+        interfaces.acu_interface.receive_em_measurement(msg, millis);
+        break;
+    }
+
     case DRIVEBRAIN_TORQUE_LIM_INPUT_CANID: 
     {
         if (interface_type == CANInterfaceType_e::AUX) {
