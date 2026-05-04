@@ -43,11 +43,6 @@
 /* From pio-git-hash */
 #include "device_fw_version.h"
 
-/* externed CAN instances */
-FlexCAN_Type<CAN2> VCRCANInterfaceImpl::AUXILLARY_CAN;
-FlexCAN_Type<CAN1> VCRCANInterfaceImpl::TELEM_CAN;
-FlexCAN_Type<CAN3> VCRCANInterfaceImpl::INVERTER_CAN;
-
 /* Ethernet message sockets */
 qindesign::network::EthernetUDP vcr_data_send_socket;
 qindesign::network::EthernetUDP vcf_data_recv_socket;
@@ -55,10 +50,10 @@ qindesign::network::EthernetUDP vcf_data_recv_socket;
 /* Drivetrain Initialization */
 
 // Inverter Interfaces
-InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
-InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
-InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
-InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+InverterInterface fl_inverter_int(INV1_CONTROL_WORD_CANID, INV1_CONTROL_INPUT_CANID, INV1_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = VCRSystemConstants::INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+InverterInterface fr_inverter_int(INV2_CONTROL_WORD_CANID, INV2_CONTROL_INPUT_CANID, INV2_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = VCRSystemConstants::INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+InverterInterface rl_inverter_int(INV3_CONTROL_WORD_CANID, INV3_CONTROL_INPUT_CANID, INV3_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = VCRSystemConstants::INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
+InverterInterface rr_inverter_int(INV4_CONTROL_WORD_CANID, INV4_CONTROL_INPUT_CANID, INV4_CONTROL_PARAMETER_CANID, {.MINIMUM_HV_VOLTAGE = VCRSystemConstants::INVERTER_MINIMUM_HV_VOLTAGE}); //NOLINT
 
 // Inverter Functs
 DrivetrainSystem::InverterFuncts fl_inverter_functs = {
@@ -95,30 +90,30 @@ DrivetrainSystem::InverterFuncts rr_inverter_functs = {
 
 veh_vec<DrivetrainSystem::InverterFuncts> inverter_functs(fl_inverter_functs, fr_inverter_functs, rl_inverter_functs, rr_inverter_functs);
 
-etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create([](bool set_active) { digitalWrite(INVERTER_ENABLE_PIN, static_cast<int>(set_active)); });
+etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create([](bool set_active) { digitalWrite(VCRInterfaceConstants::INVERTER_ENABLE_PIN, static_cast<int>(set_active)); });
 
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
 
 /* Task Declarations */
-HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
-HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
-HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, watchdog_priority, kick_watchdog_period_us);
-HT_TASK::Task ams_system_task(init_acu_heartbeat, update_acu_heartbeat, ams_priority, ams_update_period_us);
-HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, suspension_priority, suspension_can_period_us);
-HT_TASK::Task enqueue_controls_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_controls_CAN_data, controls_priority, controls_can_period_us);
-HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, inverter_send_priority, inv_send_period);
-HT_TASK::Task enqueue_dashboard_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_dashboard_CAN_data, dashboard_send_priority, dashboard_send_period_us);
-HT_TASK::Task enqueue_coolant_temp_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_coolant_temp_CAN_data, coolant_temp_send_priority, coolant_temp_send_period_us);
-HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, send_can_priority, send_can_period_us); // Sends all messages from the CAN queue
-HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority, ethernet_update_period);
-HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
-HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, main_task_priority, main_task_period_us);
-HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
-HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
-HT_TASK::Task run_enable_motor_cooling(HT_TASK::DUMMY_FUNCTION, enable_motor_cooling, dashboard_send_priority, dashboard_send_period_us);
-HT_TASK::Task run_enable_inverter_cooling(HT_TASK::DUMMY_FUNCTION, enable_inverter_cooling, dashboard_send_priority, dashboard_send_period_us);
+HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, VCRTaskConstants::adc0_priority, VCRTaskConstants::adc0_sample_period_us);
+HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, VCRTaskConstants::adc1_priority, VCRTaskConstants::adc1_sample_period_us);
+HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, VCRTaskConstants::watchdog_priority, VCRTaskConstants::kick_watchdog_period_us);
+HT_TASK::Task ams_system_task(init_acu_heartbeat, update_acu_heartbeat, VCRTaskConstants::ams_priority, VCRTaskConstants::ams_update_period_us);
+HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, VCRTaskConstants::suspension_priority, VCRTaskConstants::suspension_can_period_us);
+HT_TASK::Task enqueue_controls_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_controls_CAN_data, VCRTaskConstants::controls_priority, VCRTaskConstants::controls_can_period_us);
+HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, VCRTaskConstants::inverter_send_priority, VCRTaskConstants::inv_send_period);
+HT_TASK::Task enqueue_dashboard_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_dashboard_CAN_data, VCRTaskConstants::dashboard_send_priority, VCRTaskConstants::dashboard_send_period_us);
+HT_TASK::Task enqueue_coolant_temp_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_coolant_temp_CAN_data, VCRTaskConstants::coolant_temp_send_priority, VCRTaskConstants::coolant_temp_send_period_us);
+HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, VCRTaskConstants::send_can_priority, VCRTaskConstants::send_can_period_us); // Sends all messages from the CAN queue
+HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, VCRTaskConstants::ethernet_send_priority, VCRTaskConstants::ethernet_update_period);
+HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, VCRTaskConstants::ioexpander_priority, VCRTaskConstants::ioexpander_sample_period_us);
+HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, VCRTaskConstants::main_task_priority, VCRTaskConstants::main_task_period_us);
+HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, VCRTaskConstants::update_brakelight_priority, VCRTaskConstants::update_brakelight_period_us);
+HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, VCRTaskConstants::dashboard_send_priority, VCRTaskConstants::dashboard_send_period_us);
+HT_TASK::Task run_enable_motor_cooling(HT_TASK::DUMMY_FUNCTION, enable_motor_cooling, VCRTaskConstants::dashboard_send_priority, VCRTaskConstants::dashboard_send_period_us);
+HT_TASK::Task run_enable_inverter_cooling(HT_TASK::DUMMY_FUNCTION, enable_inverter_cooling, VCRTaskConstants::dashboard_send_priority, VCRTaskConstants::dashboard_send_period_us);
 
 
 
@@ -288,9 +283,9 @@ void setup() {
 
 
     // Configure pins
-    pinMode(MOTOR_COOLING_CONTROL_PIN, OUTPUT);
-    pinMode(INVERTER_COOLING_CONTROL_PIN, OUTPUT);
-    pinMode(INVERTER_ENABLE_PIN, OUTPUT);
+    pinMode(VCRInterfaceConstants::MOTOR_COOLING_CONTROL_PIN, OUTPUT);
+    pinMode(VCRInterfaceConstants::INVERTER_COOLING_CONTROL_PIN, OUTPUT);
+    pinMode(VCRInterfaceConstants::INVERTER_ENABLE_PIN, OUTPUT);
 
     // Save firmware version
     vcr_data.fw_version_info.fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
@@ -298,7 +293,7 @@ void setup() {
     vcr_data.fw_version_info.project_is_dirty = device_status_t::project_is_dirty;
 
     SPI.begin();
-    analogReadResolution(ANALOG_RESOLUTION);
+    analogReadResolution(VCRInterfaceConstants::ANALOG_RESOLUTION);
 
     // Flowmeter stuff
     // pinMode(FLOWMETER_PIN, INPUT_PULLUP); //need to change based on aux uart
@@ -311,7 +306,7 @@ void setup() {
     // Create all singletons
     ProtobufSocketsInstance::create(vcr_data_send_socket, vcf_data_recv_socket);
     EthernetIPDefsInstance::create();
-    VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
+    VCFInterfaceInstance::create(sys_time::hal_millis(), VCRInterfaceConstants::VCF_PEDALS_MAX_HEARTBEAT_MS);
     DrivebrainInterfaceInstance::create(
         EthernetIPDefsInstance::instance().drivebrain_ip,
         EthernetIPDefsInstance::instance().VCRData_port,
@@ -336,7 +331,7 @@ void setup() {
     );
     VCRAsynchronousInterfacesInstance::create(CANInterfacesInstance::instance());
 
-    VCRControlsInstance::create(&DrivetrainInstance::instance(), MAX_ALLOWED_DB_LATENCY_MS);
+    VCRControlsInstance::create(&DrivetrainInstance::instance(), VCRSystemConstants::MAX_ALLOWED_DB_LATENCY_MS);
     VehicleStateMachineInstance::create(
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold>(DrivetrainInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_start_button_pressed>(VCFInterfaceInstance::instance()),
@@ -358,68 +353,68 @@ void setup() {
 
     // Initialize CAN
     const uint32_t telem_CAN_baudrate = 1000000;
-    const uint32_t auxillary_CAN_baudrate = 500000;
+    const uint32_t rear_aux_CAN_baudrate = 500000;
     const uint32_t inv_CAN_baudrate = 500000;
 
-    handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
-    handle_CAN_setup(VCRCANInterfaceImpl::TELEM_CAN, telem_CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
-    handle_CAN_setup(VCRCANInterfaceImpl::AUXILLARY_CAN, auxillary_CAN_baudrate, &VCRCANInterfaceImpl::on_auxillary_can_receive);
+    handle_CAN_setup(VCRCANInterfaceInstace::instance().INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
+    handle_CAN_setup(VCRCANInterfaceInstace::instance().TELEM_CAN, telem_CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
+    handle_CAN_setup(VCRCANInterfaceInstace::instance().REAR_AUX_CAN, rear_aux_CAN_baudrate, &VCRCANInterfaceImpl::on_auxillary_can_receive);
 
     // Instantiate ADC interface
     ADCInterfaceInstance::create(
-      ADCPinout_s {ADC0_CS, ADC1_CS, BRAKE_HIGH_SENSE_PIN, CURRENT_HIGH_SENSE_PIN},
+      ADCPinout_s {VCRInterfaceConstants::ADC0_CS, VCRInterfaceConstants::ADC1_CS, VCRInterfaceConstants::BRAKE_HIGH_SENSE_PIN, VCRInterfaceConstants::CURRENT_HIGH_SENSE_PIN},
       ADCChannels_s {
-        GLV_SENSE_CHANNEL,
-        CURRENT_SENSE_CHANNEL,
-        REFERENCE_SENSE_CHANNEL,
-        RL_LOADCELL_CHANNEL,
-        RR_LOADCELL_CHANNEL,
-        RL_SUS_POT_CHANNEL,
-        RR_SUS_POT_CHANNEL,
-        THERMISTOR_0_CHANNEL,
-        THERMISTOR_1_CHANNEL,
-        THERMISTOR_2_CHANNEL,
-        THERMISTOR_3_CHANNEL,
-        THERMISTOR_4_CHANNEL,
-        THERMISTOR_5_CHANNEL,
-        THERMISTOR_6_CHANNEL,
-        THERMISTOR_7_CHANNEL
+        VCRInterfaceConstants::GLV_SENSE_CHANNEL,
+        VCRInterfaceConstants::CURRENT_SENSE_CHANNEL,
+        VCRInterfaceConstants::REFERENCE_SENSE_CHANNEL,
+        VCRInterfaceConstants::RL_LOADCELL_CHANNEL,
+        VCRInterfaceConstants::RR_LOADCELL_CHANNEL,
+        VCRInterfaceConstants::RL_SUS_POT_CHANNEL,
+        VCRInterfaceConstants::RR_SUS_POT_CHANNEL,
+        VCRInterfaceConstants::THERMISTOR_0_CHANNEL,
+        VCRInterfaceConstants::THERMISTOR_1_CHANNEL,
+        VCRInterfaceConstants::THERMISTOR_2_CHANNEL,
+        VCRInterfaceConstants::THERMISTOR_3_CHANNEL,
+        VCRInterfaceConstants::THERMISTOR_4_CHANNEL,
+        VCRInterfaceConstants::THERMISTOR_5_CHANNEL,
+        VCRInterfaceConstants::THERMISTOR_6_CHANNEL,
+        VCRInterfaceConstants::THERMISTOR_7_CHANNEL
       },
       ADCScales_s {
-        GLV_SENSE_SCALE,
-        CURRENT_SENSE_SCALE,
-        REFERENCE_SENSE_SCALE,
-        RL_LOADCELL_SCALE,
-        RR_LOADCELL_SCALE,
-        RL_SUS_POT_SCALE,
-        RR_SUS_POT_SCALE,
-        THERMISTOR_0_SCALE,
-        THERMISTOR_1_SCALE,
-        THERMISTOR_2_SCALE,
-        THERMISTOR_3_SCALE,
-        THERMISTOR_4_SCALE,
-        THERMISTOR_5_SCALE,
-        THERMISTOR_6_SCALE,
-        THERMISTOR_7_SCALE,
-        COOLANT_TEMP_SCALE
+        VCRInterfaceConstants::GLV_SENSE_SCALE,
+        VCRInterfaceConstants::CURRENT_SENSE_SCALE,
+        VCRInterfaceConstants::REFERENCE_SENSE_SCALE,
+        VCRInterfaceConstants::RL_LOADCELL_SCALE,
+        VCRInterfaceConstants::RR_LOADCELL_SCALE,
+        VCRInterfaceConstants::RL_SUS_POT_SCALE,
+        VCRInterfaceConstants::RR_SUS_POT_SCALE,
+        VCRInterfaceConstants::THERMISTOR_0_SCALE,
+        VCRInterfaceConstants::THERMISTOR_1_SCALE,
+        VCRInterfaceConstants::THERMISTOR_2_SCALE,
+        VCRInterfaceConstants::THERMISTOR_3_SCALE,
+        VCRInterfaceConstants::THERMISTOR_4_SCALE,
+        VCRInterfaceConstants::THERMISTOR_5_SCALE,
+        VCRInterfaceConstants::THERMISTOR_6_SCALE,
+        VCRInterfaceConstants::THERMISTOR_7_SCALE,
+        VCRInterfaceConstants::COOLANT_TEMP_SCALE
       },
       ADCOffsets_s {
-        GLV_SENSE_OFFSET,
-        CURRENT_SENSE_OFFSET,
-        REFERENCE_SENSE_OFFSET,
-        RL_LOADCELL_OFFSET,
-        RR_LOADCELL_OFFSET,
-        RL_SUS_POT_OFFSET,
-        RR_SUS_POT_OFFSET,
-        THERMISTOR_0_OFFSET,
-        THERMISTOR_1_OFFSET,
-        THERMISTOR_2_OFFSET,
-        THERMISTOR_3_OFFSET,
-        THERMISTOR_4_OFFSET,
-        THERMISTOR_5_OFFSET,
-        THERMISTOR_6_OFFSET,
-        THERMISTOR_7_OFFSET,
-        COOLANT_TEMP_OFFSET
+        VCRInterfaceConstants::GLV_SENSE_OFFSET,
+        VCRInterfaceConstants::CURRENT_SENSE_OFFSET,
+        VCRInterfaceConstants::REFERENCE_SENSE_OFFSET,
+        VCRInterfaceConstants::RL_LOADCELL_OFFSET,
+        VCRInterfaceConstants::RR_LOADCELL_OFFSET,
+        VCRInterfaceConstants::RL_SUS_POT_OFFSET,
+        VCRInterfaceConstants::RR_SUS_POT_OFFSET,
+        VCRInterfaceConstants::THERMISTOR_0_OFFSET,
+        VCRInterfaceConstants::THERMISTOR_1_OFFSET,
+        VCRInterfaceConstants::THERMISTOR_2_OFFSET,
+        VCRInterfaceConstants::THERMISTOR_3_OFFSET,
+        VCRInterfaceConstants::THERMISTOR_4_OFFSET,
+        VCRInterfaceConstants::THERMISTOR_5_OFFSET,
+        VCRInterfaceConstants::THERMISTOR_6_OFFSET,
+        VCRInterfaceConstants::THERMISTOR_7_OFFSET,
+        VCRInterfaceConstants::COOLANT_TEMP_OFFSET
       }
     );
   

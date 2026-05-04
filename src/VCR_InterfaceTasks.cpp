@@ -22,7 +22,7 @@
 HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     ADCInterfaceInstance::instance().tick_adc0();
-    ADCInterfaceInstance::instance().update_filtered_values(LOADCELL_IIR_FILTER_ALPHA);
+    ADCInterfaceInstance::instance().update_filtered_values(VCRInterfaceConstants::LOADCELL_IIR_FILTER_ALPHA);
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -42,29 +42,29 @@ HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const
 
 HT_TASK::TaskResponse init_acu_heartbeat(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    ACUInterfaceInstance::create(sys_time::hal_millis(), ACU_ACU_OK_MAX_HEARTBEAT_MS); // NOLINT
+    ACUInterfaceInstance::create(sys_time::hal_millis(), VCRInterfaceConstants::ACU_ACU_OK_MAX_HEARTBEAT_MS); // NOLINT
     return HT_TASK::TaskResponse::YIELD;
 }
 
 HT_TASK::TaskResponse update_acu_heartbeat(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     ACUCANInterfaceData_s data = ACUInterfaceInstance::instance().get_latest_data(sys_time::hal_millis());
-    digitalWrite(SOFTWARE_OK_PIN, data.heartbeat_ok);
+    digitalWrite(VCRInterfaceConstants::SOFTWARE_OK_PIN, data.heartbeat_ok);
     return HT_TASK::TaskResponse::YIELD;
 }
 
 HT_TASK::TaskResponse init_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    WatchdogInstance::create(WATCHDOG_KICK_INTERVAL_MS); // NOLINT
-    pinMode(SOFTWARE_OK_PIN, OUTPUT);
-    pinMode(WATCHDOG_PIN, OUTPUT);
+    WatchdogInstance::create(VCRInterfaceConstants::WATCHDOG_KICK_INTERVAL_MS); // NOLINT
+    pinMode(VCRInterfaceConstants::SOFTWARE_OK_PIN, OUTPUT);
+    pinMode(VCRInterfaceConstants::WATCHDOG_PIN, OUTPUT);
     return HT_TASK::TaskResponse::YIELD;
 }
 
 HT_TASK::TaskResponse run_kick_watchdog(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    digitalWrite(WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
-    digitalWrite(SOFTWARE_OK_PIN, HIGH);
+    digitalWrite(VCRInterfaceConstants::WATCHDOG_PIN, WatchdogInstance::instance().get_watchdog_state(sys_time::hal_millis()));
+    digitalWrite(VCRInterfaceConstants::SOFTWARE_OK_PIN, HIGH);
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -85,7 +85,7 @@ HT_TASK::TaskResponse enqueue_controls_CAN_data(const unsigned long& sysMicros, 
 
 HT_TASK::TaskResponse enqueue_coolant_temp_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    DrivebrainInterfaceInstance::instance().handle_enqueue_coolant_temp_CAN_data();
+    DrivebrainInterfaceInstance::instance().handle_enqueue_coolant_temp_CAN_data(ADCInterfaceInstance::instance());
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -116,9 +116,9 @@ HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, 
 
 HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &VCRCANInterfaceImpl::INVERTER_CAN);
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::auxillary_can_tx_buffer, &VCRCANInterfaceImpl::AUXILLARY_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceInstace::instance().inverter_can_tx_buffer, &VCRCANInterfaceInstace::instance().INVERTER_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceInstace::instance().telem_can_tx_buffer, &VCRCANInterfaceInstace::instance().TELEM_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceInstace::instance().rear_aux_can_tx_buffer, &VCRCANInterfaceInstace::instance().REAR_AUX_CAN);
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -196,20 +196,20 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
 
 HT_TASK::TaskResponse init_update_brakelight_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    pinMode(BRAKELIGHT_CONTROL_PIN, OUTPUT);
+    pinMode(VCRInterfaceConstants::BRAKELIGHT_CONTROL_PIN, OUTPUT);
     return HT_TASK::TaskResponse::YIELD;
 }
 
 HT_TASK::TaskResponse run_update_brakelight_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    digitalWrite(BRAKELIGHT_CONTROL_PIN, VCFInterfaceInstance::instance().is_brake_pressed());
+    digitalWrite(VCRInterfaceConstants::BRAKELIGHT_CONTROL_PIN, VCFInterfaceInstance::instance().is_brake_pressed());
     return HT_TASK::TaskResponse::YIELD;
 }
 
 
 HT_TASK::TaskResponse enable_motor_cooling(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
 {
-    digitalWrite(MOTOR_COOLING_CONTROL_PIN, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? HIGH : LOW);
+    digitalWrite(VCRInterfaceConstants::MOTOR_COOLING_CONTROL_PIN, VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE ? HIGH : LOW);
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -217,7 +217,7 @@ HT_TASK::TaskResponse enable_inverter_cooling(const unsigned long& sysMicros, co
 {
     VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state(); //NOLINT will alway be populated so is ok
     bool enable_state = vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE || vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE || vehicle_state == VehicleState_e::READY_TO_DRIVE;
-    digitalWrite(INVERTER_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
+    digitalWrite(VCRInterfaceConstants::INVERTER_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
     
     return HT_TASK::TaskResponse::YIELD;
 }

@@ -19,11 +19,11 @@ VCRInterfaceData_s sample_async_data(
 {
     VCRInterfaceData_s ret = cur_vcr_int_data;
     // process ring buffer is from CANInterface. TODO put into namespace
-    process_ring_buffer(VCRCANInterfaceImpl::inverter_can_rx_buffer, interface_ref_container.can_interfaces,
+    process_ring_buffer(VCRCANInterfaceInstace::instance().inverter_can_rx_buffer, interface_ref_container.can_interfaces,
                         sys_time::hal_millis(), recv_call, CANInterfaceType_e::INVERTER);
-    process_ring_buffer(VCRCANInterfaceImpl::telem_can_rx_buffer, interface_ref_container.can_interfaces,
+    process_ring_buffer(VCRCANInterfaceInstace::instance().telem_can_rx_buffer, interface_ref_container.can_interfaces,
                         sys_time::hal_millis(), recv_call, CANInterfaceType_e::TELEM);
-    process_ring_buffer(VCRCANInterfaceImpl::auxillary_can_rx_buffer, interface_ref_container.can_interfaces,
+    process_ring_buffer(VCRCANInterfaceInstace::instance().rear_aux_can_rx_buffer, interface_ref_container.can_interfaces,
                         sys_time::hal_millis(), recv_call, CANInterfaceType_e::AUX);
 
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
