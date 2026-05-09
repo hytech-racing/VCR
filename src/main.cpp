@@ -124,21 +124,21 @@ HT_TASK::Task run_enable_inverter_cooling(HT_TASK::DUMMY_FUNCTION, enable_invert
 
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-        Serial.println("time\t:\taccel\t:\tbrake");
-        Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
-        Serial.print("\t:\t");
-        Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
-        Serial.print("\t:\t");
-        Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
-        Serial.println();
-        Serial.print("pedals heartbeat good: "); Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
-        Serial.println();
-        Serial.print("steering heartbeat good: "); Serial.print(vcr_data.interface_data.recvd_steering_data.heartbeat_ok);
-        Serial.println();
-        Serial.print("Pedals Brake Is Active: "); Serial.print(VCFInterfaceInstance::instance().is_brake_pressed() ? "YES" : "NO");
-        Serial.println();
-        Serial.print("Is Start Button Active: "); Serial.print(VCFInterfaceInstance::instance().is_start_button_pressed() ? "YES" : "NO");
-        Serial.println();
+        // Serial.println("time\t:\taccel\t:\tbrake");
+        // Serial.print(vcr_data.interface_data.recvd_pedals_data.last_recv_millis);
+        // Serial.print("\t:\t");
+        // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.accel_percent);
+        // Serial.print("\t:\t");
+        // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
+        // Serial.println();
+        // Serial.print("pedals heartbeat good: "); Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
+        // Serial.println();
+        // Serial.print("steering heartbeat good: "); Serial.print(vcr_data.interface_data.recvd_steering_data.heartbeat_ok);
+        // Serial.println();
+        // Serial.print("Pedals Brake Is Active: "); Serial.print(VCFInterfaceInstance::instance().is_brake_pressed() ? "YES" : "NO");
+        // Serial.println();
+        // Serial.print("Is Start Button Active: "); Serial.print(VCFInterfaceInstance::instance().is_start_button_pressed() ? "YES" : "NO");
+        // Serial.println();
         
 
         // Serial.println();
