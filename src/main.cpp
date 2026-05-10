@@ -463,8 +463,8 @@ void setup() {
 
     scheduler.schedule(IOExpander_read_task);
 
-    // scheduler.schedule(run_enable_motor_cooling);
-    // scheduler.schedule(run_enable_inverter_cooling);
+    scheduler.schedule(run_enable_motor_cooling);
+    scheduler.schedule(run_enable_inverter_cooling);
 }
 
 void loop() {

@@ -262,7 +262,7 @@ HT_TASK::TaskResponse enable_inverter_cooling(const unsigned long& sysMicros, co
 {
     VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state(); //NOLINT will alway be populated so is ok
     bool enable_state = vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE || vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE || vehicle_state == VehicleState_e::READY_TO_DRIVE;
-    digitalWrite(MOTOR_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
+    digitalWrite(INVERTER_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
     
     return HT_TASK::TaskResponse::YIELD;
 }
