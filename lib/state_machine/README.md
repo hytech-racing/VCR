@@ -26,18 +26,31 @@ title: Vehicle State Machine
 ---
 stateDiagram-v2
 
+    ---
+title: Vehicle State Machine
+---
+stateDiagram-v2
+
     tsna : TRACTIVE_SYSTEM_NOT_ACTIVE
     tsa : TRACTIVE_SYSTEM_ACTIVE
     wrtd : WANTING_READY_TO_DRIVE
     rtd : READY_TO_DRIVE
     wcp : WANTING_CALIBRATE_PEDALS
     cp : CALIBRATING_PEDALS
+    wcs : WANTING_CALIBRATE_STEERING
+    cs : CALIBRATING_STEERING
 
     tsna --> tsa : If HV is over threshold
     tsna --> wcp : Pedal calibration button is pressed
+    tsna --> wcs : Steering calibration button is pressed
+
+    wcs --> cs : Steering calibration button held for > 3000ms
+    wcs --> tsna : Steering calibration button released within 3000ms
 
     wcp --> cp : Pedal calibration button held for >3000ms
     wcp --> tsna : Pedal calibration button released within 3000ms
+
+    cs --> tsna : Steering Calibration button released
 
     cp --> tsna : Pedal calibration button released
 
