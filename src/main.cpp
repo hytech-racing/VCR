@@ -182,10 +182,14 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         );
         Serial.println(buf);
 
+        // snprintf(buf, sizeof(buf),
+        //     "%-10d %-14d %-13d %-10d %-8d %-6d",
+        //     s.bspd_is_ok, s.bspd_missing, s.bspd_fault,
+        //     s.watchdog_is_ok, s.bms_is_ok, s.imd_is_ok
+        // );
         snprintf(buf, sizeof(buf),
-            "%-10d %-14d %-13d %-10d %-8d %-6d",
-            s.bspd_is_ok, s.bspd_missing, s.bspd_fault,
-            s.watchdog_is_ok, s.bms_is_ok, s.imd_is_ok
+            "%-10d %-8d %-6d",
+            s.bspd_is_ok, s.bms_is_ok, s.imd_is_ok
         );
         Serial.println(buf);
         Serial.println();
