@@ -459,7 +459,7 @@ void setup() {
 
     scheduler.schedule(enqueue_controls_CAN_task);
 
-    scheduler.schedule(debug_state_print_task);
+    // scheduler.schedule(debug_state_print_task);
     
     scheduler.schedule(update_brakelight_task);
 

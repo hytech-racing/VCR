@@ -70,13 +70,14 @@ void InverterInterface::receive_INV_STATUS(const CAN_message_t &can_msg, unsigne
         Serial.print("OOR DC BUS VOLTAGE for CAN ID "); Serial.println(can_msg.id);
     }
     if (_feedback_data.status.diagnostic_number != 0 && 
+        _feedback_data.status.diagnostic_number != 3587 &&
         _feedback_data.status.diagnostic_number != 2310 && 
         _feedback_data.status.diagnostic_number != 2320 &&
         _feedback_data.status.diagnostic_number != 2340 &&
         _feedback_data.status.diagnostic_number != 1059 &&
         _feedback_data.status.diagnostic_number != 1049)
     {
-        Serial.print("UNKNOWN DIAGNOSTIC NUMBER SEEN"); Serial.println(can_msg.id);
+        Serial.print("UNKNOWN DIAGNOSTIC NUMBER "); Serial.print(_feedback_data.status.diagnostic_number); Serial.print(" SEEN for CAN ID on "); Serial.println(can_msg.id);
     }
 }
 
@@ -126,7 +127,7 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     {
         Serial.print("OOR Actual power for CAN ID "); Serial.println(can_msg.id);
     }
-    if (_feedback_data.motor_mechanics.actual_torque > 50 || _feedback_data.motor_mechanics.actual_torque < 0)
+    if (_feedback_data.motor_mechanics.actual_torque > 50 || _feedback_data.motor_mechanics.actual_torque < -1)
     {
         Serial.print("OOR Actual Torque for CAN ID "); Serial.println(can_msg.id);
     }
