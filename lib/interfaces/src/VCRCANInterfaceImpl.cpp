@@ -25,10 +25,12 @@ void on_auxillary_can_receive(const CAN_message_t &msg)
 void on_inverter_can_receive(const CAN_message_t &msg) 
 {
     // AUXILLARY_CAN.write(msg);
-    TELEM_CAN.write(msg); // send immediately onto the telem CAN line
+    // TELEM_CAN.write(msg); // send immediately onto the telem CAN line
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
     inverter_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
+
+    telem_can_tx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
 void on_telem_can_receive(const CAN_message_t &msg)
@@ -207,7 +209,6 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
 
 void send_all_CAN_msgs(CANTXBufferType &buffer, FlexCAN_T4_Base *can_interface) 
 {
-    CAN_message_t msg;
     while (buffer.available()) 
     {
         CAN_message_t msg;
