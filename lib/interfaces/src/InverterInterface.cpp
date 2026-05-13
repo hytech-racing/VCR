@@ -67,7 +67,7 @@ void InverterInterface::receive_INV_STATUS(const CAN_message_t &can_msg, unsigne
     // DEBUG
     if (_feedback_data.status.dc_bus_voltage > 600 || _feedback_data.status.dc_bus_voltage < 0)
     {
-        Serial.print("OOR DC BUS VOLTAGE for CAN ID "); Serial.println(can_msg.id);
+        Serial.print("OOR DC BUS VOLTAGE "); Serial.print(_feedback_data.status.dc_bus_voltage); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
     }
     if (_feedback_data.status.diagnostic_number != 0 && 
         _feedback_data.status.diagnostic_number != 3587 &&
@@ -96,17 +96,17 @@ void InverterInterface::receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned
     _feedback_data.temps.new_data = true;
     _feedback_data.temps.last_recv_millis = curr_millis;
 
-    if (_feedback_data.temps.igbt_temp > 150 || _feedback_data.temps.igbt_temp < 15)
+    if (_feedback_data.temps.igbt_temp > 150 || _feedback_data.temps.igbt_temp < 20)
     {
-        Serial.print("OOR IGBT Temp for CAN ID "); Serial.println(can_msg.id);
+        Serial.print("OOR IGBT Temp "); Serial.print(_feedback_data.temps.igbt_temp); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
     }
-    if (_feedback_data.temps.inverter_temp > 150 || _feedback_data.temps.igbt_temp < 15)
+    if (_feedback_data.temps.inverter_temp > 150 || _feedback_data.temps.inverter_temp < 10)
     {
-        Serial.print("OOR Inverter Temp for CAN ID "); Serial.println(can_msg.id);
+        Serial.print("OOR Inverter Temp "); Serial.print(_feedback_data.temps.inverter_temp); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
     }
-    if (_feedback_data.temps.motor_temp > 150 || _feedback_data.temps.igbt_temp < 15)
+    if (_feedback_data.temps.motor_temp > 150 || _feedback_data.temps.motor_temp < 10)
     {
-        Serial.print("OOR Motor Temp for CAN ID "); Serial.println(can_msg.id);
+        Serial.print("OOR Motor Temp "); Serial.print(_feedback_data.temps.motor_temp); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
     }
 }
 
@@ -123,7 +123,7 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     _feedback_data.motor_mechanics.new_data = true;
     _feedback_data.motor_mechanics.last_recv_millis = curr_millis;
 
-    if (_feedback_data.motor_mechanics.actual_power > 120000 || _feedback_data.motor_mechanics.actual_power < 0)
+    if (_feedback_data.motor_mechanics.actual_power > 1000 || _feedback_data.motor_mechanics.actual_power < 0)
     {
         Serial.print("OOR Actual power for CAN ID "); Serial.println(can_msg.id);
     }
@@ -131,9 +131,9 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     {
         Serial.print("OOR Actual Torque for CAN ID "); Serial.println(can_msg.id);
     }
-    if (_feedback_data.motor_mechanics.actual_speed > 100000 || _feedback_data.motor_mechanics.actual_speed < 0)
+    if (_feedback_data.motor_mechanics.actual_speed > 1000 || _feedback_data.motor_mechanics.actual_speed < -1)
     {
-        Serial.print("OOR Actual speed for CAN ID "); Serial.println(can_msg.id);
+        Serial.print("OOR Actual speed "); Serial.print(_feedback_data.motor_mechanics.actual_speed); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
     }
 }
 
