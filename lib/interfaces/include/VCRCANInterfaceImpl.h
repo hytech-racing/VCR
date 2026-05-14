@@ -25,7 +25,7 @@
 #include "InverterInterface.h"
 
 using CANRXBufferType = Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)>;
-using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_message_t)>;
+using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)512, sizeof(CAN_message_t)>;
 
 /* RX buffers for CAN extern declarations*/
 
