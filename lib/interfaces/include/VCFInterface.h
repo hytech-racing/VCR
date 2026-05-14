@@ -24,7 +24,7 @@ public:
     {
         _curr_data.stamped_pedals.last_recv_millis = 0;
         _curr_data.stamped_steering.last_recv_millis = 0;
-        _curr_data.stamped_pedals.heartbeat_ok = false; // start out false
+        _curr_data.stamped_pedals.heartbeat_ok = false;
         _curr_data.stamped_steering.heartbeat_ok = false;
     };
 
