@@ -29,7 +29,7 @@ using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_messa
 
 /* RX buffers for CAN extern declarations*/
 
-template <CAN_DEV_TABLE CAN_DEV> using FlexCAN_Type = FlexCAN_T4<CAN_DEV, RX_SIZE_256, TX_SIZE_16>;
+template <CAN_DEV_TABLE CAN_DEV> using FlexCAN_Type = FlexCAN_T4<CAN_DEV, RX_SIZE_256, TX_SIZE_32>;
 
 // this is being done to send immediately from the inverter CAN line to the TELEM CAN every inverter
 
@@ -74,9 +74,9 @@ namespace VCRCANInterfaceImpl {
     extern CANTXBufferType inverter_can_tx_buffer;
     extern CANTXBufferType telem_can_tx_buffer;
 
-    extern FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> AUXILLARY_CAN;
-    extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> TELEM_CAN; // gets defined in main as of right now
-    extern FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> INVERTER_CAN; // gets defined in main as of right now
+    extern FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_32> AUXILLARY_CAN;
+    extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_32> TELEM_CAN; // gets defined in main as of right now
+    extern FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_32> INVERTER_CAN; // gets defined in main as of right now
 
     void on_auxillary_can_receive(const CAN_message_t &msg);
     void on_inverter_can_receive(const CAN_message_t &msg);
