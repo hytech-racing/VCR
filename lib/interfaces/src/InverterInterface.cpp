@@ -131,7 +131,8 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     {
         Serial.print("OOR Actual Torque for CAN ID "); Serial.println(can_msg.id);
     }
-    if (_feedback_data.motor_mechanics.actual_speed > 1000 || _feedback_data.motor_mechanics.actual_speed < -1)
+    // if (_feedback_data.motor_mechanics.actual_speed > 1000 || _feedback_data.motor_mechanics.actual_speed < -1)
+    if (_feedback_data.motor_mechanics.actual_speed != 0)
     {
         Serial.print("OOR Actual speed "); Serial.print(_feedback_data.motor_mechanics.actual_speed); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
     }
