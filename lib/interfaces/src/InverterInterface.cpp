@@ -47,6 +47,7 @@ void InverterInterface::receive_INV_STATUS(const CAN_message_t &can_msg, unsigne
     // Unpack the message
     INV1_STATUS_t unpacked_msg;
     Unpack_INV1_STATUS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    CAN_util::enqueue_msg(&unpacked_msg, &Pack_INV1_STATUS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, can_msg.id);
     
     // Update inverter interface with new data
     _feedback_data.status.connected = true; // Will set to true once first CAN message has been received
@@ -87,6 +88,7 @@ void InverterInterface::receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned
     // Unpack the message
     INV1_TEMPS_t unpacked_msg;
     Unpack_INV1_TEMPS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    CAN_util::enqueue_msg(&unpacked_msg, &Pack_INV1_TEMPS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, can_msg.id);
 
     // Update inverter interface with new data
     _feedback_data.temps.igbt_temp = HYTECH_igbt_temp_ro_fromS(unpacked_msg.igbt_temp_ro);
@@ -108,6 +110,8 @@ void InverterInterface::receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned
     {
         Serial.print("OOR Motor Temp "); Serial.print(_feedback_data.temps.motor_temp); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
     }
+
+
 }
 
 void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsigned long curr_millis) 
@@ -115,6 +119,7 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     // Unpack the message
     INV1_DYNAMICS_t unpacked_msg;
     Unpack_INV1_DYNAMICS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    CAN_util::enqueue_msg(&unpacked_msg, &Pack_INV1_DYNAMICS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, can_msg.id);
 
     // Update inverter interface with new data
     _feedback_data.motor_mechanics.actual_power = unpacked_msg.actual_power_w; // NOLINT (watts)
@@ -143,6 +148,7 @@ void InverterInterface::receive_INV_POWER(const CAN_message_t &can_msg, unsigned
     // Unpack the message
     INV1_POWER_t unpacked_msg;
     Unpack_INV1_POWER_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    CAN_util::enqueue_msg(&unpacked_msg, &Pack_INV1_POWER_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, can_msg.id);
 
     // Update inverter interface with new data
     _feedback_data.power.active_power = unpacked_msg.active_power_w; // NOLINT (watts)
@@ -158,6 +164,7 @@ void InverterInterface::receive_INV_FEEDBACK(const CAN_message_t &can_msg, unsig
     // Unpack the message
     INV1_FEEDBACK_t unpacked_msg;
     Unpack_INV1_FEEDBACK_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    CAN_util::enqueue_msg(&unpacked_msg, &Pack_INV1_FEEDBACK_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, can_msg.id);
 
     // Update inverter interface with new data
     _feedback_data.control_feedback.speed_control_kp = unpacked_msg.speed_control_kp;
