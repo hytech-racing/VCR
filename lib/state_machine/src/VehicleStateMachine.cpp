@@ -102,10 +102,11 @@ VehicleState_e VehicleStateMachine::tick_state_machine(unsigned long current_mil
                 break;
             }
 
-            // if (_check_steering_timeout())
-            // {
-            //     _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
-            // }
+            if (_check_steering_timeout())
+            {
+                Serial.println("STEERING TIMEOUT SO WE LEAVIN RTD");
+                _set_state(VehicleState_e::TRACTIVE_SYSTEM_ACTIVE, current_millis);
+            }
 
             break;
         }
