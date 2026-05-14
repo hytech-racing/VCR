@@ -29,7 +29,7 @@ using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_messa
 
 /* RX buffers for CAN extern declarations*/
 
-template <CAN_DEV_TABLE CAN_DEV> using FlexCAN_Type = FlexCAN_T4<CAN_DEV, RX_SIZE_256, TX_SIZE_16>;
+template <CAN_DEV_TABLE CAN_DEV> using FlexCAN_Type = FlexCAN_T4<CAN_DEV, RX_SIZE_256, TX_SIZE_512>;
 
 // this is being done to send immediately from the inverter CAN line to the TELEM CAN every inverter
 

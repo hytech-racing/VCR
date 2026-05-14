@@ -24,12 +24,10 @@ void on_auxillary_can_receive(const CAN_message_t &msg)
 
 void on_inverter_can_receive(const CAN_message_t &msg) 
 {
-    // AUXILLARY_CAN.write(msg);
-    // TELEM_CAN.write(msg); // send immediately onto the telem CAN line
+    // TELEM_CAN.write(msg);
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
     inverter_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
-
     telem_can_tx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
