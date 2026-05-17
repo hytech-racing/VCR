@@ -194,7 +194,7 @@ HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_T
     IOExpanderInstance::instance().writeRegister(MCP23017Register::GPPU_A, 0xFF);
     
 
-    // invert - double check when you need to do this or not... retest
+    // invert - double check when you need to do this or not
     //  IOExpanderInstance::instance().writeRegister(MCP23017Register::IPOL_A, 0xFF);
     //  IOExpanderInstance::instance().writeRegister(MCP23017Register::IPOL_B, 0xFF);
 
@@ -208,32 +208,23 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
     // NOLINTBEGIN
     uint16_t data = IOExpanderInstance::instance().read();
 
-    // inputs on port a (0)
+    // inputs on port a (GPA0-6)
     vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 1);
-    // vcr_data.interface_data.shutdown_sensing_data.bspd_fault = IOExpanderUtils::getBit(data, 0, 2); 
-    vcr_data.interface_data.ethernet_is_linked.vn_link = IOExpanderUtils::getBit(data, 0, 3); 
-    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 0, 4);
-    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 0, 5);
-    // vcr_data.interface_data.shutdown_sensing_data.bspd_missing = IOExpanderUtils::getBit(data, 0, 6); 
+    vcr_data.interface_data.shutdown_sensing_data.shdn_h_is_ok = IOExpanderUtils::getBit(data, 0, 2); // SHDN_H = SHDN_IN to VCR from VCF
+    vcr_data.interface_data.shutdown_sensing_data.shdn_i_is_ok = IOExpanderUtils::getBit(data, 0, 3); 
+    vcr_data.interface_data.shutdown_sensing_data.shdn_j_is_ok = IOExpanderUtils::getBit(data, 0, 4);
+    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 0, 5);
+    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 0, 6);
+    vcr_data.interface_data.shutdown_sensing_data.shdn_k_is_ok = IOExpanderUtils::getBit(data, 0, 7);
 
-    // inputs on port b (1)
-    // vcr_data.interface_data.shutdown_sensing_data.lv_present = IOExpanderUtils::getBit(data, 1, 0); 
-    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0, 1); 
-    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 1, 2);
-    vcr_data.interface_data.shutdown_sensing_data.vcr_sw_is_ok = IOExpanderUtils::getBit(data, 1, 3);
-    vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 4);
-    vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 5);
-    vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 6);
-
-    uint8_t portA = IOExpanderInstance::instance().readPort(MCP23017Port::A);
-    // Serial.println(portA);
-    
-    // uint8_t portB = IOExpanderInstance::instance().readPort(MCP23017Port::B);
-    // digitalWrite(11, 1);
-    // uint8_t vcr_ok = IOExpanderInstance::instance().digitalRead(10);
-    // Serial.println(vcr_ok);
-    //Serial.println(portB);
- 
+    // inputs on port b (GPB0-6)
+    vcr_data.interface_data.shutdown_sensing_data.shdn_l_is_ok = IOExpanderUtils::getBit(data, 1, 1); // SHDN_L = SHDN_OUT from VCR
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 1, 2);
+    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 1, 3);
+    vcr_data.interface_data.shutdown_sensing_data.vcr_sw_is_ok = IOExpanderUtils::getBit(data, 1, 4);
+    vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 5);
+    vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 6);
+    vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 7); 
 
     return HT_TASK::TaskResponse::YIELD;
     // NOLINTEND
