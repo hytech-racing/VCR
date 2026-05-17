@@ -47,6 +47,7 @@ void InverterInterface::receive_INV_STATUS(const CAN_message_t &can_msg, unsigne
     // Unpack the message
     INV1_STATUS_t unpacked_msg;
     Unpack_INV1_STATUS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    CAN_util::enqueue_msg(&unpacked_msg, &Pack_INV1_STATUS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, can_msg.id);
     
     // Update inverter interface with new data
     _feedback_data.status.connected = true; // Will set to true once first CAN message has been received
@@ -64,6 +65,21 @@ void InverterInterface::receive_INV_STATUS(const CAN_message_t &can_msg, unsigne
     _feedback_data.status.new_data = true;
     _feedback_data.status.last_recv_millis = curr_millis;
 
+    // DEBUG
+    if (_feedback_data.status.dc_bus_voltage > 600 || _feedback_data.status.dc_bus_voltage < 0)
+    {
+        Serial.print("OOR DC BUS VOLTAGE "); Serial.print(_feedback_data.status.dc_bus_voltage); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
+    }
+    if (_feedback_data.status.diagnostic_number != 0 && 
+        _feedback_data.status.diagnostic_number != 3587 &&
+        _feedback_data.status.diagnostic_number != 2310 && 
+        _feedback_data.status.diagnostic_number != 2320 &&
+        _feedback_data.status.diagnostic_number != 2340 &&
+        _feedback_data.status.diagnostic_number != 1059 &&
+        _feedback_data.status.diagnostic_number != 1049)
+    {
+        Serial.print("UNKNOWN DIAGNOSTIC NUMBER "); Serial.print(_feedback_data.status.diagnostic_number); Serial.print(" SEEN for CAN ID on "); Serial.println(can_msg.id);
+    }
 }
 
 void InverterInterface::receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned long curr_millis)
@@ -72,6 +88,7 @@ void InverterInterface::receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned
     // Unpack the message
     INV1_TEMPS_t unpacked_msg;
     Unpack_INV1_TEMPS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    CAN_util::enqueue_msg(&unpacked_msg, &Pack_INV1_TEMPS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, can_msg.id);
 
     // Update inverter interface with new data
     _feedback_data.temps.igbt_temp = HYTECH_igbt_temp_ro_fromS(unpacked_msg.igbt_temp_ro);
@@ -80,6 +97,21 @@ void InverterInterface::receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned
 
     _feedback_data.temps.new_data = true;
     _feedback_data.temps.last_recv_millis = curr_millis;
+
+    if (_feedback_data.temps.igbt_temp > 150 || _feedback_data.temps.igbt_temp < 20)
+    {
+        Serial.print("OOR IGBT Temp "); Serial.print(_feedback_data.temps.igbt_temp); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
+    }
+    if (_feedback_data.temps.inverter_temp > 150 || _feedback_data.temps.inverter_temp < 10)
+    {
+        Serial.print("OOR Inverter Temp "); Serial.print(_feedback_data.temps.inverter_temp); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
+    }
+    if (_feedback_data.temps.motor_temp > 150 || _feedback_data.temps.motor_temp < 10)
+    {
+        Serial.print("OOR Motor Temp "); Serial.print(_feedback_data.temps.motor_temp); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
+    }
+
+
 }
 
 void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsigned long curr_millis) 
@@ -87,6 +119,7 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     // Unpack the message
     INV1_DYNAMICS_t unpacked_msg;
     Unpack_INV1_DYNAMICS_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    CAN_util::enqueue_msg(&unpacked_msg, &Pack_INV1_DYNAMICS_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, can_msg.id);
 
     // Update inverter interface with new data
     _feedback_data.motor_mechanics.actual_power = unpacked_msg.actual_power_w; // NOLINT (watts)
@@ -95,7 +128,19 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     _feedback_data.motor_mechanics.new_data = true;
     _feedback_data.motor_mechanics.last_recv_millis = curr_millis;
 
-    // Serial.println(unpacked_msg.actual_power_w);
+    if (_feedback_data.motor_mechanics.actual_power > 1000 || _feedback_data.motor_mechanics.actual_power < 0)
+    {
+        Serial.print("OOR Actual power for CAN ID "); Serial.println(can_msg.id);
+    }
+    if (_feedback_data.motor_mechanics.actual_torque > 50 || _feedback_data.motor_mechanics.actual_torque < -1)
+    {
+        Serial.print("OOR Actual Torque for CAN ID "); Serial.println(can_msg.id);
+    }
+    // if (_feedback_data.motor_mechanics.actual_speed > 1000 || _feedback_data.motor_mechanics.actual_speed < -1)
+    if (_feedback_data.motor_mechanics.actual_speed != 0)
+    {
+        Serial.print("OOR Actual speed "); Serial.print(_feedback_data.motor_mechanics.actual_speed); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
+    }
 }
 
 void InverterInterface::receive_INV_POWER(const CAN_message_t &can_msg, unsigned long curr_millis) 
@@ -103,6 +148,7 @@ void InverterInterface::receive_INV_POWER(const CAN_message_t &can_msg, unsigned
     // Unpack the message
     INV1_POWER_t unpacked_msg;
     Unpack_INV1_POWER_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    CAN_util::enqueue_msg(&unpacked_msg, &Pack_INV1_POWER_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, can_msg.id);
 
     // Update inverter interface with new data
     _feedback_data.power.active_power = unpacked_msg.active_power_w; // NOLINT (watts)
@@ -110,6 +156,7 @@ void InverterInterface::receive_INV_POWER(const CAN_message_t &can_msg, unsigned
 
     _feedback_data.power.new_data = true;
     _feedback_data.power.last_recv_millis = curr_millis;
+    
 }
 
 void InverterInterface::receive_INV_FEEDBACK(const CAN_message_t &can_msg, unsigned long curr_millis) 
@@ -117,6 +164,7 @@ void InverterInterface::receive_INV_FEEDBACK(const CAN_message_t &can_msg, unsig
     // Unpack the message
     INV1_FEEDBACK_t unpacked_msg;
     Unpack_INV1_FEEDBACK_hytech(&unpacked_msg, can_msg.buf, can_msg.len);
+    CAN_util::enqueue_msg(&unpacked_msg, &Pack_INV1_FEEDBACK_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer, can_msg.id);
 
     // Update inverter interface with new data
     _feedback_data.control_feedback.speed_control_kp = unpacked_msg.speed_control_kp;

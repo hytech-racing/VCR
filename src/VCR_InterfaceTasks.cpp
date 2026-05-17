@@ -160,7 +160,7 @@ HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, 
 
     CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
-    // VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
+
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -177,7 +177,6 @@ HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicr
     DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(VCREthernetInterface::make_vcr_data_msg(vcr_data));
     return HT_TASK::TaskResponse::YIELD;
 }
-
 
 HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -252,7 +251,10 @@ HT_TASK::TaskResponse enable_motor_cooling(const unsigned long& sysMicros, const
 HT_TASK::TaskResponse enable_inverter_cooling(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
 {
     VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state(); //NOLINT will alway be populated so is ok
-    bool enable_state = vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE || vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE || vehicle_state == VehicleState_e::READY_TO_DRIVE;
+    bool enable_state = vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE || 
+                        vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE || 
+                        vehicle_state == VehicleState_e::READY_TO_DRIVE || 
+                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2;
     digitalWrite(INVERTER_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
     
     return HT_TASK::TaskResponse::YIELD;
