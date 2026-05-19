@@ -4,6 +4,7 @@
 #include "ht_can_version.h"
 #include "hytech_msgs_version.h"
 #include <algorithm>
+#include "VCFInterface.h"
 
 hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &shared_state)
 {
@@ -22,7 +23,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.has_firmware_version_info = true;
     out.has_rear_loadcell_data = true;
     out.has_rear_suspot_data = true;
-    out.has_shutdown_sensing_data = true;
+    out.has_vcr_shutdown_data = true;
     out.has_tcmux_status = true;
     out.has_msg_versions = true;
     out.has_status = true;
@@ -35,18 +36,19 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.rear_suspot_data.RL_sus_pot_analog = shared_state.interface_data.rear_suspot_data.RL_sus_pot_analog;
     out.rear_suspot_data.RR_sus_pot_analog = shared_state.interface_data.rear_suspot_data.RR_sus_pot_analog;
 
-    //ShutdownSensingData_s
-    out.shutdown_sensing_data.i_shutdown_in = shared_state.interface_data.shutdown_sensing_data.i_shutdown_in;
-    out.shutdown_sensing_data.j_bspd_relay = shared_state.interface_data.shutdown_sensing_data.j_bspd_relay;
-    out.shutdown_sensing_data.k_watchdog_relay = shared_state.interface_data.shutdown_sensing_data.k_watchdog_relay;
-    out.shutdown_sensing_data.l_bms_relay = shared_state.interface_data.shutdown_sensing_data.l_bms_relay;
-    out.shutdown_sensing_data.m_imd_relay = shared_state.interface_data.shutdown_sensing_data.m_imd_relay;
-    out.shutdown_sensing_data.bspd_is_ok = shared_state.interface_data.shutdown_sensing_data.bspd_is_ok;
-    out.shutdown_sensing_data.watchdog_is_ok = shared_state.interface_data.shutdown_sensing_data.watchdog_is_ok;
-    out.shutdown_sensing_data.bms_is_ok = shared_state.interface_data.shutdown_sensing_data.bms_is_ok;
-    out.shutdown_sensing_data.imd_is_ok = shared_state.interface_data.shutdown_sensing_data.imd_is_ok;
+    // ShutdownSensingData_s
+    out.vcr_shutdown_data.i_shutdown_in = false; //shared_state.interface_data.shutdown_sensing_data.i_shutdown_in;
+    out.vcr_shutdown_data.j_bspd_relay = false; //shared_state.interface_data.shutdown_sensing_data.j_bspd_relay;
+    out.vcr_shutdown_data.k_watchdog_relay = false; //shared_state.interface_data.shutdown_sensing_data.k_watchdog_relay;
+    out.vcr_shutdown_data.l_bms_relay = false; //shared_state.interface_data.shutdown_sensing_data.l_bms_relay;
+    out.vcr_shutdown_data.m_imd_relay = false; //shared_state.interface_data.shutdown_sensing_data.m_imd_relay;
 
-    //VCREthernetLinkData_s
+    out.vcr_shutdown_data.bspd_is_ok = shared_state.interface_data.shutdown_sensing_data.bspd_is_ok;
+    out.vcr_shutdown_data.watchdog_is_ok = shared_state.interface_data.shutdown_sensing_data.vcr_sw_is_ok;
+    out.vcr_shutdown_data.bms_is_ok = shared_state.interface_data.shutdown_sensing_data.bms_is_ok;
+    out.vcr_shutdown_data.imd_is_ok = shared_state.interface_data.shutdown_sensing_data.imd_is_ok;
+
+    // VCREthernetLinkData_s
     out.ethernet_is_linked.acu_link = shared_state.interface_data.ethernet_is_linked.acu_link;
     out.ethernet_is_linked.debug_link = shared_state.interface_data.ethernet_is_linked.debug_link;
     out.ethernet_is_linked.drivebrain_link = shared_state.interface_data.ethernet_is_linked.drivebrain_link;
@@ -54,7 +56,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.ethernet_is_linked.ubiquiti_link = shared_state.interface_data.ethernet_is_linked.ubiquiti_link;
     out.ethernet_is_linked.vcf_link = shared_state.interface_data.ethernet_is_linked.vcf_link;
 
-    //veh_vec<InverterData>
+    // veh_vec<InverterData>
 
     copy_inverter_data(shared_state.interface_data.inverter_data.FL, out.inverter_data.FL);
     out.inverter_data.has_FL = true;
@@ -69,6 +71,8 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.current_sensor_data.twentyfour_volt_sensor = shared_state.interface_data.current_sensor_data.twentyfour_volt_sensor;
     out.current_sensor_data.current_sensor_unfiltered = shared_state.interface_data.current_sensor_data.current_sensor_unfiltered;
     out.current_sensor_data.current_refererence_unfiltered = shared_state.interface_data.current_sensor_data.current_refererence_unfiltered;
+    out.current_sensor_data.bpsd_brake_high_sense = shared_state.interface_data.current_sensor_data.bspd_brake_high_sense;
+    out.current_sensor_data.bspd_current_high_sense = shared_state.interface_data.current_sensor_data.bspd_current_high_sense;
 
     //DrivetrainDynamicReport_s
     out.drivetrain_data.measuredInverterFLPackVoltage = shared_state.system_data.drivetrain_data.measuredInverterFLPackVoltage;
@@ -94,21 +98,24 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;
     std::copy(shared_state.fw_version_info.fw_version_hash.begin(), shared_state.fw_version_info.fw_version_hash.end(), out.firmware_version_info.git_hash);
     out.msg_versions.ht_can_version = HT_CAN_LIB_VERSION;
-    std::copy(version, version + std::min(strlen(version), sizeof(out.msg_versions.ht_proto_version) - 1), out.msg_versions.ht_proto_version);    
-    out.msg_versions.ht_proto_version[sizeof(out.msg_versions.ht_proto_version) - 1] = '\0';
+    
+    // working with bytes in nanopb
+    std::string_view version_view(version);
+    const size_t version_len = [&]() -> size_t {
+        return std::min(version_view.size(), sizeof(out.msg_versions.ht_proto_version.bytes));
+    }();
+    out.msg_versions.ht_proto_version.size = version_len;
+    std::copy(version_view.begin(), version_view.begin() + version_len, std::begin(out.msg_versions.ht_proto_version.bytes));
 
     // // VCR Status
-    // const char* state_label = "UNKNOWN";
     out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(shared_state.system_data.vehicle_state_machine_state);
     out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(shared_state.system_data.drivetrain_state_machine_state);
     
     out.status.drivebrain_controller_timing_failure = shared_state.system_data.db_cntrl_status.drivebrain_controller_timing_failure;
     out.status.drivebrain_is_in_control = shared_state.system_data.db_cntrl_status.drivebrain_is_in_control;
     
-    
-    
-    out.status.pedals_heartbeat_ok = shared_state.system_data.vcf_heartbeat_data.heartbeat_ok;
-
+    out.status.pedals_heartbeat_ok = !(VCFInterfaceInstance::instance().is_pedals_heartbeat_not_ok());
+    out.status.steering_heartbeat_ok = !(VCFInterfaceInstance::instance().is_steering_heartbeat_not_ok());
     return out;
 }
 

@@ -12,6 +12,9 @@ struct ACUCANInterfaceData_s {
     bool imd_ok;
     uint64_t last_recv_millis; 
 
+    float em_current;
+    float em_voltage;    
+
     bool heartbeat_ok;
 };
 
@@ -23,6 +26,7 @@ public:
         _curr_data.last_recv_millis = 0;
     };
     void receive_acu_ok_message(const CAN_message_t &msg, unsigned long curr_millis);
+    void receive_em_measurement(const CAN_message_t &msg, unsigned long curr_millis);
 
     /* Getters */
     bool is_imd_ok() { return _curr_data.imd_ok; }

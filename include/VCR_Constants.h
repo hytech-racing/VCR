@@ -5,9 +5,9 @@
 /* -------------------------------------------------- */
 /*                 Teensy 4.1 GPIO pins               */
 /* -------------------------------------------------- */
-constexpr int ADC0_CS = 40; // MCP3208. ADC0 in VCR schematic. Used for valuable telem data.
-constexpr int ADC1_CS = 39; // MCP3208. ADC1 in VCR schematic. Used for extra thermistors or extra sensors while testing.
-constexpr int BRAKELIGHT_CONTROL_PIN = 32;
+constexpr int ADC0_CS = 10; // MCP3208. ADC0 in VCR schematic. Used for valuable telem data.
+constexpr int ADC1_CS = 36; // MCP3208. ADC1 in VCR schematic. Used for extra thermistors or extra sensors while testing.
+constexpr int BRAKELIGHT_CONTROL_PIN = 9;
 
 
 /* -------------------------------------------------- */
@@ -18,13 +18,13 @@ constexpr int ANALOG_RESOLUTION = 12;
 constexpr unsigned int CHANNELS_WITHIN_MCP_ADC = 8;
 
 /* Channels on adc_0 */
-constexpr int GLV_SENSE_CHANNEL       = 0;
-constexpr int CURRENT_SENSE_CHANNEL   = 1;
-constexpr int REFERENCE_SENSE_CHANNEL = 2;
-constexpr int RL_LOADCELL_CHANNEL     = 3;
-constexpr int RR_LOADCELL_CHANNEL     = 4;
-constexpr int RL_SUS_POT_CHANNEL      = 5;
-constexpr int RR_SUS_POT_CHANNEL      = 6;
+constexpr int RL_LOADCELL_CHANNEL     = 0;
+constexpr int RR_LOADCELL_CHANNEL     = 1;
+constexpr int RL_SUS_POT_CHANNEL      = 2;
+constexpr int RR_SUS_POT_CHANNEL      = 3; 
+constexpr int GLV_SENSE_CHANNEL       = 4;
+constexpr int CURRENT_SENSE_CHANNEL   = 5;
+constexpr int REFERENCE_SENSE_CHANNEL = 6;
 // const int UNUSED_CHANNEL       = 7;
 
 /* Channels on adc_1 */
@@ -51,11 +51,11 @@ constexpr float RL_LOADCELL_OFFSET = 0.0;
 constexpr float RR_LOADCELL_SCALE = 1.0;
 constexpr float RR_LOADCELL_OFFSET = 0;
 
-
-constexpr float RL_SUS_POT_SCALE = 1;
-constexpr int RL_SUS_POT_OFFSET = 0;
-constexpr float RR_SUS_POT_SCALE = 1;
-constexpr int RR_SUS_POT_OFFSET = 0;
+// Calibrated values measured from bolt to bolt
+constexpr float RL_SUS_POT_SCALE = 0.01459;
+constexpr float RL_SUS_POT_OFFSET = 148.5;
+constexpr float RR_SUS_POT_SCALE = 0.01337;
+constexpr float RR_SUS_POT_OFFSET = 152.5;
 
 //figure out values
 const float THERMISTOR_0_SCALE = 1;
@@ -81,18 +81,26 @@ constexpr const float COOLANT_TEMP_OFFSET = 242;
 constexpr const float TEST_TEMP_SCALE = -46.8;
 constexpr const float TEST_TEMP_OFFSET = 386;
 
+// Fan/Pump Control
+constexpr int MOTOR_COOLING_CONTROL_PIN = 33;
+constexpr int INVERTER_COOLING_CONTROL_PIN = 37;
+
+// BSPD
+constexpr int BRAKE_HIGH_SENSE_PIN = 38;
+constexpr int CURRENT_HIGH_SENSE_PIN = 39;
+
 /* Watchdog constants */
-constexpr int INVERTER_ENABLE_PIN = 2;
-constexpr int WATCHDOG_PIN = 36;
+constexpr int INVERTER_ENABLE_PIN = 5;
 constexpr int FLOWMETER_PIN = 7;
-constexpr int SOFTWARE_OK_PIN = 37; // Watchdog's !RESET pin
+constexpr int WATCHDOG_PIN = 26;
+constexpr int SOFTWARE_OK_PIN = 27; // Watchdog's !RESET pin
 constexpr unsigned long WATCHDOG_KICK_INTERVAL_MS = 10UL;
 constexpr unsigned long VCF_PEDALS_MAX_HEARTBEAT_MS = 50UL;         // 20ms at 60mph is about 0.5 meters
 constexpr uint64_t ACU_ACU_OK_MAX_HEARTBEAT_MS = 500;
 constexpr unsigned long MAX_ALLOWED_DB_LATENCY_MS = 40; // milliseconds
 
 /* Inverter constants */
-constexpr int INVERTER_EN_PIN = 2;
+constexpr int INVERTER_EN_PIN = 5;
 constexpr int INVERTER_MINIMUM_HV_VOLTAGE = 60;
 
 /* Filter constants */
@@ -121,7 +129,7 @@ constexpr unsigned long coolant_temp_send_period_us = 100000;        // 100 000 
 constexpr unsigned long coolant_temp_send_priority = 9;
 constexpr unsigned long flowmeter_send_period_us = 100000;          // 100 000 us = 10 Hz
 constexpr unsigned long flowmeter_send_priority = 10;
-constexpr unsigned long ioexpander_sample_period_us = 50000;         // 50 000 us = 20 Hz
+constexpr unsigned long ioexpander_sample_period_us = 5000;         // 5 000 us = 200 Hz
 constexpr unsigned long ioexpander_priority = 100;
 constexpr unsigned long dashboard_send_period_us = 200000;         // 200 000 us = 5 Hz
 constexpr unsigned long dashboard_send_priority = 5;
