@@ -108,7 +108,6 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     std::copy(version_view.begin(), version_view.begin() + version_len, std::begin(out.msg_versions.ht_proto_version.bytes));
 
     // // VCR Status
-    // const char* state_label = "UNKNOWN";
     out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(shared_state.system_data.vehicle_state_machine_state);
     out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(shared_state.system_data.drivetrain_state_machine_state);
     
