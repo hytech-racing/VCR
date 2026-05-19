@@ -2,10 +2,10 @@
 #include "VCRCANInterfaceImpl.h"
 
 #include <Arduino.h>
+
 /**
  * Getters for the data
  */
-
 InverterStatus_s InverterInterface::get_status() {
     InverterStatus_s status_struct = _feedback_data.status;
     _feedback_data.status.new_data = false;
@@ -30,18 +30,15 @@ MotorMechanics_s InverterInterface::get_motor_mechanics() {
     return mm_struct;
 }
 
-
 InverterControlFeedback_s InverterInterface::get_control_params() {
     InverterControlFeedback_s cf_struct = _feedback_data.control_feedback;
     _feedback_data.control_feedback.new_data = false;
     return cf_struct;
 }
 
-
 /**
  * receiving CAN messages
  */
-
 void InverterInterface::receive_INV_STATUS(const CAN_message_t &can_msg, unsigned long curr_millis)
 {
     // Unpack the message
@@ -64,22 +61,6 @@ void InverterInterface::receive_INV_STATUS(const CAN_message_t &can_msg, unsigne
 
     _feedback_data.status.new_data = true;
     _feedback_data.status.last_recv_millis = curr_millis;
-
-    // DEBUG
-    if (_feedback_data.status.dc_bus_voltage > 600 || _feedback_data.status.dc_bus_voltage < 0)
-    {
-        Serial.print("OOR DC BUS VOLTAGE "); Serial.print(_feedback_data.status.dc_bus_voltage); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
-    }
-    if (_feedback_data.status.diagnostic_number != 0 && 
-        _feedback_data.status.diagnostic_number != 3587 &&
-        _feedback_data.status.diagnostic_number != 2310 && 
-        _feedback_data.status.diagnostic_number != 2320 &&
-        _feedback_data.status.diagnostic_number != 2340 &&
-        _feedback_data.status.diagnostic_number != 1059 &&
-        _feedback_data.status.diagnostic_number != 1049)
-    {
-        Serial.print("UNKNOWN DIAGNOSTIC NUMBER "); Serial.print(_feedback_data.status.diagnostic_number); Serial.print(" SEEN for CAN ID on "); Serial.println(can_msg.id);
-    }
 }
 
 void InverterInterface::receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned long curr_millis)
@@ -97,21 +78,6 @@ void InverterInterface::receive_INV_TEMPS(const CAN_message_t &can_msg, unsigned
 
     _feedback_data.temps.new_data = true;
     _feedback_data.temps.last_recv_millis = curr_millis;
-
-    if (_feedback_data.temps.igbt_temp > 150 || _feedback_data.temps.igbt_temp < 20)
-    {
-        Serial.print("OOR IGBT Temp "); Serial.print(_feedback_data.temps.igbt_temp); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
-    }
-    if (_feedback_data.temps.inverter_temp > 150 || _feedback_data.temps.inverter_temp < 10)
-    {
-        Serial.print("OOR Inverter Temp "); Serial.print(_feedback_data.temps.inverter_temp); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
-    }
-    if (_feedback_data.temps.motor_temp > 150 || _feedback_data.temps.motor_temp < 10)
-    {
-        Serial.print("OOR Motor Temp "); Serial.print(_feedback_data.temps.motor_temp); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
-    }
-
-
 }
 
 void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsigned long curr_millis) 
@@ -127,20 +93,6 @@ void InverterInterface::receive_INV_DYNAMICS(const CAN_message_t &can_msg, unsig
     _feedback_data.motor_mechanics.actual_speed = unpacked_msg.actual_speed_rpm;
     _feedback_data.motor_mechanics.new_data = true;
     _feedback_data.motor_mechanics.last_recv_millis = curr_millis;
-
-    if (_feedback_data.motor_mechanics.actual_power > 1000 || _feedback_data.motor_mechanics.actual_power < 0)
-    {
-        Serial.print("OOR Actual power for CAN ID "); Serial.println(can_msg.id);
-    }
-    if (_feedback_data.motor_mechanics.actual_torque > 50 || _feedback_data.motor_mechanics.actual_torque < -1)
-    {
-        Serial.print("OOR Actual Torque for CAN ID "); Serial.println(can_msg.id);
-    }
-    // if (_feedback_data.motor_mechanics.actual_speed > 1000 || _feedback_data.motor_mechanics.actual_speed < -1)
-    if (_feedback_data.motor_mechanics.actual_speed != 0)
-    {
-        Serial.print("OOR Actual speed "); Serial.print(_feedback_data.motor_mechanics.actual_speed); Serial.print(" for CAN ID "); Serial.println(can_msg.id);
-    }
 }
 
 void InverterInterface::receive_INV_POWER(const CAN_message_t &can_msg, unsigned long curr_millis) 
@@ -156,7 +108,6 @@ void InverterInterface::receive_INV_POWER(const CAN_message_t &can_msg, unsigned
 
     _feedback_data.power.new_data = true;
     _feedback_data.power.last_recv_millis = curr_millis;
-    
 }
 
 void InverterInterface::receive_INV_FEEDBACK(const CAN_message_t &can_msg, unsigned long curr_millis) 
@@ -178,7 +129,6 @@ void InverterInterface::receive_INV_FEEDBACK(const CAN_message_t &can_msg, unsig
 /**
  * Sending CAN messages
  */
-
 void InverterInterface::send_INV_SETPOINT_COMMAND() 
 {
     INV1_CONTROL_INPUT_t msg_out;
@@ -201,7 +151,6 @@ void InverterInterface::send_INV_CONTROL_WORD()
     msg_out.remove_error = _inverter_control_word.remove_error;
 
     CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_WORD_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_word_id);
-    
 }
 
 void InverterInterface::send_INV_CONTROL_PARAMS() 
@@ -215,16 +164,12 @@ void InverterInterface::send_INV_CONTROL_PARAMS()
     CAN_util::enqueue_msg(&msg_out, &Pack_INV1_CONTROL_PARAMETER_hytech, VCRCANInterfaceImpl::inverter_can_tx_buffer, inverter_ids.inv_control_parameter_id);
 }
 
-
-
 /**
  * Methods for use as inverter functs
  */
-
 void InverterInterface::set_speed(float desired_rpm, float torque_limit_nm) 
 {
     _inverter_control_inputs.speed_rpm_setpoint = static_cast<int16_t>(desired_rpm);
-
     _inverter_control_inputs.positive_torque_limit = ::fabs(torque_limit_nm);
     _inverter_control_inputs.negative_torque_limit = -1.0f * ::fabs(torque_limit_nm);
 }
