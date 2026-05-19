@@ -101,7 +101,6 @@ etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create(
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
-
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
 HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
@@ -121,8 +120,6 @@ HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_bra
 HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
 HT_TASK::Task run_enable_motor_cooling(HT_TASK::DUMMY_FUNCTION, enable_motor_cooling, dashboard_send_priority, dashboard_send_period_us);
 HT_TASK::Task run_enable_inverter_cooling(HT_TASK::DUMMY_FUNCTION, enable_inverter_cooling, dashboard_send_priority, dashboard_send_period_us);
-
-
 
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -286,9 +283,8 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
 HT_TASK::Task debug_state_print_task(HT_TASK::DUMMY_FUNCTION, debug_print, 100, 100000); //NOLINT (priority and loop rate)
 
-void setup() {
-
-
+void setup()
+{
     // Configure pins
     pinMode(MOTOR_COOLING_CONTROL_PIN, OUTPUT);
     pinMode(INVERTER_COOLING_CONTROL_PIN, OUTPUT);
@@ -301,16 +297,6 @@ void setup() {
 
     SPI.begin();
     analogReadResolution(ANALOG_RESOLUTION);
-    pinMode(INVERTER_ENABLE_PIN, OUTPUT);
-
-
-    // Flowmeter stuff
-    // pinMode(FLOWMETER_PIN, INPUT_PULLUP); //need to change based on aux uart
-    // pinMode(27, OUTPUT);
-    // digitalWrite(27, HIGH);
-
-    //attachInterrupt(digitalPinToInterrupt(FLOWMETER_PIN), countPulse, RISING);
-    //pulseCount = 0;
     
     // Create all singletons
     ProtobufSocketsInstance::create(vcr_data_send_socket, vcf_data_recv_socket);
@@ -468,6 +454,7 @@ void setup() {
     scheduler.schedule(run_enable_inverter_cooling);
 }
 
-void loop() {
+void loop()
+{
     scheduler.run();
 }

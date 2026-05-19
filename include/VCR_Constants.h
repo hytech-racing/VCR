@@ -90,7 +90,6 @@ constexpr int BRAKE_HIGH_SENSE_PIN = 38;
 constexpr int CURRENT_HIGH_SENSE_PIN = 39;
 
 /* Watchdog constants */
-constexpr int INVERTER_ENABLE_PIN = 5;
 constexpr int FLOWMETER_PIN = 7;
 constexpr int WATCHDOG_PIN = 26;
 constexpr int SOFTWARE_OK_PIN = 27; // Watchdog's !RESET pin
@@ -100,7 +99,7 @@ constexpr uint64_t ACU_ACU_OK_MAX_HEARTBEAT_MS = 500;
 constexpr unsigned long MAX_ALLOWED_DB_LATENCY_MS = 40; // milliseconds
 
 /* Inverter constants */
-constexpr int INVERTER_EN_PIN = 5;
+constexpr int INVERTER_ENABLE_PIN = 5;
 constexpr int INVERTER_MINIMUM_HV_VOLTAGE = 60;
 
 /* Filter constants */
