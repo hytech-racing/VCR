@@ -72,17 +72,23 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
 
         case DRIVEBRAIN_TORQUE_LIM_INPUT_CANID: 
         {
-            if (interface_type == CANInterfaceType_e::RAUX) {
+            if (interface_type == CANInterfaceType_e::RAUX) 
+            {
                 interfaces.db_interface.receive_drivebrain_torque_lim_command_auxillary(msg, millis);
-            } else if (interface_type == CANInterfaceType_e::TELEM) {
+            }
+            else if (interface_type == CANInterfaceType_e::TELEM) 
+            {
                 interfaces.db_interface.receive_drivebrain_torque_lim_command_telem(msg, millis);
             }
             break;
         }
         case DRIVEBRAIN_SPEED_SET_INPUT_CANID: {
-            if (interface_type == CANInterfaceType_e::RAUX) {
+            if (interface_type == CANInterfaceType_e::RAUX) 
+            {
                 interfaces.db_interface.receive_drivebrain_speed_command_auxillary(msg, millis);
-            } else if (interface_type == CANInterfaceType_e::TELEM) {
+            } 
+            else if (interface_type == CANInterfaceType_e::TELEM) 
+            {
                 interfaces.db_interface.receive_drivebrain_speed_command_telem(msg, millis);
             }
             interfaces.db_interface.receive_drivebrain_speed_command_telem(msg, millis);
