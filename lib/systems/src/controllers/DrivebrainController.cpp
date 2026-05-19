@@ -3,8 +3,8 @@
 #include "DrivetrainSystem.h"
 #include <cstdint>
 
-DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsigned long curr_millis) {
-
+DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsigned long curr_millis)
+{
     auto db_telem_input = state.interface_data.latest_drivebrain_telem_command;
     auto db_auxillary_input = state.interface_data.latest_drivebrain_auxillary_command;
 
@@ -12,17 +12,23 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     _check_drivebrain_command_timing_failure(db_auxillary_input, curr_millis, _aux_latency_info);
     bool drivebrain_reinit_button_pressed = state.interface_data.dash_input_state.mc_reset_btn_is_pressed && !DrivetrainInstance::instance().drivetrain_error_present();
 
-    if (drivebrain_reinit_button_pressed && (!_should_run_controller)) {
+    if (drivebrain_reinit_button_pressed && (!_should_run_controller))
+    {
         _should_run_controller = true;
     }
 
     DrivetrainCommand_s output;
 
-    if (_should_run_controller && !_telem_latency_info.timing_failure) {
+    if (_should_run_controller && !_telem_latency_info.timing_failure)
+    {
         output = db_telem_input.get_command();
-    } else if (_should_run_controller && !_aux_latency_info.timing_failure) {
+    }
+    else if (_should_run_controller && !_aux_latency_info.timing_failure)
+    {
         output = db_auxillary_input.get_command();
-    } else {
+    }
+    else
+    {
         _should_run_controller = false;
         DrivetrainCommand_s coast_to_stop = {
             .desired_speeds = {0.0f, 0.0f, 0.0f, 0.0f},
@@ -31,11 +37,13 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     }
 
     // Handle worst latency updates
-    if (_last_reset_worse_latency_clock == 0) {
+    if (_last_reset_worse_latency_clock == 0)
+    {
         _last_reset_worse_latency_clock = curr_millis;
     }
 
-    if (curr_millis - _last_reset_worse_latency_clock > WORST_LATENCY_PERIOD_MS) {
+    if (curr_millis - _last_reset_worse_latency_clock > WORST_LATENCY_PERIOD_MS)
+    {
         _last_reset_worse_latency_clock = curr_millis; 
         _telem_latency_info.worst_period_millis = 0;
         _aux_latency_info.worst_period_millis = 0;
@@ -57,7 +65,8 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     return output;
 }
 
-void DrivebrainController::_check_drivebrain_command_timing_failure(StampedDrivetrainCommand_s command, unsigned long curr_millis, MessageLatencyInfo_s& latency_info) {
+void DrivebrainController::_check_drivebrain_command_timing_failure(StampedDrivetrainCommand_s command, unsigned long curr_millis, MessageLatencyInfo_s& latency_info)
+{
     // Cases for timing_failure:
 
     // 1. we have not received any messages from the db (timestamped message recvd flag initialized as false in struct def)
