@@ -27,13 +27,10 @@
 using CANRXBufferType = Circular_Buffer<uint8_t, (uint32_t)16, sizeof(CAN_message_t)>;
 using CANTXBufferType = Circular_Buffer<uint8_t, (uint32_t)128, sizeof(CAN_message_t)>;
 
-/* RX buffers for CAN extern declarations*/
+template <CAN_DEV_TABLE CAN_DEV> using FlexCAN_Type = FlexCAN_T4<CAN_DEV, RX_SIZE_256, TX_SIZE_32>;
 
-template <CAN_DEV_TABLE CAN_DEV> using FlexCAN_Type = FlexCAN_T4<CAN_DEV, RX_SIZE_256, TX_SIZE_16>;
-
-// this is being done to send immediately from the inverter CAN line to the TELEM CAN every inverter
-
-struct CANInterfaces {
+struct CANInterfaces 
+{
     explicit CANInterfaces(
         VCFInterface &vcf_int, 
         ACUInterface &acu_int,
@@ -42,14 +39,14 @@ struct CANInterfaces {
         InverterInterface &fr_inv_int,
         InverterInterface &rl_inv_int,
         InverterInterface &rr_inv_int
-    )
-        : vcf_interface(vcf_int), 
-          acu_interface(acu_int),
-          db_interface(db_int),
-          fl_inverter_interface(fl_inv_int),
-          fr_inverter_interface(fr_inv_int),
-          rl_inverter_interface(rl_inv_int),
-          rr_inverter_interface(rr_inv_int) {}
+    ) : 
+        vcf_interface(vcf_int), 
+        acu_interface(acu_int),
+        db_interface(db_int),
+        fl_inverter_interface(fl_inv_int),
+        fr_inverter_interface(fr_inv_int),
+        rl_inverter_interface(rl_inv_int),
+        rr_inverter_interface(rr_inv_int) {}
 
     VCFInterface &vcf_interface;
     ACUInterface &acu_interface;
@@ -64,24 +61,19 @@ struct CANInterfaces {
 using CANInterfacesInstance = etl::singleton<CANInterfaces>;
 
 
-namespace VCRCANInterfaceImpl {
-
+namespace VCRCANInterfaceImpl 
+{
     extern CANRXBufferType auxillary_can_rx_buffer;
     extern CANRXBufferType inverter_can_rx_buffer;
     extern CANRXBufferType telem_can_rx_buffer;
 
-    /* TX buffer for CAN1 */
     extern CANTXBufferType auxillary_can_tx_buffer;
-    /* TX buffer for CAN2 */
     extern CANTXBufferType inverter_can_tx_buffer;
-    /* TX buffer for CAN3 */
     extern CANTXBufferType telem_can_tx_buffer;
 
-    extern FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> AUXILLARY_CAN;
-    extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> TELEM_CAN; // gets defined in main as of right now
-    extern FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> INVERTER_CAN; // gets defined in main as of right now
-    //extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> CAN_1; 
-
+    extern FlexCAN_Type<CAN2> AUXILLARY_CAN;
+    extern FlexCAN_Type<CAN1> TELEM_CAN;
+    extern FlexCAN_Type<CAN3> INVERTER_CAN;
 
     void on_auxillary_can_receive(const CAN_message_t &msg);
     void on_inverter_can_receive(const CAN_message_t &msg);

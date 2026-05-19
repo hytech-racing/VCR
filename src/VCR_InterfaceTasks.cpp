@@ -160,7 +160,7 @@ HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, 
 
     CANInterfacesInstance::instance().rr_inverter_interface.send_INV_CONTROL_WORD();
     CANInterfacesInstance::instance().rr_inverter_interface.send_INV_SETPOINT_COMMAND();
-    // VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &TELEM_CAN);
+
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -177,7 +177,6 @@ HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicr
     DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(VCREthernetInterface::make_vcr_data_msg(vcr_data));
     return HT_TASK::TaskResponse::YIELD;
 }
-
 
 HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -210,14 +209,14 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
 
     // inputs on port a (0)
     vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 1);
-    vcr_data.interface_data.shutdown_sensing_data.bspd_fault = IOExpanderUtils::getBit(data, 0, 2); 
+    // vcr_data.interface_data.shutdown_sensing_data.bspd_fault = IOExpanderUtils::getBit(data, 0, 2); 
     vcr_data.interface_data.ethernet_is_linked.vn_link = IOExpanderUtils::getBit(data, 0, 3); 
     vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 0, 4);
     vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 0, 5);
-    vcr_data.interface_data.shutdown_sensing_data.bspd_missing = IOExpanderUtils::getBit(data, 0, 6); 
+    // vcr_data.interface_data.shutdown_sensing_data.bspd_missing = IOExpanderUtils::getBit(data, 0, 6); 
 
     // inputs on port b (1)
-    vcr_data.interface_data.shutdown_sensing_data.lv_present = IOExpanderUtils::getBit(data, 1, 0); 
+    // vcr_data.interface_data.shutdown_sensing_data.lv_present = IOExpanderUtils::getBit(data, 1, 0); 
     vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0, 1); 
     vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 1, 2);
     vcr_data.interface_data.shutdown_sensing_data.vcr_sw_is_ok = IOExpanderUtils::getBit(data, 1, 3);
@@ -234,7 +233,6 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
     // Serial.println(vcr_ok);
     //Serial.println(portB);
  
-
     return HT_TASK::TaskResponse::YIELD;
     // NOLINTEND
 }
@@ -251,10 +249,13 @@ HT_TASK::TaskResponse run_update_brakelight_task(const unsigned long& sysMicros,
     return HT_TASK::TaskResponse::YIELD;
 }
 
-
 HT_TASK::TaskResponse enable_motor_cooling(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
 {
-    digitalWrite(MOTOR_COOLING_CONTROL_PIN, (VehicleStateMachineInstance::instance().get_state() == VehicleState_e::READY_TO_DRIVE || vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2) ? HIGH : LOW);
+    VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state(); //NOLINT will alway be populated so is ok
+    bool enable_state = vehicle_state == VehicleState_e::READY_TO_DRIVE ||
+                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2 || 
+                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_3;
+    digitalWrite(MOTOR_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -263,8 +264,9 @@ HT_TASK::TaskResponse enable_inverter_cooling(const unsigned long& sysMicros, co
     VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state(); //NOLINT will alway be populated so is ok
     bool enable_state = vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE || 
                         vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE || 
-                        vehicle_state == VehicleState_e::READY_TO_DRIVE || 
-                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2;
+                        vehicle_state == VehicleState_e::READY_TO_DRIVE ||
+                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2 ||
+                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_5;
     digitalWrite(INVERTER_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
     
     return HT_TASK::TaskResponse::YIELD;

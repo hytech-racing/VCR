@@ -14,6 +14,9 @@ bool called_recalibrate_pedals = false;
 bool inverter_button_pressed = false;
 bool calibrate_pedals_pressed = false;
 bool called_reset_inverter_error = false;
+bool called_recalibrate_steering = false;
+bool calibrate_steering_pressed = false;
+bool steering_timeout = false;
 
 void reset_all_booleans()
 {
@@ -30,6 +33,9 @@ void reset_all_booleans()
     inverter_button_pressed = false;
     calibrate_pedals_pressed = false;
     called_reset_inverter_error = false;
+    called_recalibrate_steering = false;
+    calibrate_steering_pressed = false;
+    steering_timeout = false;
 }
 
 etl::delegate<bool()> mock_hv_over_threshold = etl::delegate<bool()>::create([]() -> bool {
@@ -103,6 +109,24 @@ etl::delegate<void()> mock_reset_inverter_error = etl::delegate<void()>::create(
     return;
 });
 
+etl::delegate<void()> mock_recalibrate_steering = etl::delegate<void()>::create([]() -> void {
+    called_recalibrate_steering = true;
+    return;
+});
+
+etl::delegate<bool()> mock_is_calibrate_steering_pressed = etl::delegate<bool()>::create([]() -> bool {
+    return calibrate_steering_pressed;
+});
+
+etl::delegate<bool()> mock_steering_timeout = etl::delegate<bool()>::create([]() -> bool {
+    return steering_timeout;
+});
+
+etl::delegate<void()> mock_steering_reset = etl::delegate<void()>::create([]() -> void {
+    steering_timeout = false;
+    return;
+});
+
 void ASSERT_DRIVETRAIN_COMMANDED(bool wrtd, bool rtd)
 {
     ASSERT_EQ(wanting_ready_to_drive, wrtd);
@@ -123,7 +147,11 @@ TEST (VehicleStateMachine, TractiveSystemNotActive) {
         mock_pedals_reset,
         mock_inverter_button_pressed,
         mock_calibrate_pedals_pressed,
-        mock_reset_inverter_error
+        mock_reset_inverter_error,
+        mock_recalibrate_steering,
+        mock_is_calibrate_steering_pressed,
+        mock_steering_timeout,
+        mock_steering_reset
     );
     reset_all_booleans();
 
@@ -154,6 +182,8 @@ TEST (VehicleStateMachine, TractiveSystemNotActive) {
     
 }
 
+// TODO: Add CalibratingSteering test
+
 TEST (VehicleStateMachine, CalibratingPedals) {
     VehicleStateMachine state_machine = VehicleStateMachine(
         mock_hv_over_threshold,
@@ -168,7 +198,11 @@ TEST (VehicleStateMachine, CalibratingPedals) {
         mock_pedals_reset,
         mock_inverter_button_pressed,
         mock_calibrate_pedals_pressed,
-        mock_reset_inverter_error
+        mock_reset_inverter_error,
+        mock_recalibrate_steering,
+        mock_is_calibrate_steering_pressed,
+        mock_steering_timeout,
+        mock_steering_reset
     );
     reset_all_booleans();
 
@@ -241,7 +275,11 @@ TEST (VehicleStateMachine, TractiveSystemActive) {
         mock_pedals_reset,
         mock_inverter_button_pressed,
         mock_calibrate_pedals_pressed,
-        mock_reset_inverter_error
+        mock_reset_inverter_error,
+        mock_recalibrate_steering,
+        mock_is_calibrate_steering_pressed,
+        mock_steering_timeout,
+        mock_steering_reset
     );
     reset_all_booleans();
 
@@ -321,7 +359,11 @@ TEST (VehicleStateMachine, WantingReadyToDrive) {
         mock_pedals_reset,
         mock_inverter_button_pressed,
         mock_calibrate_pedals_pressed,
-        mock_reset_inverter_error
+        mock_reset_inverter_error,
+        mock_recalibrate_steering,
+        mock_is_calibrate_steering_pressed,
+        mock_steering_timeout,
+        mock_steering_reset
     );
     reset_all_booleans();
 
@@ -389,7 +431,11 @@ TEST (VehicleStateMachine, ExitsReadyToDriveWhenNoHV) {
         mock_pedals_reset,
         mock_inverter_button_pressed,
         mock_calibrate_pedals_pressed,
-        mock_reset_inverter_error
+        mock_reset_inverter_error,
+        mock_recalibrate_steering,
+        mock_is_calibrate_steering_pressed,
+        mock_steering_timeout,
+        mock_steering_reset
     );
     reset_all_booleans();
 
@@ -441,7 +487,11 @@ TEST (VehicleStateMachine, ExitsReadyToDriveWhenDrivetrainError) {
         mock_pedals_reset,
         mock_inverter_button_pressed,
         mock_calibrate_pedals_pressed,
-        mock_reset_inverter_error
+        mock_reset_inverter_error,
+        mock_recalibrate_steering,
+        mock_is_calibrate_steering_pressed,
+        mock_steering_timeout,
+        mock_steering_reset
     );
     reset_all_booleans();
 
@@ -481,6 +531,8 @@ TEST (VehicleStateMachine, ExitsReadyToDriveWhenDrivetrainError) {
 
 }
 
+// TODO: Add ExitsReadyToDriveWhenSteeringTimeout
+
 TEST (VehicleStateMachine, ExitsReadyToDriveWhenPedalsTimeout) {
     VehicleStateMachine state_machine = VehicleStateMachine(
         mock_hv_over_threshold,
@@ -495,7 +547,11 @@ TEST (VehicleStateMachine, ExitsReadyToDriveWhenPedalsTimeout) {
         mock_pedals_reset,
         mock_inverter_button_pressed,
         mock_calibrate_pedals_pressed,
-        mock_reset_inverter_error
+        mock_reset_inverter_error,
+        mock_recalibrate_steering,
+        mock_is_calibrate_steering_pressed,
+        mock_steering_timeout,
+        mock_steering_reset
     );
     reset_all_booleans();
 

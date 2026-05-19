@@ -4,6 +4,7 @@
 #include "ht_can_version.h"
 #include "hytech_msgs_version.h"
 #include <algorithm>
+#include "VCFInterface.h"
 
 hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &shared_state)
 {
@@ -107,15 +108,14 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     std::copy(version_view.begin(), version_view.begin() + version_len, std::begin(out.msg_versions.ht_proto_version.bytes));
 
     // // VCR Status
-    // const char* state_label = "UNKNOWN";
     out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(shared_state.system_data.vehicle_state_machine_state);
     out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(shared_state.system_data.drivetrain_state_machine_state);
     
     out.status.drivebrain_controller_timing_failure = shared_state.system_data.db_cntrl_status.drivebrain_controller_timing_failure;
     out.status.drivebrain_is_in_control = shared_state.system_data.db_cntrl_status.drivebrain_is_in_control;
     
-    out.status.pedals_heartbeat_ok = shared_state.system_data.vcf_heartbeat_data.heartbeat_ok;
-
+    out.status.pedals_heartbeat_ok = !(VCFInterfaceInstance::instance().is_pedals_heartbeat_not_ok());
+    out.status.steering_heartbeat_ok = !(VCFInterfaceInstance::instance().is_steering_heartbeat_not_ok());
     return out;
 }
 
