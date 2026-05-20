@@ -82,7 +82,7 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
 
 HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    vcr_data.interface_data.flowmeter_data.flowmeter_gallons_per_min = FlowmeterInterfaceInstance::instance().get_flow();
+    vcr_data.interface_data.flowmeter_data.flowmeter_gallons_per_min = FlowmeterInterfaceInstance::instance().get_flow_gpm();
     return HT_TASK::TaskResponse::YIELD;
 }
 
