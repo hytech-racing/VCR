@@ -10,8 +10,8 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
 
     _check_drivebrain_command_timing_failure(db_telem_input, curr_millis, _telem_latency_info);
     _check_drivebrain_command_timing_failure(db_auxillary_input, curr_millis, _aux_latency_info);
-    bool drivebrain_reinit_button_pressed = state.interface_data.dash_input_state.mc_reset_btn_is_pressed; // && !DrivetrainInstance::instance().drivetrain_error_present();
-
+    bool drivebrain_reinit_button_pressed = state.interface_data.dash_input_state.mc_reset_btn_is_pressed;
+    
     if (drivebrain_reinit_button_pressed && (!_should_run_controller))
     {
         _should_run_controller = true;
