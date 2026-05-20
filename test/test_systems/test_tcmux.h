@@ -392,7 +392,7 @@ TEST(TorqueControllerMuxTesting, test_drivebrain_and_simple_controller_integrati
     EXPECT_TRUE(db_controller.get_timing_failure_status());
 
 
-    state.interface_data.dash_input_state.data_btn_is_pressed = true;
+    state.interface_data.dash_input_state.mc_reset_btn_is_pressed = true;
     res = torque_controller_mux.get_drivetrain_command(ControllerMode_e::MODE_1, TorqueLimit_e::TCMUX_FULL_TORQUE, state);
     data.torque_limits.last_recv_millis = 3000;
     state.interface_data.latest_drivebrain_telem_command = data;
