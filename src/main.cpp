@@ -105,6 +105,7 @@ HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
 HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
+HT_TASK::Task adc_mpb_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc_mpb_task, adc_mpb_priority, adc_mpb_sample_period_us);
 HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, watchdog_priority, kick_watchdog_period_us);
 HT_TASK::Task ams_system_task(init_acu_heartbeat, update_acu_heartbeat, ams_priority, ams_update_period_us);
 HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, suspension_priority, suspension_can_period_us);
@@ -272,7 +273,7 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.print(" Thermistor 7 degrees C: ");
         // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C);
 
-        Serial.print("MPB Current Sensor Reading (A)");
+        Serial.print("MPB Current Sensor Reading (A): ");
         Serial.println(ADS112InterfaceInstance::instance().get_channel(CURRENT_SENSOR_CHANNEL).conversion);
 
     Serial.println();
@@ -436,7 +437,7 @@ void setup() {
     // Schedule scheduler tasks
     scheduler.schedule(adc_0_sample_task);
     scheduler.schedule(adc_1_sample_task);
-
+    scheduler.schedule(adc_mpb_sample_task);
     scheduler.schedule(kick_watchdog_task);
 
     scheduler.schedule(ams_system_task); // ensure ACU connection

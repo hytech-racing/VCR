@@ -8,6 +8,14 @@
 #include "AnalogSensorsInterface.h"
 #include "etl/singleton.h"
 
+using namespace ads112_bit_shift_params;
+
+namespace ads112_bit_shift_params {
+    constexpr uint8_t DATA_RATE_SHIFT = 5U;
+    constexpr uint8_t NORMAL_MODE_SHIFT = 4U;
+    constexpr uint8_t SINGLE_SHOT_SHIFT = 3U;
+    constexpr uint8_t REFERENCE_SHIFT = 1U;
+}
 namespace ads112_default_parameters
 {
     constexpr const int ADS112U04_NUM_CHANNELS = 4;
@@ -20,9 +28,10 @@ namespace ads112_default_parameters
     constexpr const uint8_t ADS112U04_START_SYNC_COMMAND = 0x08;
     constexpr const uint8_t ADS112U04_POWERDOWN_COMMAND  = 0x02;
     constexpr const uint8_t ADS112U04_RDATA_COMMAND      = 0x10;
-
     constexpr const uint8_t ADS112U04_WREG_BASE_COMMAND = 0x40;
     constexpr const uint8_t ADS112U04_RREG_BASE_COMMAND = 0x20;
+
+    constexpr const uint8_t ADS112U04_CONFIG_REG_4_DEFAULT = 0x48U;
 
     constexpr const uint32_t ADS112U04_POWER_UP_DELAY_US = 600;
     constexpr const uint32_t ADS112U04_RESET_DELAY_US    = 80;
@@ -37,6 +46,10 @@ namespace ads112_default_parameters
     constexpr const float ADS112U04_REFERENCE_VOLTAGE = 5.0f;
     constexpr const float ADS112U04_GAIN              = 1.0f;
     constexpr const float ADS112U04_FULL_SCALE_COUNTS = 32768.0f;
+    
+    constexpr const uint16_t ADS112U04_TEMP_SIGN_BIT_MASK = 0x2000U;  // Bit 13 of 14-bit value
+    constexpr const uint16_t ADS112U04_TEMP_SIGN_EXTEND_MASK = 0xC000U;  // Extend to 16-bit
+    constexpr const float ADS112U04_TEMP_SCALE = 0.03125f;
 }
 
 enum class ADS112U04InputMux_e : uint8_t
@@ -92,6 +105,11 @@ struct ADS112Config_s
     float reference_voltage;
     float gain_value;
     float full_scale_counts;
+    float internal_temp_scale;
+
+    uint16_t temp_sign_bit_mask;
+    uint16_t temp_sign_extend_mask;
+    uint8_t config_reg_4_default_value;
 };
 
 struct ADS112Commands_s
@@ -113,6 +131,13 @@ struct ADS112Timing_s
     uint32_t conversion_delay_us;
 };
 
+struct ADS112TemperatureReading_s
+{
+    int16_t raw_temperature_count = 0;
+    float temperature_c = 0.0f;
+    bool data_valid = false;
+};
+
 class ADS112Interface : public AnalogMultiSensor<ads112_default_parameters::ADS112U04_NUM_CHANNELS>
 {
 public:
@@ -120,8 +145,8 @@ public:
 
     ADS112Interface(
         HardwareSerial& serial,
-        const float scales[NUM_CHANNELS],
-        const float offsets[NUM_CHANNELS],
+        const std::array<float, NUM_CHANNELS>& scales,
+        const std::array<float, NUM_CHANNELS>& offsets,
         ADS112Pinout_s pinouts = {
             ads112_default_parameters::ADS112U04_PIN_UNUSED,
             ads112_default_parameters::ADS112U04_PIN_UNUSED
@@ -138,7 +163,11 @@ public:
             ADS112U04Reference_e::ANALOG_SUPPLY,
             ads112_default_parameters::ADS112U04_REFERENCE_VOLTAGE,
             ads112_default_parameters::ADS112U04_GAIN,
-            ads112_default_parameters::ADS112U04_FULL_SCALE_COUNTS
+            ads112_default_parameters::ADS112U04_FULL_SCALE_COUNTS,
+            ads112_default_parameters::ADS112U04_TEMP_SCALE,
+            ads112_default_parameters::ADS112U04_TEMP_SIGN_BIT_MASK,
+            ads112_default_parameters::ADS112U04_TEMP_SIGN_EXTEND_MASK,
+            ads112_default_parameters::ADS112U04_CONFIG_REG_4_DEFAULT
         },
         ADS112Commands_s commands = {
             ads112_default_parameters::ADS112U04_SYNC_WORD,
@@ -170,6 +199,17 @@ public:
 
     void power_down();
 
+    /**
+     * Samples the ADS112U04 internal temperature sensor.
+     * This temporarily enables temperature sensor mode.
+    */
+    void sample_internal_temperature();
+
+    /**
+     * @return Last internal temperature reading in Celsius.
+    */
+    ADS112TemperatureReading_s get_internal_temperature();
+
 private:
     HardwareSerial* _serial;
 
@@ -177,6 +217,7 @@ private:
     ADS112Config_s _config;
     ADS112Commands_s _commands;
     ADS112Timing_s _timing;
+    ADS112TemperatureReading_s _internal_temperature = {};
 
     uint32_t _baud_rate;
 
@@ -191,7 +232,7 @@ private:
     uint8_t _read_register(uint8_t register_address);
 
     uint8_t _build_config_register_0(ADS112U04InputMux_e mux) const;
-    uint8_t _build_config_register_1() const;
+    uint8_t _build_config_register_1(bool temperature_sensor_enabled = false) const;
 
     void _send_command(uint8_t command);
     void _clear_serial_rx_buffer();

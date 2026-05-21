@@ -5,7 +5,7 @@
 #include "ht_task.hpp"
 #include "ACUInterface.h"
 #include "ADCInterface.h"
-
+#include "ADS112Interface.h"
 
 /* From shared-systems-lib */
 #include "Logger.h"
@@ -78,6 +78,10 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
     return HT_TASK::TaskResponse::YIELD;
 }
 
+HT_TASK::TaskResponse run_read_adc_mpb_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+{
+    ADS112InterfaceInstance::instance().tick();
+}
 
 HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
