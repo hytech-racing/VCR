@@ -36,6 +36,7 @@
 #include "DrivebrainInterface.h"
 #include "InverterInterface.h"
 #include "DrivetrainSystem.h"
+#include "ADS112Interface.h"
 #include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
 #include "controls.h"
@@ -271,6 +272,9 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.print(" Thermistor 7 degrees C: ");
         // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C);
 
+        Serial.print("MPB Current Sensor Reading (A)");
+        Serial.println(ADS112InterfaceInstance::instance().get_channel(CURRENT_SENSOR_CHANNEL).conversion);
+
     Serial.println();
  
     return HT_TASK::TaskResponse::YIELD;
@@ -424,8 +428,10 @@ void setup() {
         THERMISTOR_7_OFFSET,
       }
     );
-  
     ADCInterfaceInstance::instance().init();
+
+    ADS112InterfaceInstance::create(Serial8, ADS112_SCALES, ADS112_OFFSETS);
+    ADS112InterfaceInstance::instance().init();
 
     // Schedule scheduler tasks
     scheduler.schedule(adc_0_sample_task);
