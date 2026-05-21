@@ -11,7 +11,7 @@ FlowmeterInterface::FlowmeterInterface(
     attachInterrupt(digitalPinToInterrupt(_pin), count_pulse, RISING);
 
     _last_sample_timestamp_ms = 0;
-};
+}
 
 float FlowmeterInterface::get_flow_gpm(unsigned long curr_millis) 
 { 
@@ -27,4 +27,4 @@ float FlowmeterInterface::get_flow_gpm(unsigned long curr_millis)
     _pulse_count = 0;
 
     return reading;
-};
+}
