@@ -8,7 +8,6 @@
 #include "AnalogSensorsInterface.h"
 #include "etl/singleton.h"
 
-using namespace ads112_bit_shift_params;
 
 namespace ads112_bit_shift_params {
     constexpr uint8_t DATA_RATE_SHIFT = 5U;
@@ -16,6 +15,9 @@ namespace ads112_bit_shift_params {
     constexpr uint8_t SINGLE_SHOT_SHIFT = 3U;
     constexpr uint8_t REFERENCE_SHIFT = 1U;
 }
+
+using namespace ads112_bit_shift_params;
+
 namespace ads112_default_parameters
 {
     constexpr const int ADS112U04_NUM_CHANNELS = 4;
