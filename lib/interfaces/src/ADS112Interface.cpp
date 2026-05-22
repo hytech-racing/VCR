@@ -54,7 +54,7 @@ void ADS112Interface::init()
 void ADS112Interface::tick()
 {
     _sample();
-    sample_internal_temperature();
+    // sample_internal_temperature();
     this->_convert();
 }
 
@@ -292,7 +292,7 @@ void ADS112Interface::_clear_serial_rx_buffer()
 {
     while (_serial->available() > 0)
     {
-        static_cast<void>(_serial->read());
+        _serial->read();
     }
 }
 
@@ -318,6 +318,7 @@ bool ADS112Interface::_wait_for_conversion()
 
     while (!is_data_ready())
     {
+        Serial.println("IN WHILE LOOP, IS DATA READY");
         if ((millis() - start_time_ms) > _timing.read_timeout_ms)
         {
             return false;
