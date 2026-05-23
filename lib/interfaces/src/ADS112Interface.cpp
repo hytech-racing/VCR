@@ -318,7 +318,6 @@ bool ADS112Interface::_wait_for_conversion()
 
     while (!is_data_ready())
     {
-        Serial.println("IN WHILE LOOP, IS DATA READY");
         if ((millis() - start_time_ms) > _timing.read_timeout_ms)
         {
             return false;
@@ -331,28 +330,42 @@ bool ADS112Interface::_wait_for_conversion()
 bool ADS112Interface::_read_raw_adc_count(int16_t& raw_adc_count)
 {
     _clear_serial_rx_buffer();
-
+    
+    Serial.println("Sending RDATA command...");
     _send_command(_commands.rdata_command);
-
+    
     const uint32_t start_time_ms = millis();
-
+    Serial.print("Waiting for 2 bytes... ");
+    
     while (_serial->available() < 2)
     {
         if ((millis() - start_time_ms) > _timing.read_timeout_ms)
         {
+            Serial.print("TIMEOUT! Only received ");
+            Serial.print(_serial->available());
+            Serial.println(" bytes");
             return false;
         }
     }
-
-    const uint8_t lsb = static_cast<uint8_t>(_serial->read());
-    const uint8_t msb = static_cast<uint8_t>(_serial->read());
-
+    
+    Serial.println("OK");
+    
+    const uint8_t byte1 = static_cast<uint8_t>(_serial->read());
+    const uint8_t byte2 = static_cast<uint8_t>(_serial->read());
+    
+    Serial.print("Byte1: 0x");
+    Serial.print(byte1, HEX);
+    Serial.print(", Byte2: 0x");
+    Serial.println(byte2, HEX);
+    
     const uint16_t raw_word = static_cast<uint16_t>(
-        (static_cast<uint16_t>(msb) << 8U) |
-        static_cast<uint16_t>(lsb)
+        (static_cast<uint16_t>(byte1) << 8U) | byte2
     );
-
+    
     raw_adc_count = static_cast<int16_t>(raw_word);
-
+    
+    Serial.print("Raw count: ");
+    Serial.println(raw_adc_count);
+    
     return true;
 }
