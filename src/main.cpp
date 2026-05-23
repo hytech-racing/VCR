@@ -255,6 +255,8 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.print(" Thermistor 0 degrees C: ");
         // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C);
 
+        Serial.print("MPB Current Sensor Analog RAW: ");
+        Serial.print(ADS112InterfaceInstance::instance().get_channel(CURRENT_SENSOR_CHANNEL).raw);
         Serial.print("MPB Current Sensor Reading (A): ");
         Serial.println(ADS112InterfaceInstance::instance().get_channel(CURRENT_SENSOR_CHANNEL).conversion);
 
