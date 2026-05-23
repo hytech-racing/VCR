@@ -94,5 +94,3 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
     
     return HT_TASK::TaskResponse::YIELD;
 }
-
-

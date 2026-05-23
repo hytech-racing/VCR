@@ -38,6 +38,7 @@
 #include "DrivetrainSystem.h"
 #include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
+#include "FlowmeterInterface.h"
 #include "controls.h"
 
 /* From pio-git-hash */
@@ -100,7 +101,6 @@ etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create(
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
-
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
 HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
@@ -110,6 +110,7 @@ HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspe
 HT_TASK::Task enqueue_controls_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_controls_CAN_data, controls_priority, controls_can_period_us);
 HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, inverter_send_priority, inv_send_period);
 HT_TASK::Task enqueue_dashboard_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_dashboard_CAN_data, dashboard_send_priority, dashboard_send_period_us);
+HT_TASK::Task enqueue_flowmeter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_flowmeter_CAN_data, flowmeter_send_priority, flowmeter_send_period_us);
 HT_TASK::Task enqueue_coolant_temp_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_coolant_temp_CAN_data, coolant_temp_send_priority, coolant_temp_send_period_us);
 HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, send_can_priority, send_can_period_us); // Sends all messages from the CAN queue
 HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority, ethernet_update_period);
@@ -119,8 +120,6 @@ HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_bra
 HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
 HT_TASK::Task run_enable_motor_cooling(HT_TASK::DUMMY_FUNCTION, enable_motor_cooling, dashboard_send_priority, dashboard_send_period_us);
 HT_TASK::Task run_enable_inverter_cooling(HT_TASK::DUMMY_FUNCTION, enable_inverter_cooling, dashboard_send_priority, dashboard_send_period_us);
-
-
 
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -284,15 +283,8 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
 HT_TASK::Task debug_state_print_task(HT_TASK::DUMMY_FUNCTION, debug_print, 100, 100000); //NOLINT (priority and loop rate)
 
-void countPulse() // NOLINT
+void setup()
 {
-    pulseCount++;
-    
-}
-
-void setup() {
-
-
     // Configure pins
     pinMode(MOTOR_COOLING_CONTROL_PIN, OUTPUT);
     pinMode(INVERTER_COOLING_CONTROL_PIN, OUTPUT);
@@ -305,24 +297,17 @@ void setup() {
 
     SPI.begin();
     analogReadResolution(ANALOG_RESOLUTION);
-
-    // Flowmeter stuff
-    // pinMode(FLOWMETER_PIN, INPUT_PULLUP); //need to change based on aux uart
-    // pinMode(27, OUTPUT);
-    // digitalWrite(27, HIGH);
-
-    //attachInterrupt(digitalPinToInterrupt(FLOWMETER_PIN), countPulse, RISING);
-    //pulseCount = 0;
     
     // Create all singletons
     ProtobufSocketsInstance::create(vcr_data_send_socket, vcf_data_recv_socket);
     EthernetIPDefsInstance::create();
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
+    FlowmeterInterfaceInstance::create(FLOWMETER_PIN);  //NOLINT
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
         vcr_data.interface_data.thermistor_data.thermistor_0,
         vcr_data.interface_data.thermistor_data.thermistor_1,
-        vcr_data.interface_data.thermistor_data.thermistor_2,
+        vcr_data.interface_data.flowmeter_data,
         EthernetIPDefsInstance::instance().drivebrain_ip,
         EthernetIPDefsInstance::instance().VCRData_port,
         &vcr_data_send_socket);
@@ -452,9 +437,7 @@ void setup() {
     scheduler.schedule(vcr_data_ethernet_send);
 
     scheduler.schedule(enqueue_inverter_CAN_task);
-
-    // scheduler.schedule(enqueue_coolant_temp_CAN_task);
-
+    scheduler.schedule(enqueue_coolant_temp_CAN_task);
     scheduler.schedule(async_main_task);
 
     scheduler.schedule(enqueue_controls_CAN_task);
@@ -471,6 +454,7 @@ void setup() {
     scheduler.schedule(run_enable_inverter_cooling);
 }
 
-void loop() {
+void loop()
+{
     scheduler.run();
 }
