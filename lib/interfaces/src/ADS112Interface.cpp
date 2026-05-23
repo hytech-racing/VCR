@@ -43,11 +43,27 @@ void ADS112Interface::init()
     }
 
     _serial->begin(_baud_rate);
+    Serial.print("Serial port started at ");
+    Serial.println(_baud_rate);
 
     delayMicroseconds(_timing.power_up_delay_us);
 
     _reset_adc();
+    
+    // TEST: Try to read a register to verify communication
+    Serial.println("Testing communication by reading Config Register 0...");
+    uint8_t reg0 = _read_register(0x00);
+    Serial.print("Config Reg 0: 0x");
+    Serial.println(reg0, HEX);
+    
     _configure_adc();
+    
+    // Read it back again after configuration
+    Serial.println("Reading Config Register 0 after configuration...");
+    reg0 = _read_register(0x00);
+    Serial.print("Config Reg 0 after config: 0x");
+    Serial.println(reg0, HEX);
+    
     start_conversions();
 }
 
