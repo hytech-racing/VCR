@@ -37,7 +37,7 @@ namespace ads112_default_parameters
 
     constexpr const uint32_t ADS112U04_POWER_UP_DELAY_US = 600;
     constexpr const uint32_t ADS112U04_RESET_DELAY_US    = 80;
-    constexpr const uint32_t ADS112U04_READ_TIMEOUT_MS   = 5;
+    constexpr const uint32_t ADS112U04_READ_TIMEOUT_MS   = 100;
 
     /*
      * Fallback conversion wait when DRDY is not connected.
