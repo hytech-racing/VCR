@@ -66,7 +66,7 @@ void ADS112Interface::init()
     
     start_conversions();
 
-    delay(100000);
+    // delay(100000);
 }
 
 void ADS112Interface::tick()
