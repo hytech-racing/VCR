@@ -53,7 +53,7 @@ void ADS112Interface::init()
 
 void ADS112Interface::tick()
 {
-    _sample();
+    // _sample();
     // sample_internal_temperature();
     this->_convert();
 }

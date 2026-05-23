@@ -450,7 +450,7 @@ void setup() {
 
     scheduler.schedule(enqueue_inverter_CAN_task);
 
-    // scheduler.schedule(enqueue_coolant_temp_CAN_task);
+    scheduler.schedule(enqueue_coolant_temp_CAN_task);
 
     scheduler.schedule(async_main_task);
 
