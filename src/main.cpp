@@ -251,27 +251,9 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         
         /* Thermistor Data */
         // Serial.print("Thermistor 0 Analog: ");
-
-        // Serial.println(ADCInterfaceInstance::instance().read_thermistor_0().conversion);
         // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog);
         // Serial.print(" Thermistor 0 degrees C: ");
         // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C);
-        // Serial.print("Thermistor 4 Analog: ");
-        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog);
-        // Serial.print(" Thermistor 4 degrees C: ");
-        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_degrees_C);
-        // Serial.print("Thermistor 5 Analog: ");
-        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog);
-        // Serial.print(" Thermistor 5 degrees C: ");
-        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_degrees_C);
-        // Serial.print("Thermistor 6 Analog: ");
-        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog);
-        // Serial.print(" Thermistor 6 degrees C: ");
-        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_degrees_C);
-        // Serial.print("Thermistor 7 Analog: ");
-        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog);
-        // Serial.print(" Thermistor 7 degrees C: ");
-        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C);
 
         Serial.print("MPB Current Sensor Reading (A): ");
         Serial.println(ADS112InterfaceInstance::instance().get_channel(CURRENT_SENSOR_CHANNEL).conversion);
