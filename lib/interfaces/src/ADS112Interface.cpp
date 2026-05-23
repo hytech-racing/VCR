@@ -65,6 +65,8 @@ void ADS112Interface::init()
     Serial.println(reg0, HEX);
     
     start_conversions();
+
+    delay(100000);
 }
 
 void ADS112Interface::tick()
