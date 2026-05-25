@@ -46,6 +46,9 @@ public:
     TorqueControllerSimple(TorqueControllerSimpleParams_s params = TorqueControllerSimpleParams_s())
         : _params(params)
     { }
+    TorqueControllerSimple(float rear_torque_scale, float rear_regen_torque_scale, float max_rpm, float max_torque, float max_regen_torque)
+        : _params(rear_torque_scale, rear_regen_torque_scale, max_rpm, max_torque, max_regen_torque)
+    { }
     /// @brief calculates torque output based off max torque and simple torque scaling
     DrivetrainCommand_s evaluate(const VCRData_s &state, unsigned long curr_millis);
 

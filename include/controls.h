@@ -9,6 +9,7 @@
 #include "controllers/SimpleLaunchController.h"
 #include "controllers/DrivebrainController.h"
 #include "etl/singleton.h"
+#include "PhysicalParameters.h"
 
 class VCRControls
 {
@@ -54,6 +55,7 @@ class VCRControls
     private:
         TorqueControllerSimple _mode0; // this needs to be first for tc_mux to have a valid capture
         LoadCellVectoringTorqueController _mode1;
+        TorqueControllerSimple _mode0_nobias{1.0f, 1.0f, PhysicalParameters::AMK_MAX_RPM, PhysicalParameters::AMK_MAX_TORQUE, PhysicalParameters::MAX_REGEN_TORQUE};
         SimpleLaunchController _mode3;
         DrivebrainController _mode4;
         TCMuxType _tc_mux;
