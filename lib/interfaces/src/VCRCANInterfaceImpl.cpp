@@ -3,7 +3,7 @@
 #include "hytech.h"
 #include <cstdint>
 
-namespace VCRCANInterfaceImpl 
+namespace VCRCANInterfaceImpl
 {
 
 // global forwards
@@ -15,14 +15,14 @@ CANTXBufferType auxillary_can_tx_buffer;
 CANTXBufferType inverter_can_tx_buffer;
 CANTXBufferType telem_can_tx_buffer;
 
-void on_auxillary_can_receive(const CAN_message_t &msg) 
+void on_auxillary_can_receive(const CAN_message_t &msg)
 {
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
     auxillary_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
-void on_inverter_can_receive(const CAN_message_t &msg) 
+void on_inverter_can_receive(const CAN_message_t &msg)
 {
     uint8_t buf[sizeof(CAN_message_t)];
     memmove(buf, &msg, sizeof(msg));
@@ -36,11 +36,11 @@ void on_telem_can_receive(const CAN_message_t &msg)
     telem_can_rx_buffer.push_back(buf, sizeof(CAN_message_t));
 }
 
-void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis, CANInterfaceType_e interface_type) 
-{    
+void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned long millis, CANInterfaceType_e interface_type)
+{
     switch (msg.id)
     {
-        case PEDALS_SYSTEM_DATA_CANID: 
+        case PEDALS_SYSTEM_DATA_CANID:
         {
             interfaces.vcf_interface.receive_pedals_message(msg, millis);
             break;
@@ -48,6 +48,7 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
         case STEERING_DATA_CANID:
         {
             interfaces.vcf_interface.receive_steering_message(msg, millis);
+            break;
         }
         case FRONT_SUSPENSION_CANID:
         {
@@ -70,24 +71,24 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
             break;
         }
 
-        case DRIVEBRAIN_TORQUE_LIM_INPUT_CANID: 
+        case DRIVEBRAIN_TORQUE_LIM_INPUT_CANID:
         {
-            if (interface_type == CANInterfaceType_e::RAUX) 
+            if (interface_type == CANInterfaceType_e::RAUX)
             {
                 interfaces.db_interface.receive_drivebrain_torque_lim_command_auxillary(msg, millis);
             }
-            else if (interface_type == CANInterfaceType_e::TELEM) 
+            else if (interface_type == CANInterfaceType_e::TELEM)
             {
                 interfaces.db_interface.receive_drivebrain_torque_lim_command_telem(msg, millis);
             }
             break;
         }
         case DRIVEBRAIN_SPEED_SET_INPUT_CANID: {
-            if (interface_type == CANInterfaceType_e::RAUX) 
+            if (interface_type == CANInterfaceType_e::RAUX)
             {
                 interfaces.db_interface.receive_drivebrain_speed_command_auxillary(msg, millis);
-            } 
-            else if (interface_type == CANInterfaceType_e::TELEM) 
+            }
+            else if (interface_type == CANInterfaceType_e::TELEM)
             {
                 interfaces.db_interface.receive_drivebrain_speed_command_telem(msg, millis);
             }
@@ -98,7 +99,7 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
         // Front Left Inverter
         {
             case INV1_STATUS_CANID: {
-                interfaces.fl_inverter_interface.receive_INV_STATUS(msg, millis); 
+                interfaces.fl_inverter_interface.receive_INV_STATUS(msg, millis);
                 break;
             }
             case INV1_TEMPS_CANID: {
@@ -121,27 +122,27 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
 
         // Front right inverter
         {
-            case INV2_STATUS_CANID: 
+            case INV2_STATUS_CANID:
             {
-                interfaces.fr_inverter_interface.receive_INV_STATUS(msg, millis); 
+                interfaces.fr_inverter_interface.receive_INV_STATUS(msg, millis);
                 break;
             }
-            case INV2_TEMPS_CANID: 
+            case INV2_TEMPS_CANID:
             {
                 interfaces.fr_inverter_interface.receive_INV_TEMPS(msg, millis);
                 break;
             }
-            case INV2_DYNAMICS_CANID: 
+            case INV2_DYNAMICS_CANID:
             {
                 interfaces.fr_inverter_interface.receive_INV_DYNAMICS(msg, millis);
                 break;
             }
-            case INV2_POWER_CANID: 
+            case INV2_POWER_CANID:
             {
                 interfaces.fr_inverter_interface.receive_INV_POWER(msg, millis);
                 break;
             }
-            case INV2_FEEDBACK_CANID: 
+            case INV2_FEEDBACK_CANID:
             {
                 interfaces.fr_inverter_interface.receive_INV_FEEDBACK(msg, millis);
                 break;
@@ -150,27 +151,27 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
 
         // Rear left inverter
         {
-            case INV3_STATUS_CANID: 
+            case INV3_STATUS_CANID:
             {
-                interfaces.rl_inverter_interface.receive_INV_STATUS(msg, millis); 
+                interfaces.rl_inverter_interface.receive_INV_STATUS(msg, millis);
                 break;
             }
-            case INV3_TEMPS_CANID: 
+            case INV3_TEMPS_CANID:
             {
                 interfaces.rl_inverter_interface.receive_INV_TEMPS(msg, millis);
                 break;
             }
-            case INV3_DYNAMICS_CANID: 
+            case INV3_DYNAMICS_CANID:
             {
                 interfaces.rl_inverter_interface.receive_INV_DYNAMICS(msg, millis);
                 break;
             }
-            case INV3_POWER_CANID: 
+            case INV3_POWER_CANID:
             {
                 interfaces.rl_inverter_interface.receive_INV_POWER(msg, millis);
                 break;
             }
-            case INV3_FEEDBACK_CANID: 
+            case INV3_FEEDBACK_CANID:
             {
                 interfaces.rl_inverter_interface.receive_INV_FEEDBACK(msg, millis);
                 break;
@@ -179,43 +180,43 @@ void vcr_CAN_recv(CANInterfaces &interfaces, const CAN_message_t &msg, unsigned 
 
         // Rear right inverter
         {
-            case INV4_STATUS_CANID: 
+            case INV4_STATUS_CANID:
             {
-                interfaces.rr_inverter_interface.receive_INV_STATUS(msg, millis); 
+                interfaces.rr_inverter_interface.receive_INV_STATUS(msg, millis);
                 break;
             }
-            case INV4_TEMPS_CANID: 
+            case INV4_TEMPS_CANID:
             {
                 interfaces.rr_inverter_interface.receive_INV_TEMPS(msg, millis);
                 break;
             }
-            case INV4_DYNAMICS_CANID: 
+            case INV4_DYNAMICS_CANID:
             {
                 interfaces.rr_inverter_interface.receive_INV_DYNAMICS(msg, millis);
                 break;
             }
-            case INV4_POWER_CANID: 
+            case INV4_POWER_CANID:
             {
                 interfaces.rr_inverter_interface.receive_INV_POWER(msg, millis);
                 break;
             }
-            case INV4_FEEDBACK_CANID: 
+            case INV4_FEEDBACK_CANID:
             {
                 interfaces.rr_inverter_interface.receive_INV_FEEDBACK(msg, millis);
                 break;
             }
         }
-        
-        default: 
+
+        default:
         {
             break;
         }
     }
 }
 
-void send_all_CAN_msgs(CANTXBufferType &buffer, FlexCAN_T4_Base *can_interface) 
+void send_all_CAN_msgs(CANTXBufferType &buffer, FlexCAN_T4_Base *can_interface)
 {
-    while (buffer.available()) 
+    while (buffer.available())
     {
         CAN_message_t msg;
         uint8_t buf[sizeof(CAN_message_t)];

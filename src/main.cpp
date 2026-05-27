@@ -110,14 +110,14 @@ HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspe
 HT_TASK::Task enqueue_controls_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_controls_CAN_data, controls_priority, controls_can_period_us);
 HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, inverter_send_priority, inv_send_period);
 HT_TASK::Task enqueue_dashboard_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_dashboard_CAN_data, dashboard_send_priority, dashboard_send_period_us);
-HT_TASK::Task enqueue_flowmeter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_flowmeter_CAN_data, flowmeter_send_priority, flowmeter_send_period_us);
+//HT_TASK::Task enqueue_flowmeter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_flowmeter_CAN_data, flowmeter_send_priority, flowmeter_send_period_us);
 HT_TASK::Task enqueue_coolant_temp_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_coolant_temp_CAN_data, coolant_temp_send_priority, coolant_temp_send_period_us);
 HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, send_can_priority, send_can_period_us); // Sends all messages from the CAN queue
 HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority, ethernet_update_period);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
 HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
-HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
+//HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
 HT_TASK::Task run_enable_motor_cooling(HT_TASK::DUMMY_FUNCTION, enable_motor_cooling, dashboard_send_priority, dashboard_send_period_us);
 HT_TASK::Task run_enable_inverter_cooling(HT_TASK::DUMMY_FUNCTION, enable_inverter_cooling, dashboard_send_priority, dashboard_send_period_us);
 
@@ -138,10 +138,10 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.println();
         // Serial.print("Is Start Button Active: "); Serial.print(VCFInterfaceInstance::instance().is_start_button_pressed() ? "YES" : "NO");
         // Serial.println();
-        
+
 
         // Serial.println();
-        // Serial.println();       
+        // Serial.println();
 
         // Serial.print("Drivetrain system state: ");
         // Serial.println(static_cast<int>(DrivetrainInstance::instance().get_state()));
@@ -165,10 +165,10 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
         // Serial.print("pedal recalibrate button pressed: ");
         // Serial.println(vcr_data.interface_data.dash_input_state.preset_btn_is_pressed);
-        
+
         // Serial.print("mc reset button pressed: ");
         // Serial.println(vcr_data.interface_data.dash_input_state.mc_reset_btn_is_pressed);
-        
+
         // Serial.print("torque mode cycle button pressed: ");
         // Serial.println(vcr_data.interface_data.dash_input_state.mode_btn_is_pressed);
 
@@ -192,7 +192,7 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         );
         Serial.println(buf);
         Serial.println();
-        
+
         auto& e = vcr_data.interface_data.ethernet_is_linked;
 
         snprintf(buf, sizeof(buf),
@@ -251,7 +251,7 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
         Serial.print("Current Controller Mode: ");
         Serial.println(static_cast<uint8_t>(vcr_data.interface_data.dash_input_state.dial_state));
-        
+
         /* Thermistor Data */
         // Serial.print("Thermistor 0 Analog: ");
 
@@ -277,7 +277,7 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C);
 
     Serial.println();
- 
+
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -297,12 +297,12 @@ void setup()
 
     SPI.begin();
     analogReadResolution(ANALOG_RESOLUTION);
-    
+
     // Create all singletons
     ProtobufSocketsInstance::create(vcr_data_send_socket, vcf_data_recv_socket);
     EthernetIPDefsInstance::create();
     VCFInterfaceInstance::create(sys_time::hal_millis(), VCF_PEDALS_MAX_HEARTBEAT_MS);
-    FlowmeterInterfaceInstance::create(FLOWMETER_PIN);  //NOLINT
+    //FlowmeterInterfaceInstance::create(FLOWMETER_PIN);  //NOLINT
     DrivebrainInterfaceInstance::create(vcr_data.interface_data.rear_loadcell_data,
         vcr_data.interface_data.rear_suspot_data,
         vcr_data.interface_data.thermistor_data.thermistor_0,
@@ -323,7 +323,7 @@ void setup()
     CANInterfacesInstance::create(
         VCFInterfaceInstance::instance(),
         ACUInterfaceInstance::instance(),
-        DrivebrainInterfaceInstance::instance(), 
+        DrivebrainInterfaceInstance::instance(),
         fl_inverter_int,
         fr_inverter_int,
         rl_inverter_int,
@@ -333,14 +333,14 @@ void setup()
 
     VCRControlsInstance::create(&DrivetrainInstance::instance(), MAX_ALLOWED_DB_LATENCY_MS);
     VehicleStateMachineInstance::create(
-        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold>(DrivetrainInstance::instance()), 
+        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold>(DrivetrainInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_start_button_pressed>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_brake_pressed>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present>(DrivetrainInstance::instance()),
         etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready>(DrivetrainInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_recalibrate_pedals_message>(VCFInterfaceInstance::instance()),
-        etl::delegate<void(bool, bool)>::create<VCRControls, &VCRControls::handle_drivetrain_command>(VCRControlsInstance::instance()), 
+        etl::delegate<void(bool, bool)>::create<VCRControls, &VCRControls::handle_drivetrain_command>(VCRControlsInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_not_ok>(VCFInterfaceInstance::instance()),
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_drivetrain_reset_pressed>(VCFInterfaceInstance::instance()),
@@ -355,11 +355,11 @@ void setup()
     // Scheduler timing function
     scheduler.setTimingFunction(micros);
 
-    // Initialize CAN 
+    // Initialize CAN
     const uint32_t telem_CAN_baudrate = 1000000;
     const uint32_t auxillary_CAN_baudrate = 500000;
     const uint32_t inv_CAN_baudrate = 500000;
-   
+
     handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
     handle_CAN_setup(VCRCANInterfaceImpl::TELEM_CAN, telem_CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
     handle_CAN_setup(VCRCANInterfaceImpl::AUXILLARY_CAN, auxillary_CAN_baudrate, &VCRCANInterfaceImpl::on_auxillary_can_receive);
@@ -419,7 +419,7 @@ void setup()
         THERMISTOR_7_OFFSET,
       }
     );
-  
+
     ADCInterfaceInstance::instance().init();
 
     // Schedule scheduler tasks
@@ -430,7 +430,7 @@ void setup()
 
     scheduler.schedule(ams_system_task); // ensure ACU connection
     scheduler.schedule(enqueue_suspension_CAN_task);
-    scheduler.schedule(enqueue_dashboard_CAN_task); 
+    scheduler.schedule(enqueue_dashboard_CAN_task);
 
     scheduler.schedule(send_CAN_task);
 
@@ -443,7 +443,7 @@ void setup()
     scheduler.schedule(enqueue_controls_CAN_task);
 
     // scheduler.schedule(debug_state_print_task);
-    
+
     scheduler.schedule(update_brakelight_task);
 
     // scheduler.schedule(update_sample_flowmeter);

@@ -30,7 +30,7 @@ class DrivebrainInterface {
 
     void receive_drivebrain_torque_lim_command_telem(const CAN_message_t &msg, unsigned long curr_millis);
 
-    void receive_drivebrain_speed_command_auxillary(const CAN_message_t &msg, unsigned long curr_millis); 
+    void receive_drivebrain_speed_command_auxillary(const CAN_message_t &msg, unsigned long curr_millis);
 
     void receive_drivebrain_torque_lim_command_auxillary(const CAN_message_t &msg, unsigned long curr_millis);
 
@@ -43,7 +43,7 @@ class DrivebrainInterface {
     void handle_send_ethernet_data(const hytech_msgs_VCRData_s &data);
 
     StampedDrivetrainCommand_s get_latest_telem_drivebrain_command();
-    StampedDrivetrainCommand_s get_latest_auxillary_drivebrain_command(); 
+    StampedDrivetrainCommand_s get_latest_auxillary_drivebrain_command();
 
   private:
     struct {
