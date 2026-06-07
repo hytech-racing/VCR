@@ -36,6 +36,7 @@
 #include "DrivebrainInterface.h"
 #include "InverterInterface.h"
 #include "DrivetrainSystem.h"
+#include "ADS112Interface.h"
 #include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
 #include "FlowmeterInterface.h"
@@ -104,20 +105,21 @@ HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, adc0_priority, adc0_sample_period_us);
 HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, adc1_priority, adc1_sample_period_us);
+HT_TASK::Task adc_mpb_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc_mpb_task, adc_mpb_priority, adc_mpb_sample_period_us);
 HT_TASK::Task kick_watchdog_task(init_kick_watchdog, run_kick_watchdog, watchdog_priority, kick_watchdog_period_us);
 HT_TASK::Task ams_system_task(init_acu_heartbeat, update_acu_heartbeat, ams_priority, ams_update_period_us);
 HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspension_CAN_data, suspension_priority, suspension_can_period_us);
 HT_TASK::Task enqueue_controls_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_controls_CAN_data, controls_priority, controls_can_period_us);
 HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, inverter_send_priority, inv_send_period);
 HT_TASK::Task enqueue_dashboard_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_dashboard_CAN_data, dashboard_send_priority, dashboard_send_period_us);
-//HT_TASK::Task enqueue_flowmeter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_flowmeter_CAN_data, flowmeter_send_priority, flowmeter_send_period_us);
+// HT_TASK::Task enqueue_flowmeter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_flowmeter_CAN_data, flowmeter_send_priority, flowmeter_send_period_us);
 HT_TASK::Task enqueue_coolant_temp_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_coolant_temp_CAN_data, coolant_temp_send_priority, coolant_temp_send_period_us);
 HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, send_can_priority, send_can_period_us); // Sends all messages from the CAN queue
 HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority, ethernet_update_period);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
 HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
-//HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
+// HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
 HT_TASK::Task run_enable_motor_cooling(HT_TASK::DUMMY_FUNCTION, enable_motor_cooling, dashboard_send_priority, dashboard_send_period_us);
 HT_TASK::Task run_enable_inverter_cooling(HT_TASK::DUMMY_FUNCTION, enable_inverter_cooling, dashboard_send_priority, dashboard_send_period_us);
 
@@ -254,27 +256,12 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
         /* Thermistor Data */
         // Serial.print("Thermistor 0 Analog: ");
-
-        // Serial.println(ADCInterfaceInstance::instance().read_thermistor_0().conversion);
         // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog);
         // Serial.print(" Thermistor 0 degrees C: ");
         // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C);
-        // Serial.print("Thermistor 4 Analog: ");
-        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_analog);
-        // Serial.print(" Thermistor 4 degrees C: ");
-        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_4.thermistor_degrees_C);
-        // Serial.print("Thermistor 5 Analog: ");
-        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog);
-        // Serial.print(" Thermistor 5 degrees C: ");
-        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_degrees_C);
-        // Serial.print("Thermistor 6 Analog: ");
-        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog);
-        // Serial.print(" Thermistor 6 degrees C: ");
-        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_degrees_C);
-        // Serial.print("Thermistor 7 Analog: ");
-        // Serial.print(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog);
-        // Serial.print(" Thermistor 7 degrees C: ");
-        // Serial.println(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C);
+
+        Serial.print("MPB Current Sensor Reading (A): ");
+        Serial.println(ADS112InterfaceInstance::instance().get_channel(BAT_CURRENT_SENSOR_CHANNEL).conversion);
 
     Serial.println();
 
@@ -419,16 +406,19 @@ void setup()
         THERMISTOR_7_OFFSET,
       }
     );
-
+  
     ADCInterfaceInstance::instance().init();
+
+    ADS112InterfaceInstance::create(Serial8, ADS112_SCALES, ADS112_OFFSETS);
+    ADS112InterfaceInstance::instance().init();
 
     // Schedule scheduler tasks
     scheduler.schedule(adc_0_sample_task);
     scheduler.schedule(adc_1_sample_task);
-
+    scheduler.schedule(adc_mpb_sample_task);
     scheduler.schedule(kick_watchdog_task);
 
-    scheduler.schedule(ams_system_task); // ensure ACU connection
+    scheduler.schedule(ams_system_task);
     scheduler.schedule(enqueue_suspension_CAN_task);
     scheduler.schedule(enqueue_dashboard_CAN_task);
 
@@ -437,12 +427,14 @@ void setup()
     scheduler.schedule(vcr_data_ethernet_send);
 
     scheduler.schedule(enqueue_inverter_CAN_task);
+
     scheduler.schedule(enqueue_coolant_temp_CAN_task);
+
     scheduler.schedule(async_main_task);
 
     scheduler.schedule(enqueue_controls_CAN_task);
 
-    // scheduler.schedule(debug_state_print_task);
+    scheduler.schedule(debug_state_print_task);
 
     scheduler.schedule(update_brakelight_task);
 
