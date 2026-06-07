@@ -24,7 +24,7 @@ VCRInterfaceData_s sample_async_data(
     process_ring_buffer(VCRCANInterfaceImpl::telem_can_rx_buffer, interface_ref_container.can_interfaces,
                         sys_time::hal_millis(), recv_call, CANInterfaceType_e::TELEM);
     process_ring_buffer(VCRCANInterfaceImpl::auxillary_can_rx_buffer, interface_ref_container.can_interfaces,
-                        sys_time::hal_millis(), recv_call, CANInterfaceType_e::AUX);
+                        sys_time::hal_millis(), recv_call, CANInterfaceType_e::RAUX);
 
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
     auto acu_data = interface_ref_container.can_interfaces.acu_interface.get_latest_data(sys_time::hal_millis());
@@ -92,9 +92,5 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
     vcr_data.system_data.db_cntrl_status.drivebrain_is_in_control = VCRControlsInstance::instance().drivebrain_is_in_control();
     vcr_data.system_data.db_cntrl_status.drivebrain_controller_timing_failure = VCRControlsInstance::instance().drivebrain_timing_failure();
     
-    // VCRControlsInstance::instance().handle_drivetrain_command(true, true);
-
     return HT_TASK::TaskResponse::YIELD;
 }
-
-

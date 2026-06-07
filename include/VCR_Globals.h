@@ -19,9 +19,4 @@ extern VCRData_s vcr_data; // NOLINT
 /* IO Expander Setup */
 using IOExpanderInstance = etl::singleton<MCP23017>;
 
-/* ADC setup */
-constexpr unsigned int channels_within_mcp_adc = 8;
-
-extern unsigned long pulseCount; // NOLINT
-
 #endif /* VCR_GLOBALS */

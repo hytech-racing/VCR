@@ -23,14 +23,14 @@ class DrivebrainInterface {
                         const RearSusPotData_s &rear_suspot_data,
                         const ThermistorData_s &coolant_temperature_data_0,
                         const ThermistorData_s &coolant_temperature_data_1,
-                        const ThermistorData_s &flowmeter_data,
+                        const FlowmeterData_s &flowmeter_data,
                         IPAddress drivebrain_ip,
                         uint16_t vcr_data_port, qindesign::network::EthernetUDP *udp_socket);
     void receive_drivebrain_speed_command_telem(const CAN_message_t &msg, unsigned long curr_millis);
 
     void receive_drivebrain_torque_lim_command_telem(const CAN_message_t &msg, unsigned long curr_millis);
 
-    void receive_drivebrain_speed_command_auxillary(const CAN_message_t &msg, unsigned long curr_millis); 
+    void receive_drivebrain_speed_command_auxillary(const CAN_message_t &msg, unsigned long curr_millis);
 
     void receive_drivebrain_torque_lim_command_auxillary(const CAN_message_t &msg, unsigned long curr_millis);
 
@@ -38,10 +38,12 @@ class DrivebrainInterface {
 
     void handle_enqueue_coolant_temp_CAN_data();
 
+    void handle_enqueue_flowmeter_CAN_data();
+
     void handle_send_ethernet_data(const hytech_msgs_VCRData_s &data);
 
     StampedDrivetrainCommand_s get_latest_telem_drivebrain_command();
-    StampedDrivetrainCommand_s get_latest_auxillary_drivebrain_command(); 
+    StampedDrivetrainCommand_s get_latest_auxillary_drivebrain_command();
 
   private:
     struct {
@@ -52,8 +54,9 @@ class DrivebrainInterface {
     struct {
         const ThermistorData_s &coolant_temperature_0_data;
         const ThermistorData_s &coolant_temperature_1_data;
-        const ThermistorData_s &flowmeter_data;
     } _thermistor_data;
+
+    FlowmeterData_s _flowmeter_data;
 
     IPAddress _drivebrain_ip;
     uint16_t _vcr_data_port;
