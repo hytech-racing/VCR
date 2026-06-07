@@ -159,7 +159,7 @@ constexpr unsigned long adc0_sample_period_us = 250;                 // 250 us =
 constexpr unsigned long adc0_priority = 7;
 constexpr unsigned long adc1_sample_period_us = 10000;               // 10 000 us = 100 Hz
 constexpr unsigned long adc1_priority = 50;
-constexpr unsigned long adc_mpb_sample_period_us = 1000000;               // 10 000 us = 100 Hz
+constexpr unsigned long adc_mpb_sample_period_us = 10000;               // 10 000 us = 100 Hz
 constexpr unsigned long adc_mpb_priority = 49;
 constexpr unsigned long update_buzzer_controller_period_us = 100000; // 100 000 us = 10 Hz
 constexpr unsigned long buzzer_priority = 3;

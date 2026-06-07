@@ -8,51 +8,55 @@
 #include "AnalogSensorsInterface.h"
 #include "etl/singleton.h"
 
-
 namespace ads112_bit_shift_params {
-    constexpr uint8_t DATA_RATE_SHIFT = 5U;
-    constexpr uint8_t NORMAL_MODE_SHIFT = 4U;
-    constexpr uint8_t SINGLE_SHOT_SHIFT = 3U;
-    constexpr uint8_t REFERENCE_SHIFT = 1U;
+    constexpr uint8_t DATA_RATE_SHIFT    = 5U;
+    constexpr uint8_t NORMAL_MODE_SHIFT  = 4U;
+    constexpr uint8_t SINGLE_SHOT_SHIFT  = 3U;
+    constexpr uint8_t REFERENCE_SHIFT    = 1U;
 }
 
 using namespace ads112_bit_shift_params;
 
 namespace ads112_default_parameters
 {
-    constexpr const int ADS112U04_NUM_CHANNELS = 4;
-    constexpr const int ADS112U04_PIN_UNUSED = -1;
+    constexpr int      ADS112U04_NUM_CHANNELS  = 4;
+    constexpr int      ADS112U04_PIN_UNUSED    = -1;
+    constexpr uint32_t ADS112U04_BAUDRATE      = 115200;
 
-    constexpr const uint32_t ADS112U04_BAUDRATE = 115200;
+    constexpr uint8_t  ADS112U04_SYNC_WORD           = 0x55;
+    constexpr uint8_t  ADS112U04_RESET_COMMAND        = 0x06;
+    constexpr uint8_t  ADS112U04_START_SYNC_COMMAND   = 0x08;
+    constexpr uint8_t  ADS112U04_POWERDOWN_COMMAND    = 0x02;
+    constexpr uint8_t  ADS112U04_RDATA_COMMAND        = 0x10;
+    constexpr uint8_t  ADS112U04_WREG_BASE_COMMAND    = 0x40;
+    constexpr uint8_t  ADS112U04_RREG_BASE_COMMAND    = 0x20;
+    constexpr uint8_t  ADS112U04_CONFIG_REG_4_DEFAULT = 0x48U;
 
-    constexpr const uint8_t ADS112U04_SYNC_WORD          = 0x55;
-    constexpr const uint8_t ADS112U04_RESET_COMMAND      = 0x06;
-    constexpr const uint8_t ADS112U04_START_SYNC_COMMAND = 0x08;
-    constexpr const uint8_t ADS112U04_POWERDOWN_COMMAND  = 0x02;
-    constexpr const uint8_t ADS112U04_RDATA_COMMAND      = 0x10;
-    constexpr const uint8_t ADS112U04_WREG_BASE_COMMAND = 0x40;
-    constexpr const uint8_t ADS112U04_RREG_BASE_COMMAND = 0x20;
+    constexpr uint32_t ADS112U04_POWER_UP_DELAY_US    = 600;
+    constexpr uint32_t ADS112U04_RESET_DELAY_MS       = 50;
+    constexpr uint32_t ADS112U04_READ_TIMEOUT_MS      = 200;
 
-    constexpr const uint8_t ADS112U04_CONFIG_REG_4_DEFAULT = 0x48U;
+    // Conversion wait time in ms per data rate.
+    // 20 SPS -> 70ms (50ms nominal + margin)
+    // 330 SPS -> 10ms (3ms nominal + margin)
+    constexpr uint32_t ADS112U04_CONVERSION_WAIT_MS   = 70;
 
-    constexpr const uint32_t ADS112U04_POWER_UP_DELAY_US = 600;
-    constexpr const uint32_t ADS112U04_RESET_DELAY_US    = 80;
-    constexpr const uint32_t ADS112U04_READ_TIMEOUT_MS   = 100;
+    // Gap between bytes sent over UART — gives the ADC time to detect
+    // baud rate from the sync word and latch each command on the stop bit.
+    constexpr uint32_t ADS112U04_BYTE_GAP_US          = 500;
 
-    /*
-     * Fallback conversion wait when DRDY is not connected.
-     * 330 SPS is about 3.03 ms per conversion, so 4000 us is conservative.
-     */
-    constexpr const uint32_t ADS112U04_CONVERSION_DELAY_US = 4000;
+    constexpr float    ADS112U04_REFERENCE_VOLTAGE    = 5.0f;
+    constexpr float    ADS112U04_GAIN                 = 1.0f;
+    constexpr float    ADS112U04_FULL_SCALE_COUNTS    = 32768.0f;
 
-    constexpr const float ADS112U04_REFERENCE_VOLTAGE = 5.0f;
-    constexpr const float ADS112U04_GAIN              = 1.0f;
-    constexpr const float ADS112U04_FULL_SCALE_COUNTS = 32768.0f;
-    
-    constexpr const uint16_t ADS112U04_TEMP_SIGN_BIT_MASK = 0x2000U;  // Bit 13 of 14-bit value
-    constexpr const uint16_t ADS112U04_TEMP_SIGN_EXTEND_MASK = 0xC000U;  // Extend to 16-bit
-    constexpr const float ADS112U04_TEMP_SCALE = 0.03125f;
+    constexpr uint16_t ADS112U04_TEMP_SIGN_BIT_MASK   = 0x2000U;
+    constexpr uint16_t ADS112U04_TEMP_SIGN_EXTEND_MASK = 0xC000U;
+    constexpr float    ADS112U04_TEMP_SCALE           = 0.03125f;
 }
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
 
 enum class ADS112U04InputMux_e : uint8_t
 {
@@ -92,6 +96,10 @@ enum class ADS112U04Reference_e : uint8_t
     ANALOG_SUPPLY      = 0x02
 };
 
+// ---------------------------------------------------------------------------
+// Config structs
+// ---------------------------------------------------------------------------
+
 struct ADS112Pinout_s
 {
     int reset_pin;
@@ -101,17 +109,16 @@ struct ADS112Pinout_s
 struct ADS112Config_s
 {
     std::array<ADS112U04InputMux_e, ads112_default_parameters::ADS112U04_NUM_CHANNELS> muxes;
-    ADS112U04Gain_e gain;
-    ADS112U04DataRate_e data_rate;
+    ADS112U04Gain_e      gain;
+    ADS112U04DataRate_e  data_rate;
     ADS112U04Reference_e reference;
-    float reference_voltage;
-    float gain_value;
-    float full_scale_counts;
-    float internal_temp_scale;
-
-    uint16_t temp_sign_bit_mask;
-    uint16_t temp_sign_extend_mask;
-    uint8_t config_reg_4_default_value;
+    float                reference_voltage;
+    float                gain_value;
+    float                full_scale_counts;
+    float                internal_temp_scale;
+    uint16_t             temp_sign_bit_mask;
+    uint16_t             temp_sign_extend_mask;
+    uint8_t              config_reg_4_default_value;
 };
 
 struct ADS112Commands_s
@@ -128,17 +135,49 @@ struct ADS112Commands_s
 struct ADS112Timing_s
 {
     uint32_t power_up_delay_us;
-    uint32_t reset_delay_us;
+    uint32_t reset_delay_ms;
     uint32_t read_timeout_ms;
-    uint32_t conversion_delay_us;
+    uint32_t conversion_wait_ms;
+    uint32_t byte_gap_us;
 };
 
 struct ADS112TemperatureReading_s
 {
     int16_t raw_temperature_count = 0;
-    float temperature_c = 0.0f;
-    bool data_valid = false;
+    float   temperature_c         = 0.0f;
+    bool    data_valid            = false;
 };
+
+// ---------------------------------------------------------------------------
+// State machine states
+// ---------------------------------------------------------------------------
+
+enum class ADS112State_e : uint8_t
+{
+    // Initialisation sequence
+    INIT_RESET,           // send RESET command, start reset wait
+    INIT_WAIT_RESET,      // waiting for reset delay to expire
+    INIT_WRITE_REG0,      // write config register 0
+    INIT_WRITE_REG1,      // write config register 1
+    INIT_WRITE_REG2,      // write config register 2
+    INIT_WRITE_REG3,      // write config register 3
+    INIT_WRITE_REG4,      // write config register 4
+
+    // Normal sampling sequence (repeated for each channel)
+    IDLE,                 // ready to start a new channel conversion
+    START_CONVERSION,     // send START command for current channel
+    WAIT_CONVERSION,      // waiting for conversion time to elapse
+    REQUEST_DATA,         // send RDATA command
+    READ_DATA,            // waiting for 2 RX bytes
+    PROCESS_DATA,         // assemble raw count, advance to next channel
+
+    // Error / fault
+    FAULT                 // communication error, stops ticking
+};
+
+// ---------------------------------------------------------------------------
+// Interface class
+// ---------------------------------------------------------------------------
 
 class ADS112Interface : public AnalogMultiSensor<ads112_default_parameters::ADS112U04_NUM_CHANNELS>
 {
@@ -161,7 +200,7 @@ public:
                 ADS112U04InputMux_e::AIN3_AVSS
             },
             ADS112U04Gain_e::GAIN_1,
-            ADS112U04DataRate_e::SPS_330,
+            ADS112U04DataRate_e::SPS_20,
             ADS112U04Reference_e::ANALOG_SUPPLY,
             ads112_default_parameters::ADS112U04_REFERENCE_VOLTAGE,
             ads112_default_parameters::ADS112U04_GAIN,
@@ -182,68 +221,77 @@ public:
         },
         ADS112Timing_s timing = {
             ads112_default_parameters::ADS112U04_POWER_UP_DELAY_US,
-            ads112_default_parameters::ADS112U04_RESET_DELAY_US,
+            ads112_default_parameters::ADS112U04_RESET_DELAY_MS,
             ads112_default_parameters::ADS112U04_READ_TIMEOUT_MS,
-            ads112_default_parameters::ADS112U04_CONVERSION_DELAY_US
+            ads112_default_parameters::ADS112U04_CONVERSION_WAIT_MS,
+            ads112_default_parameters::ADS112U04_BYTE_GAP_US
         },
         uint32_t baud_rate = ads112_default_parameters::ADS112U04_BAUDRATE
     );
 
+    // Call once at startup — starts the init state machine (non-blocking).
     void init();
 
+    // Call every loop iteration. Drives the state machine forward.
     void tick() override;
 
+    // Returns the most recent converted value for a channel.
     AnalogConversion_s get_channel(size_t channel);
 
-    bool is_data_ready();
+    // True once the init sequence is complete and sampling is running.
+    bool is_ready() const;
 
-    void start_conversions();
+    // True if a communication fault has been detected.
+    bool is_faulted() const;
+
+    // Current state machine state (useful for debugging).
+    ADS112State_e get_state() const;
 
     void power_down();
 
-    /**
-     * Samples the ADS112U04 internal temperature sensor.
-     * This temporarily enables temperature sensor mode.
-    */
-    void sample_internal_temperature();
-
-    /**
-     * @return Last internal temperature reading in Celsius.
-    */
     ADS112TemperatureReading_s get_internal_temperature();
 
 private:
-    HardwareSerial* _serial;
+    HardwareSerial*   _serial;
+    ADS112Pinout_s    _pinouts;
+    ADS112Config_s    _config;
+    ADS112Commands_s  _commands;
+    ADS112Timing_s    _timing;
+    uint32_t          _baud_rate;
 
-    ADS112Pinout_s _pinouts;
-    ADS112Config_s _config;
-    ADS112Commands_s _commands;
-    ADS112Timing_s _timing;
+    ADS112State_e     _state          = ADS112State_e::INIT_RESET;
+    int               _current_channel = 0;
+    uint32_t          _state_entered_ms = 0;  // millis() when we entered current state
+    uint32_t          _timeout_start_ms = 0;  // for RX timeout tracking
+
     ADS112TemperatureReading_s _internal_temperature = {};
 
-    uint32_t _baud_rate;
+    // --------------- state machine helpers ----------------------------------
 
-    void _sample() override;
+    // Send one byte then flush. Inserts byte-gap delay after flush.
+    void _send_byte(uint8_t b);
 
-    void _reset_adc();
-    void _configure_adc();
+    // Send sync word + command byte.
+    void _send_command(uint8_t command);
 
-    void _configure_mux(ADS112U04InputMux_e mux);
-
+    // Send sync word + WREG command + data byte.
     void _write_register(uint8_t register_address, uint8_t value);
-    uint8_t _read_register(uint8_t register_address);
 
+    // Drain all bytes currently in the RX buffer.
+    void _clear_rx();
+
+    // Transition to a new state and record the entry time.
+    void _enter_state(ADS112State_e next);
+
+    // Build register byte values.
     uint8_t _build_config_register_0(ADS112U04InputMux_e mux) const;
     uint8_t _build_config_register_1(bool temperature_sensor_enabled = false) const;
 
-    void _send_command(uint8_t command);
-    void _clear_serial_rx_buffer();
-
     bool _has_reset_pin() const;
-    bool _has_drdy_pin() const;
+    bool _has_drdy_pin()  const;
 
-    bool _wait_for_conversion();
-    bool _read_raw_adc_count(int16_t& raw_adc_count);
+    // Required by AnalogMultiSensor — not used (state machine drives sampling).
+    void _sample() override {}
 };
 
 using ADS112InterfaceInstance = etl::singleton<ADS112Interface>;
