@@ -76,7 +76,7 @@ const float THERMISTOR_7_SCALE = 1;
 const float THERMISTOR_7_OFFSET = 0; 
 
 /* Maintenance Panel ADC */
-constexpr int CURRENT_SENSOR_CHANNEL = 0;
+constexpr int BAT_CURRENT_SENSOR_CHANNEL = 0;
 constexpr int MAINTENANCE_AUX_1_CHANNEL = 1;
 constexpr int SHDN_P_CHANNEL = 2;
 constexpr int SHDN_Q_CHANNEL = 3;

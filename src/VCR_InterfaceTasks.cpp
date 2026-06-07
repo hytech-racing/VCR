@@ -70,6 +70,9 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
 HT_TASK::TaskResponse run_read_adc_mpb_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     ADS112InterfaceInstance::instance().tick();
+
+
+
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -173,7 +176,12 @@ HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, c
 
 HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(VCREthernetInterface::make_vcr_data_msg(vcr_data));
+    DrivebrainInterfaceInstance::instance().handle_send_ethernet_data(
+        VCREthernetInterface::make_vcr_data_msg(
+            vcr_data,
+            ADS112InterfaceInstance::instance().get_channel(BAT_CURRENT_SENSOR_CHANNEL).conversion
+        )
+    );
     return HT_TASK::TaskResponse::YIELD;
 }
 

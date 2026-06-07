@@ -6,7 +6,7 @@
 #include <algorithm>
 #include "VCFInterface.h"
 
-hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &shared_state)
+hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &shared_state, const float lv_bat_current_sensor_A)
 {
 	hytech_msgs_VCRData_s out;
 
@@ -73,6 +73,7 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.current_sensor_data.current_refererence_unfiltered = shared_state.interface_data.current_sensor_data.current_refererence_unfiltered;
     out.current_sensor_data.bpsd_brake_high_sense = shared_state.interface_data.current_sensor_data.bspd_brake_high_sense;
     out.current_sensor_data.bspd_current_high_sense = shared_state.interface_data.current_sensor_data.bspd_current_high_sense;
+    out.current_sensor_data.lv_bat_current_sensor_A = lv_bat_current_sensor_A;
 
     //DrivetrainDynamicReport_s
     out.drivetrain_data.measuredInverterFLPackVoltage = shared_state.system_data.drivetrain_data.measuredInverterFLPackVoltage;

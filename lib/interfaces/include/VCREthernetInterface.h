@@ -13,7 +13,7 @@ namespace VCREthernetInterface
      * @param shared_state The current VCR state, which includes both interface and system data.
      * @return A populated instance of the outgoing protoc struct.
      */
-    hytech_msgs_VCRData_s make_vcr_data_msg(const VCRData_s &shared_state);
+    hytech_msgs_VCRData_s make_vcr_data_msg(const VCRData_s &shared_state, const float lv_bat_current_sensor_A);
 
     /**
      * Function to take a populated protoc struct from the drivebrain and update the VCR state.

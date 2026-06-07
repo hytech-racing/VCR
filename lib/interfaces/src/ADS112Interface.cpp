@@ -24,10 +24,6 @@ ADS112Interface::ADS112Interface(
     }
 }
 
-// ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
-
 void ADS112Interface::init()
 {
     if (_has_reset_pin())
@@ -216,10 +212,6 @@ ADS112TemperatureReading_s ADS112Interface::get_internal_temperature()
 {
     return _internal_temperature;
 }
-
-// ---------------------------------------------------------------------------
-// Private helpers
-// ---------------------------------------------------------------------------
 
 void ADS112Interface::_send_byte(uint8_t b)
 {

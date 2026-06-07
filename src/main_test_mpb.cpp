@@ -1,12 +1,12 @@
 /*
- * ads112_4ch_test.cpp
- *
  * Tests all 4 channels single-ended vs AVSS.
  * gain=1, PGA bypass, AVDD=5V ref, 20SPS, single-shot.
  *
  * Wiring:
  *   Teensy Serial8 TX (pin 35) -> 47R -> ADS112U04 RX
  *   Teensy Serial8 RX (pin 34) -> 47R -> ADS112U04 TX
+ * 
+ * datasheet: https://www.ti.com/lit/ds/symlink/ads122u04.pdf?ts=1780787426961&ref_url=https%253A%252F%252Fgoogle.com
  */
 
 #include <Arduino.h>
@@ -180,11 +180,6 @@ void setup()
 
 void loop()
 {
-    // Reg0 MUX values for each channel vs AVSS, gain=1, PGA bypass
-    // MUX=1000 (AIN0) = 0x81
-    // MUX=1001 (AIN1) = 0x91
-    // MUX=1010 (AIN2) = 0xA1
-    // MUX=1011 (AIN3) = 0xB1
     const uint8_t mux[4] = {0x81, 0x91, 0xA1, 0xB1};
 
     float voltages[4];
