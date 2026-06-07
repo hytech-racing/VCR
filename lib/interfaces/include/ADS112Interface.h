@@ -34,7 +34,7 @@ namespace ads112_default_parameters
 
     constexpr uint32_t ADS112U04_POWER_UP_DELAY_US    = 600;
     constexpr uint32_t ADS112U04_RESET_DELAY_MS       = 50;
-    constexpr uint32_t ADS112U04_READ_TIMEOUT_MS      = 200;
+    constexpr uint32_t ADS112U04_READ_TIMEOUT_MS      = 100;
 
     // Conversion wait time in ms per data rate.
     // 20 SPS -> 70ms (50ms nominal + margin)
@@ -43,7 +43,7 @@ namespace ads112_default_parameters
 
     // Gap between bytes sent over UART — gives the ADC time to detect
     // baud rate from the sync word and latch each command on the stop bit.
-    constexpr uint32_t ADS112U04_BYTE_GAP_US          = 500;
+    constexpr uint32_t ADS112U04_BYTE_GAP_US          = 25;
 
     constexpr float    ADS112U04_REFERENCE_VOLTAGE    = 5.0f;
     constexpr float    ADS112U04_GAIN                 = 1.0f;
