@@ -5,7 +5,8 @@
 #include "ht_task.hpp"
 #include "ACUInterface.h"
 #include "ADCInterface.h"
-#include "ADS112Interface.h"#include "FlowmeterInterface.h"
+#include "ADS112Interface.h"
+#include "FlowmeterInterface.h"
 
 
 /* From shared-systems-lib */

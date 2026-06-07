@@ -112,14 +112,14 @@ HT_TASK::Task enqueue_suspension_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_suspe
 HT_TASK::Task enqueue_controls_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_controls_CAN_data, controls_priority, controls_can_period_us);
 HT_TASK::Task enqueue_inverter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_inverter_CAN_data, inverter_send_priority, inv_send_period);
 HT_TASK::Task enqueue_dashboard_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_dashboard_CAN_data, dashboard_send_priority, dashboard_send_period_us);
-//HT_TASK::Task enqueue_flowmeter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_flowmeter_CAN_data, flowmeter_send_priority, flowmeter_send_period_us);
+// HT_TASK::Task enqueue_flowmeter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_flowmeter_CAN_data, flowmeter_send_priority, flowmeter_send_period_us);
 HT_TASK::Task enqueue_coolant_temp_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_coolant_temp_CAN_data, coolant_temp_send_priority, coolant_temp_send_period_us);
 HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, send_can_priority, send_can_period_us); // Sends all messages from the CAN queue
 HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, ethernet_send_priority, ethernet_update_period);
 HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, ioexpander_priority, ioexpander_sample_period_us);
 HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, main_task_priority, main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, update_brakelight_priority, update_brakelight_period_us);
-//HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
+// HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, dashboard_send_priority, dashboard_send_period_us);
 HT_TASK::Task run_enable_motor_cooling(HT_TASK::DUMMY_FUNCTION, enable_motor_cooling, dashboard_send_priority, dashboard_send_period_us);
 HT_TASK::Task run_enable_inverter_cooling(HT_TASK::DUMMY_FUNCTION, enable_inverter_cooling, dashboard_send_priority, dashboard_send_period_us);
 
@@ -438,12 +438,10 @@ void setup()
 
     scheduler.schedule(update_brakelight_task);
 
-    scheduler.schedule(update_sample_flowmeter);
+    // scheduler.schedule(update_sample_flowmeter);
 
     scheduler.schedule(IOExpander_read_task);
 
-    scheduler.schedule(run_enable_motor_cooling);
-    scheduler.schedule(run_enable_inverter_cooling);
     scheduler.schedule(run_enable_motor_cooling);
     scheduler.schedule(run_enable_inverter_cooling);
 }
