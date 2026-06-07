@@ -418,7 +418,7 @@ void setup()
     scheduler.schedule(adc_mpb_sample_task);
     scheduler.schedule(kick_watchdog_task);
 
-    scheduler.schedule(ams_system_task); // ensure ACU connection
+    scheduler.schedule(ams_system_task);
     scheduler.schedule(enqueue_suspension_CAN_task);
     scheduler.schedule(enqueue_dashboard_CAN_task);
 
@@ -434,7 +434,7 @@ void setup()
 
     scheduler.schedule(enqueue_controls_CAN_task);
 
-    // scheduler.schedule(debug_state_print_task);
+    scheduler.schedule(debug_state_print_task);
 
     scheduler.schedule(update_brakelight_task);
 

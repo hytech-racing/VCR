@@ -155,7 +155,7 @@ void ADS112Interface::tick()
     case ADS112State_e::PROCESS_DATA:
     {
         // Drain any extra bytes, keeping only the last 2.
-        delayMicroseconds(500);
+        delayMicroseconds(100);
         while (_serial->available() > 2) _serial->read();
 
         const uint8_t lsb = static_cast<uint8_t>(_serial->read());
