@@ -21,8 +21,7 @@ class DrivebrainInterface {
 
     DrivebrainInterface(const RearLoadCellData_s &rear_load_cell_data,
                         const RearSusPotData_s &rear_suspot_data,
-                        const ThermistorData_s &coolant_temperature_data_0,
-                        const ThermistorData_s &coolant_temperature_data_1,
+                        const VCRThermistorData_s &thermistor_data,
                         const FlowmeterData_s &flowmeter_data,
                         IPAddress drivebrain_ip,
                         uint16_t vcr_data_port, qindesign::network::EthernetUDP *udp_socket);
@@ -51,10 +50,8 @@ class DrivebrainInterface {
         const RearSusPotData_s &rear_suspot_data;
     } _suspension_data;
 
-    struct {
-        const ThermistorData_s &coolant_temperature_0_data;
-        const ThermistorData_s &coolant_temperature_1_data;
-    } _thermistor_data;
+
+    VCRThermistorData_s _thermistor_data;
 
     FlowmeterData_s _flowmeter_data;
 
