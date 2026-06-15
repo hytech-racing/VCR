@@ -13,7 +13,6 @@
 /* Arduino specific upstream Libraries */
 #include "QNEthernet.h"
 #include "FlexCAN_T4.h"
-#include <InternalTemperature.h>
 
 /* From Embedded Template Library libdep */
 #include "etl/singleton.h"
@@ -40,6 +39,7 @@
 #include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
 #include "FlowmeterInterface.h"
+#include "CPUThrottleInterface.h"
 #include "controls.h"
 
 /* From pio-git-hash */
@@ -425,6 +425,9 @@ void setup()
     );
 
     ADCInterfaceInstance::instance().init();
+
+    /* Setup CPU throttling using Internal Temperature Sensor */
+    setup_cpu_throttle();
 
     // Schedule scheduler tasks
     scheduler.schedule(adc_0_sample_task);
