@@ -13,16 +13,11 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
     const FrontLoadCellData_s &front_lc_data = vcr_data.interface_data.front_loadcell_data;
     const RearLoadCellData_s &rear_lc_data = vcr_data.interface_data.rear_loadcell_data;
 
-    float _fz_fl = static_cast<float>(front_lc_data.FL_loadcell_analog) * _fl_load_cell_scale + _fl_load_cell_offset;
-    float _fz_fr = static_cast<float>(front_lc_data.FR_loadcell_analog) * _fr_load_cell_scale + _fr_load_cell_offset;
-    float _fz_rl = static_cast<float>(rear_lc_data.RL_loadcell_analog) * _rl_load_cell_scale + _rl_load_cell_offset;
-    float _fz_rr = static_cast<float>(rear_lc_data.RR_loadcell_analog) * _rr_load_cell_scale + _rr_load_cell_offset;
+    veh_vec<float> load_cell_data(static_cast<float>(front_lc_data.FL_loadcell_analog),
+                                  static_cast<float>(front_lc_data.FR_loadcell_analog),
+                                  static_cast<float>(rear_lc_data.RL_loadcell_analog),
+                                  static_cast<float>(rear_lc_data.RR_loadcell_analog));
 
-    veh_vec<float> load_cell_data(static_cast<float>(_fz_fl), 
-                                  static_cast<float>(_fz_fr),
-                                  static_cast<float>(_fz_rl),  
-                                  static_cast<float>(_fz_rr)); 
-    
     // Do sanity checks on raw data - FIX
     _load_cell_error_counts.FL = front_lc_data.valid_FL_sample ? 0 : _load_cell_error_counts.FL + 1;
     _load_cell_error_counts.FR = front_lc_data.valid_FR_sample ? 0 : _load_cell_error_counts.FR + 1;
@@ -41,7 +36,7 @@ DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s 
 
         if (accel_request >= 0.0)
         {
-            // Positive torque request  
+            // Positive torque request
             torque_request = accel_request * PhysicalParameters::AMK_MAX_TORQUE * 4;
 
             out.desired_speeds.FL = PhysicalParameters::AMK_MAX_RPM;

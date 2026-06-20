@@ -12,6 +12,7 @@
 #include "controllers/DrivebrainController.h"
 #include "controls.h"
 #include <algorithm>
+#include "VCFInterface.h"
 
 hytech_msgs_VCRData_s VCREthernetInterface::makeVCRDataMsg(
     const ADCInterface &adc_interface,

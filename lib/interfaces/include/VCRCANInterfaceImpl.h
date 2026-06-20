@@ -34,7 +34,8 @@ using InverterCAN_t = FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16>;
 
 // this is being done to send immediately from the inverter CAN line to the TELEM CAN every inverter
 
-struct CANInterfaces {
+struct CANInterfaces
+{
     explicit CANInterfaces(
         VCFInterface &vcf_int, 
         ACUInterface &acu_int,
@@ -43,14 +44,14 @@ struct CANInterfaces {
         InverterInterface &fr_inv_int,
         InverterInterface &rl_inv_int,
         InverterInterface &rr_inv_int
-    )
-        : vcf_interface(vcf_int), 
-          acu_interface(acu_int),
-          db_interface(db_int),
-          fl_inverter_interface(fl_inv_int),
-          fr_inverter_interface(fr_inv_int),
-          rl_inverter_interface(rl_inv_int),
-          rr_inverter_interface(rr_inv_int) {}
+    ) : 
+        vcf_interface(vcf_int), 
+        acu_interface(acu_int),
+        db_interface(db_int),
+        fl_inverter_interface(fl_inv_int),
+        fr_inverter_interface(fr_inv_int),
+        rl_inverter_interface(rl_inv_int),
+        rr_inverter_interface(rr_inv_int) {}
 
     VCFInterface &vcf_interface;
     ACUInterface &acu_interface;

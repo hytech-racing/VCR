@@ -119,6 +119,12 @@ void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data(const ADCInterfac
     CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
+void DrivebrainInterface::handle_enqueue_flowmeter_CAN_data() {
+  FLOWMETER_DATA_t flowmeter_msg;
+  flowmeter_msg.flow_rate = static_cast<int>(_flowmeter_data.flowmeter_gallons_per_min);
+  CAN_util::enqueue_msg(&flowmeter_msg, &Pack_FLOWMETER_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+}
+
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {
     handle_ethernet_socket_send_pb<hytech_msgs_VCRData_s_size>(_drivebrain_ip, _vcr_data_port, _udp_socket, data,
                                    hytech_msgs_VCRData_s_fields);

@@ -38,6 +38,7 @@
 #include "DrivetrainSystem.h"
 #include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
+#include "FlowmeterInterface.h"
 #include "controls.h"
 
 /* From pio-git-hash */
@@ -95,7 +96,6 @@ etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create(
 /* Scheduler setup */
 HT_SCHED::Scheduler& scheduler = HT_SCHED::Scheduler::getInstance();
 
-
 /* Task Declarations */
 HT_TASK::Task adc_0_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc0_task, VCRTaskConstants::adc0_priority, VCRTaskConstants::adc0_sample_period_us);
 HT_TASK::Task adc_1_sample_task(HT_TASK::DUMMY_FUNCTION, run_read_adc1_task, VCRTaskConstants::adc1_priority, VCRTaskConstants::adc1_sample_period_us);
@@ -112,10 +112,9 @@ HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, VCRTaskCons
 HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, VCRTaskConstants::main_task_priority, VCRTaskConstants::main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, VCRTaskConstants::update_brakelight_priority, VCRTaskConstants::update_brakelight_period_us);
 HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, VCRTaskConstants::dashboard_send_priority, VCRTaskConstants::dashboard_send_period_us);
+//HT_TASK::Task enqueue_flowmeter_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_flowmeter_CAN_data, flowmeter_send_priority, flowmeter_send_period_us);
 HT_TASK::Task run_enable_motor_cooling(HT_TASK::DUMMY_FUNCTION, enable_motor_cooling, VCRTaskConstants::dashboard_send_priority, VCRTaskConstants::dashboard_send_period_us);
 HT_TASK::Task run_enable_inverter_cooling(HT_TASK::DUMMY_FUNCTION, enable_inverter_cooling, VCRTaskConstants::dashboard_send_priority, VCRTaskConstants::dashboard_send_period_us);
-
-
 
 HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -127,6 +126,8 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.print(vcr_data.interface_data.recvd_pedals_data.pedals_data.brake_percent);
         // Serial.println();
         // Serial.print("pedals heartbeat good: "); Serial.print(vcr_data.interface_data.recvd_pedals_data.heartbeat_ok);
+        // Serial.println();
+        // Serial.print("steering heartbeat good: "); Serial.print(vcr_data.interface_data.recvd_steering_data.heartbeat_ok);
         // Serial.println();
         // Serial.print("Pedals Brake Is Active: "); Serial.print(VCFInterfaceInstance::instance().is_brake_pressed() ? "YES" : "NO");
         // Serial.println();
@@ -238,7 +239,6 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
         // Serial.print(VCRControlsInstance::instance()._debug_dt_command.desired_speeds.RR); Serial.print(" ");
         // Serial.println(VCRControlsInstance::instance()._debug_dt_command.torque_limits.RR);
 
-
         // Serial.print("Current Controller Mode: ");
         // Serial.println(static_cast<uint8_t>(vcr_data.interface_data.dash_input_state.dial_state));
 
@@ -273,15 +273,8 @@ HT_TASK::TaskResponse debug_print(const unsigned long& sysMicros, const HT_TASK:
 
 HT_TASK::Task debug_state_print_task(HT_TASK::DUMMY_FUNCTION, debug_print, 100, 100000); //NOLINT (priority and loop rate)
 
-void countPulse() // NOLINT
+void setup()
 {
-    pulseCount++;
-
-}
-
-void setup() {
-
-
     // Configure pins
     pinMode(VCRInterfaceConstants::MOTOR_COOLING_CONTROL_PIN, OUTPUT);
     pinMode(VCRInterfaceConstants::INVERTER_COOLING_CONTROL_PIN, OUTPUT);
@@ -345,7 +338,11 @@ void setup() {
         etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_drivetrain_reset_pressed>(VCFInterfaceInstance::instance()),
         etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_recalibrate_pedals_button_pressed>(VCFInterfaceInstance::instance()),
-        etl::delegate<void()>::create<DrivetrainSystem, &DrivetrainSystem::reset_dt_error>(DrivetrainInstance::instance())
+        etl::delegate<void()>::create<DrivetrainSystem, &DrivetrainSystem::reset_dt_error>(DrivetrainInstance::instance()),
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_recalibrate_steering_message>(VCFInterfaceInstance::instance()),
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_recalibrate_steering_button_pressed>(VCFInterfaceInstance::instance()),
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_steering_heartbeat_not_ok>(VCFInterfaceInstance::instance()),
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_steering_heartbeat>(VCFInterfaceInstance::instance())
     );
 
     // Scheduler timing function
@@ -417,7 +414,7 @@ void setup() {
         VCRInterfaceConstants::COOLANT_TEMP_OFFSET
       }
     );
-  
+
     ADCInterfaceInstance::instance().init();
 
     // Schedule scheduler tasks
@@ -435,14 +432,12 @@ void setup() {
     scheduler.schedule(vcr_data_ethernet_send);
 
     scheduler.schedule(enqueue_inverter_CAN_task);
-
-    // scheduler.schedule(enqueue_coolant_temp_CAN_task);
-
+    scheduler.schedule(enqueue_coolant_temp_CAN_task);
     scheduler.schedule(async_main_task);
 
     scheduler.schedule(enqueue_controls_CAN_task);
 
-    scheduler.schedule(debug_state_print_task);
+    // scheduler.schedule(debug_state_print_task);
 
     scheduler.schedule(update_brakelight_task);
 
@@ -454,6 +449,7 @@ void setup() {
     scheduler.schedule(run_enable_inverter_cooling);
 }
 
-void loop() {
+void loop()
+{
     scheduler.run();
 }

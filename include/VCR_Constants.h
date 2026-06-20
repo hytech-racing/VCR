@@ -142,7 +142,4 @@ namespace VCRTaskConstants {
     constexpr unsigned long update_brakelight_priority = 20;
     constexpr unsigned long update_brakelight_period_us = 50000UL;       // 50 000 us = 20 Hz
 }
-
-
-
 #endif /* VCR_CONSTANTS */
