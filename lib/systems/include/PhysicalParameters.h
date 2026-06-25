@@ -3,8 +3,8 @@
 
 namespace PhysicalParameters
 {
-    const float AMK_MAX_RPM = 20000;
-    const float AMK_MAX_TORQUE = 21.0f; 
+    const float AMK_MAX_RPM = 16000;
+    const float AMK_MAX_TORQUE = 21.0f;
     const float MAX_REGEN_TORQUE = 10.0f;
 }
 

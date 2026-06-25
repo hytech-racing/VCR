@@ -56,7 +56,7 @@
 namespace TC_MUX_DEFAULT_PARAMS {
 constexpr const float MAX_SPEED_FOR_MODE_CHANGE = 5.0;        // m/s
 constexpr const float MAX_TORQUE_DELTA_FOR_MODE_CHANGE = 0.5; // Nm
-constexpr const float MAX_POWER_LIMIT = 63000.0;              // watts of mechanical power
+constexpr const float MAX_POWER_LIMIT = 60000.0;              // watts of mechanical power
 }; // namespace TC_MUX_DEFAULT_PARAMS
 
 /// @brief the torque controller muxer that can handle live switching between controller modes
@@ -86,18 +86,18 @@ template <std::size_t num_controllers> class TorqueControllerMux {
     explicit TorqueControllerMux(
         std::array<
             std::function<DrivetrainCommand_s(const VCRData_s &state, unsigned long curr_millis)>,
-            num_controllers>    
+            num_controllers>
             controller_evals,
         std::array<bool, num_controllers> mux_bypass_limits,
         float max_change_speed = TC_MUX_DEFAULT_PARAMS::MAX_SPEED_FOR_MODE_CHANGE,
         float max_torque_pos_change_delta = TC_MUX_DEFAULT_PARAMS::MAX_TORQUE_DELTA_FOR_MODE_CHANGE,
         float max_power_limit = TC_MUX_DEFAULT_PARAMS::MAX_POWER_LIMIT, size_t num_motors = 4)
-        : _controller_evals(controller_evals), 
+        : _controller_evals(controller_evals),
           _mux_bypass_limits(mux_bypass_limits),
           _max_change_speed(max_change_speed),
           _max_torque_pos_change_delta(max_torque_pos_change_delta),
-          _max_power_limit(max_power_limit), 
-          _num_motors(num_motors) 
+          _max_power_limit(max_power_limit),
+          _num_motors(num_motors)
           {}
 
     const TorqueControllerMuxStatus_s &get_tc_mux_status() { return _active_status; }
@@ -124,12 +124,12 @@ template <std::size_t num_controllers> class TorqueControllerMux {
         {TorqueLimit_e::TCMUX_FULL_TORQUE, PhysicalParameters::AMK_MAX_TORQUE},
         {TorqueLimit_e::TCMUX_MID_TORQUE, 15.0f},
         {TorqueLimit_e::TCMUX_LOW_TORQUE, 10.0f}};
-    
-    
-    
+
+
+
     float _max_change_speed;
     float _max_torque_pos_change_delta;
-    float _max_power_limit; 
+    float _max_power_limit;
     size_t _num_motors;
     DrivetrainCommand_s _prev_command = {};
     TorqueControllerMuxStatus_s _active_status = {};

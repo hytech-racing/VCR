@@ -111,27 +111,27 @@ void DrivebrainInterface::receive_drivebrain_torque_lim_command_auxillary(const 
 
 void DrivebrainInterface::handle_enqueue_suspension_CAN_data(ADCInterface &instance) {
     REAR_SUSPENSION_t rear_sus_msg;
-    
+
     rear_sus_msg.rl_load_cell = _suspension_data.rear_load_cell_data.RL_loadcell_analog;
     rear_sus_msg.rr_load_cell = _suspension_data.rear_load_cell_data.RR_loadcell_analog;
     rear_sus_msg.rl_shock_pot_ro = HYTECH_rl_shock_pot_ro_toS(instance.get_filtered_RL_sus_pot());
     rear_sus_msg.rr_shock_pot_ro = HYTECH_rr_shock_pot_ro_toS(instance.get_filtered_RR_sus_pot());
-    
+
     CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_hytech,
-                          VCRCANInterfaceImpl::telem_can_tx_buffer); 
+                          VCRCANInterfaceInstance::instance().telem_can_tx_buffer);
 }
 
 void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
     REAR_THERMISTORS_DATA_t thermistor_msg;
     thermistor_msg.thermistor_0_deg_C_ro = HYTECH_thermistor_0_deg_C_ro_toS(_thermistor_data.coolant_temperature_0_data.thermistor_degrees_C);
     thermistor_msg.thermistor_1_deg_C_ro = HYTECH_thermistor_1_deg_C_ro_toS(_thermistor_data.coolant_temperature_1_data.thermistor_degrees_C);
-    CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+    CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceInstance::instance().telem_can_tx_buffer);
 }
 
 void DrivebrainInterface::handle_enqueue_flowmeter_CAN_data() {
   FLOWMETER_DATA_t flowmeter_msg;
   flowmeter_msg.flow_rate = static_cast<int>(_flowmeter_data.flowmeter_gallons_per_min);
-  CAN_util::enqueue_msg(&flowmeter_msg, &Pack_FLOWMETER_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+  CAN_util::enqueue_msg(&flowmeter_msg, &Pack_FLOWMETER_DATA_hytech, VCRCANInterfaceInstance::instance().telem_can_tx_buffer);
 }
 
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {

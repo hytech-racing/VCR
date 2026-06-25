@@ -14,16 +14,16 @@
 
 
 VCRInterfaceData_s sample_async_data(
-    etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> recv_call,
+    etl::delegate<void(CANInterfaces_s &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> recv_call,
     VCRAsynchronousInterfaces &interface_ref_container, const VCRInterfaceData_s &cur_vcr_int_data)
 {
     VCRInterfaceData_s ret = cur_vcr_int_data;
     // process ring buffer is from CANInterface. TODO put into namespace
-    process_ring_buffer(VCRCANInterfaceImpl::inverter_can_rx_buffer, interface_ref_container.can_interfaces,
+    process_ring_buffer(VCRCANInterfaceInstance::instance().inverter_can_rx_buffer, interface_ref_container.can_interfaces,
                         sys_time::hal_millis(), recv_call, CANInterfaceType_e::INVERTER);
-    process_ring_buffer(VCRCANInterfaceImpl::telem_can_rx_buffer, interface_ref_container.can_interfaces,
+    process_ring_buffer(VCRCANInterfaceInstance::instance().telem_can_rx_buffer, interface_ref_container.can_interfaces,
                         sys_time::hal_millis(), recv_call, CANInterfaceType_e::TELEM);
-    process_ring_buffer(VCRCANInterfaceImpl::auxillary_can_rx_buffer, interface_ref_container.can_interfaces,
+    process_ring_buffer(VCRCANInterfaceInstance::instance().auxillary_can_rx_buffer, interface_ref_container.can_interfaces,
                         sys_time::hal_millis(), recv_call, CANInterfaceType_e::RAUX);
 
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
@@ -64,12 +64,12 @@ VCRInterfaceData_s sample_async_data(
 HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
 
-    etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
+    etl::delegate<void(CANInterfaces_s &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> main_can_recv = etl::delegate<void(CANInterfaces_s &, const CAN_message_t &, uint32_t, CANInterfaceType_e)>::create<VCRCANInterfaceImpl::vcr_recv_switch>();
 
     bool torque_mode_cycle_button_was_pressed = vcr_data.interface_data.dash_input_state.BUTTON_2;
 
     VCRInterfaceData_s new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data);
-    
+
     vcr_data.system_data.drivetrain_data.measuredSpeeds = {new_interface_data.inverter_data.FL.speed_rpm, new_interface_data.inverter_data.FR.speed_rpm, new_interface_data.inverter_data.RL.speed_rpm, new_interface_data.inverter_data.RR.speed_rpm};
     vcr_data.system_data.drivetrain_data.measuredInverterFLPackVoltage = new_interface_data.inverter_data.FL.dc_bus_voltage;
 
@@ -84,13 +84,13 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
     vcr_data.system_data.tc_mux_status = tc_mux_status;
 
     vcr_data.system_data.vehicle_state_machine_state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
-    
+
     vcr_data.system_data.drivetrain_state_machine_state = DrivetrainInstance::instance().get_state();
 
     vcr_data.interface_data = new_interface_data;
 
     vcr_data.system_data.db_cntrl_status.drivebrain_is_in_control = VCRControlsInstance::instance().drivebrain_is_in_control();
     vcr_data.system_data.db_cntrl_status.drivebrain_controller_timing_failure = VCRControlsInstance::instance().drivebrain_timing_failure();
-    
+
     return HT_TASK::TaskResponse::YIELD;
 }

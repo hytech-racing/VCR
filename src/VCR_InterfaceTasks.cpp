@@ -31,12 +31,12 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
 
     vcr_data.interface_data.rear_loadcell_data.RL_loadcell_analog = ADCInterfaceInstance::instance().get_filtered_RL_load_cell();
 
-    vcr_data.interface_data.rear_loadcell_data.valid_RL_sample = ((ADCInterfaceInstance::instance().get_RL_load_cell().raw != 4095) 
+    vcr_data.interface_data.rear_loadcell_data.valid_RL_sample = ((ADCInterfaceInstance::instance().get_RL_load_cell().raw != 4095)
                                                                 && (ADCInterfaceInstance::instance().get_RL_load_cell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
 
     vcr_data.interface_data.rear_loadcell_data.RR_loadcell_analog = ADCInterfaceInstance::instance().get_filtered_RR_load_cell();
-    
-    vcr_data.interface_data.rear_loadcell_data.valid_RR_sample = ((ADCInterfaceInstance::instance().get_RR_load_cell().raw != 4095) 
+
+    vcr_data.interface_data.rear_loadcell_data.valid_RR_sample = ((ADCInterfaceInstance::instance().get_RR_load_cell().raw != 4095)
                                                                 && (ADCInterfaceInstance::instance().get_RR_load_cell().status != AnalogSensorStatus_e::ANALOG_SENSOR_CLAMPED));
 
     vcr_data.interface_data.rear_suspot_data.RL_sus_pot_analog = ADCInterfaceInstance::instance().get_filtered_RL_sus_pot();
@@ -50,7 +50,7 @@ HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const H
 
 HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    ADCInterfaceInstance::instance().tick_adc1();  
+    ADCInterfaceInstance::instance().tick_adc1();
 
     vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog = ADCInterfaceInstance::instance().get_thermistor_0().conversion;
     vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog = ADCInterfaceInstance::instance().get_thermistor_1().conversion;
@@ -66,7 +66,7 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
     // with a 8.2k resistor for R1 and the sensor as R2, the formula for actual temperature should follow 198 - 31 * ln(analog_value)
     vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_0.thermistor_analog)); // log() is ln
     vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_degrees_C = COOLANT_TEMP_OFFSET + (COOLANT_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_1.thermistor_analog)); // log() is ln
-    
+
 
     // other thermistors computation is not as straight forward, not sure what these are
     // vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_2.thermistor_analog));
@@ -75,7 +75,7 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
     // vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_5.thermistor_analog));
     // vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_6.thermistor_analog));
     // vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_degrees_C = TEST_TEMP_OFFSET + (TEST_TEMP_SCALE * log(vcr_data.interface_data.thermistor_data.thermistor_7.thermistor_analog));
-  
+
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -88,7 +88,7 @@ HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const
 
 HT_TASK::TaskResponse init_acu_heartbeat(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    ACUInterfaceInstance::create(sys_time::hal_millis(), ACU_ACU_OK_MAX_HEARTBEAT_MS); // NOLINT 
+    ACUInterfaceInstance::create(sys_time::hal_millis(), ACU_ACU_OK_MAX_HEARTBEAT_MS); // NOLINT
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -120,14 +120,14 @@ HT_TASK::TaskResponse run_kick_watchdog(const unsigned long& sysMicros, const HT
 
 // CAN send tasks
 
-// adds rear suspension and vcr status CAN messages to the sent on next mega loop run 
+// adds rear suspension and vcr status CAN messages to the sent on next mega loop run
 HT_TASK::TaskResponse enqueue_suspension_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo )
 {
     DrivebrainInterfaceInstance::instance().handle_enqueue_suspension_CAN_data(ADCInterfaceInstance::instance());
     return HT_TASK::TaskResponse::YIELD;
 }
 
-HT_TASK::TaskResponse enqueue_controls_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
+HT_TASK::TaskResponse enqueue_controls_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     VCRControlsInstance::instance().send_controls_can_messages();
     return HT_TASK::TaskResponse::YIELD;
@@ -147,7 +147,7 @@ HT_TASK::TaskResponse enqueue_flowmeter_CAN_data(const unsigned long& sysMicros,
 
 HT_TASK::TaskResponse enqueue_dashboard_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    VCFInterfaceInstance::instance().enqueue_vehicle_state_message(VehicleStateMachineInstance::instance().get_state(), 
+    VCFInterfaceInstance::instance().enqueue_vehicle_state_message(VehicleStateMachineInstance::instance().get_state(),
                                                                 DrivetrainInstance::instance().get_state(),
                                                                 VCRControlsInstance::instance().drivebrain_is_in_control());
     return HT_TASK::TaskResponse::YIELD;
@@ -172,9 +172,9 @@ HT_TASK::TaskResponse enqueue_inverter_CAN_data(const unsigned long& sysMicros, 
 
 HT_TASK::TaskResponse handle_send_all_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::inverter_can_tx_buffer, &VCRCANInterfaceImpl::INVERTER_CAN);
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::telem_can_tx_buffer, &VCRCANInterfaceImpl::TELEM_CAN);
-    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceImpl::auxillary_can_tx_buffer, &VCRCANInterfaceImpl::AUXILLARY_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceInstance::instance().inverter_can_tx_buffer, &VCRCANInterfaceInstance::instance().INVERTER_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceInstance::instance().telem_can_tx_buffer, &VCRCANInterfaceInstance::instance().TELEM_CAN);
+    VCRCANInterfaceImpl::send_all_CAN_msgs(VCRCANInterfaceInstance::instance().auxillary_can_tx_buffer, &VCRCANInterfaceInstance::instance().AUXILLARY_CAN);
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -192,12 +192,12 @@ HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_T
 
     // set all pins as inputs
     IOExpanderInstance::instance().portMode(MCP23017Port::A, 0b11111111);
-    IOExpanderInstance::instance().portMode(MCP23017Port::B, 0b11111111); 
+    IOExpanderInstance::instance().portMode(MCP23017Port::B, 0b11111111);
 
     // internal pullups
     IOExpanderInstance::instance().writeRegister(MCP23017Register::GPPU_B, 0xFF);
     IOExpanderInstance::instance().writeRegister(MCP23017Register::GPPU_A, 0xFF);
-    
+
 
     // invert - double check when you need to do this or not... retest
     //  IOExpanderInstance::instance().writeRegister(MCP23017Register::IPOL_A, 0xFF);
@@ -215,15 +215,15 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
 
     // inputs on port a (0)
     vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 1);
-    // vcr_data.interface_data.shutdown_sensing_data.bspd_fault = IOExpanderUtils::getBit(data, 0, 2); 
-    vcr_data.interface_data.ethernet_is_linked.vn_link = IOExpanderUtils::getBit(data, 0, 3); 
+    // vcr_data.interface_data.shutdown_sensing_data.bspd_fault = IOExpanderUtils::getBit(data, 0, 2);
+    vcr_data.interface_data.ethernet_is_linked.vn_link = IOExpanderUtils::getBit(data, 0, 3);
     vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 0, 4);
     vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 0, 5);
-    // vcr_data.interface_data.shutdown_sensing_data.bspd_missing = IOExpanderUtils::getBit(data, 0, 6); 
+    // vcr_data.interface_data.shutdown_sensing_data.bspd_missing = IOExpanderUtils::getBit(data, 0, 6);
 
     // inputs on port b (1)
-    // vcr_data.interface_data.shutdown_sensing_data.lv_present = IOExpanderUtils::getBit(data, 1, 0); 
-    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0, 1); 
+    // vcr_data.interface_data.shutdown_sensing_data.lv_present = IOExpanderUtils::getBit(data, 1, 0);
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0, 1);
     vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 1, 2);
     vcr_data.interface_data.shutdown_sensing_data.vcr_sw_is_ok = IOExpanderUtils::getBit(data, 1, 3);
     vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 4);
@@ -232,13 +232,13 @@ HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_T
 
     uint8_t portA = IOExpanderInstance::instance().readPort(MCP23017Port::A);
     // Serial.println(portA);
-    
+
     // uint8_t portB = IOExpanderInstance::instance().readPort(MCP23017Port::B);
     // digitalWrite(11, 1);
     // uint8_t vcr_ok = IOExpanderInstance::instance().digitalRead(10);
     // Serial.println(vcr_ok);
     //Serial.println(portB);
- 
+
     return HT_TASK::TaskResponse::YIELD;
     // NOLINTEND
 }
@@ -255,25 +255,25 @@ HT_TASK::TaskResponse run_update_brakelight_task(const unsigned long& sysMicros,
     return HT_TASK::TaskResponse::YIELD;
 }
 
-HT_TASK::TaskResponse enable_motor_cooling(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
+HT_TASK::TaskResponse enable_motor_cooling(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state(); //NOLINT will alway be populated so is ok
     bool enable_state = vehicle_state == VehicleState_e::READY_TO_DRIVE ||
-                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2 || 
+                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2 ||
                         vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_3;
     digitalWrite(MOTOR_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
     return HT_TASK::TaskResponse::YIELD;
 }
 
-HT_TASK::TaskResponse enable_inverter_cooling(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) 
+HT_TASK::TaskResponse enable_inverter_cooling(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
     VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state(); //NOLINT will alway be populated so is ok
-    bool enable_state = vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE || 
-                        vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE || 
+    bool enable_state = vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE ||
+                        vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE ||
                         vehicle_state == VehicleState_e::READY_TO_DRIVE ||
                         vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2 ||
                         vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_5;
     digitalWrite(INVERTER_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
-    
+
     return HT_TASK::TaskResponse::YIELD;
 }

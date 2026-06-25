@@ -44,11 +44,6 @@
 /* From pio-git-hash */
 #include "device_fw_version.h"
 
-/* externed CAN instances */
-FlexCAN_Type<CAN2> VCRCANInterfaceImpl::AUXILLARY_CAN;
-FlexCAN_Type<CAN1> VCRCANInterfaceImpl::TELEM_CAN;
-FlexCAN_Type<CAN3> VCRCANInterfaceImpl::INVERTER_CAN;
-
 /* Ethernet message sockets */
 qindesign::network::EthernetUDP vcr_data_send_socket;
 qindesign::network::EthernetUDP vcf_data_recv_socket;
@@ -321,13 +316,13 @@ void setup()
     vcf_data_recv_socket.begin(EthernetIPDefsInstance::instance().VCFData_port);
 
     CANInterfacesInstance::create(
-        VCFInterfaceInstance::instance(),
         ACUInterfaceInstance::instance(),
         DrivebrainInterfaceInstance::instance(),
         fl_inverter_int,
         fr_inverter_int,
         rl_inverter_int,
-        rr_inverter_int
+        rr_inverter_int,
+        VCFInterfaceInstance::instance()
     );
     VCRAsynchronousInterfacesInstance::create(CANInterfacesInstance::instance());
 
@@ -360,9 +355,9 @@ void setup()
     const uint32_t auxillary_CAN_baudrate = 500000;
     const uint32_t inv_CAN_baudrate = 500000;
 
-    handle_CAN_setup(VCRCANInterfaceImpl::INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
-    handle_CAN_setup(VCRCANInterfaceImpl::TELEM_CAN, telem_CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
-    handle_CAN_setup(VCRCANInterfaceImpl::AUXILLARY_CAN, auxillary_CAN_baudrate, &VCRCANInterfaceImpl::on_auxillary_can_receive);
+    handle_CAN_setup(VCRCANInterfaceInstance::instance().INVERTER_CAN, inv_CAN_baudrate, &VCRCANInterfaceImpl::on_inverter_can_receive);
+    handle_CAN_setup(VCRCANInterfaceInstance::instance().TELEM_CAN, telem_CAN_baudrate, &VCRCANInterfaceImpl::on_telem_can_receive);
+    handle_CAN_setup(VCRCANInterfaceInstance::instance().AUXILLARY_CAN, auxillary_CAN_baudrate, &VCRCANInterfaceImpl::on_auxillary_can_receive);
 
     // Instantiate ADC interface
     ADCInterfaceInstance::create(
@@ -424,7 +419,7 @@ void setup()
 
     // Schedule scheduler tasks
     scheduler.schedule(adc_0_sample_task);
-    scheduler.schedule(adc_1_sample_task);
+    // scheduler.schedule(adc_1_sample_task);
 
     scheduler.schedule(kick_watchdog_task);
 
