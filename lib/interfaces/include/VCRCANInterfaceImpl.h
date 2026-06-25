@@ -66,11 +66,9 @@ using CANInterfacesInstance = etl::singleton<CANInterfaces_s>;
 /**
  * @brief This struct holds the FlexCAN peripheral instances and their associated RX/TX ring buffers.
  */
-struct VCRCANInterface
+struct VCRCANInterface_s
 {
-    explicit VCRCANInterface(etl::delegate<void (CANInterfaces_s &, const CAN_message_t &, uint32_t, CANInterfaceType_e)> recv_switch_func)
-        : can_recv_switch(recv_switch_func)
-    {}
+    explicit VCRCANInterface_s(etl::delegate<void (CANInterfaces_s &, const CAN_message_t &, uint32_t, CANInterfaceType_e)> recv_switch_func) : can_recv_switch(recv_switch_func) {}
 
     FlexCAN_t<CAN1> TELEM_CAN;
     CANRXBuffer_t telem_can_rx_buffer;
@@ -87,7 +85,7 @@ struct VCRCANInterface
 
     etl::delegate<void (CANInterfaces_s &, const CAN_message_t &, uint32_t, CANInterfaceType_e)> can_recv_switch;
 };
-using VCRCANInterfaceInstance = etl::singleton<VCRCANInterface>;
+using VCRCANInterfaceInstance = etl::singleton<VCRCANInterface_s>;
 
 
 namespace VCRCANInterfaceImpl
