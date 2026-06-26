@@ -5,7 +5,7 @@
 #include "SharedFirmwareTypes.h"
 
 /* Interface and system data structs */
-VCRData_s vcr_data;
+VCRData_s vcr_data; // TODO: remove this entirely
 
 unsigned long pulseCount;
 

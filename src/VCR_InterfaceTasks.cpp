@@ -14,7 +14,6 @@
 /* Local includes */
 #include "VCREthernetInterface.h"
 #include "VCR_Constants.h"
-#include "VCR_Globals.h"
 #include "controls.h"
 
 #include "DrivebrainInterface.h"
@@ -216,7 +215,7 @@ HT_TASK::TaskResponse enable_motor_cooling(const unsigned long& sysMicros, const
     bool enable_state = vehicle_state == VehicleState_e::READY_TO_DRIVE ||
                         vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2 || 
                         vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_3;
-    digitalWrite(MOTOR_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
+    digitalWrite(VCRInterfaceConstants::MOTOR_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -228,7 +227,7 @@ HT_TASK::TaskResponse enable_inverter_cooling(const unsigned long& sysMicros, co
                         vehicle_state == VehicleState_e::READY_TO_DRIVE ||
                         vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2 ||
                         vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_5;
-    digitalWrite(INVERTER_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
+    digitalWrite(VCRInterfaceConstants::INVERTER_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
     
     return HT_TASK::TaskResponse::YIELD;
 }

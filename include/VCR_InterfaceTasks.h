@@ -8,7 +8,6 @@
 #include "WatchdogSystem.h"
 #include "VCR_Constants.h"
 #include "VehicleStateMachine.h"
-#include "VCR_Globals.h"
 #include <ht_task.hpp>
 
 // maybe move using IOExpanderInstance = etl::singleton<MCP23017>; here

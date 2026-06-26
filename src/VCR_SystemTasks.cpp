@@ -1,5 +1,4 @@
 #include "FlexCAN_T4.h"
-#include "VCR_Globals.h"
 #include "etl/delegate.h"
 
 #include "CANInterface.h"
@@ -24,7 +23,7 @@ VCRInterfaceData_s sample_async_data(
     process_ring_buffer(VCRCANInterfaceInstace::instance().telem_can_rx_buffer, interface_ref_container.can_interfaces,
                         sys_time::hal_millis(), recv_call, CANInterfaceType_e::TELEM);
     process_ring_buffer(VCRCANInterfaceInstace::instance().rear_aux_can_rx_buffer, interface_ref_container.can_interfaces,
-                        sys_time::hal_millis(), recv_call, CANInterfaceType_e::AUX);
+                        sys_time::hal_millis(), recv_call, CANInterfaceType_e::RAUX);
 
     auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
     auto acu_data = interface_ref_container.can_interfaces.acu_interface.get_latest_data(sys_time::hal_millis());
