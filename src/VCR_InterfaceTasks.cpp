@@ -32,12 +32,12 @@ HT_TASK::TaskResponse run_read_adc1_task(const unsigned long& sysMicros, const H
     return HT_TASK::TaskResponse::YIELD;
 }
 
-
-HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    vcr_data.interface_data.flowmeter_data.flowmeter_gallons_per_min = FlowmeterInterfaceInstance::instance().get_flow_gpm(sys_time::hal_millis());
-    return HT_TASK::TaskResponse::YIELD;
-}
+// doesn't need to exist anymore
+// HT_TASK::TaskResponse run_sample_flowmeter(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
+// {
+//     vcr_data.interface_data.flowmeter_data.flowmeter_gallons_per_min = FlowmeterInterfaceInstance::instance().get_flow_gpm(sys_time::hal_millis());
+//     return HT_TASK::TaskResponse::YIELD;
+// }
 
 HT_TASK::TaskResponse init_acu_heartbeat(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -90,7 +90,7 @@ HT_TASK::TaskResponse enqueue_coolant_temp_CAN_data(const unsigned long& sysMicr
 
 HT_TASK::TaskResponse enqueue_flowmeter_CAN_data(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
-  DrivebrainInterfaceInstance::instance().handle_enqueue_flowmeter_CAN_data();
+  DrivebrainInterfaceInstance::instance().handle_enqueue_flowmeter_CAN_data(FlowmeterInterfaceInstance::instance(), millis());
   return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -160,7 +160,7 @@ HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_T
     return HT_TASK::TaskResponse::YIELD;
 }
 
-
+// TODO: replace these with a separate interface (should likely just create general IOexpander interface and then keep logic in here based on specific values)
 // need to double check pin assigments
 HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) // TODO: make all of this in a separate IO Expander Interface
 {
@@ -213,8 +213,8 @@ HT_TASK::TaskResponse enable_motor_cooling(const unsigned long& sysMicros, const
 {
     VehicleState_e vehicle_state = VehicleStateMachineInstance::instance().get_state(); //NOLINT will alway be populated so is ok
     bool enable_state = vehicle_state == VehicleState_e::READY_TO_DRIVE ||
-                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2 || 
-                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_3;
+                        VCFInterfaceInstance::instance().get_latest_data().dash_input_state.dial_state == ControllerMode_e::MODE_2 || 
+                        VCFInterfaceInstance::instance().get_latest_data().dash_input_state.dial_state == ControllerMode_e::MODE_3;
     digitalWrite(VCRInterfaceConstants::MOTOR_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
     return HT_TASK::TaskResponse::YIELD;
 }
@@ -225,8 +225,8 @@ HT_TASK::TaskResponse enable_inverter_cooling(const unsigned long& sysMicros, co
     bool enable_state = vehicle_state == VehicleState_e::TRACTIVE_SYSTEM_ACTIVE || 
                         vehicle_state == VehicleState_e::WANTING_READY_TO_DRIVE || 
                         vehicle_state == VehicleState_e::READY_TO_DRIVE ||
-                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2 ||
-                        vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_5;
+                        VCFInterfaceInstance::instance().get_latest_data().dash_input_state.dial_state == ControllerMode_e::MODE_2 ||
+                        VCFInterfaceInstance::instance().get_latest_data().dash_input_state.dial_state == ControllerMode_e::MODE_5;
     digitalWrite(VCRInterfaceConstants::INVERTER_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
     
     return HT_TASK::TaskResponse::YIELD;

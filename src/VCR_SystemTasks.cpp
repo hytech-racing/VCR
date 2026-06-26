@@ -11,12 +11,12 @@
 #include "VCR_SystemTasks.h"
 #include <string>
 
-
+// TODO: fix this to be better
 VCRInterfaceData_s sample_async_data(
     etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> recv_call,
-    VCRAsynchronousInterfaces &interface_ref_container, const VCRInterfaceData_s &cur_vcr_int_data)
+    VCRAsynchronousInterfaces &interface_ref_container)
 {
-    VCRInterfaceData_s ret = cur_vcr_int_data;
+    VCRInterfaceData_s ret;
     // process ring buffer is from CANInterface. TODO put into namespace
     process_ring_buffer(VCRCANInterfaceInstace::instance().inverter_can_rx_buffer, interface_ref_container.can_interfaces,
                         sys_time::hal_millis(), recv_call, CANInterfaceType_e::INVERTER);
@@ -65,9 +65,9 @@ HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const 
 
     etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> main_can_recv = etl::delegate<void(CANInterfaces &, const CAN_message_t &, unsigned long, CANInterfaceType_e)>::create<VCRCANInterfaceImpl::vcr_CAN_recv>();
 
-    bool torque_mode_cycle_button_was_pressed = vcr_data.interface_data.dash_input_state.BUTTON_2;
+    bool torque_mode_cycle_button_was_pressed = VCFInterfaceInstance::instance().get_latest_data().dash_input_state.BUTTON_2;
 
-    VCRInterfaceData_s new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data);
+    VCRInterfaceData_s new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance());
     
     vcr_data.system_data.drivetrain_data.measuredSpeeds = {new_interface_data.inverter_data.FL.speed_rpm, new_interface_data.inverter_data.FR.speed_rpm, new_interface_data.inverter_data.RL.speed_rpm, new_interface_data.inverter_data.RR.speed_rpm};
     vcr_data.system_data.drivetrain_data.measuredInverterFLPackVoltage = new_interface_data.inverter_data.FL.dc_bus_voltage;
