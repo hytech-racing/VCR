@@ -14,6 +14,7 @@
 #include <QNEthernet.h>
 
 #include "ADCInterface.h"
+#include "FlowmeterInterface.h"
 
 
 class DrivebrainInterface {
@@ -34,7 +35,7 @@ class DrivebrainInterface {
 
     void handle_enqueue_coolant_temp_CAN_data(const ADCInterface &adc_instance);
 
-    void handle_enqueue_flowmeter_CAN_data();
+    void handle_enqueue_flowmeter_CAN_data(FlowmeterInterface &flowmeter_instance, unsigned long curr_millis);
 
     void handle_send_ethernet_data(const hytech_msgs_VCRData_s &data);
 

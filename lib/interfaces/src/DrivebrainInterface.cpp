@@ -108,7 +108,7 @@ void DrivebrainInterface::handle_enqueue_suspension_CAN_data(const ADCInterface 
     rear_sus_msg.rr_shock_pot_ro = HYTECH_rr_shock_pot_ro_toS(adc_instance.get_filtered_RR_sus_pot());
     
     CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_hytech,
-                          VCRCANInterfaceImpl::telem_can_tx_buffer);
+                          VCRCANInterfaceInstace::instance().telem_can_tx_buffer);
 }
 
 void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data(const ADCInterface &adc_instance) {
@@ -116,13 +116,13 @@ void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data(const ADCInterfac
     thermistor_msg.thermistor_0_deg_C_ro = HYTECH_thermistor_0_deg_C_ro_toS(adc_instance.get_thermistor_n_degrees_C(0));
     thermistor_msg.thermistor_1_deg_C_ro = HYTECH_thermistor_1_deg_C_ro_toS(adc_instance.get_thermistor_n_degrees_C(1));
     thermistor_msg.thermistor_2_deg_C_ro = HYTECH_thermistor_2_deg_C_ro_toS(adc_instance.get_thermistor_n_degrees_C(2));
-    CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+    CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceInstace::instance().telem_can_tx_buffer);
 }
 
-void DrivebrainInterface::handle_enqueue_flowmeter_CAN_data() {
+void DrivebrainInterface::handle_enqueue_flowmeter_CAN_data(FlowmeterInterface &flowmeter_instance, unsigned long curr_millis) {
   FLOWMETER_DATA_t flowmeter_msg;
-  flowmeter_msg.flow_rate = static_cast<int>(_flowmeter_data.flowmeter_gallons_per_min);
-  CAN_util::enqueue_msg(&flowmeter_msg, &Pack_FLOWMETER_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+  flowmeter_msg.flow_rate = static_cast<int>(flowmeter_instance.get_flow_gpm(curr_millis));
+  CAN_util::enqueue_msg(&flowmeter_msg, &Pack_FLOWMETER_DATA_hytech, VCRCANInterfaceInstace::instance().telem_can_tx_buffer);
 }
 
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {
