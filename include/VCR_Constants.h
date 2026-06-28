@@ -102,6 +102,17 @@ namespace VCRInterfaceConstants {
     
     /* Filter constants */
     constexpr float LOADCELL_IIR_FILTER_ALPHA = 0.01f;
+
+    /* IOExpander constants */
+    constexpr uint8_t IOEXPANDER_I2C_ADDRESS = 0x20;
+    // Port A modes
+    constexpr uint8_t PORTA_DIRECTIONS = 0b11111111; // All inputs
+    constexpr uint8_t PORTA_PULLUPS = 0b11111111; // All pullups
+    constexpr uint8_t PORTA_INVERTED = 0b00000000; // None inverted
+    // Port B modes
+    constexpr uint8_t PORTB_DIRECTIONS = 0b11111111; // All inputs
+    constexpr uint8_t PORTB_PULLUPS = 0b11111111; // All pullups
+    constexpr uint8_t PORTB_INVERTED = 0b00000000; // None inverted
 }
 
 namespace VCRSystemConstants {

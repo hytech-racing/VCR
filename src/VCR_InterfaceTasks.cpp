@@ -7,7 +7,6 @@
 #include "ADCInterface.h"
 #include "FlowmeterInterface.h"
 
-
 /* From shared-systems-lib */
 #include "Logger.h"
 
@@ -17,7 +16,9 @@
 #include "controls.h"
 
 #include "DrivebrainInterface.h"
-#include "IOExpanderUtils.h"
+#include "IOExpanderInterface.h"
+
+#include "VCR_Globals.h" //TODO: remove
 
 HT_TASK::TaskResponse run_read_adc0_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
 {
@@ -138,60 +139,31 @@ HT_TASK::TaskResponse handle_send_VCR_ethernet_data(const unsigned long& sysMicr
     return HT_TASK::TaskResponse::YIELD;
 }
 
-HT_TASK::TaskResponse init_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
-    Wire.begin();
-    IOExpanderInstance::create(0x20, Wire);
-    IOExpanderInstance::instance().init();
-
-    // set all pins as inputs
-    IOExpanderInstance::instance().portMode(MCP23017Port::A, 0b11111111);
-    IOExpanderInstance::instance().portMode(MCP23017Port::B, 0b11111111);
-
-    // internal pullups
-    IOExpanderInstance::instance().writeRegister(MCP23017Register::GPPU_B, 0xFF);
-    IOExpanderInstance::instance().writeRegister(MCP23017Register::GPPU_A, 0xFF);
-
-
-    // invert - double check when you need to do this or not... retest
-    //  IOExpanderInstance::instance().writeRegister(MCP23017Register::IPOL_A, 0xFF);
-    //  IOExpanderInstance::instance().writeRegister(MCP23017Register::IPOL_B, 0xFF);
-
-    return HT_TASK::TaskResponse::YIELD;
-}
-
 // TODO: replace these with a separate interface (should likely just create general IOexpander interface and then keep logic in here based on specific values)
 // need to double check pin assigments
 HT_TASK::TaskResponse read_ioexpander(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo) // TODO: make all of this in a separate IO Expander Interface
 {
-    // NOLINTBEGIN
-    uint16_t data = IOExpanderInstance::instance().read();
+    IOExpanderInterfaceInstance::instance().read();
 
     // inputs on port a (0)
-    vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderUtils::getBit(data, 0, 1);
-    // vcr_data.interface_data.shutdown_sensing_data.bspd_fault = IOExpanderUtils::getBit(data, 0, 2); 
-    vcr_data.interface_data.ethernet_is_linked.vn_link = IOExpanderUtils::getBit(data, 0, 3); 
-    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderUtils::getBit(data, 0, 4);
-    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderUtils::getBit(data, 0, 5);
-    // vcr_data.interface_data.shutdown_sensing_data.bspd_missing = IOExpanderUtils::getBit(data, 0, 6); 
+    vcr_data.interface_data.shutdown_sensing_data.bspd_is_ok = IOExpanderInterfaceInstance::instance().getBitPortA(0);
+    // nothing = IOExpanderInterfaceInstance::instance().getBitPortA(1);
+    // vcr_data.interface_data.shutdown_sensing_data.bspd_fault = IOExpanderInterfaceInstance::instance().getBitPortA(2);
+    vcr_data.interface_data.ethernet_is_linked.vn_link = IOExpanderInterfaceInstance::instance().getBitPortA(3);
+    vcr_data.interface_data.ethernet_is_linked.drivebrain_link = IOExpanderInterfaceInstance::instance().getBitPortA(4);
+    vcr_data.interface_data.ethernet_is_linked.ubiquiti_link = IOExpanderInterfaceInstance::instance().getBitPortA(5);
+    // vcr_data.interface_data.shutdown_sensing_data.bspd_missing = IOExpanderInterfaceInstance::instance().getBitPortA(6);
+    // nothing = IOExpanderInterfaceInstance::instance().getBitPortA(7);
 
     // inputs on port b (1)
-    // vcr_data.interface_data.shutdown_sensing_data.lv_present = IOExpanderUtils::getBit(data, 1, 0); 
-    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderUtils::getBit(data, 0, 1); 
-    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderUtils::getBit(data, 1, 2);
-    vcr_data.interface_data.shutdown_sensing_data.vcr_sw_is_ok = IOExpanderUtils::getBit(data, 1, 3);
-    vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderUtils::getBit(data, 1, 4);
-    vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderUtils::getBit(data, 1, 5);
-    vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderUtils::getBit(data, 1, 6);
-
-    uint8_t portA = IOExpanderInstance::instance().readPort(MCP23017Port::A);
-    // Serial.println(portA);
-
-    // uint8_t portB = IOExpanderInstance::instance().readPort(MCP23017Port::B);
-    // digitalWrite(11, 1);
-    // uint8_t vcr_ok = IOExpanderInstance::instance().digitalRead(10);
-    // Serial.println(vcr_ok);
-    //Serial.println(portB);
+    // vcr_data.interface_data.shutdown_sensing_data.lv_present = IOExpanderInterfaceInstance::instance().getBitPortB(0);
+    vcr_data.interface_data.shutdown_sensing_data.bms_is_ok = IOExpanderInterfaceInstance::instance().getBitPortB(1);
+    vcr_data.interface_data.shutdown_sensing_data.imd_is_ok = IOExpanderInterfaceInstance::instance().getBitPortB(2);
+    vcr_data.interface_data.shutdown_sensing_data.vcr_sw_is_ok = IOExpanderInterfaceInstance::instance().getBitPortB(3);
+    vcr_data.interface_data.ethernet_is_linked.acu_link = IOExpanderInterfaceInstance::instance().getBitPortB(4);
+    vcr_data.interface_data.ethernet_is_linked.teensy_link = IOExpanderInterfaceInstance::instance().getBitPortB(5);
+    vcr_data.interface_data.ethernet_is_linked.vcf_link = IOExpanderInterfaceInstance::instance().getBitPortB(6);
+    // nothing = IOExpanderInterfaceInstance::instance().getBitPortB(7);
  
     return HT_TASK::TaskResponse::YIELD;
     // NOLINTEND

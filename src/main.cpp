@@ -25,20 +25,21 @@
 #include "EthernetAddressDefs.h"
 
 /* Local includes */
-#include "TorqueControllerMux.hpp"
-#include "VCFInterface.h"
-#include "VCREthernetInterface.h"
 #include "VCR_Constants.h"
 #include "VCR_Globals.h"
 #include "VCR_InterfaceTasks.h"
+#include "VCR_SystemTasks.h"
+#include "VCFInterface.h"
+#include "VCREthernetInterface.h"
 #include "VCRCANInterfaceImpl.h"
+#include "FlowmeterInterface.h"
 #include "ADCInterface.h"
 #include "DrivebrainInterface.h"
 #include "InverterInterface.h"
+#include "IOExpanderInterface.h"
+#include "TorqueControllerMux.hpp"
 #include "DrivetrainSystem.h"
-#include "VCR_SystemTasks.h"
 #include "VehicleStateMachine.h"
-#include "FlowmeterInterface.h"
 #include "controls.h"
 
 /* From pio-git-hash */
@@ -108,7 +109,7 @@ HT_TASK::Task enqueue_dashboard_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_dashbo
 HT_TASK::Task enqueue_coolant_temp_CAN_task(HT_TASK::DUMMY_FUNCTION, enqueue_coolant_temp_CAN_data, VCRTaskConstants::coolant_temp_send_priority, VCRTaskConstants::coolant_temp_send_period_us);
 HT_TASK::Task send_CAN_task(HT_TASK::DUMMY_FUNCTION, handle_send_all_CAN_data, VCRTaskConstants::send_can_priority, VCRTaskConstants::send_can_period_us); // Sends all messages from the CAN queue
 HT_TASK::Task vcr_data_ethernet_send(HT_TASK::DUMMY_FUNCTION, handle_send_VCR_ethernet_data, VCRTaskConstants::ethernet_send_priority, VCRTaskConstants::ethernet_update_period);
-HT_TASK::Task IOExpander_read_task(init_ioexpander, read_ioexpander, VCRTaskConstants::ioexpander_priority, VCRTaskConstants::ioexpander_sample_period_us);
+HT_TASK::Task IOExpander_read_task(HT_TASK::DUMMY_FUNCTION, read_ioexpander, VCRTaskConstants::ioexpander_priority, VCRTaskConstants::ioexpander_sample_period_us);
 HT_TASK::Task async_main_task(HT_TASK::DUMMY_FUNCTION, run_async_main_task, VCRTaskConstants::main_task_priority, VCRTaskConstants::main_task_period_us);
 HT_TASK::Task update_brakelight_task(init_update_brakelight_task, run_update_brakelight_task, VCRTaskConstants::update_brakelight_priority, VCRTaskConstants::update_brakelight_period_us);
 HT_TASK::Task update_sample_flowmeter(HT_TASK::DUMMY_FUNCTION, run_sample_flowmeter, VCRTaskConstants::dashboard_send_priority, VCRTaskConstants::dashboard_send_period_us);
@@ -416,6 +417,23 @@ void setup()
     );
 
     ADCInterfaceInstance::instance().init();
+
+    // Create IOExpander instance
+    IOExpanderInterfaceInstance::create(Wire,
+        IOExpanderInterfaceParams_s {
+            VCRInterfaceConstants::IOEXPANDER_I2C_ADDRESS,
+            IOExpanderPortMode_s {
+                VCRInterfaceConstants::PORTA_DIRECTIONS,
+                VCRInterfaceConstants::PORTA_PULLUPS,
+                VCRInterfaceConstants::PORTA_INVERTED
+            },
+            IOExpanderPortMode_s {
+                VCRInterfaceConstants::PORTB_DIRECTIONS,
+                VCRInterfaceConstants::PORTB_PULLUPS,
+                VCRInterfaceConstants::PORTB_INVERTED
+            }
+        }
+    );
 
     // Schedule scheduler tasks
     scheduler.schedule(adc_0_sample_task);
