@@ -1,17 +1,21 @@
 #ifndef ADCINTERFACE_H
 #define ADCINTERFACE_H
 
-#include "MCP_ADC.h"
-#include "etl/singleton.h"
+/* ETL Library */
+#include <etl/singleton.h>
 
+/* External Includes */
 #include <array>
 #include <optional>
+#include "MCP_ADC.h"
 
-namespace adc_default_parameters {
+namespace adc_default_parameters
+{
     constexpr const unsigned int channels_within_mcp_adc = 8;
 }
 
-struct ADCPinout_s {
+struct ADCPinout_s
+{
     int adc0_spi_cs_pin;
     int adc1_spi_cs_pin;
 
@@ -19,7 +23,8 @@ struct ADCPinout_s {
     int current_high_sense_pin;
 };
 
-struct ADCChannels_s {
+struct ADCChannels_s
+{
     /* ADC 0 */
     int glv_sense_channel;
     int current_sense_channel;
@@ -40,7 +45,8 @@ struct ADCChannels_s {
     int thermistor7_channel;
 };
 
-struct ADCScales_s {
+struct ADCScales_s
+{
     float glv_sense_scale;
     float current_sense_scale;
     float reference_sense_scale;
@@ -57,9 +63,12 @@ struct ADCScales_s {
     float thermistor5_scale;
     float thermistor6_scale;
     float thermistor7_scale;
+
+    float coolant_temp_scale;
 };
 
-struct ADCOffsets_s {
+struct ADCOffsets_s
+{
     float glv_sense_offset;
     float current_sense_offset;
     float reference_sense_offset;
@@ -76,9 +85,12 @@ struct ADCOffsets_s {
     float thermistor5_offset;
     float thermistor6_offset;
     float thermistor7_offset;
+
+    float coolant_temp_offset;
 };
 
-struct ADCInterfaceParams_s {
+struct ADCInterfaceParams_s
+{
     ADCPinout_s pinouts;
     ADCChannels_s channels;
     ADCScales_s scales;
@@ -88,29 +100,36 @@ struct ADCInterfaceParams_s {
 class ADCInterface
 {
 public:
-    ADCInterface(ADCPinout_s pinouts, ADCChannels_s channels, ADCScales_s scales, ADCOffsets_s offsets) : _adc_parameters { 
-      pinouts,
-      channels,
-      scales,
-      offsets },
-      _adc0(
-        _adc_parameters.pinouts.adc0_spi_cs_pin,
-        MCP_ADC_DEFAULT_SPI_SDI,
-        MCP_ADC_DEFAULT_SPI_SDO,
-        MCP_ADC_DEFAULT_SPI_CLK,
-        MCP_ADC_DEFAULT_SPI_SPEED,
-        adc0_scales().data(),
-        adc0_offsets().data()
-      ),
-      _adc1(
-        _adc_parameters.pinouts.adc1_spi_cs_pin,
-        MCP_ADC_DEFAULT_SPI_SDI,
-        MCP_ADC_DEFAULT_SPI_SDO,
-        MCP_ADC_DEFAULT_SPI_CLK,
-        MCP_ADC_DEFAULT_SPI_SPEED,
-        adc1_scales().data(),
-        adc1_offsets().data()
-      ) {};
+
+    ADCInterface(ADCPinout_s pinouts,
+                ADCChannels_s channels,
+                ADCScales_s scales,
+                ADCOffsets_s offsets
+    ) : _adc_parameters {
+            pinouts,
+            channels,
+            scales,
+            offsets
+        },
+        _adc0 (
+            _adc_parameters.pinouts.adc0_spi_cs_pin,
+            MCP_ADC_DEFAULT_SPI_SDI,
+            MCP_ADC_DEFAULT_SPI_SDO,
+            MCP_ADC_DEFAULT_SPI_CLK,
+            MCP_ADC_DEFAULT_SPI_SPEED,
+            adc0_scales().data(),
+            adc0_offsets().data()
+        ),
+        _adc1 (
+            _adc_parameters.pinouts.adc1_spi_cs_pin,
+            MCP_ADC_DEFAULT_SPI_SDI,
+            MCP_ADC_DEFAULT_SPI_SDO,
+            MCP_ADC_DEFAULT_SPI_CLK,
+            MCP_ADC_DEFAULT_SPI_SPEED,
+            adc1_scales().data(),
+            adc1_offsets().data()
+        )
+    {};
 
     /**
      * Init function for pin modes
@@ -134,37 +153,37 @@ public:
     /**
      * @return The reading of the 24V sensor analog channel
     */
-    AnalogConversion_s get_glv();
+    AnalogConversion_s get_glv() const;
 
     /**
      * @return The reading of the BSPD current analog channel
     */
-    AnalogConversion_s get_bspd_current();
+    AnalogConversion_s get_bspd_current() const;
 
     /**
      * @return The reading of the BSPD reference current analog channel
     */
-    AnalogConversion_s get_bspd_reference_current();
+    AnalogConversion_s get_bspd_reference_current() const;
 
     /**
      * @return The reading of the rear left load cell analog channel
     */
-    AnalogConversion_s get_RL_load_cell();
+    AnalogConversion_s get_RL_load_cell() const;
 
     /**
      * @return The reading of the rear right load cell analog channel
     */
-    AnalogConversion_s get_RR_load_cell();
+    AnalogConversion_s get_RR_load_cell() const;
 
     /**
      * @return The reading of the rear left suspension potentiometer analog channel
     */
-    AnalogConversion_s get_RL_sus_pot();
+    AnalogConversion_s get_RL_sus_pot() const;
 
     /**
      * @return The reading of the rear right suspension potentiometer analog channel
-    */ 
-    AnalogConversion_s get_RR_sus_pot();
+    */
+    AnalogConversion_s get_RR_sus_pot() const;
 
     /**
      * Update filtered signals based on given alpha
@@ -174,55 +193,65 @@ public:
     /**
      * @return The filtered value of the RL load cell
      */
-    float get_filtered_RL_load_cell();
-
-    /**
-     * @return The filtered value of the RL sus pot
-     */
-    float get_filtered_RL_sus_pot();
+    float get_filtered_RL_load_cell() const;
 
     /**
      * @return The filtered value of the RR load cell
      */
-    float get_filtered_RR_load_cell();
+    float get_filtered_RR_load_cell() const;
+
+    /**
+     * @return The filtered value of the RL sus pot
+     */
+    float get_filtered_RL_sus_pot() const;
 
     /**
      * @return The filtered value of the RR sus pot
      */
-    float get_filtered_RR_sus_pot();
+    float get_filtered_RR_sus_pot() const;
 
     /* -------------------- ADC1 -------------------- */
 
-    AnalogConversion_s get_thermistor_0();
+    AnalogConversion_s get_thermistor_0() const;
 
-    AnalogConversion_s get_thermistor_1();
+    AnalogConversion_s get_thermistor_1() const;
 
-    AnalogConversion_s get_thermistor_2(); 
+    AnalogConversion_s get_thermistor_2() const;
 
-    AnalogConversion_s get_thermistor_3();
+    AnalogConversion_s get_thermistor_3() const;
 
-    AnalogConversion_s get_thermistor_4();
+    AnalogConversion_s get_thermistor_4() const;
 
-    AnalogConversion_s get_thermistor_5();
+    AnalogConversion_s get_thermistor_5() const;
 
-    AnalogConversion_s get_thermistor_6();
+    AnalogConversion_s get_thermistor_6() const;
 
-    AnalogConversion_s get_thermistor_7();
-  
-    bool is_brake_sense_high();
+    AnalogConversion_s get_thermistor_7() const;
 
-    bool is_current_sense_high();
+    /**
+     * Converts the output of the ADC to a temperature in degrees following the function:
+     * deg C = offset + (scale * ln(raw analog value))
+     * @param n which thermistor to convert into degrees
+     * @return defaults to -1 if incorrect thermistor number is given
+     */
+    float get_thermistor_n_degrees_C(int n) const;
+
+    bool is_brake_sense_high() const;
+
+    bool is_current_sense_high() const;
 
 private:
+
+    const size_t _digital_high_threshold = 2048;
+
     ADCInterfaceParams_s _adc_parameters = {};
 
     MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc0;
     MCP_ADC<adc_default_parameters::channels_within_mcp_adc> _adc1;
 
-
     float _RL_load_cell_filtered;
-    float _RL_sus_pot_filtered;
     float _RR_load_cell_filtered;
+    float _RL_sus_pot_filtered;
     float _RR_sus_pot_filtered;
 
     std::array<float, adc_default_parameters::channels_within_mcp_adc> adc0_scales();
@@ -230,15 +259,13 @@ private:
     std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_scales();
     std::array<float, adc_default_parameters::channels_within_mcp_adc> adc1_offsets();
 
-
-    const size_t digital_high_threshold = 2048;
     /**
      * @return updated filtered value based on given alpha, previous value, and new value
      */
-    static float apply_iir_filter(float alpha, float old_value, float new_value);
+    static float _apply_iir_filter(float alpha, float old_value, float new_value);
 
 };
 
-using ADCInterfaceInstance = etl::singleton<ADCInterface>; // Singleton for ADCs. Used to pass ADCs to other systems that need them, such as the TelemetrySystem.
+using ADCInterfaceInstance = etl::singleton<ADCInterface>;
 
 #endif

@@ -1,14 +1,32 @@
 #include "VCREthernetInterface.h"
-#include "SharedFirmwareTypes.h"
-#include "base_msgs.pb.h"
-#include "ht_can_version.h"
 #include "hytech_msgs_version.h"
-#include <algorithm>
-#include "VCFInterface.h"
 
-hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &shared_state)
+
+void VCREthernetInterface::init_ethernet_device()
 {
-	hytech_msgs_VCRData_s out;
+    EthernetIPDefsInstance::create();
+    Ethernet.begin(EthernetIPDefsInstance::instance().vcr_ip,
+                EthernetIPDefsInstance::instance().car_subnet,
+                EthernetIPDefsInstance::instance().default_gateway
+    );
+    vcr_data_send_socket.begin(EthernetIPDefsInstance::instance().VCRData_port);
+    vcf_data_recv_socket.begin(EthernetIPDefsInstance::instance().VCFData_port);
+}
+
+hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const ADCInterface &adc_interface,
+                                                        DrivetrainDynamicReport_s &DrivetrainData,
+                                                        const VCFInterface &vcf_interface,
+                                                        const VehicleStateMachine &vehicle_state_machine,
+                                                        const DrivetrainSystem &drivetrain_system,
+                                                        const InverterInterface &fl_inverter,
+                                                        const InverterInterface &fr_inverter,
+                                                        const InverterInterface &rl_inverter,
+                                                        const InverterInterface &rr_inverter,
+                                                        const VCRControls &vcr_controls
+)
+{
+	auto fw_version_hash = convert_version_to_char_arr(device_status_t::firmware_version);
+    hytech_msgs_VCRData_s out;
 
     //has_data
     out.has_current_sensor_data = true;
@@ -28,94 +46,96 @@ hytech_msgs_VCRData_s VCREthernetInterface::make_vcr_data_msg(const VCRData_s &s
     out.has_msg_versions = true;
     out.has_status = true;
 
-    //RearLoadCellData_s
-    out.rear_loadcell_data.RL_loadcell_analog = shared_state.interface_data.rear_loadcell_data.RL_loadcell_analog;
-    out.rear_loadcell_data.RR_loadcell_analog = shared_state.interface_data.rear_loadcell_data.RR_loadcell_analog;
+    // RearLoadCellData_s
+    out.rear_loadcell_data.RL_loadcell_analog = static_cast<uint32_t>(adc_interface.get_filtered_RL_load_cell());
+    out.rear_loadcell_data.RR_loadcell_analog = static_cast<uint32_t>(adc_interface.get_filtered_RR_load_cell());
 
-    //RearSusPotData_s
-    out.rear_suspot_data.RL_sus_pot_analog = shared_state.interface_data.rear_suspot_data.RL_sus_pot_analog;
-    out.rear_suspot_data.RR_sus_pot_analog = shared_state.interface_data.rear_suspot_data.RR_sus_pot_analog;
+    // RearSusPotData_s
+    out.rear_suspot_data.RL_sus_pot_analog = static_cast<uint32_t>(adc_interface.get_RL_sus_pot().conversion);
+    out.rear_suspot_data.RR_sus_pot_analog = static_cast<uint32_t>(adc_interface.get_RR_sus_pot().conversion);
 
     // ShutdownSensingData_s
-    out.vcr_shutdown_data.i_shutdown_in = false; //shared_state.interface_data.shutdown_sensing_data.i_shutdown_in;
-    out.vcr_shutdown_data.j_bspd_relay = false; //shared_state.interface_data.shutdown_sensing_data.j_bspd_relay;
-    out.vcr_shutdown_data.k_watchdog_relay = false; //shared_state.interface_data.shutdown_sensing_data.k_watchdog_relay;
-    out.vcr_shutdown_data.l_bms_relay = false; //shared_state.interface_data.shutdown_sensing_data.l_bms_relay;
-    out.vcr_shutdown_data.m_imd_relay = false; //shared_state.interface_data.shutdown_sensing_data.m_imd_relay;
+    out.vcr_shutdown_data.i_shutdown_in = false; // shared_state.interface_data.shutdown_sensing_data.i_shutdown_in;
+    out.vcr_shutdown_data.j_bspd_relay = false; // shared_state.interface_data.shutdown_sensing_data.j_bspd_relay;
+    out.vcr_shutdown_data.k_watchdog_relay = false; // shared_state.interface_data.shutdown_sensing_data.k_watchdog_relay;
+    out.vcr_shutdown_data.l_bms_relay = false; // shared_state.interface_data.shutdown_sensing_data.l_bms_relay;
+    out.vcr_shutdown_data.m_imd_relay = false; // shared_state.interface_data.shutdown_sensing_data.m_imd_relay;
 
-    out.vcr_shutdown_data.bspd_is_ok = shared_state.interface_data.shutdown_sensing_data.bspd_is_ok;
-    out.vcr_shutdown_data.watchdog_is_ok = shared_state.interface_data.shutdown_sensing_data.vcr_sw_is_ok;
-    out.vcr_shutdown_data.bms_is_ok = shared_state.interface_data.shutdown_sensing_data.bms_is_ok;
-    out.vcr_shutdown_data.imd_is_ok = shared_state.interface_data.shutdown_sensing_data.imd_is_ok;
+    IOExpanderInterfaceInstance::instance().read();
+
+    out.vcr_shutdown_data.bspd_is_ok = IOExpanderInterfaceInstance::instance().getBitPortA(0);       // GPA0 = BSPD_OK_SENSE
+    out.vcr_shutdown_data.watchdog_is_ok = IOExpanderInterfaceInstance::instance().getBitPortB(3);   // GPB3 = VCR_OK_SENSE
+    out.vcr_shutdown_data.bms_is_ok = IOExpanderInterfaceInstance::instance().getBitPortB(1);        // GPB1 = BMS_OK_SENSE
+    out.vcr_shutdown_data.imd_is_ok = IOExpanderInterfaceInstance::instance().getBitPortB(2);        // GPB2 = IMD_OK_SENSE
 
     // VCREthernetLinkData_s
-    out.ethernet_is_linked.acu_link = shared_state.interface_data.ethernet_is_linked.acu_link;
-    out.ethernet_is_linked.debug_link = shared_state.interface_data.ethernet_is_linked.debug_link;
-    out.ethernet_is_linked.drivebrain_link = shared_state.interface_data.ethernet_is_linked.drivebrain_link;
-    out.ethernet_is_linked.teensy_link = shared_state.interface_data.ethernet_is_linked.teensy_link;
-    out.ethernet_is_linked.ubiquiti_link = shared_state.interface_data.ethernet_is_linked.ubiquiti_link;
-    out.ethernet_is_linked.vcf_link = shared_state.interface_data.ethernet_is_linked.vcf_link;
+    out.ethernet_is_linked.acu_link = IOExpanderInterfaceInstance::instance().getBitPortB(4);        // GPB4 = ACU_LINK_SENSE
+    // out.ethernet_is_linked.debug_link = shared_state.interface_data.ethernet_is_linked.debug_link; // TODO: fix this still
+    out.ethernet_is_linked.drivebrain_link = IOExpanderInterfaceInstance::instance().getBitPortA(4); // GPA4 = DB_LINK_SENSE
+    out.ethernet_is_linked.teensy_link = IOExpanderInterfaceInstance::instance().getBitPortB(5);     // GPB5 = TEENSY_LINK_SENSE
+    out.ethernet_is_linked.ubiquiti_link = IOExpanderInterfaceInstance::instance().getBitPortA(5);   // GPA5 = Ubiquiti_LINK_SENSE
+    out.ethernet_is_linked.vcf_link = IOExpanderInterfaceInstance::instance().getBitPortB(6);        // GPB6 = VCF_LINK_SENSE
 
     // veh_vec<InverterData>
-
-    copy_inverter_data(shared_state.interface_data.inverter_data.FL, out.inverter_data.FL);
+    copy_inverter_data(fl_inverter.get_all_inverter_data(), out.inverter_data.FL);
     out.inverter_data.has_FL = true;
-    copy_inverter_data(shared_state.interface_data.inverter_data.FR, out.inverter_data.FR);
+    copy_inverter_data(fr_inverter.get_all_inverter_data(), out.inverter_data.FR);
     out.inverter_data.has_FR = true;
-    copy_inverter_data(shared_state.interface_data.inverter_data.RL, out.inverter_data.RL);
+    copy_inverter_data(rl_inverter.get_all_inverter_data(), out.inverter_data.RL);
     out.inverter_data.has_RL = true;
-    copy_inverter_data(shared_state.interface_data.inverter_data.RR, out.inverter_data.RR);
+    copy_inverter_data(rr_inverter.get_all_inverter_data(), out.inverter_data.RR);
     out.inverter_data.has_RR = true;
 
     //CurrentSensorData_s
-    out.current_sensor_data.twentyfour_volt_sensor = shared_state.interface_data.current_sensor_data.twentyfour_volt_sensor;
-    out.current_sensor_data.current_sensor_unfiltered = shared_state.interface_data.current_sensor_data.current_sensor_unfiltered;
-    out.current_sensor_data.current_refererence_unfiltered = shared_state.interface_data.current_sensor_data.current_refererence_unfiltered;
-    out.current_sensor_data.bpsd_brake_high_sense = shared_state.interface_data.current_sensor_data.bspd_brake_high_sense;
-    out.current_sensor_data.bspd_current_high_sense = shared_state.interface_data.current_sensor_data.bspd_current_high_sense;
+    out.current_sensor_data.twentyfour_volt_sensor = adc_interface.get_glv().conversion;
+    out.current_sensor_data.current_sensor_unfiltered = adc_interface.get_bspd_current().conversion;
+    out.current_sensor_data.current_refererence_unfiltered = adc_interface.get_bspd_reference_current().conversion;
+    out.current_sensor_data.bpsd_brake_high_sense = adc_interface.is_brake_sense_high();
+    out.current_sensor_data.bspd_current_high_sense = adc_interface.is_current_sense_high();
+
 
     //DrivetrainDynamicReport_s
-    out.drivetrain_data.measuredInverterFLPackVoltage = shared_state.system_data.drivetrain_data.measuredInverterFLPackVoltage;
-    copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredSpeeds, out.drivetrain_data.measuredSpeeds);
-    copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredTorques, out.drivetrain_data.measuredTorques);
-    copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredTorqueCurrents, out.drivetrain_data.measuredTorqueCurrents);
-    copy_veh_vec_members(shared_state.system_data.drivetrain_data.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
+    out.drivetrain_data.measuredInverterFLPackVoltage = DrivetrainData.measuredInverterFLPackVoltage;
+
+    copy_veh_vec_members(DrivetrainData.measuredSpeeds, out.drivetrain_data.measuredSpeeds);
+    copy_veh_vec_members(DrivetrainData.measuredTorques, out.drivetrain_data.measuredTorques);
+    copy_veh_vec_members(DrivetrainData.measuredTorqueCurrents, out.drivetrain_data.measuredTorqueCurrents);
+    copy_veh_vec_members(DrivetrainData.measuredMagnetizingCurrents, out.drivetrain_data.measuredMagnetizingCurrents);
 
     //TorqueControllerMuxStatus
-    out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) shared_state.system_data.tc_mux_status.active_error;
-    out.tcmux_status.active_controller_mode = (hytech_msgs_ControllerMode_e) shared_state.system_data.tc_mux_status.active_controller_mode;
-    out.tcmux_status.active_torque_limit_enum = (hytech_msgs_TorqueLimit_e) shared_state.system_data.tc_mux_status.active_torque_limit_enum;
-    out.tcmux_status.active_torque_limit_value = shared_state.system_data.tc_mux_status.active_torque_limit_value;
-    out.tcmux_status.output_is_bypassing_limits = shared_state.system_data.tc_mux_status.output_is_bypassing_limits;    
+    out.tcmux_status.active_error = (hytech_msgs_TorqueControllerMuxError_e) vcr_controls.get_tc_mux_status().active_error;
+    out.tcmux_status.active_controller_mode = (hytech_msgs_ControllerMode_e) vcr_controls.get_tc_mux_status().active_controller_mode;
+    out.tcmux_status.active_torque_limit_enum = (hytech_msgs_TorqueLimit_e) vcr_controls.get_tc_mux_status().active_torque_limit_enum;
+    out.tcmux_status.active_torque_limit_value = vcr_controls.get_tc_mux_status().active_torque_limit_value;
+    out.tcmux_status.output_is_bypassing_limits = vcr_controls.get_tc_mux_status().output_is_bypassing_limits;
 
     // Buzzer
-    out.buzzer_is_active = shared_state.system_data.buzzer_is_active;
+    out.buzzer_is_active = adc_interface.get_glv().conversion;
 
-    // GLV Measurement
-    out.measured_glv = shared_state.interface_data.current_sensor_data.twentyfour_volt_sensor;
-    
-    out.firmware_version_info.project_is_dirty = shared_state.fw_version_info.project_is_dirty;
-    out.firmware_version_info.project_on_main_or_master = shared_state.fw_version_info.project_on_main_or_master;
-    std::copy(shared_state.fw_version_info.fw_version_hash.begin(), shared_state.fw_version_info.fw_version_hash.end(), out.firmware_version_info.git_hash);
+    /* Firmware Version */
+    out.has_firmware_version_info = true;
+    out.firmware_version_info.project_is_dirty = device_status_t::project_is_dirty;
+    out.firmware_version_info.project_on_main_or_master = device_status_t::project_on_main_or_master;
+    std::copy(fw_version_hash.begin(), fw_version_hash.end(), out.firmware_version_info.git_hash);
+    out.has_msg_versions = true;
     out.msg_versions.ht_can_version = HT_CAN_LIB_VERSION;
-    
+
     // working with bytes in nanopb
     std::string_view version_view(version);
-    const size_t version_len = [&]() -> size_t {
-        return std::min(version_view.size(), sizeof(out.msg_versions.ht_proto_version.bytes));
-    }();
+    const size_t version_len = std::min(version_view.size(), sizeof(out.msg_versions.ht_proto_version.bytes));
     out.msg_versions.ht_proto_version.size = version_len;
     std::copy(version_view.begin(), version_view.begin() + version_len, std::begin(out.msg_versions.ht_proto_version.bytes));
 
-    // // VCR Status
-    out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(shared_state.system_data.vehicle_state_machine_state);
-    out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(shared_state.system_data.drivetrain_state_machine_state);
-    
-    out.status.drivebrain_controller_timing_failure = shared_state.system_data.db_cntrl_status.drivebrain_controller_timing_failure;
-    out.status.drivebrain_is_in_control = shared_state.system_data.db_cntrl_status.drivebrain_is_in_control;
-    
-    out.status.pedals_heartbeat_ok = !(VCFInterfaceInstance::instance().is_pedals_heartbeat_not_ok());
-    out.status.steering_heartbeat_ok = !(VCFInterfaceInstance::instance().is_steering_heartbeat_not_ok());
+    // VCR Status
+    // const char* state_label = "UNKNOWN";
+    out.status.vehicle_state = static_cast<hytech_msgs_VehicleState_e>(vehicle_state_machine.get_state());
+    out.status.drivetrain_state = static_cast<hytech_msgs_DrivetrainState_e>(drivetrain_system.get_state());
+
+    out.status.drivebrain_controller_timing_failure = vcr_controls.drivebrain_timing_failure();
+    out.status.drivebrain_is_in_control = vcr_controls.drivebrain_is_in_control();
+
+    out.status.pedals_heartbeat_ok = vcf_interface.get_latest_data().stamped_pedals.heartbeat_ok;
+
     return out;
 }
 
@@ -123,7 +143,7 @@ void VCREthernetInterface::receive_pb_msg_db(const hytech_msgs_MCUCommandData &m
 {
     //TODO: Finish this function. This function could parse the message and put it into shared_state, but depending
     //      on where things are defined, it might be cleaner for this function to simply return the new data. I do
-    //      not know yet. Definitely worth asking Ben.    
+    //      not know yet. Definitely worth asking Ben.
 }
 
 void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_in, VCRData_s &shared_state, unsigned long curr_millis)
@@ -139,25 +159,34 @@ void VCREthernetInterface::receive_pb_msg_vcf(const hytech_msgs_VCFData_s &msg_i
     // shared_state.interface_data.dash_input_state.preset_btn_is_pressed = msg_in.dash_input_state.preset_btn_is_pressed;
     // shared_state.interface_data.dash_input_state.start_btn_is_pressed = msg_in.dash_input_state.start_btn_is_pressed;
 }
-	
-void VCREthernetInterface::copy_inverter_data(const InverterData_s &original, hytech_msgs_InverterData_s &destination)
+
+void VCREthernetInterface::copy_inverter_data(const InverterFeedbackData_s &original, hytech_msgs_InverterData_s &destination)
 {
-    destination.actual_motor_torque = original.actual_motor_torque;
-    destination.actual_power = original.actual_power;
-    destination.commanded_torque = original.commanded_torque;
-    destination.dc_bus_voltage = original.dc_bus_voltage;
-    destination.dc_on = original.dc_on;
-    destination.derating_on = original.derating_on;
-    destination.diagnostic_number = original.diagnostic_number;
-    destination.error = original.error;
-    destination.feedback_torque = original.feedback_torque;
-    destination.igbt_temp = original.igbt_temp;
-    destination.inverter_on = original.inverter_on;
-    destination.inverter_temp = original.inverter_temp;
-    destination.motor_temp = original.motor_temp;
-    destination.quit_dc_on = original.quit_dc_on;
-    destination.quit_inverter_on = original.quit_inverter_on;
-    destination.speed_rpm = original.speed_rpm;
-    destination.system_ready = original.system_ready;
-    destination.warning = original.warning;
+    // Status
+    destination.system_ready = original.status.system_ready;
+    destination.error = original.status.error;
+    destination.warning = original.status.warning;
+    destination.quit_dc_on = original.status.quit_dc_on;
+    destination.dc_on = original.status.dc_on;
+    destination.quit_inverter_on = original.status.quit_inverter_on;
+    destination.inverter_on = original.status.inverter_on;
+    destination.derating_on = original.status.derating_on;
+    destination.dc_bus_voltage = original.status.dc_bus_voltage;
+    destination.diagnostic_number = original.status.diagnostic_number;
+
+    // Temps
+    destination.igbt_temp = original.temps.igbt_temp;
+    destination.inverter_temp = original.temps.inverter_temp;
+    destination.motor_temp = original.temps.motor_temp;
+
+    // Power
+
+    // Motor Mechanics
+    destination.actual_power = original.motor_mechanics.actual_power;
+    destination.actual_motor_torque = original.motor_mechanics.actual_torque;
+    destination.speed_rpm = original.motor_mechanics.actual_speed;
+
+    // Control Feedback
+    destination.commanded_torque = 0; //TODO: figure out if this is actually used / updated
+    destination.feedback_torque = 0; //TODO: figure out if this is actually used / updated
 }

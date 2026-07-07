@@ -1,5 +1,5 @@
 #include "controllers/SimpleLaunchController.h"
-#include <stdlib.h> /* abs */
+
 
 DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, uint32_t curr_millis)
 {
@@ -9,12 +9,12 @@ DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, 
     };
 
     const PedalsSystemData_s &pedalsData = vcr_data.interface_data.recvd_pedals_data.pedals_data;
-    
+
     int16_t brake_torque_req = static_cast<int16_t>(pedalsData.brake_percent * PhysicalParameters::MAX_REGEN_TORQUE);
 
     float max_speed = 0;
     veh_vec<speed_rpm> measured_speeds = vcr_data.system_data.drivetrain_data.measuredSpeeds;
-    std::array<float, 4> wheel_rpms = measured_speeds.as_array();    
+    std::array<float, 4> wheel_rpms = measured_speeds.as_array();
     for (int i = 0; i < 4; i++)
     {
         max_speed = std::max(max_speed, abs(wheel_rpms[i]));
@@ -65,7 +65,7 @@ DrivetrainCommand_s SimpleLaunchController::evaluate(const VCRData_s &vcr_data, 
             break;
         }
         case LaunchStates_e::LAUNCHING:
-        { 
+        {
             // use brackets to ignore 'cross initialization' of secs_since_launch
             // check accel below launch threshold and brake above
             if ((pedalsData.accel_percent <= LaunchControllerParams::launch_stop_accel_threshold) || (pedalsData.brake_percent >= LaunchControllerParams::launch_ready_brake_threshold))

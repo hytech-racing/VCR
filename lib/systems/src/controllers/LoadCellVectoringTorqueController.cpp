@@ -1,6 +1,5 @@
 #include "controllers/LoadCellVectoringTorqueController.h"
 
-#include <algorithm>
 
 DrivetrainCommand_s LoadCellVectoringTorqueController::evaluate(const VCRData_s &vcr_data, unsigned long curr_millis)
 {

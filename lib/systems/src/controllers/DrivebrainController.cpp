@@ -1,7 +1,5 @@
 #include "controllers/DrivebrainController.h"
-#include "SharedFirmwareTypes.h"
-#include "DrivetrainSystem.h"
-#include <cstdint>
+
 
 DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsigned long curr_millis)
 {
@@ -11,7 +9,7 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
     _check_drivebrain_command_timing_failure(db_telem_input, curr_millis, _telem_latency_info);
     _check_drivebrain_command_timing_failure(db_auxillary_input, curr_millis, _aux_latency_info);
     bool drivebrain_reinit_button_pressed = state.interface_data.dash_input_state.mc_reset_btn_is_pressed;
-    
+
     if (drivebrain_reinit_button_pressed && (!_should_run_controller))
     {
         _should_run_controller = true;
@@ -44,18 +42,18 @@ DrivetrainCommand_s DrivebrainController::evaluate(const VCRData_s &state, unsig
 
     if (curr_millis - _last_reset_worse_latency_clock > WORST_LATENCY_PERIOD_MS)
     {
-        _last_reset_worse_latency_clock = curr_millis; 
+        _last_reset_worse_latency_clock = curr_millis;
         _telem_latency_info.worst_period_millis = 0;
         _aux_latency_info.worst_period_millis = 0;
     }
 
     unsigned long aux_latency_millis = std::max(
-        curr_millis - db_auxillary_input.desired_speeds.last_recv_millis, 
+        curr_millis - db_auxillary_input.desired_speeds.last_recv_millis,
         curr_millis - db_auxillary_input.torque_limits.last_recv_millis
     );
 
     unsigned long telem_latency_millis = std::max(
-        curr_millis - db_telem_input.desired_speeds.last_recv_millis, 
+        curr_millis - db_telem_input.desired_speeds.last_recv_millis,
         curr_millis - db_telem_input.torque_limits.last_recv_millis
     );
 
@@ -71,7 +69,7 @@ void DrivebrainController::_check_drivebrain_command_timing_failure(StampedDrive
 
     // 1. we have not received any messages from the db (timestamped message recvd flag initialized as false in struct def)
     bool not_all_messages_recvd = ((!command.desired_speeds.recvd) || (!command.torque_limits.recvd));
-    
+
     // 2. if the time between the current VCR curr_millis time and the last millis time that we recvd a drivebrain msg is too high
     auto last_speed_setpoint_timestamp = command.desired_speeds.last_recv_millis;
     auto last_torque_lim_timestamp = command.torque_limits.last_recv_millis;

@@ -1,9 +1,16 @@
 #ifndef LAUNCH_CONTROLLER_H
 #define LAUNCH_CONTROLLER_H
+
+/* Standard Library */
+#include <stdlib.h>
+
+/* External Includes */
 #include "SharedFirmwareTypes.h"
-#include "PhysicalParameters.h"
 #include <algorithm>
 #include <math.h>
+
+/* Local Controller Includes */
+#include "PhysicalParameters.h"
 
 /// @brief Modes to define launch behavior, where each one waits for acceleration request threshold to move to next mode
 /// LAUNCH_NOT_READY keeps speed at 0 and makes sure pedals are not pressed, the launch controller begins in this state
@@ -37,8 +44,8 @@ namespace LaunchControllerParams
 
 class SimpleLaunchController
 {
-
 public:
+
     /// @brief simple TC with tunable F/R torque balance. Accel torque balance can be tuned independently of regen torque balance
     SimpleLaunchController() :
         _launch_rate_target_m_per_sec_sq(LaunchControllerParams::DEFAULT_LAUNCH_RATE_M_PER_SEC_SQ),
@@ -46,13 +53,19 @@ public:
         _launch_state(LaunchStates_e::LAUNCH_NOT_READY),
         _launch_speed_target_rpm(0),
         _init_speed_target_rpm(LaunchControllerParams::DEFAULT_INIT_SPEED_RPM)
-    { }
+    {};
 
     DrivetrainCommand_s evaluate(const VCRData_s &vcr_data, uint32_t curr_millis);
 
     LaunchStates_e get_launch_state() { return _launch_state; }
 
 private:
+
+    float _launch_rate_target_m_per_sec_sq;
+    uint32_t _time_of_launch;
+    LaunchStates_e _launch_state = LaunchStates_e::LAUNCH_NOT_READY;
+    float _launch_speed_target_rpm;
+    int16_t _init_speed_target_rpm;
 
     /// @brief calculates how speed target (the speed the car is trying to achieve during launch) is set and/or increased during launch
     /// This updates internal speed target variable _launch_speed_target_rpm
@@ -75,12 +88,6 @@ private:
         // calculated_rpm = std::min( (int) 5000, std::max(0, (int) calculated_rpm));
         return calculated_rpm;
     }
-
-    float _launch_rate_target_m_per_sec_sq;
-    uint32_t _time_of_launch;
-    LaunchStates_e _launch_state = LaunchStates_e::LAUNCH_NOT_READY;
-    float _launch_speed_target_rpm;
-    int16_t _init_speed_target_rpm;
 
 };
 

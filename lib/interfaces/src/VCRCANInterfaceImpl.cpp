@@ -1,27 +1,28 @@
 #include "VCRCANInterfaceImpl.h"
 
+
 void VCRCANInterfaceImpl::on_auxillary_can_receive(const CAN_message_t &msg)
 {
     std::array<uint8_t, CAN_MSG_SIZE> buf;
-    memmove(buf.data(), &msg, CAN_MSG_SIZE);
-    VCRCANInterfaceInstance::instance().auxillary_can_rx_buffer.push_back(buf.data(), CAN_MSG_SIZE);
+    memmove(buf.data(), &msg, sizeof(msg));
+    VCRCANInterfaceInstance::instance().rear_aux_can_rx_buffer.push_back(buf.data(), sizeof(CAN_message_t));
 }
 
 void VCRCANInterfaceImpl::on_inverter_can_receive(const CAN_message_t &msg)
 {
     std::array<uint8_t, CAN_MSG_SIZE> buf;
-    memmove(buf.data(), &msg, CAN_MSG_SIZE);
-    VCRCANInterfaceInstance::instance().inverter_can_rx_buffer.push_back(buf.data(), CAN_MSG_SIZE);
+    memmove(buf.data(), &msg, sizeof(msg));
+    VCRCANInterfaceInstance::instance().inverter_can_rx_buffer.push_back(buf.data(), sizeof(CAN_message_t));
 }
 
 void VCRCANInterfaceImpl::on_telem_can_receive(const CAN_message_t &msg)
 {
     std::array<uint8_t, CAN_MSG_SIZE> buf;
-    memmove(buf.data(), &msg, CAN_MSG_SIZE);
-    VCRCANInterfaceInstance::instance().telem_can_rx_buffer.push_back(buf.data(), CAN_MSG_SIZE);
+    memmove(buf.data(), &msg, sizeof(msg));
+    VCRCANInterfaceInstance::instance().telem_can_rx_buffer.push_back(buf.data(), sizeof(CAN_message_t));
 }
 
-void VCRCANInterfaceImpl::vcr_recv_switch(CANInterfaces_s &interfaces, const CAN_message_t &msg, uint32_t millis, CANInterfaceType_e interface_type)
+void vcr_CAN_recv_switch(CANInterfaces_s &interfaces, const CAN_message_t &msg, unsigned long millis, CANInterfaceType_e interface_type)
 {
     switch (msg.id)
     {
@@ -68,7 +69,8 @@ void VCRCANInterfaceImpl::vcr_recv_switch(CANInterfaces_s &interfaces, const CAN
             }
             break;
         }
-        case DRIVEBRAIN_SPEED_SET_INPUT_CANID: {
+        case DRIVEBRAIN_SPEED_SET_INPUT_CANID:
+        {
             if (interface_type == CANInterfaceType_e::RAUX)
             {
                 interfaces.db_interface.receive_drivebrain_speed_command_auxillary(msg, millis);
@@ -83,23 +85,28 @@ void VCRCANInterfaceImpl::vcr_recv_switch(CANInterfaces_s &interfaces, const CAN
 
         // Front Left Inverter
         {
-            case INV1_STATUS_CANID: {
+            case INV1_STATUS_CANID:
+            {
                 interfaces.fl_inverter_interface.receive_INV_STATUS(msg, millis);
                 break;
             }
-            case INV1_TEMPS_CANID: {
+            case INV1_TEMPS_CANID:
+            {
                 interfaces.fl_inverter_interface.receive_INV_TEMPS(msg, millis);
                 break;
             }
-            case INV1_DYNAMICS_CANID: {
+            case INV1_DYNAMICS_CANID:
+            {
                 interfaces.fl_inverter_interface.receive_INV_DYNAMICS(msg, millis);
                 break;
             }
-            case INV1_POWER_CANID: {
+            case INV1_POWER_CANID:
+            {
                 interfaces.fl_inverter_interface.receive_INV_POWER(msg, millis);
                 break;
             }
-            case INV1_FEEDBACK_CANID: {
+            case INV1_FEEDBACK_CANID:
+            {
                 interfaces.fl_inverter_interface.receive_INV_FEEDBACK(msg, millis);
                 break;
             }
@@ -210,3 +217,4 @@ void VCRCANInterfaceImpl::send_all_CAN_msgs(CANTXBuffer_t &buffer, FlexCAN_T4_Ba
         can_interface->write(msg);
     }
 }
+

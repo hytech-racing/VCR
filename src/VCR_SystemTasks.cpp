@@ -1,96 +1,130 @@
-#include "FlexCAN_T4.h"
-#include "VCR_Globals.h"
-#include "etl/delegate.h"
-
-#include "CANInterface.h"
-#include "SharedFirmwareTypes.h"
-
-#include "VCFInterface.h"
-#include "ACUInterface.h"
-#include "VCREthernetInterface.h"
-#include "VCRCANInterfaceImpl.h"
 #include "VCR_SystemTasks.h"
-#include <string>
 
 
-VCRInterfaceData_s sample_async_data(
-    etl::delegate<void(CANInterfaces_s &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> recv_call,
-    VCRAsynchronousInterfaces &interface_ref_container, const VCRInterfaceData_s &cur_vcr_int_data)
+DrivetrainSystem::InverterFuncts_s fl_inverter_functs = {
+    .set_speed = [](float rpm, float torque_nm) { fl_inverter_interface.set_speed(rpm, torque_nm); },
+    .set_idle = []() { fl_inverter_interface.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s cw) { fl_inverter_interface.set_inverter_control_word(cw); },
+    .get_status = []() { return fl_inverter_interface.get_status(); },
+    .get_motor_mechanics = []() { return fl_inverter_interface.get_motor_mechanics(); }
+};
+
+DrivetrainSystem::InverterFuncts_s fr_inverter_functs = {
+    .set_speed = [](float rpm, float torque_nm) { fr_inverter_interface.set_speed(rpm, torque_nm); },
+    .set_idle = []() { fr_inverter_interface.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s cw) { fr_inverter_interface.set_inverter_control_word(cw); },
+    .get_status = []() { return fr_inverter_interface.get_status(); },
+    .get_motor_mechanics = []() { return fr_inverter_interface.get_motor_mechanics(); }
+};
+
+DrivetrainSystem::InverterFuncts_s rl_inverter_functs = {
+    .set_speed = [](float rpm, float torque_nm) { rl_inverter_interface.set_speed(rpm, torque_nm); },
+    .set_idle = []() { rl_inverter_interface.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s cw) { rl_inverter_interface.set_inverter_control_word(cw); },
+    .get_status = []() { return rl_inverter_interface.get_status(); },
+    .get_motor_mechanics = []() { return rl_inverter_interface.get_motor_mechanics(); }
+};
+
+DrivetrainSystem::InverterFuncts_s rr_inverter_functs = {
+    .set_speed = [](float rpm, float torque_nm) { rr_inverter_interface.set_speed(rpm, torque_nm); },
+    .set_idle = []() { rr_inverter_interface.set_idle(); },
+    .set_inverter_control_word = [](InverterControlWord_s cw) { rr_inverter_interface.set_inverter_control_word(cw); },
+    .get_status = []() { return rr_inverter_interface.get_status(); },
+    .get_motor_mechanics = []() { return rr_inverter_interface.get_motor_mechanics(); }
+};
+
+veh_vec<DrivetrainSystem::InverterFuncts_s> inverter_functs(fl_inverter_functs, fr_inverter_functs, rl_inverter_functs, rr_inverter_functs);
+
+etl::delegate<void(bool)> set_ef_pin_active = etl::delegate<void(bool)>::create(
+    [](bool set_active) { digitalWrite(VCRInterfaces::INVERTER_ENABLE_PIN, static_cast<int>(set_active)); });
+
+
+void initialize_all_systems()
 {
-    VCRInterfaceData_s ret = cur_vcr_int_data;
-    // process ring buffer is from CANInterface. TODO put into namespace
-    process_ring_buffer(VCRCANInterfaceInstance::instance().inverter_can_rx_buffer, interface_ref_container.can_interfaces,
-                        sys_time::hal_millis(), recv_call, CANInterfaceType_e::INVERTER);
-    process_ring_buffer(VCRCANInterfaceInstance::instance().telem_can_rx_buffer, interface_ref_container.can_interfaces,
-                        sys_time::hal_millis(), recv_call, CANInterfaceType_e::TELEM);
-    process_ring_buffer(VCRCANInterfaceInstance::instance().auxillary_can_rx_buffer, interface_ref_container.can_interfaces,
-                        sys_time::hal_millis(), recv_call, CANInterfaceType_e::RAUX);
+    /* Delegate Function Definitions */
+    etl::delegate<bool()> hv_over_threshold =
+        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::hv_over_threshold>(DrivetrainInstance::instance());
 
-    auto vcf_data = interface_ref_container.can_interfaces.vcf_interface.get_latest_data();
-    auto acu_data = interface_ref_container.can_interfaces.acu_interface.get_latest_data(sys_time::hal_millis());
-    auto drivebrain_telem_data = interface_ref_container.can_interfaces.db_interface.get_latest_telem_drivebrain_command();
-    auto drivebrain_auxillary_data = interface_ref_container.can_interfaces.db_interface.get_latest_auxillary_drivebrain_command();
+    etl::delegate<bool()> start_button_pressed =
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_start_button_pressed>(VCFInterfaceInstance::instance());
 
-    auto fl_inv_mechanics = interface_ref_container.can_interfaces.fl_inverter_interface.get_motor_mechanics();
-    auto fr_inv_mechanics = interface_ref_container.can_interfaces.fr_inverter_interface.get_motor_mechanics();
-    auto rl_inv_mechanics = interface_ref_container.can_interfaces.rl_inverter_interface.get_motor_mechanics();
-    auto rr_inv_mechanics = interface_ref_container.can_interfaces.rr_inverter_interface.get_motor_mechanics();
+    etl::delegate<bool()> brake_pressed =
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_brake_pressed>(VCFInterfaceInstance::instance());
 
-    auto fl_inv_status = interface_ref_container.can_interfaces.fl_inverter_interface.get_status();
-    auto fr_inv_status = interface_ref_container.can_interfaces.fr_inverter_interface.get_status();
-    auto rl_inv_status = interface_ref_container.can_interfaces.rl_inverter_interface.get_status();
-    auto rr_inv_status = interface_ref_container.can_interfaces.rr_inverter_interface.get_status();
+    etl::delegate<bool()> drivetrain_error_present =
+        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_error_present>(DrivetrainInstance::instance());
 
-    ret.inverter_data.FL.speed_rpm = fl_inv_mechanics.actual_speed;
-    ret.inverter_data.FR.speed_rpm = fr_inv_mechanics.actual_speed;
-    ret.inverter_data.RL.speed_rpm = rl_inv_mechanics.actual_speed;
-    ret.inverter_data.RR.speed_rpm = rr_inv_mechanics.actual_speed;
+    etl::delegate<bool()> drivetrain_ready =
+        etl::delegate<bool()>::create<DrivetrainSystem, &DrivetrainSystem::drivetrain_ready>(DrivetrainInstance::instance());
 
-    ret.inverter_data.FL.dc_bus_voltage = fl_inv_status.dc_bus_voltage;
-    ret.inverter_data.FR.dc_bus_voltage = fr_inv_status.dc_bus_voltage;
-    ret.inverter_data.RL.dc_bus_voltage = rl_inv_status.dc_bus_voltage;
-    ret.inverter_data.RR.dc_bus_voltage = rr_inv_status.dc_bus_voltage;
+    etl::delegate<void()> send_buzzer_start_message =
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_buzzer_start_message>(VCFInterfaceInstance::instance());
 
-    ret.recvd_pedals_data = vcf_data.stamped_pedals;
-    ret.front_loadcell_data = vcf_data.front_loadcell_data;
-    ret.front_suspot_data = vcf_data.front_suspot_data;
-    ret.dash_input_state = vcf_data.dash_input_state;
-    ret.latest_drivebrain_telem_command = drivebrain_telem_data;
-    ret.latest_drivebrain_auxillary_command = drivebrain_auxillary_data;
+    etl::delegate<void()> send_recalibrate_pedals_message =
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_recalibrate_pedals_message>(VCFInterfaceInstance::instance());
 
-    return ret;
+    etl::delegate<void(bool, bool)> handle_drivetrain_command =
+        etl::delegate<void(bool, bool)>::create<VCRControls, &VCRControls::handle_drivetrain_command>(VCRControlsInstance::instance());
+
+    etl::delegate<bool()> pedals_heartbeat_not_ok =
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_pedals_heartbeat_not_ok>(VCFInterfaceInstance::instance());
+
+    etl::delegate<void()> reset_pedals_heartbeat =
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_pedals_heartbeat>(VCFInterfaceInstance::instance());
+
+    etl::delegate<bool()> drivetrain_reset_pressed =
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_drivetrain_reset_pressed>(VCFInterfaceInstance::instance());
+
+    etl::delegate<bool()> recalibrate_pedals_button_pressed =
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_recalibrate_pedals_button_pressed>(VCFInterfaceInstance::instance());
+
+    etl::delegate<void()> reset_dt_error =
+        etl::delegate<void()>::create<DrivetrainSystem, &DrivetrainSystem::reset_dt_error>(DrivetrainInstance::instance());
+
+    etl::delegate<void()> send_recalibrate_steering_message =
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::send_recalibrate_steering_message>(VCFInterfaceInstance::instance());
+
+    etl::delegate<bool()> recalibrate_steering_button_pressed =
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_recalibrate_steering_button_pressed>(VCFInterfaceInstance::instance());
+
+    etl::delegate<bool()> steering_heartbeat_not_ok =
+        etl::delegate<bool()>::create<VCFInterface, &VCFInterface::is_steering_heartbeat_not_ok>(VCFInterfaceInstance::instance());
+
+    etl::delegate<void()> reset_steering_heartbeat =
+        etl::delegate<void()>::create<VCFInterface, &VCFInterface::reset_steering_heartbeat>(VCFInterfaceInstance::instance());
+
+    VehicleStateMachineInstance::create(hv_over_threshold,
+                                    start_button_pressed,
+                                    brake_pressed,
+                                    drivetrain_error_present,
+                                    drivetrain_ready,
+                                    send_buzzer_start_message,
+                                    send_recalibrate_pedals_message,
+                                    handle_drivetrain_command,
+                                    pedals_heartbeat_not_ok,
+                                    reset_pedals_heartbeat,
+                                    drivetrain_reset_pressed,
+                                    recalibrate_pedals_button_pressed,
+                                    reset_dt_error,
+                                    send_recalibrate_steering_message,
+                                    recalibrate_steering_button_pressed,
+                                    steering_heartbeat_not_ok,
+                                    reset_steering_heartbeat
+    );
+
+    /* ---------- Drivebrain Control System ---------- */
+    VCRControlsInstance::create(&DrivetrainInstance::instance(), VCRSystems::MAX_ALLOWED_DB_LATENCY_MS);
+
+    /* ---------- Drivetrain System ---------- */
+    DrivetrainInstance::create(inverter_functs, set_ef_pin_active);
 }
 
-HT_TASK::TaskResponse run_async_main_task(const unsigned long& sysMicros, const HT_TASK::TaskInfo& taskInfo)
-{
+/**
+ * TODO: Understand asyn better, but not sure ticking state machine needs to/should go there.
+ */
+// HT_TASK::TaskResponse tick_state_machine(const unsigned long &sysMicros, const HT_TASK::TaskInfo &taskInfo)
+// {
+//     VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
 
-    etl::delegate<void(CANInterfaces_s &, const CAN_message_t &, unsigned long, CANInterfaceType_e)> main_can_recv = etl::delegate<void(CANInterfaces_s &, const CAN_message_t &, uint32_t, CANInterfaceType_e)>::create<VCRCANInterfaceImpl::vcr_recv_switch>();
-
-    bool torque_mode_cycle_button_was_pressed = vcr_data.interface_data.dash_input_state.BUTTON_2;
-
-    VCRInterfaceData_s new_interface_data = sample_async_data(main_can_recv, VCRAsynchronousInterfacesInstance::instance(), vcr_data.interface_data);
-
-    vcr_data.system_data.drivetrain_data.measuredSpeeds = {new_interface_data.inverter_data.FL.speed_rpm, new_interface_data.inverter_data.FR.speed_rpm, new_interface_data.inverter_data.RL.speed_rpm, new_interface_data.inverter_data.RR.speed_rpm};
-    vcr_data.system_data.drivetrain_data.measuredInverterFLPackVoltage = new_interface_data.inverter_data.FL.dc_bus_voltage;
-
-    // If torque button was released (it was pressed before updating and now it's not)
-    if (torque_mode_cycle_button_was_pressed && !new_interface_data.dash_input_state.BUTTON_2)
-    {
-        VCRControlsInstance::instance().cycle_torque_limit();
-        VCFInterfaceInstance::instance().enqueue_torque_mode_LED_message(VCRControlsInstance::instance().get_current_torque_limit());
-    }
-
-    auto tc_mux_status = VCRControlsInstance::instance().get_tc_mux_status();
-    vcr_data.system_data.tc_mux_status = tc_mux_status;
-
-    vcr_data.system_data.vehicle_state_machine_state = VehicleStateMachineInstance::instance().tick_state_machine(sys_time::hal_millis());
-
-    vcr_data.system_data.drivetrain_state_machine_state = DrivetrainInstance::instance().get_state();
-
-    vcr_data.interface_data = new_interface_data;
-
-    vcr_data.system_data.db_cntrl_status.drivebrain_is_in_control = VCRControlsInstance::instance().drivebrain_is_in_control();
-    vcr_data.system_data.db_cntrl_status.drivebrain_controller_timing_failure = VCRControlsInstance::instance().drivebrain_timing_failure();
-
-    return HT_TASK::TaskResponse::YIELD;
-}
+//     return HT_TASK::TaskResponse::YIELD;
+// }
