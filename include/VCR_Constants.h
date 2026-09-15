@@ -139,4 +139,13 @@ constexpr unsigned long main_task_priority = 0;
 constexpr unsigned long update_brakelight_priority = 20;
 constexpr unsigned long update_brakelight_period_us = 50000UL;       // 50 000 us = 20 Hz
 
+namespace VCRConversions {
+    constexpr float GEARBOX_RATIO = 11.86;
+    constexpr float WHEEL_DIAMETER = 0.4064;
+    constexpr float RPM_TO_METERS_PER_SECOND = WHEEL_DIAMETER * 3.1415 / GEARBOX_RATIO / 60.0;
+    constexpr float METERS_PER_SECOND_TO_MPH = 2.2369;
+}
+
+constexpr float FAN_CUTOFF_THRESH_MPH = 30.0;
+
 #endif /* VCR_CONSTANTS */

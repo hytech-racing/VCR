@@ -261,7 +261,8 @@ HT_TASK::TaskResponse enable_motor_cooling(const unsigned long& sysMicros, const
     bool enable_state = vehicle_state == VehicleState_e::READY_TO_DRIVE ||
                         vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2 || 
                         vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_3;
-    digitalWrite(MOTOR_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
+    bool disable_state = FAN_CUTOFF_THRESH_MPH < (vcr_data.interface_data.inverter_data.FL.speed_rpm * VCRConversions::RPM_TO_METERS_PER_SECOND * VCRConversions::METERS_PER_SECOND_TO_MPH);
+    digitalWrite(MOTOR_COOLING_CONTROL_PIN, (enable_state && !disable_state) ? HIGH : LOW);
     return HT_TASK::TaskResponse::YIELD;
 }
 
@@ -273,7 +274,8 @@ HT_TASK::TaskResponse enable_inverter_cooling(const unsigned long& sysMicros, co
                         vehicle_state == VehicleState_e::READY_TO_DRIVE ||
                         vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_2 ||
                         vcr_data.interface_data.dash_input_state.dial_state == ControllerMode_e::MODE_5;
-    digitalWrite(INVERTER_COOLING_CONTROL_PIN, enable_state ? HIGH : LOW);
+    bool disable_state = FAN_CUTOFF_THRESH_MPH < (vcr_data.interface_data.inverter_data.FL.speed_rpm * VCRConversions::RPM_TO_METERS_PER_SECOND * VCRConversions::METERS_PER_SECOND_TO_MPH);
+    digitalWrite(INVERTER_COOLING_CONTROL_PIN, (enable_state && !disable_state) ? HIGH : LOW);
     
     return HT_TASK::TaskResponse::YIELD;
 }
