@@ -6,6 +6,18 @@
 FlexCAN_T4<CAN2> MAIN_CAN;
 const uint32_t CAN_BAUDRATE = 500000;
 
+
+void setOperationalMode() {
+    SET_OPERATING_MODE_t set_operating_mode_msg;
+    set_operating_mode_msg.requested_state = 0x01;
+    set_operating_mode_msg.target_node = 0x011;
+
+    CAN_message_t msg;
+    msg.id = Pack_SET_OPERATING_MODE_ht_can(&set_operating_mode_msg, msg.buf, &msg.len, (uint8_t *) &msg.flags.extended);
+
+    MAIN_CAN.write(msg);
+}
+
 void on_recv(const CAN_message_t &msg)
 {
     // Serial.print("MB: "); Serial.print(msg.mb);
@@ -43,17 +55,6 @@ void on_recv(const CAN_message_t &msg)
             Serial.println("unrecognized msg");
         break;
     }
-}
-
-void setOperationalMode() {
-    SET_OPERATING_MODE_t set_operating_mode_msg;
-    set_operating_mode_msg.requested_state = 0x01;
-    set_operating_mode_msg.target_node = 0x011;
-
-    CAN_message_t msg;
-    msg.id = Pack_SET_OPERATING_MODE_ht_can(&set_operating_mode_msg, msg.buf, &msg.len, (uint8_t *) &msg.flags.extended);
-
-    MAIN_CAN.write(msg);
 }
 
 void setup()
