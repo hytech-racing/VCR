@@ -5,7 +5,7 @@
 #include "CANInterface.h"
 #include "VCRCANInterfaceImpl.h"
 
-#include "hytech.h" // HT_can
+#include "ht_can.h" // HT_can
 
 #include "hytech_msgs.pb.h"
 #include <cstdint>
@@ -40,7 +40,7 @@ void DrivebrainInterface::receive_drivebrain_speed_command_telem(const CAN_messa
                                                            unsigned long curr_millis) {
     DRIVEBRAIN_SPEED_SET_INPUT_t drivebrain_msg;
 
-    Unpack_DRIVEBRAIN_SPEED_SET_INPUT_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+    Unpack_DRIVEBRAIN_SPEED_SET_INPUT_ht_can(&drivebrain_msg, &msg.buf[0], msg.len);
 
     _latest_drivebrain_command_telem.desired_speeds.recvd = true;
     _latest_drivebrain_command_telem.desired_speeds.last_recv_millis = curr_millis;
@@ -56,20 +56,20 @@ void DrivebrainInterface::receive_drivebrain_torque_lim_command_telem(const CAN_
                                                                 unsigned long curr_millis) {
     DRIVEBRAIN_TORQUE_LIM_INPUT_t drivebrain_msg;
 
-    Unpack_DRIVEBRAIN_TORQUE_LIM_INPUT_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+    Unpack_DRIVEBRAIN_TORQUE_LIM_INPUT_ht_can(&drivebrain_msg, &msg.buf[0], msg.len);
 
     _latest_drivebrain_command_telem.torque_limits.recvd = true;
     _latest_drivebrain_command_telem.torque_limits.last_recv_millis = curr_millis;
 
     _latest_drivebrain_command_telem.torque_limits.veh_vec_data = {
         static_cast<float>(
-            HYTECH_drivebrain_torque_fl_ro_fromS(drivebrain_msg.drivebrain_torque_fl_ro)),
+            HT_CAN_drivebrain_torque_fl_ro_fromS(drivebrain_msg.drivebrain_torque_fl_ro)),
         static_cast<float>(
-            HYTECH_drivebrain_torque_fr_ro_fromS(drivebrain_msg.drivebrain_torque_fr_ro)),
+            HT_CAN_drivebrain_torque_fr_ro_fromS(drivebrain_msg.drivebrain_torque_fr_ro)),
         static_cast<float>(
-            HYTECH_drivebrain_torque_rl_ro_fromS(drivebrain_msg.drivebrain_torque_rl_ro)),
+            HT_CAN_drivebrain_torque_rl_ro_fromS(drivebrain_msg.drivebrain_torque_rl_ro)),
         static_cast<float>(
-            HYTECH_drivebrain_torque_rr_ro_fromS(drivebrain_msg.drivebrain_torque_rr_ro))};
+            HT_CAN_drivebrain_torque_rr_ro_fromS(drivebrain_msg.drivebrain_torque_rr_ro))};
 }
 
 
@@ -77,7 +77,7 @@ void DrivebrainInterface::receive_drivebrain_speed_command_auxillary(const CAN_m
                                                            unsigned long curr_millis) {
     DRIVEBRAIN_SPEED_SET_INPUT_t drivebrain_msg;
 
-    Unpack_DRIVEBRAIN_SPEED_SET_INPUT_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+    Unpack_DRIVEBRAIN_SPEED_SET_INPUT_ht_can(&drivebrain_msg, &msg.buf[0], msg.len);
 
     _latest_drivebrain_command_auxillary.desired_speeds.recvd = true;
     _latest_drivebrain_command_auxillary.desired_speeds.last_recv_millis = curr_millis;
@@ -93,20 +93,20 @@ void DrivebrainInterface::receive_drivebrain_torque_lim_command_auxillary(const 
                                                                 unsigned long curr_millis) {
     DRIVEBRAIN_TORQUE_LIM_INPUT_t drivebrain_msg;
 
-    Unpack_DRIVEBRAIN_TORQUE_LIM_INPUT_hytech(&drivebrain_msg, &msg.buf[0], msg.len);
+    Unpack_DRIVEBRAIN_TORQUE_LIM_INPUT_ht_can(&drivebrain_msg, &msg.buf[0], msg.len);
 
     _latest_drivebrain_command_auxillary.torque_limits.recvd = true;
     _latest_drivebrain_command_auxillary.torque_limits.last_recv_millis = curr_millis;
 
     _latest_drivebrain_command_auxillary.torque_limits.veh_vec_data = {
         static_cast<float>(
-            HYTECH_drivebrain_torque_fl_ro_fromS(drivebrain_msg.drivebrain_torque_fl_ro)),
+            HT_CAN_drivebrain_torque_fl_ro_fromS(drivebrain_msg.drivebrain_torque_fl_ro)),
         static_cast<float>(
-            HYTECH_drivebrain_torque_fr_ro_fromS(drivebrain_msg.drivebrain_torque_fr_ro)),
+            HT_CAN_drivebrain_torque_fr_ro_fromS(drivebrain_msg.drivebrain_torque_fr_ro)),
         static_cast<float>(
-            HYTECH_drivebrain_torque_rl_ro_fromS(drivebrain_msg.drivebrain_torque_rl_ro)),
+            HT_CAN_drivebrain_torque_rl_ro_fromS(drivebrain_msg.drivebrain_torque_rl_ro)),
         static_cast<float>(
-            HYTECH_drivebrain_torque_rr_ro_fromS(drivebrain_msg.drivebrain_torque_rr_ro))};
+            HT_CAN_drivebrain_torque_rr_ro_fromS(drivebrain_msg.drivebrain_torque_rr_ro))};
 }
 
 void DrivebrainInterface::handle_enqueue_suspension_CAN_data(ADCInterface &instance) {
@@ -114,24 +114,24 @@ void DrivebrainInterface::handle_enqueue_suspension_CAN_data(ADCInterface &insta
     
     rear_sus_msg.rl_load_cell = _suspension_data.rear_load_cell_data.RL_loadcell_analog;
     rear_sus_msg.rr_load_cell = _suspension_data.rear_load_cell_data.RR_loadcell_analog;
-    rear_sus_msg.rl_shock_pot_ro = HYTECH_rl_shock_pot_ro_toS(instance.get_filtered_RL_sus_pot());
-    rear_sus_msg.rr_shock_pot_ro = HYTECH_rr_shock_pot_ro_toS(instance.get_filtered_RR_sus_pot());
+    rear_sus_msg.rl_shock_pot_ro = HT_CAN_rl_shock_pot_ro_toS(instance.get_filtered_RL_sus_pot());
+    rear_sus_msg.rr_shock_pot_ro = HT_CAN_rr_shock_pot_ro_toS(instance.get_filtered_RR_sus_pot());
     
-    CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_hytech,
+    CAN_util::enqueue_msg(&rear_sus_msg, &Pack_REAR_SUSPENSION_ht_can,
                           VCRCANInterfaceImpl::telem_can_tx_buffer); 
 }
 
 void DrivebrainInterface::handle_enqueue_coolant_temp_CAN_data() {
     REAR_THERMISTORS_DATA_t thermistor_msg;
-    thermistor_msg.thermistor_0_deg_C_ro = HYTECH_thermistor_0_deg_C_ro_toS(_thermistor_data.coolant_temperature_0_data.thermistor_degrees_C);
-    thermistor_msg.thermistor_1_deg_C_ro = HYTECH_thermistor_1_deg_C_ro_toS(_thermistor_data.coolant_temperature_1_data.thermistor_degrees_C);
-    CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+    thermistor_msg.thermistor_0_deg_C_ro = HT_CAN_thermistor_0_deg_C_ro_toS(_thermistor_data.coolant_temperature_0_data.thermistor_degrees_C);
+    thermistor_msg.thermistor_1_deg_C_ro = HT_CAN_thermistor_1_deg_C_ro_toS(_thermistor_data.coolant_temperature_1_data.thermistor_degrees_C);
+    CAN_util::enqueue_msg(&thermistor_msg, &Pack_REAR_THERMISTORS_DATA_ht_can, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
 void DrivebrainInterface::handle_enqueue_flowmeter_CAN_data() {
   FLOWMETER_DATA_t flowmeter_msg;
   flowmeter_msg.flow_rate = static_cast<int>(_flowmeter_data.flowmeter_gallons_per_min);
-  CAN_util::enqueue_msg(&flowmeter_msg, &Pack_FLOWMETER_DATA_hytech, VCRCANInterfaceImpl::telem_can_tx_buffer);
+  CAN_util::enqueue_msg(&flowmeter_msg, &Pack_FLOWMETER_DATA_ht_can, VCRCANInterfaceImpl::telem_can_tx_buffer);
 }
 
 void DrivebrainInterface::handle_send_ethernet_data(const hytech_msgs_VCRData_s &data) {

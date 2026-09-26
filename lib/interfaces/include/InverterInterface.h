@@ -4,7 +4,7 @@
 
 #include "FlexCAN_T4.h"
 
-#include <hytech.h>
+#include <ht_can.h>
 #include "DrivetrainSystem.h"
 #include <CANInterface.h>
 #include <shared_types.h>

@@ -1,7 +1,7 @@
 #include "controls.h"
 #include "SharedFirmwareTypes.h"
 #include "VCR_Globals.h"
-#include "hytech.h"
+#include "ht_can.h"
 #include "VCRCANInterfaceImpl.h"
 #include "CANInterface.h"
 
@@ -66,7 +66,7 @@ void VCRControls::send_controls_can_messages() {
     status_msg.db_aux_timing_fault = aux_latency_info.timing_failure;
     status_msg.db_telem_timing_fault = telem_latency_info.timing_failure;
 
-    CAN_util::enqueue_msg(&status_msg, &Pack_DRIVEBRAIN_LATENCY_STATUSES_hytech,
+    CAN_util::enqueue_msg(&status_msg, &Pack_DRIVEBRAIN_LATENCY_STATUSES_ht_can,
                           VCRCANInterfaceImpl::telem_can_tx_buffer);
 
     // Enqueue latency periods 
@@ -75,6 +75,6 @@ void VCRControls::send_controls_can_messages() {
     latency_msg.aux_latency_millis = static_cast<int>(aux_latency_info.worst_period_millis);
     latency_msg.telem_latency_millis = static_cast<int>(telem_latency_info.worst_period_millis);
 
-    CAN_util::enqueue_msg(&latency_msg, &Pack_DRIVEBRAIN_LATENCY_TIMES_hytech,
+    CAN_util::enqueue_msg(&latency_msg, &Pack_DRIVEBRAIN_LATENCY_TIMES_ht_can,
                           VCRCANInterfaceImpl::telem_can_tx_buffer);
 }

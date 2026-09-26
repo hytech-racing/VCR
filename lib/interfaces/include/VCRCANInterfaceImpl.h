@@ -15,7 +15,7 @@
 
 #include "SharedFirmwareTypes.h"
 
-#include "hytech.h" // generated CAN library
+#include "ht_can.h" // generated CAN library
 #include "shared_types.h"
 
 #include "DrivebrainInterface.h"

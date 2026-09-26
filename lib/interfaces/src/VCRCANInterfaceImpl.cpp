@@ -1,6 +1,6 @@
 #include "VCRCANInterfaceImpl.h"
 
-#include "hytech.h"
+#include "ht_can.h"
 #include <cstdint>
 
 namespace VCRCANInterfaceImpl
